@@ -1,0 +1,34 @@
+/* Global styles */
+:root {
+    --primary: #4f46e5;
+    --secondary: #f59e0b;
+}
+
+body {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+}
+
+.card-custom {
+    border: none;
+    border-radius: 16px;
+    transition: transform .2s, box-shadow .2s;
+}
+
+.card-custom:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 30px rgba(0,0,0,.08);
+}
+
+.star-rating {
+    color: #f59e0b;
+}
+
+.btn-primary {
+    background: var(--primary);
+    border-color: var(--primary);
+}
+
+.btn-primary:hover {
+    background: #4338ca;
+    border-color: #4338ca;
+}
