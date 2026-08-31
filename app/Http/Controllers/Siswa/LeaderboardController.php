@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Siswa;
 use App\Http\Controllers\Controller;
 use App\Models\Guru;
 use App\Models\Kelas;
+use App\Models\Penilaian;
 use App\Models\Periode;
 use Illuminate\Http\Request;
 
@@ -12,70 +13,49 @@ class LeaderboardController extends Controller
 {
     public function index(Request $request)
     {
+        $user = auth()->user();
         $periodeAktif = Periode::where('status', 'aktif')->first();
+        $periodeId = $periodeAktif?->id;
+
+        $filterKategori = $request->get('kategori', 'semua');
         $filterKelasId = $request->get('kelas_id', null);
 
-        // 1. TOP 3 GLOBAL (Semua Kelas)
-        $top3Global = Guru::with('jurusan')
-            ->where('total_penilaian', '>', 0)
-            ->get()
-            ->sortByDesc(function($guru) {
-                return ($guru->rata_rata_nilai * 0.7) + ($guru->rasio_penilaian * 0.3);
-            })
-            ->values()
-            ->take(3);
-
-        // 2. TOP 10 GLOBAL
-        $top10Global = Guru::with('jurusan')
-            ->where('total_penilaian', '>', 0)
-            ->get()
-            ->sortByDesc(function($guru) {
-                return ($guru->rata_rata_nilai * 0.7) + ($guru->rasio_penilaian * 0.3);
-            })
-            ->values()
-            ->take(10);
-
-        // 3. STATISTIK PER KELAS (TERPISAH NORMADA & PRODUKTIF)
-        $kelasList = Kelas::with('jurusan')->orderBy('tingkat')->orderBy('nama_kelas')->get();
-        
-        $statistikPerKelas = [];
-        foreach ($kelasList as $kelas) {
-            $guruNormada = $kelas->guru()
-                ->where('kategori', 'normada')
-                ->withCount(['penilaian' => function($q) use ($periodeAktif) {
-                    if ($periodeAktif) $q->where('periode_id', $periodeAktif->id);
-                }])
-                ->get()
-                ->sortByDesc('rata_rata_nilai')
-                ->values();
-
-            $guruProduktif = $kelas->guru()
-                ->where('kategori', 'produktif')
-                ->withCount(['penilaian' => function($q) use ($periodeAktif) {
-                    if ($periodeAktif) $q->where('periode_id', $periodeAktif->id);
-                }])
-                ->get()
-                ->sortByDesc('rata_rata_nilai')
-                ->values();
-            
-            $statistikPerKelas[$kelas->id] = [
-                'kelas' => $kelas,
-                'normada' => $guruNormada,
-                'produktif' => $guruProduktif,
-            ];
+        if (!$filterKelasId) {
+            $filterKelasId = $user->kelas()
+                ->wherePivot('tahun_ajaran', $periodeAktif?->tahun_ajaran)
+                ->value('kelas_id');
         }
 
-        $kelasAktifStats = $filterKelasId && isset($statistikPerKelas[$filterKelasId]) 
-            ? $statistikPerKelas[$filterKelasId] 
-            : (count($statistikPerKelas) > 0 ? reset($statistikPerKelas) : null);
+        $query = Guru::query();
+        if ($filterKategori === 'normada') {
+            $query->where('kategori', 'normada');
+        } elseif ($filterKategori === 'produktif') {
+            $query->where('kategori', 'produktif');
+        }
+
+        if ($filterKelasId) {
+            $query->whereHas('kelas', function($q) use ($filterKelasId) {
+                $q->where('kelas.id', $filterKelasId);
+            });
+        }
+
+        $guruList = $query->get();
+
+        $guruWithData = $guruList->map(function($guru) use ($filterKelasId, $periodeId) {
+            $guru->persentase = $guru->getPersentasePartisipasiDiKelas($filterKelasId, $periodeId);
+            $guru->jumlah_siswa = $guru->getJumlahSiswaMenilaiDiKelas($filterKelasId, $periodeId);
+            $guru->total_siswa = Kelas::find($filterKelasId)?->jumlah_siswa ?? 0;
+            $guru->rata_evaluasi = $guru->getRataRataEvaluasiDiKelas($filterKelasId, $periodeId);
+            return $guru;
+        });
+
+        $rankedGuru = $guruWithData->sortByDesc('persentase')->values();
+        $top3 = $rankedGuru->take(3);
+
+        $semuaKelas = Kelas::with('jurusan')->orderBy('tingkat')->orderBy('nama_kelas')->get();
 
         return view('siswa.leaderboard.index', compact(
-            'top3Global',
-            'top10Global',
-            'kelasList',
-            'statistikPerKelas',
-            'kelasAktifStats',
-            'filterKelasId'
+            'top3', 'rankedGuru', 'semuaKelas', 'filterKategori', 'filterKelasId'
         ));
     }
 }

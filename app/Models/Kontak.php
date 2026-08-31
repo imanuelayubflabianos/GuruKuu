@@ -11,7 +11,6 @@ class Kontak extends Model
 
     protected $table = 'kontak';
 
-    // WAJIB: Semua kolom yang bisa di-update harus ada di sini
     protected $fillable = [
         'pengirim',
         'identifier',
@@ -19,6 +18,12 @@ class Kontak extends Model
         'balasan',
         'is_siswa',
         'is_read',
-        'is_replied'
+        'is_replied',
+    ];
+
+    protected $casts = [
+        'is_siswa' => 'boolean',
+        'is_read' => 'boolean',
+        'is_replied' => 'boolean',
     ];
 }

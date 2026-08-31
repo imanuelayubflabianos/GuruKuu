@@ -63,12 +63,13 @@
     </div>
 </section>
 
-{{-- 3. GURU FAVORIT / LEADERBOARD (id="guru") --}}
+{{-- 3. GURU FAVORIT / LEADERBOARD (id="guru") - MENGGUNAKAN PERSENTASE PARTISIPASI --}}
 <section id="guru" class="section-padding" style="background: var(--bg-light);">
     <div class="container">
         <div class="text-center mb-5" data-aos="fade-up">
             <div class="section-label">PENCAPAIAN TERBAIK</div>
-            <h2 class="section-title">Guru Favorit Periode Ini</h2>
+            <h2 class="section-title">Guru dengan Partisipasi Tertinggi</h2>
+            <p class="text-muted">Guru dengan persentase partisipasi penilaian tertinggi dari siswa</p>
         </div>
 
         <ul class="nav nav-pills justify-content-center mb-5" role="tablist" data-aos="fade-up">
@@ -78,8 +79,24 @@
 
         <div class="tab-content">
             @php
-                $topNormada = \App\Models\Guru::with('jurusan')->normada()->terbaik(3)->get();
-                $topProduktif = \App\Models\Guru::with('jurusan')->produktif()->terbaik(3)->get();
+                // Ambil guru dengan persentase partisipasi tertinggi
+                $allNormada = \App\Models\Guru::with('jurusan')->where('kategori', 'normada')->where('total_penilaian', '>', 0)->get();
+                $allProduktif = \App\Models\Guru::with('jurusan')->where('kategori', 'produktif')->where('total_penilaian', '>', 0)->get();
+                
+                // Hitung persentase partisipasi untuk setiap guru
+                $topNormada = $allNormada->map(function($guru) {
+                    $totalSiswa = $guru->kelas->sum('jumlah_siswa');
+                    $jumlahMenilai = $guru->total_penilaian;
+                    $guru->persentase = $totalSiswa > 0 ? round(($jumlahMenilai / $totalSiswa) * 100, 1) : 0;
+                    return $guru;
+                })->sortByDesc('persentase')->take(3)->values();
+                
+                $topProduktif = $allProduktif->map(function($guru) {
+                    $totalSiswa = $guru->kelas->sum('jumlah_siswa');
+                    $jumlahMenilai = $guru->total_penilaian;
+                    $guru->persentase = $totalSiswa > 0 ? round(($jumlahMenilai / $totalSiswa) * 100, 1) : 0;
+                    return $guru;
+                })->sortByDesc('persentase')->take(3)->values();
             @endphp
 
             @foreach(['normada' => $topNormada, 'produktif' => $topProduktif] as $key => $list)
@@ -94,11 +111,15 @@
                                     <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill" style="background: #C0C0C0; color: #fff; font-size: 0.9rem; padding: 0.5rem 0.75rem;">#2</span>
                                 </div>
                                 <h6 class="fw-bold mb-1">{{ $list[1]->nama }}</h6>
-                                <div style="color: var(--secondary); font-weight: 700;"><i class="bi bi-star-fill"></i> {{ number_format($list[1]->rata_rata_nilai, 2) }}</div>
+                                <div class="mb-2">
+                                    <div class="fw-bold" style="color: var(--primary); font-size: 1.3rem;">{{ number_format($list[1]->persentase, 0) }}%</div>
+                                    <small class="text-muted">{{ $list[1]->total_penilaian }} siswa menilai</small>
+                                </div>
                             </div>
                         </div>
                         @endif
 
+                        @if($list->count() > 0)
                         <div class="col-md-4 order-md-2 mt-md-4" data-aos="zoom-in">
                             <div class="card-custom p-5 text-center" style="background: var(--primary); border: none; color: white;">
                                 <div class="position-relative d-inline-block mb-3">
@@ -107,9 +128,13 @@
                                 </div>
                                 <h5 class="fw-bold mb-1">{{ $list[0]->nama }}</h5>
                                 <div class="font-mono mb-2" style="font-size: 0.7rem; letter-spacing: 1px; color: rgba(255,255,255,0.7);">{{ strtoupper($list[0]->jurusan?->nama_jurusan ?? 'UMUM') }}</div>
-                                <div style="color: var(--secondary); font-weight: 700; font-size: 1.5rem;"><i class="bi bi-star-fill"></i> {{ number_format($list[0]->rata_rata_nilai, 2) }}</div>
+                                <div class="mb-2">
+                                    <div class="fw-bold" style="color: var(--secondary); font-size: 2rem;">{{ number_format($list[0]->persentase, 0) }}%</div>
+                                    <small style="opacity: 0.8;">{{ $list[0]->total_penilaian }} siswa menilai</small>
+                                </div>
                             </div>
                         </div>
+                        @endif
 
                         @if($list->count() > 2)
                         <div class="col-md-3 order-md-3" data-aos="fade-left">
@@ -119,7 +144,10 @@
                                     <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill" style="background: #CD7F32; color: #fff; font-size: 0.9rem; padding: 0.5rem 0.75rem;">#3</span>
                                 </div>
                                 <h6 class="fw-bold mb-1">{{ $list[2]->nama }}</h6>
-                                <div style="color: var(--secondary); font-weight: 700;"><i class="bi bi-star-fill"></i> {{ number_format($list[2]->rata_rata_nilai, 2) }}</div>
+                                <div class="mb-2">
+                                    <div class="fw-bold" style="color: var(--primary); font-size: 1.3rem;">{{ number_format($list[2]->persentase, 0) }}%</div>
+                                    <small class="text-muted">{{ $list[2]->total_penilaian }} siswa menilai</small>
+                                </div>
                             </div>
                         </div>
                         @endif
@@ -132,7 +160,7 @@
         </div>
 
         <div class="text-center" data-aos="zoom-in">
-            <a href="{{ route('login') }}" class="btn btn-cta"><i class="bi bi-box-arrow-in-right"></i> Login untuk Lihat Lengkap & Vote</a>
+            <a href="{{ route('login') }}" class="btn btn-cta"><i class="bi bi-box-arrow-in-right"></i> Login untuk Lihat Lengkap & Beri Penilaian</a>
         </div>
     </div>
 </section>
@@ -156,7 +184,7 @@
             <div class="col-md-4" data-aos="fade-up" data-aos-delay="200">
                 <div class="tutorial-card p-4 p-md-5 text-center h-100">
                     <div class="tutorial-number" style="background: var(--accent); color: white;">2</div>
-                    <h5 class="fw-bold mb-3 mt-4">Pilih Guru & Beri Rating</h5>
+                    <h5 class="fw-bold mb-3 mt-4">Pilih Guru & Beri Nilai</h5>
                     <p class="text-muted mb-0 small">Pilih guru Normada atau Produktif, lalu beri nilai (1-5) pada 6 kriteria pengajaran.</p>
                 </div>
             </div>

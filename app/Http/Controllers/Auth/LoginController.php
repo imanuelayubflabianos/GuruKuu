@@ -7,14 +7,17 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Cookie;
 
 class LoginController extends Controller
 {
     public function showLoginForm()
     {
         if (Auth::check()) {
-            return redirect()->route('landing.index');
+            // Jika sudah login, redirect ke dashboard yang sesuai
+            if (session('login_as_siswa')) {
+                return redirect()->route('siswa.dashboard');
+            }
+            return redirect()->route('admin.dashboard');
         }
         return view('auth.login');
     }
@@ -38,7 +41,7 @@ class LoginController extends Controller
             return back()->withErrors(['tanggal_lahir' => 'Tanggal lahir tidak cocok.'])->withInput();
         }
 
-        // ✅ TAB ADMIN: Harus punya role admin di database
+        // Login sebagai admin
         if ($request->login_role === 'admin') {
             if ($user->role !== 'admin') {
                 return back()->withErrors(['nis' => 'NIS ini bukan admin. Gunakan tab Siswa.'])->withInput();
@@ -48,21 +51,24 @@ class LoginController extends Controller
             }
             
             Auth::login($user, $request->boolean('remember'));
-            $request->session()->forget('login_as_siswa'); // Hapus flag siswa
+            $request->session()->forget('login_as_siswa');
             $request->session()->regenerate();
             
-            return redirect()->route('landing.index')->with('success', 'Login sebagai Admin berhasil!');
+            // Redirect langsung ke admin dashboard
+            return redirect()->intended(route('admin.dashboard'));
         }
 
-        // ✅ TAB SISWA: Boleh siapa saja (termasuk admin yang ingin login sebagai siswa)
-        // Tidak ada validasi role di sini
+        // Login sebagai siswa
+        if ($user->role !== 'siswa' && $user->role !== 'admin') {
+            return back()->withErrors(['nis' => 'NIS ini tidak valid.'])->withInput();
+        }
+
         Auth::login($user, $request->boolean('remember'));
-        
-        // ✅ Set flag "login sebagai siswa" agar middleware mengizinkan admin masuk ke route siswa
         $request->session()->put('login_as_siswa', true);
         $request->session()->regenerate();
         
-        return redirect()->route('landing.index')->with('success', 'Login sebagai Siswa berhasil!');
+        // Redirect langsung ke siswa dashboard
+        return redirect()->intended(route('siswa.dashboard'));
     }
 
     public function logout(Request $request)
@@ -70,9 +76,8 @@ class LoginController extends Controller
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-        Cookie::queue(Cookie::forget('laravel_session'));
-        Cookie::queue(Cookie::forget('XSRF-TOKEN'));
         
-        return redirect()->route('landing.index')->with('success', 'Anda telah keluar.');
+        // Redirect ke landing page
+        return redirect()->route('landing.index');
     }
 }

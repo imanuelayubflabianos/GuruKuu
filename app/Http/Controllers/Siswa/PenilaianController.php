@@ -10,9 +10,6 @@ use Illuminate\Http\Request;
 
 class PenilaianController extends Controller
 {
-    /**
-     * Form penilaian guru
-     */
     public function create(Guru $guru)
     {
         $user = auth()->user();
@@ -22,7 +19,6 @@ class PenilaianController extends Controller
             return redirect()->route('siswa.guru.index')->with('error', 'Tidak ada periode aktif saat ini.');
         }
 
-        // Validasi: Guru harus mengajar di kelas siswa
         $kelasAktif = $user->kelas()
                           ->wherePivot('tahun_ajaran', $periodeAktif->tahun_ajaran)
                           ->first();
@@ -31,7 +27,7 @@ class PenilaianController extends Controller
             return redirect()->route('siswa.guru.index')->with('error', 'Guru ini tidak mengajar di kelas Anda.');
         }
 
-        // Cek apakah sudah menilai
+        // Cek apakah sudah menilai (unique constraint)
         $sudahMenilai = Penilaian::where('siswa_id', $user->id)
                                  ->where('guru_id', $guru->id)
                                  ->where('periode_id', $periodeAktif->id)
@@ -41,12 +37,9 @@ class PenilaianController extends Controller
             return redirect()->route('siswa.guru.show', $guru)->with('error', 'Anda sudah menilai guru ini pada periode ini.');
         }
 
-        return view('siswa.penilaian.create', compact('guru'));
+        return view('siswa.penilaian.create', compact('guru', 'kelasAktif'));
     }
 
-    /**
-     * Simpan penilaian
-     */
     public function store(Request $request, Guru $guru)
     {
         $request->validate([
@@ -67,14 +60,31 @@ class PenilaianController extends Controller
             return back()->with('error', 'Tidak ada periode aktif saat ini.');
         }
 
-        // Hitung total nilai
-        $totalNilai = $request->kedisiplinan + $request->cara_mengajar + $request->komunikasi +
-                      $request->tanggung_jawab + $request->kreativitas + $request->keramahan;
+        $kelasAktif = $user->kelas()
+                          ->wherePivot('tahun_ajaran', $periodeAktif->tahun_ajaran)
+                          ->first();
+
+        if (!$kelasAktif) {
+            return back()->with('error', 'Anda belum terdaftar di kelas manapun.');
+        }
+
+        // Cek unique constraint
+        $sudahMenilai = Penilaian::where('siswa_id', $user->id)
+                                 ->where('guru_id', $guru->id)
+                                 ->where('periode_id', $periodeAktif->id)
+                                 ->exists();
+
+        if ($sudahMenilai) {
+            return back()->with('error', 'Anda sudah menilai guru ini pada periode ini.');
+        }
+
+        $totalNilai = Penilaian::hitungTotal($request->all());
 
         Penilaian::create([
             'siswa_id' => $user->id,
             'guru_id' => $guru->id,
             'periode_id' => $periodeAktif->id,
+            'class_id' => $kelasAktif->id, // ✅ Simpan class_id
             'kedisiplinan' => $request->kedisiplinan,
             'cara_mengajar' => $request->cara_mengajar,
             'komunikasi' => $request->komunikasi,
@@ -86,31 +96,23 @@ class PenilaianController extends Controller
             'saran' => $request->saran,
         ]);
 
-        // Update rata-rata guru
         $guru->updateRataRata();
 
         return redirect()->route('siswa.guru.show', $guru)->with('success', 'Penilaian berhasil dikirim! Terima kasih atas kontribusi Anda.');
     }
 
-    /**
-     * Tampilkan riwayat penilaian siswa
-     */
     public function riwayat()
     {
         $riwayat = Penilaian::where('siswa_id', auth()->id())
-                           ->with(['guru', 'periode'])
+                           ->with(['guru', 'periode', 'kelas'])
                            ->latest()
                            ->get();
 
         return view('siswa.riwayat.index', compact('riwayat'));
     }
 
-    /**
-     * ✅ BARU: Hapus Riwayat Penilaian
-     */
     public function destroy(Penilaian $penilaian)
     {
-        // Pastikan hanya pemilik yang bisa menghapus
         if ($penilaian->siswa_id !== auth()->id()) {
             return back()->with('error', 'Anda tidak memiliki izin untuk menghapus penilaian ini.');
         }
@@ -118,7 +120,6 @@ class PenilaianController extends Controller
         $guruId = $penilaian->guru_id;
         $penilaian->delete();
         
-        // Update ulang rata-rata guru setelah dihapus
         $guru = Guru::find($guruId);
         if ($guru) {
             $guru->updateRataRata();

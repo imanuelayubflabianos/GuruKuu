@@ -34,7 +34,7 @@
         .nav-link-custom.active::after {
             content: ''; position: absolute; bottom: -4px; left: 0; right: 0; height: 2.5px; background: var(--primary); border-radius: 2px;
         }
-        .nav-actions { display: flex; align-items: center; margin-left: auto; gap: 1rem; }
+        .nav-actions { display: flex; align-items: center; margin-left: auto; gap: 0.75rem; }
         .btn-masuk {
             background: var(--primary); color: white; padding: 0.5rem 1.25rem;
             border-radius: 8px; font-weight: 600; font-size: 0.9rem; border: none; text-decoration: none; transition: all 0.3s;
@@ -47,7 +47,7 @@
         .btn-dashboard:hover { background: #008f5a; color: white; transform: translateY(-1px); }
         .btn-logout {
             background: #dc3545; color: white; padding: 0.5rem 1rem;
-            border-radius: 8px; font-weight: 600; font-size: 0.85rem; border: none; text-decoration: none; transition: all 0.3s;
+            border-radius: 8px; font-weight: 600; font-size: 0.85rem; border: none; cursor: pointer; transition: all 0.3s;
         }
         .btn-logout:hover { background: #c82333; color: white; }
 
@@ -113,15 +113,34 @@
             <button class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navMenu"><span class="navbar-toggler-icon"></span></button>
             <div class="collapse navbar-collapse" id="navMenu">
                 <div class="nav-menu-center">
-                    <a class="nav-link nav-link-custom" href="#home" data-page="home">Beranda</a>
-                    <a class="nav-link nav-link-custom" href="#guru" data-page="guru">Guru</a>
-                    <a class="nav-link nav-link-custom" href="#panduan" data-page="panduan">Panduan</a>
-                    <a class="nav-link nav-link-custom" href="#tentang" data-page="about">Tentang</a>
+                    <a class="nav-link nav-link-custom" href="#home">Beranda</a>
+                    <a class="nav-link nav-link-custom" href="#guru">Guru</a>
+                    <a class="nav-link nav-link-custom" href="#panduan">Panduan</a>
+                    <a class="nav-link nav-link-custom" href="#tentang">Tentang</a>
                 </div>
-                <div class="nav-actions">
+                                <div class="nav-actions">
                     @auth
-                        <a href="{{ auth()->user()->role === 'admin' ? route('admin.dashboard') : route('siswa.dashboard') }}" class="btn btn-dashboard">
-                            <i class="bi bi-speedometer2 me-1"></i> Dashboard
+                        {{-- ✅ DEBUG: Tampilkan session value --}}
+                        @php
+                            $isSiswaMode = session('login_as_siswa', false);
+                            $userRole = auth()->user()->role;
+                            
+                            // ✅ LOGIKA: Jika session login_as_siswa = true, maka dashboard siswa
+                            if ($isSiswaMode === true) {
+                                $dashboardUrl = route('siswa.dashboard');
+                                $dashboardLabel = 'Dashboard Siswa';
+                            } else {
+                                // Jika bukan siswa mode, cek role database
+                                $dashboardUrl = $userRole === 'admin' ? route('admin.dashboard') : route('siswa.dashboard');
+                                $dashboardLabel = $userRole === 'admin' ? 'Dashboard Admin' : 'Dashboard Siswa';
+                            }
+                        @endphp
+                        
+                        {{-- ✅ DEBUG: Tampilkan session value di HTML (bisa dihapus nanti) --}}
+                        <!-- DEBUG: login_as_siswa = {{ $isSiswaMode ? 'true' : 'false' }}, role = {{ $userRole }} -->
+                        
+                        <a href="{{ $dashboardUrl }}" class="btn btn-dashboard">
+                            <i class="bi bi-speedometer2 me-1"></i> {{ $dashboardLabel }}
                         </a>
                         <form action="{{ route('logout') }}" method="POST" class="d-inline">
                             @csrf

@@ -23,7 +23,6 @@
 
                     <form action="{{ route('login.post') }}" method="POST" id="loginForm">
                         @csrf
-                        {{-- Hidden field untuk menentukan role login (default: siswa) --}}
                         <input type="hidden" name="login_role" id="loginRole" value="siswa">
 
                         <div class="mb-3">
@@ -35,16 +34,15 @@
                             </div>
                         </div>
 
-                        <div class="mb-3" id="dobContainer">
+                        <div class="mb-3">
                             <label class="form-label font-mono" style="font-size: 0.75rem; font-weight: 600; letter-spacing: 1px;">TANGGAL LAHIR</label>
                             <div class="input-group">
                                 <span class="input-group-text bg-white border-end-0"><i class="bi bi-calendar-event text-muted"></i></span>
                                 <input type="date" name="tanggal_lahir" id="dobInput" class="form-control border-start-0 ps-0" 
-                                    value="{{ old('tanggal_lahir') }}" required style="border-radius: 0 8px 8px 0; padding: 0.65rem 1rem;">
+                                    value="{{ old('tanggal_lahir') }}" required max="2010-12-31" style="border-radius: 0 8px 8px 0; padding: 0.65rem 1rem;">
                             </div>
                         </div>
 
-                        {{-- Field Password (Awalnya disembunyikan, muncul jika pilih Admin di pop-up) --}}
                         <div class="mb-4" id="passwordContainer" style="display: none;">
                             <label class="form-label font-mono" style="font-size: 0.75rem; font-weight: 600; letter-spacing: 1px;">PASSWORD ADMIN</label>
                             <div class="input-group">
@@ -112,20 +110,16 @@ document.addEventListener('DOMContentLoaded', function() {
     const submitBtn = document.getElementById('submitBtn');
     const roleModal = new bootstrap.Modal(document.getElementById('roleModal'));
     
-    // Daftar NIS Admin yang bisa login sebagai siswa juga
     const dualRoleNis = ['4669', '4686'];
 
-    // 1. Logic Pop-up saat Submit
     loginForm.addEventListener('submit', function(e) {
         const nis = nisInput.value.trim();
         const role = loginRoleInput.value;
 
-        // Jika NIS dual-role DAN belum memilih role (masih default siswa) DAN password belum muncul
         if (dualRoleNis.includes(nis) && role === 'siswa' && passwordContainer.style.display === 'none') {
-            e.preventDefault(); // Hentikan submit
-            roleModal.show();   // Tampilkan pop-up
+            e.preventDefault();
+            roleModal.show();
         }
-        // Jika sudah pilih Admin tapi password kosong
         else if (role === 'admin' && !passwordInput.value) {
             e.preventDefault();
             passwordInput.focus();
@@ -133,19 +127,16 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // 2. Fungsi saat tombol di Pop-up diklik
     window.selectRole = function(role) {
         roleModal.hide();
         loginRoleInput.value = role;
 
         if (role === 'admin') {
-            // Tampilkan field password
             passwordContainer.style.display = 'block';
             passwordInput.setAttribute('required', 'required');
             submitBtn.innerHTML = '<i class="bi bi-shield-lock-fill me-2"></i> Masuk sebagai Admin';
             setTimeout(() => passwordInput.focus(), 300);
         } else {
-            // Masuk sebagai siswa (langsung submit)
             passwordContainer.style.display = 'none';
             passwordInput.removeAttribute('required');
             submitBtn.innerHTML = '<i class="bi bi-box-arrow-in-right me-2"></i> Lanjutkan';
@@ -153,7 +144,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     };
 
-    // 3. Fitur Lihat/Sembunyikan Password
     const toggleBtn = document.getElementById('togglePassword');
     const toggleIcon = document.getElementById('toggleIcon');
     

@@ -12,11 +12,13 @@ class Penilaian extends Model
     protected $table = 'penilaian';
 
     protected $fillable = [
-        'siswa_id', 'guru_id', 'periode_id',
+        'siswa_id', 'guru_id', 'periode_id', 'class_id',
         'kedisiplinan', 'cara_mengajar', 'komunikasi',
         'tanggung_jawab', 'kreativitas', 'keramahan',
         'total_nilai', 'kritik', 'saran',
     ];
+
+    // ==================== RELASI ====================
 
     public function siswa()
     {
@@ -33,6 +35,13 @@ class Penilaian extends Model
         return $this->belongsTo(Periode::class);
     }
 
+    public function kelas()
+    {
+        return $this->belongsTo(Kelas::class, 'class_id');
+    }
+
+    // ==================== METHOD ====================
+
     public static function hitungTotal(array $data): int
     {
         return ($data['kedisiplinan'] ?? 0) + ($data['cara_mengajar'] ?? 0) +
@@ -40,7 +49,14 @@ class Penilaian extends Model
                ($data['kreativitas'] ?? 0) + ($data['keramahan'] ?? 0);
     }
 
-    // ✅ DETEKSI TOXIC (berbasis kata kunci Bahasa Indonesia)
+    // Rata-rata dari 6 aspek evaluasi (skala 1-5)
+    public function getRataRataEvaluasiAttribute(): float
+    {
+        return round($this->total_nilai / 6, 2);
+    }
+
+    // ==================== DETEKSI TOXIC ====================
+
     public static function detectToxic(?string $text): bool
     {
         if (!$text) return false;
@@ -48,7 +64,7 @@ class Penilaian extends Model
             'anjing', 'babi', 'goblok', 'tolol', 'bodoh', 'bangsat', 'keparat',
             'sialan', 'brengsek', 'kampret', 'monyet', 'bego', 'dungu', 'idiot',
             'setan', 'iblis', 'bajingan', 'pecundang', 'sampah', 'busuk', 'mampus',
-            'mati aja', 'gila', 'sinting', 'tolol', 'bebal', 'otak udang',
+            'mati aja', 'gila', 'sinting', 'bebal', 'otak udang',
         ];
         $textLower = strtolower($text);
         foreach ($toxicWords as $word) {
@@ -57,15 +73,8 @@ class Penilaian extends Model
         return false;
     }
 
-    // ✅ Cek apakah penilaian ini mengandung toxic
     public function isToxic(): bool
     {
         return self::detectToxic($this->kritik) || self::detectToxic($this->saran);
-    }
-
-    // ✅ Konversi total_nilai (max 30) ke bintang (1-5)
-    public function getBintangAttribute(): int
-    {
-        return max(1, min(5, (int) round($this->total_nilai / 6)));
     }
 }
