@@ -2,15 +2,40 @@
 @section('title', 'Data Guru')
 
 @section('content')
-<div class="page-header">
+<div class="page-header d-flex justify-content-between align-items-center">
     <div>
         <div class="page-label">MANAJEMEN DATA</div>
         <h1 class="page-title">Data Guru</h1>
-        <p class="page-subtitle">Kelola data guru normada dan produktif.</p>
     </div>
     <a href="{{ route('admin.guru.create') }}" class="btn btn-primary-custom">
         <i class="bi bi-plus-circle me-1"></i> Tambah Guru
     </a>
+</div>
+
+<div class="card-custom p-3 mb-4">
+    <form method="GET" action="{{ route('admin.guru.index') }}" class="row g-3 align-items-end">
+        <div class="col-md-4">
+            <label class="form-label small fw-bold text-muted">Filter Kategori</label>
+            <select name="kategori" class="form-select" style="border-radius: 8px;">
+                <option value="">Semua Kategori</option>
+                <option value="normada" {{ request('kategori') == 'normada' ? 'selected' : '' }}>Guru Normada</option>
+                <option value="produktif" {{ request('kategori') == 'produktif' ? 'selected' : '' }}>Guru Produktif</option>
+            </select>
+        </div>
+        <div class="col-md-4">
+            <label class="form-label small fw-bold text-muted">Filter Jurusan</label>
+            <select name="jurusan_id" class="form-select" style="border-radius: 8px;">
+                <option value="">Semua Jurusan</option>
+                @foreach($jurusans as $j)
+                    <option value="{{ $j->id }}" {{ request('jurusan_id') == $j->id ? 'selected' : '' }}>{{ $j->nama_jurusan }}</option>
+                @endforeach
+            </select>
+        </div>
+        <div class="col-md-4 d-flex gap-2">
+            <button type="submit" class="btn btn-primary-custom flex-grow-1"><i class="bi bi-funnel me-1"></i> Filter</button>
+            <a href="{{ route('admin.guru.index') }}" class="btn btn-outline-custom"><i class="bi bi-arrow-counterclockwise"></i></a>
+        </div>
+    </form>
 </div>
 
 <div class="card-custom">
@@ -18,53 +43,45 @@
         <table class="table table-custom mb-0" id="guruTable">
             <thead>
                 <tr>
-                    <th>FOTO</th>
                     <th>NIP</th>
                     <th>NAMA</th>
                     <th>KATEGORI</th>
                     <th>JURUSAN</th>
-                    <th class="text-center">RATING</th>
+                    <th>PENILAIAN</th>
                     <th class="text-center">AKSI</th>
                 </tr>
             </thead>
             <tbody>
                 @forelse($guru as $g)
                 <tr>
+                    <td class="font-mono">{{ $g->nip }}</td>
                     <td>
-                        <img src="{{ $g->photo_url }}" alt="{{ $g->nama }}" class="rounded-circle" style="width: 40px; height: 40px; object-fit: cover;">
+                        <div class="d-flex align-items-center gap-2">
+                            <img src="{{ $g->photo_url }}" class="rounded-circle" style="width: 36px; height: 36px; object-fit: cover;">
+                            <strong>{{ $g->nama }}</strong>
+                        </div>
                     </td>
-                    <td class="font-mono small">{{ $g->nip }}</td>
-                    <td><strong>{{ $g->nama }}</strong></td>
                     <td>
-                        <span class="badge-custom" style="background: {{ $g->kategori === 'normada' ? 'rgba(0,51,102,0.1)' : 'rgba(0,168,107,0.1)' }}; color: {{ $g->kategori === 'normada' ? 'var(--primary)' : 'var(--accent)' }};">
-                            {{ strtoupper($g->kategori) }}
+                        <span class="badge bg-{{ $g->kategori == 'normada' ? 'primary' : 'success' }}">
+                            {{ ucfirst($g->kategori) }}
                         </span>
                     </td>
-                    <td>{{ $g->jurusan?->nama_jurusan ?? '-' }}</td>
-                    <td class="text-center">
-                        <span class="fw-bold" style="color: var(--secondary);">
-                            <i class="bi bi-star-fill"></i> {{ number_format($g->rata_rata_nilai, 2) }}
-                        </span>
-                        <br><small class="text-muted">{{ $g->total_penilaian }} vote</small>
+                    <td>{{ $g->jurusan->nama_jurusan ?? '-' }}</td>
+                    <td>
+                        <strong>{{ $g->total_penilaian }}</strong>
+                        <small class="text-muted d-block">({{ number_format($g->rata_rata_nilai, 1) }}/5)</small>
                     </td>
                     <td class="text-center">
-                        <a href="{{ route('admin.guru.edit', $g) }}" class="btn btn-sm btn-outline-primary me-1">
-                            <i class="bi bi-pencil"></i>
-                        </a>
-                        <form action="{{ route('admin.guru.destroy', $g) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus guru ini?')">
+                        <a href="{{ route('admin.guru.edit', $g) }}" class="btn btn-sm btn-outline-primary me-1"><i class="bi bi-pencil"></i></a>
+                        <form action="{{ route('admin.guru.destroy', $g) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin hapus guru ini?')">
                             @csrf @method('DELETE')
-                            <button class="btn btn-sm btn-outline-danger">
-                                <i class="bi bi-trash"></i>
-                            </button>
+                            <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
                         </form>
                     </td>
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="7" class="text-center py-5 text-muted">
-                        <i class="bi bi-inbox fs-1 d-block mb-3"></i>
-                        Belum ada data guru.
-                    </td>
+                    <td colspan="6" class="text-center py-5 text-muted">Belum ada data guru.</td>
                 </tr>
                 @endforelse
             </tbody>
@@ -78,7 +95,7 @@
 $(document).ready(function() {
     $('#guruTable').DataTable({
         language: { url: '//cdn.datatables.net/plug-ins/1.13.8/i18n/id.json' },
-        responsive: true,
+        ordering: false,
         pageLength: 10
     });
 });

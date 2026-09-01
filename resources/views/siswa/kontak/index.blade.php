@@ -101,7 +101,6 @@
 
             {{-- FORM KIRIM PESAN DENGAN CAPTCHA DI BAWAH --}}
             <div class="border-top" style="background: white;">
-                {{-- Notifikasi --}}
                 @if(session('success'))
                     <div class="alert alert-success border-0 mb-0 py-2 px-3 small d-flex align-items-center">
                         <i class="bi bi-check-circle-fill me-2"></i> {{ session('success') }}
@@ -116,10 +115,10 @@
                     </div>
                 @endif
 
-                <form action="{{ route('kontak.siswa') }}" method="POST">
+                {{-- PERBAIKAN: route('siswa.kontak.store') --}}
+                <form action="{{ route('siswa.kontak.store') }}" method="POST">
                     @csrf
                     <div class="p-3">
-                        {{-- Input Pesan --}}
                         <div class="d-flex gap-2 align-items-end mb-3">
                             <textarea name="pesan" class="form-control" rows="2" placeholder="Ketik pesan Anda di sini..." required style="border-radius: 12px; resize: none; border: 2px solid var(--border); transition: all 0.3s;" onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='var(--border)'">{{ old('pesan') }}</textarea>
                             <button type="submit" class="btn btn-primary-custom d-flex align-items-center justify-content-center" style="height: 46px; width: 46px; border-radius: 12px; padding: 0;">
@@ -127,7 +126,6 @@
                             </button>
                         </div>
 
-                        {{-- CAPTCHA DI BAWAH (Seperti Guest Page) --}}
                         <div class="p-2 rounded" style="background: var(--bg-light); border: 1px dashed var(--border);">
                             <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
                                 <div class="d-flex align-items-center gap-2">
@@ -145,7 +143,6 @@
             </div>
         </div>
 
-        {{-- Info Tambahan --}}
         <div class="text-center mt-3">
             <small class="text-muted">
                 <i class="bi bi-info-circle me-1"></i> Pesan Anda akan dijawab oleh Admin dalam waktu 1x24 jam
@@ -180,14 +177,13 @@
 
 @push('scripts')
 <script>
-    // Auto scroll ke bawah saat halaman dimuat
     window.onload = () => { 
         const c = document.getElementById('chatContainer'); 
         if(c) c.scrollTop = c.scrollHeight; 
     };
 
-    // Fungsi untuk membuka modal edit
     function openEditModal(id, text) {
+        // PERBAIKAN: Route edit siswa adalah siswa.kontak.edit
         document.getElementById('editForm').action = '/siswa/kontak/' + id;
         document.getElementById('editTextarea').value = text;
         new bootstrap.Modal(document.getElementById('editModal')).show();

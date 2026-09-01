@@ -3,107 +3,104 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Imports\SiswaImport;
-use App\Models\Jurusan;
 use App\Models\User;
+use App\Models\Kelas;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
-use Maatwebsite\Excel\Facades\Excel;
 
 class SiswaController extends Controller
 {
-    public function index() 
-    { 
-        return view('admin.siswa.index', [
-            'siswa' => User::where('role', 'siswa')->with('jurusan')->latest()->get()
-        ]); 
+    public function index(Request $request)
+    {
+        $query = User::where('role', 'siswa')->with('kelas');
+        
+        // Filter berdasarkan kelas
+        if ($request->filled('kelas')) {
+            $query->whereHas('kelas', function($q) use ($request) {
+                $q->where('kelas.id', $request->kelas);
+            });
+        }
+        
+        $siswa = $query->latest()->get();
+        $kelasList = Kelas::orderBy('tingkat')->orderBy('nama_kelas')->get();
+        
+        return view('admin.siswa.index', compact('siswa', 'kelasList'));
     }
 
-    public function create() 
-    { 
-        return view('admin.siswa.create', [
-            'jurusan' => Jurusan::all()
-        ]); 
+    public function create()
+    {
+        $kelasList = Kelas::orderBy('tingkat')->orderBy('nama_kelas')->get();
+        return view('admin.siswa.create', compact('kelasList'));
     }
 
     public function store(Request $request)
     {
         $request->validate([
-            'nis' => 'required|string|unique:users,nis', 
             'name' => 'required|string|max:255',
-            'kelas' => 'required|string|max:255', 
-            'jurusan_id' => 'nullable|exists:jurusan,id',
-            'tanggal_lahir' => 'required|date', 
-            'photo' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'nis' => 'required|string|unique:users,nis',
+            'email' => 'required|email|unique:users,email',
+            'password' => 'required|min:6',
+            'kelas_id' => 'required|exists:kelas,id',
+            'tanggal_lahir' => 'required|date',
         ]);
-        
-        $data = [
-            'nis' => $request->nis, 
-            'name' => $request->name, 
-            'kelas' => $request->kelas,
-            'jurusan_id' => $request->jurusan_id, 
+
+        $user = User::create([
+            'name' => $request->name,
+            'nis' => $request->nis,
+            'email' => $request->email,
+            'password' => bcrypt($request->password),
+            'role' => 'siswa',
             'tanggal_lahir' => $request->tanggal_lahir,
-            'role' => 'siswa', 
-            'email' => null, 
-            'password' => null, 
-            'is_active' => true
-        ];
-        
-        if ($request->hasFile('photo')) {
-            $data['photo'] = $request->file('photo')->store('siswa', 'public');
-        }
-        
-        User::create($data);
+            'is_active' => true,
+        ]);
+
+        $user->kelas()->attach($request->kelas_id, ['tahun_ajaran' => now()->year . '/' . (now()->year + 1)]);
+
         return redirect()->route('admin.siswa.index')->with('success', 'Siswa berhasil ditambahkan!');
     }
 
-    public function import(Request $request)
+    public function edit(User $siswa)
     {
-        $request->validate(['file' => 'required|mimes:xlsx,xls']);
-        Excel::import(new SiswaImport, $request->file('file'));
-        return back()->with('success', 'Data siswa berhasil diimport dari Excel!');
-    }
-
-    public function edit(User $siswa) 
-    { 
-        return view('admin.siswa.edit', [
-            'siswa' => $siswa,
-            'jurusan' => Jurusan::all()
-        ]); 
+        $kelasList = Kelas::orderBy('tingkat')->orderBy('nama_kelas')->get();
+        return view('admin.siswa.edit', compact('siswa', 'kelasList'));
     }
 
     public function update(Request $request, User $siswa)
     {
         $request->validate([
-            'nis' => 'required|string|unique:users,nis,' . $siswa->id, 
             'name' => 'required|string|max:255',
-            'kelas' => 'required|string|max:255', 
-            'jurusan_id' => 'nullable|exists:jurusan,id',
-            'tanggal_lahir' => 'required|date', 
-            'photo' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'nis' => 'required|string|unique:users,nis,' . $siswa->id,
+            'email' => 'required|email|unique:users,email,' . $siswa->id,
+            'kelas_id' => 'required|exists:kelas,id',
+            'tanggal_lahir' => 'required|date',
         ]);
-        
-        $data = [
-            'nis' => $request->nis, 
-            'name' => $request->name, 
-            'kelas' => $request->kelas,
-            'jurusan_id' => $request->jurusan_id, 
-            'tanggal_lahir' => $request->tanggal_lahir
-        ];
-        
-        if ($request->hasFile('photo')) {
-            if ($siswa->photo) Storage::disk('public')->delete($siswa->photo);
-            $data['photo'] = $request->file('photo')->store('siswa', 'public');
+
+        $siswa->update([
+            'name' => $request->name,
+            'nis' => $request->nis,
+            'email' => $request->email,
+            'tanggal_lahir' => $request->tanggal_lahir,
+        ]);
+
+        if ($request->filled('password')) {
+            $siswa->update(['password' => bcrypt($request->password)]);
         }
-        
-        $siswa->update($data);
-        return redirect()->route('admin.siswa.index')->with('success', 'Data siswa diperbarui!');
+
+        $siswa->kelas()->sync([
+            $request->kelas_id => ['tahun_ajaran' => now()->year . '/' . (now()->year + 1)]
+        ]);
+
+        return redirect()->route('admin.siswa.index')->with('success', 'Data siswa berhasil diperbarui!');
     }
 
     public function destroy(User $siswa)
     {
-        if ($siswa->photo) Storage::disk('public')->delete($siswa->photo);
         $siswa->delete();
-        return back()->with('success', 'Siswa dihapus!');
+        return redirect()->route('admin.siswa.index')->with('success', 'Siswa berhasil dihapus!');
+    }
+
+    public function toggleStatus(User $siswa)
+    {
+        $siswa->update(['is_active' => !$siswa->is_active]);
+        return back()->with('success', 'Status siswa berhasil diubah!');
     }
 }

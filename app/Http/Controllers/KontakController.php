@@ -19,36 +19,6 @@ class KontakController extends Controller
         return $deviceId;
     }
 
-    // ==================== ADMIN ====================
-    public function index() { return view('admin.kontak.index', ['pesan' => Kontak::latest()->get()]); }
-
-    public function reply(Request $request, Kontak $kontak)
-    {
-        $request->validate(['balasan' => 'required|min:5']);
-        $kontak->update(['balasan' => $request->balasan, 'is_replied' => true, 'is_read' => true]);
-        return back()->with('success', 'Pesan berhasil dibalas!');
-    }
-
-    // ✅ ADMIN EDIT BALASAN
-    public function editReply(Request $request, Kontak $kontak)
-    {
-        $request->validate(['balasan' => 'required|min:5']);
-        $kontak->update(['balasan' => $request->balasan]);
-        return back()->with('success', 'Balasan berhasil diperbarui!');
-    }
-
-    public function destroyReply(Kontak $kontak)
-    {
-        $kontak->update(['balasan' => null, 'is_replied' => false]);
-        return back()->with('success', 'Balasan admin berhasil dihapus.');
-    }
-
-    public function destroy(Kontak $kontak)
-    {
-        $kontak->delete();
-        return back()->with('success', 'Seluruh percakapan dihapus.');
-    }
-
     // ==================== GUEST (PUBLIK) ====================
     public function guestPage(Request $request)
     {
@@ -65,13 +35,14 @@ class KontakController extends Controller
         if ($request->captcha != session('captcha_answer')) return back()->withErrors(['captcha' => 'Jawaban salah.'])->withInput();
         
         Kontak::create([
-            'pengirim' => 'Tamu', 'identifier' => $this->getOrCreateDeviceId($request),
-            'pesan' => $request->pesan, 'is_siswa' => false
+            'pengirim' => 'Tamu', 
+            'identifier' => $this->getOrCreateDeviceId($request),
+            'pesan' => $request->pesan, 
+            'is_siswa' => false
         ]);
         return redirect()->route('kontak.guest.page')->with('success', 'Pesan terkirim!');
     }
 
-    // ✅ GUEST EDIT PESAN
     public function editGuest(Request $request, Kontak $kontak)
     {
         $deviceId = $this->getOrCreateDeviceId($request);
@@ -83,7 +54,6 @@ class KontakController extends Controller
         return back()->with('success', 'Pesan berhasil diperbarui!');
     }
 
-    // ✅ GUEST HAPUS PESAN (Jadi "[Pesan Dihapus]")
     public function destroyGuestMessage(Request $request, Kontak $kontak)
     {
         $deviceId = $this->getOrCreateDeviceId($request);
@@ -112,8 +82,10 @@ class KontakController extends Controller
         }
         $user = Auth::user();
         Kontak::create([
-            'pengirim' => $user->name, 'identifier' => $user->nis,
-            'pesan' => $request->pesan, 'is_siswa' => true,
+            'pengirim' => $user->name, 
+            'identifier' => $user->nis,
+            'pesan' => $request->pesan, 
+            'is_siswa' => true,
         ]);
         return back()->with('success', 'Pesan berhasil dikirim ke Admin!');
     }
@@ -124,6 +96,13 @@ class KontakController extends Controller
         $request->validate(['pesan' => 'required|min:10']);
         $kontak->update(['pesan' => $request->pesan]);
         return back()->with('success', 'Pesan berhasil diperbarui!');
+    }
+
+    public function siswaDestroy(Kontak $kontak)
+    {
+        if ($kontak->identifier !== Auth::user()->nis) return back()->with('error', 'Akses ditolak.');
+        $kontak->delete();
+        return back()->with('success', 'Pesan berhasil dihapus.');
     }
 
     public function destroySiswaMessage(Kontak $kontak)

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Guru;
 use App\Models\Penilaian;
 use App\Models\Periode;
+use Illuminate\Http\Request;
 
 class GuruController extends Controller
 {
@@ -45,6 +46,35 @@ class GuruController extends Controller
                 ->exists();
         }
 
-        return view('siswa.guru.show', compact('guru', 'kelasAktif', 'periodeId', 'sudahMenilai'));
+        // ✅ FIX: Ambil semua feedback siswa lain untuk guru ini
+        $semuaFeedback = Penilaian::with('siswa')
+            ->where('guru_id', $guru->id)
+            ->where('periode_id', $periodeId)
+            ->where(function($q) {
+                $q->whereNotNull('kritik')->where('kritik', '!=', '')
+                  ->orWhereNotNull('saran')->where('saran', '!=', '');
+            })
+            ->latest()
+            ->get();
+
+        // Statistik evaluasi
+        $allPenilaian = Penilaian::where('guru_id', $guru->id)
+            ->where('periode_id', $periodeId)
+            ->get();
+
+        $stats = [
+            'total_penilaian' => $allPenilaian->count(),
+            'rata_kedisiplinan' => $allPenilaian->avg('kedisiplinan') ?? 0,
+            'rata_cara_mengajar' => $allPenilaian->avg('cara_mengajar') ?? 0,
+            'rata_komunikasi' => $allPenilaian->avg('komunikasi') ?? 0,
+            'rata_tanggung_jawab' => $allPenilaian->avg('tanggung_jawab') ?? 0,
+            'rata_kreativitas' => $allPenilaian->avg('kreativitas') ?? 0,
+            'rata_keramahan' => $allPenilaian->avg('keramahan') ?? 0,
+        ];
+
+        return view('siswa.guru.show', compact(
+            'guru', 'kelasAktif', 'periodeId', 'sudahMenilai', 
+            'semuaFeedback', 'stats'
+        ));
     }
 }

@@ -24,6 +24,13 @@ class KontakController extends Controller
         return back()->with('success', 'Balasan berhasil dikirim!');
     }
 
+    public function editReply(Request $request, Kontak $kontak)
+    {
+        $request->validate(['balasan' => 'required|string']);
+        $kontak->update(['balasan' => $request->balasan]);
+        return back()->with('success', 'Balasan berhasil diperbarui!');
+    }
+
     public function destroyReply(Kontak $kontak)
     {
         $kontak->update([

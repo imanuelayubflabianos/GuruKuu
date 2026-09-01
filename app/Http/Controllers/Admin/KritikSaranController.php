@@ -10,29 +10,26 @@ class KritikSaranController extends Controller
 {
     public function index()
     {
-        $kritik = Penilaian::where(function($q) {
+        $feedbacks = Penilaian::with(['guru', 'siswa'])
+            ->where(function($q) {
                 $q->whereNotNull('kritik')->orWhereNotNull('saran');
             })
-            ->with(['guru', 'siswa', 'periode'])
             ->latest()
             ->get();
-        return view('admin.kritik-saran.index', compact('kritik'));
+
+        return view('admin.kritik-saran.index', compact('feedbacks'));
     }
 
-    // ✅ HAPUS FEEDBACK SAJA (kritik+saran), nilai tetap ada
-    public function destroyFeedback(Penilaian $kritikSaran)
+    // Satu tombol untuk hapus dan beri peringatan
+    public function warnAndDelete(Penilaian $kritikSaran)
     {
-        $kritikSaran->update(['kritik' => null, 'saran' => null]);
-        return back()->with('success', 'Feedback berhasil dihapus. Nilai penilaian tetap tersimpan.');
-    }
+        $kritikSaran->update([
+            'kritik' => 'Pesan anda dihapus karena melanggar aturan.',
+            'saran' => null,
+            'is_replied' => true,
+            'is_read' => true
+        ]);
 
-    // ✅ HAPUS SELURUH PENILAIAN
-    public function destroy(Penilaian $kritikSaran)
-    {
-        $guruId = $kritikSaran->guru_id;
-        $kritikSaran->delete();
-        $guru = \App\Models\Guru::find($guruId);
-        if ($guru) $guru->updateRataRata();
-        return back()->with('success', 'Seluruh penilaian berhasil dihapus.');
+        return back()->with('success', 'Pesan telah dihapus dan peringatan otomatis telah diberikan.');
     }
 }

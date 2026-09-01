@@ -1,11 +1,9 @@
 <?php
-// app/Models/Jurusan.php
 
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Jurusan extends Model
 {
@@ -13,15 +11,15 @@ class Jurusan extends Model
 
     protected $table = 'jurusan';
 
-    protected $fillable = ['nama_jurusan', 'kode_jurusan', 'deskripsi'];
+    protected $fillable = [
+        'nama_jurusan',
+        'kode_jurusan',
+        'deskripsi',
+        'logo',
+    ];
 
-    public function guru(): HasMany
+    public function getLogoUrlAttribute()
     {
-        return $this->hasMany(Guru::class);
-    }
-
-    public function siswa(): HasMany
-    {
-        return $this->hasMany(User::class)->where('role', 'siswa');
+        return $this->logo ? asset('storage/' . $this->logo) : 'https://ui-avatars.com/api/?name=' . urlencode($this->nama_jurusan) . '&background=random&color=fff';
     }
 }

@@ -4,135 +4,124 @@
 @section('content')
 <div class="page-header">
     <div>
-        <div class="page-label">PROFIL GURU</div>
-        <h1 class="page-title">{{ $guru->nama }}</h1>
-        <p class="page-subtitle">Lihat profil, pencapaian, dan ulasan dari guru ini.</p>
+        <a href="{{ route('siswa.guru.index') }}" class="text-decoration-none text-muted small">
+            <i class="bi bi-arrow-left me-1"></i> Kembali ke Daftar Guru
+        </a>
+        <h1 class="page-title mt-2">{{ $guru->nama }}</h1>
+        <p class="page-subtitle">
+            <span class="badge bg-{{ $guru->kategori == 'normada' ? 'primary' : 'success' }}">{{ ucfirst($guru->kategori) }}</span>
+            @if($guru->jurusan)
+                <span class="badge bg-warning text-dark">{{ $guru->jurusan->nama_jurusan }}</span>
+            @endif
+        </p>
     </div>
-    <a href="{{ route('siswa.guru.index') }}" class="btn btn-outline-custom">
-        <i class="bi bi-arrow-left me-1"></i> Kembali ke Daftar Guru
-    </a>
 </div>
 
-<div class="row g-4">
-    {{-- Kolom Kiri: Profil & Statistik --}}
-    <div class="col-lg-4">
-        <div class="card-custom p-4 text-center mb-4">
-            <img src="{{ $guru->photo_url }}" alt="{{ $guru->nama }}" class="rounded-circle mb-3" style="width: 120px; height: 120px; object-fit: cover; border: 4px solid var(--primary);">
-            <h4 class="fw-bold mb-1">{{ $guru->nama }}</h4>
-            <p class="text-muted small mb-3">NIP: {{ $guru->nip }}</p>
-            
-            <div class="d-flex justify-content-center gap-2 mb-3 flex-wrap">
-                <span class="badge-custom" style="background: {{ $guru->kategori === 'normada' ? 'rgba(0,51,102,0.1)' : 'rgba(0,168,107,0.1)' }}; color: {{ $guru->kategori === 'normada' ? 'var(--primary)' : 'var(--accent)' }};">
-                    {{ strtoupper($guru->kategori) }}
-                </span>
-                @if($guru->jurusan)
-                    <span class="badge-custom" style="background: rgba(255,193,7,0.15); color: #d4a017;">{{ $guru->jurusan->nama_jurusan }}</span>
-                @endif
-            </div>
-
-            <div class="row g-2 mb-3">
-                <div class="col-6">
-                    <div class="p-3 rounded" style="background: var(--bg-light);">
-                        <div class="fw-bold" style="color: var(--primary); font-size: 1.5rem;">{{ number_format($guru->rata_rata_nilai, 1) }}</div>
-                        <div class="text-muted small font-mono">RATA-RATA</div>
-                    </div>
-                </div>
-                <div class="col-6">
-                    <div class="p-3 rounded" style="background: var(--bg-light);">
-                        <div class="fw-bold" style="color: var(--accent); font-size: 1.5rem;">{{ $guru->total_penilaian }}</div>
-                        <div class="text-muted small font-mono">ULASAN</div>
-                    </div>
-                </div>
-            </div>
-
-            {{-- Tombol Beri Penilaian --}}
-            @if(!$sudahMenilai)
-                <a href="{{ route('siswa.penilaian.create', $guru) }}" class="btn btn-primary-custom w-100">
-                    <i class="bi bi-star-fill me-1"></i> Beri Penilaian
-                </a>
-            @else
-                <button class="btn btn-outline-secondary w-100" disabled>
-                    <i class="bi bi-check-circle-fill me-1"></i> Sudah Dinilai Periode Ini
-                </button>
+<div class="row g-4 mb-4">
+    <div class="col-md-4">
+        <div class="card-custom p-4 text-center">
+            <img src="{{ $guru->photo_url }}" class="rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover; border: 4px solid var(--primary);">
+            <h4 class="fw-bold mb-2">{{ $guru->nama }}</h4>
+            <p class="text-muted small mb-2">NIP: {{ $guru->nip }}</p>
+            @if($guru->bio)
+                <p class="small text-muted">{{ $guru->bio }}</p>
             @endif
         </div>
+    </div>
 
-        {{-- Badge / Penghargaan --}}
-        @if(isset($guru->penghargaan) && $guru->penghargaan->isNotEmpty())
-        <div class="card-custom p-4">
-            <h6 class="fw-bold mb-3"><i class="bi bi-trophy-fill text-warning me-2"></i>Penghargaan</h6>
-            <div class="d-flex flex-column gap-2">
-                @foreach($guru->penghargaan as $award)
-                    <div class="d-flex align-items-center gap-2 p-2 rounded" style="background: var(--bg-light);">
-                        <span style="font-size: 1.5rem;">{{ $award->badge->icon }}</span>
-                        <div class="text-start">
-                            <div class="fw-bold small">{{ $award->badge->nama_badge }}</div>
-                            <div class="text-muted" style="font-size: 0.7rem;">{{ $award->periode->nama_periode }}</div>
-                        </div>
+    <div class="col-md-8">
+        <div class="card-custom p-4 h-100">
+            <h5 class="fw-bold mb-3"><i class="bi bi-graph-up me-2"></i>Statistik Evaluasi</h5>
+            
+            @if($stats['total_penilaian'] > 0)
+            <div class="row g-3">
+                @php
+                    $aspects = [
+                        'Kedisiplinan' => $stats['rata_kedisiplinan'],
+                        'Cara Mengajar' => $stats['rata_cara_mengajar'],
+                        'Komunikasi' => $stats['rata_komunikasi'],
+                        'Tanggung Jawab' => $stats['rata_tanggung_jawab'],
+                        'Kreativitas' => $stats['rata_kreativitas'],
+                        'Keramahan' => $stats['rata_keramahan'],
+                    ];
+                @endphp
+                @foreach($aspects as $label => $value)
+                <div class="col-md-6">
+                    <div class="d-flex justify-content-between mb-1">
+                        <small class="fw-bold">{{ $label }}</small>
+                        <small class="text-primary fw-bold">{{ number_format($value, 1) }}/5</small>
                     </div>
+                    <div class="progress" style="height: 8px;">
+                        <div class="progress-bar" style="width: {{ ($value/5)*100 }}%; background: var(--primary);"></div>
+                    </div>
+                </div>
                 @endforeach
             </div>
-        </div>
-        @endif
-    </div>
-
-    {{-- Kolom Kanan: Bio & Ulasan Terbaru --}}
-    <div class="col-lg-8">
-        {{-- Bio --}}
-        <div class="card-custom p-4 mb-4">
-            <h5 class="fw-bold mb-3"><i class="bi bi-person-lines-fill me-2 text-primary"></i>Tentang Guru</h5>
-            <p class="text-muted mb-0" style="line-height: 1.8;">
-                {{ $guru->bio ?: 'Belum ada deskripsi yang ditambahkan oleh guru ini.' }}
-            </p>
-        </div>
-
-        {{-- Ulasan Terbaru --}}
-        <div class="card-custom p-4">
-            <h5 class="fw-bold mb-3"><i class="bi bi-chat-quote-fill me-2 text-primary"></i>Ulasan Terbaru</h5>
-            
-            @if(!isset($ulasanTerbaru) || $ulasanTerbaru->isEmpty())
-                <div class="text-center py-4 text-muted">
-                    <i class="bi bi-chat-square-text fs-1 mb-2 d-block opacity-50"></i>
-                    <p class="mb-0">Belum ada ulasan untuk guru ini.</p>
-                </div>
+            <div class="mt-3 p-2 rounded text-center" style="background: var(--bg-light);">
+                <small class="text-muted">Total {{ $stats['total_penilaian'] }} siswa telah memberikan penilaian</small>
+            </div>
             @else
-                <div class="d-flex flex-column gap-3">
-                    @foreach($ulasanTerbaru as $ulasan)
-                        <div class="p-3 rounded" style="background: var(--bg-light); border-left: 3px solid var(--primary);">
-                            <div class="d-flex justify-content-between align-items-start mb-2">
-                                <div class="d-flex align-items-center gap-2">
-                                    <div class="d-flex text-warning">
-                                        @php $avgRating = round($ulasan->total_nilai / 6); @endphp
-                                        @for($i = 1; $i <= 5; $i++)
-                                            @if($i <= $avgRating)
-                                                <i class="bi bi-star-fill"></i>
-                                            @else
-                                                <i class="bi bi-star"></i>
-                                            @endif
-                                        @endfor
-                                    </div>
-                                    <span class="fw-bold small">{{ number_format($ulasan->total_nilai / 6, 1) }}/5.0</span>
-                                </div>
-                                <small class="text-muted">{{ $ulasan->created_at->diffForHumans() }}</small>
-                            </div>
-                            
-                            @if($ulasan->kritik || $ulasan->saran)
-                                <div class="mb-2">
-                                    @if($ulasan->kritik)
-                                        <p class="mb-1 small"><strong class="text-muted">Kritik:</strong> {{ $ulasan->kritik }}</p>
-                                    @endif
-                                    @if($ulasan->saran)
-                                        <p class="mb-0 small"><strong class="text-muted">Saran:</strong> {{ $ulasan->saran }}</p>
-                                    @endif
-                                </div>
-                            @else
-                                <p class="mb-0 small text-muted fst-italic">"Guru yang sangat baik dan mengajar dengan penuh dedikasi."</p>
-                            @endif
-                        </div>
-                    @endforeach
-                </div>
+            <div class="text-center py-4 text-muted">
+                <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+                Belum ada penilaian untuk guru ini.
+            </div>
+            @endif
+
+            @if($periodeAktif = \App\Models\Periode::where('status', 'aktif')->first())
+                @if($sudahMenilai)
+                    <div class="alert alert-success mt-3 mb-0">
+                        <i class="bi bi-check-circle-fill me-2"></i>
+                        <strong>Anda sudah menilai guru ini pada periode {{ $periodeAktif->nama_periode }}.</strong>
+                    </div>
+                @else
+                    <a href="{{ route('siswa.penilaian.create', $guru) }}" class="btn btn-primary-custom w-100 mt-3">
+                        <i class="bi bi-pencil-square me-1"></i> Beri Penilaian Sekarang
+                    </a>
+                @endif
             @endif
         </div>
     </div>
+</div>
+
+{{-- ULASAN SISWA LAIN --}}
+<div class="card-custom p-4">
+    <h5 class="fw-bold mb-3">
+        <i class="bi bi-chat-left-quote me-2"></i>Ulasan dari Siswa Lain
+        <span class="badge bg-primary ms-2">{{ $semuaFeedback->count() }}</span>
+    </h5>
+
+    @if($semuaFeedback->count() > 0)
+        @foreach($semuaFeedback as $fb)
+        <div class="border rounded p-3 mb-3" style="background: #f8f9fa;">
+            <div class="d-flex justify-content-between mb-2">
+                <div class="d-flex align-items-center gap-2">
+                    <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 36px; height: 36px; background: var(--primary); color: white; font-weight: bold;">
+                        {{ strtoupper(substr($fb->siswa->name ?? 'A', 0, 1)) }}
+                    </div>
+                    <div>
+                        <strong class="small">{{ $fb->siswa->name ?? 'Siswa Anonim' }}</strong>
+                        <small class="text-muted d-block">{{ $fb->created_at->diffForHumans() }}</small>
+                    </div>
+                </div>
+            </div>
+            @if($fb->kritik)
+                <div class="p-2 rounded small mb-2" style="background: #fff3cd; border-left: 3px solid #ffc107;">
+                    <strong>Kritik:</strong> {{ $fb->kritik }}
+                </div>
+            @endif
+            @if($fb->saran)
+                <div class="p-2 rounded small" style="background: #d1ecf1; border-left: 3px solid #17a2b8;">
+                    <strong>Saran:</strong> {{ $fb->saran }}
+                </div>
+            @endif
+        </div>
+        @endforeach
+    @else
+        <div class="text-center py-5 text-muted">
+            <i class="bi bi-chat-square-dots fs-1 d-block mb-3"></i>
+            <p class="mb-0">Belum ada ulasan dari siswa lain untuk guru ini.</p>
+            <small>Jadilah yang pertama memberikan kritik dan saran!</small>
+        </div>
+    @endif
 </div>
 @endsection

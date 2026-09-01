@@ -1,7 +1,7 @@
-@extends('layouts.admin')
-@section('title', 'Data Jurusan')
 
-@section('content')
+<?php $__env->startSection('title', 'Data Jurusan'); ?>
+
+<?php $__env->startSection('content'); ?>
 <div class="page-header d-flex justify-content-between align-items-center">
     <div>
         <div class="page-label">MANAJEMEN DATA</div>
@@ -25,23 +25,23 @@
                 </tr>
             </thead>
             <tbody>
-                @forelse($jurusans as $j)
+                <?php $__empty_1 = true; $__currentLoopData = $jurusans; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $j): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                 <tr>
-                    <td class="font-mono fw-bold">{{ $j->kode_jurusan }}</td>
-                    <td>{{ $j->nama_jurusan }}</td>
+                    <td class="font-mono fw-bold"><?php echo e($j->kode_jurusan); ?></td>
+                    <td><?php echo e($j->nama_jurusan); ?></td>
                     <td>
-                        @if($j->logo)
-                            <img src="{{ asset('storage/' . $j->logo) }}" alt="Logo" style="height: 40px; border-radius: 4px;">
-                        @else
+                        <?php if($j->logo): ?>
+                            <img src="<?php echo e(asset('storage/' . $j->logo)); ?>" alt="Logo" style="height: 40px; border-radius: 4px;">
+                        <?php else: ?>
                             <span class="text-muted">-</span>
-                        @endif
+                        <?php endif; ?>
                     </td>
                     <td class="text-center">
-                        <button class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#modalEditJurusan{{ $j->id }}">
+                        <button class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#modalEditJurusan<?php echo e($j->id); ?>">
                             <i class="bi bi-pencil"></i> Edit
                         </button>
-                        <form action="{{ route('admin.jurusan.destroy', $j->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus jurusan ini?')">
-                            @csrf @method('DELETE')
+                        <form action="<?php echo e(route('admin.jurusan.destroy', $j->id)); ?>" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus jurusan ini?')">
+                            <?php echo csrf_field(); ?> <?php echo method_field('DELETE'); ?>
                             <button class="btn btn-sm btn-outline-danger">
                                 <i class="bi bi-trash"></i>
                             </button>
@@ -50,12 +50,12 @@
                 </tr>
 
                 <!-- Modal Edit -->
-                <div class="modal fade" id="modalEditJurusan{{ $j->id }}" tabindex="-1">
+                <div class="modal fade" id="modalEditJurusan<?php echo e($j->id); ?>" tabindex="-1">
                     <div class="modal-dialog modal-dialog-centered">
                         <div class="modal-content">
                             <!-- Perhatikan: Menggunakan $j->id, bukan $jurusans -->
-                            <form action="{{ route('admin.jurusan.update', $j->id) }}" method="POST" enctype="multipart/form-data">
-                                @csrf @method('PUT')
+                            <form action="<?php echo e(route('admin.jurusan.update', $j->id)); ?>" method="POST" enctype="multipart/form-data">
+                                <?php echo csrf_field(); ?> <?php echo method_field('PUT'); ?>
                                 <div class="modal-header">
                                     <h5 class="modal-title">Edit Jurusan</h5>
                                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
@@ -63,20 +63,20 @@
                                 <div class="modal-body">
                                     <div class="mb-3">
                                         <label class="form-label">Kode Jurusan</label>
-                                        <input type="text" name="kode_jurusan" class="form-control" value="{{ $j->kode_jurusan }}" required>
+                                        <input type="text" name="kode_jurusan" class="form-control" value="<?php echo e($j->kode_jurusan); ?>" required>
                                     </div>
                                     <div class="mb-3">
                                         <label class="form-label">Nama Jurusan</label>
-                                        <input type="text" name="nama_jurusan" class="form-control" value="{{ $j->nama_jurusan }}" required>
+                                        <input type="text" name="nama_jurusan" class="form-control" value="<?php echo e($j->nama_jurusan); ?>" required>
                                     </div>
                                     <div class="mb-3">
                                         <label class="form-label">Logo Jurusan</label>
                                         <input type="file" name="logo" class="form-control" accept="image/*">
-                                        @if($j->logo)
+                                        <?php if($j->logo): ?>
                                             <div class="mt-2">
-                                                <img src="{{ asset('storage/' . $j->logo) }}" alt="Logo Saat Ini" style="max-height: 60px;">
+                                                <img src="<?php echo e(asset('storage/' . $j->logo)); ?>" alt="Logo Saat Ini" style="max-height: 60px;">
                                             </div>
-                                        @endif
+                                        <?php endif; ?>
                                     </div>
                                 </div>
                                 <div class="modal-footer">
@@ -87,14 +87,14 @@
                         </div>
                     </div>
                 </div>
-                @empty
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                 <tr>
                     <td colspan="4" class="text-center py-5 text-muted">
                         <i class="bi bi-inbox fs-1 d-block mb-3"></i>
                         Belum ada data jurusan.
                     </td>
                 </tr>
-                @endforelse
+                <?php endif; ?>
             </tbody>
         </table>
     </div>
@@ -104,8 +104,8 @@
 <div class="modal fade" id="modalTambahJurusan" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-            <form action="{{ route('admin.jurusan.store') }}" method="POST" enctype="multipart/form-data">
-                @csrf
+            <form action="<?php echo e(route('admin.jurusan.store')); ?>" method="POST" enctype="multipart/form-data">
+                <?php echo csrf_field(); ?>
                 <div class="modal-header">
                     <h5 class="modal-title">Tambah Jurusan</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
@@ -132,9 +132,9 @@
         </div>
     </div>
 </div>
-@endsection
+<?php $__env->stopSection(); ?>
 
-@push('scripts')
+<?php $__env->startPush('scripts'); ?>
 <script>
 $(document).ready(function() {
     $('#jurusanTable').DataTable({
@@ -144,4 +144,5 @@ $(document).ready(function() {
     });
 });
 </script>
-@endpush
+<?php $__env->stopPush(); ?>
+<?php echo $__env->make('layouts.admin', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\Users\ADVAN\PROJEK\Laravel\GuruKuu\resources\views/admin/jurusan/index.blade.php ENDPATH**/ ?>
