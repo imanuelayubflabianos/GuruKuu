@@ -12,37 +12,50 @@ class Guru extends Model
     protected $table = 'guru';
 
     protected $fillable = [
-        'nip', 'nama', 'phone', 'photo', 'kategori',
-        'jurusan_id', 'bio', 'rata_rata_nilai', 'total_penilaian',
+        'nip',
+        'nama',
+        'email',
+        'phone',
+        'photo',
+        'kategori',
+        'jurusan_id',
+        'bio',
+        'rata_rata_nilai',
+        'total_penilaian',
     ];
 
     protected $casts = [
         'rata_rata_nilai' => 'decimal:2',
+        'total_penilaian' => 'integer',
     ];
 
     protected $appends = ['photo_url'];
 
+    // ==================== RELASI ELOQUENT ====================
+
     public function jurusan()
     {
-        return $this->belongsTo(Jurusan::class);
+        return $this->belongsTo(Jurusan::class, 'jurusan_id');
     }
 
     public function penilaian()
     {
-        return $this->hasMany(Penilaian::class);
+        return $this->hasMany(Penilaian::class, 'guru_id');
     }
 
     public function penghargaan()
     {
-        return $this->hasMany(Penghargaan::class);
+        return $this->hasMany(Penghargaan::class, 'guru_id');
     }
 
     public function kelas()
     {
-        return $this->belongsToMany(Kelas::class, 'guru_kelas')
+        return $this->belongsToMany(Kelas::class, 'guru_kelas', 'guru_id', 'kelas_id')
                     ->withPivot('mata_pelajaran')
                     ->withTimestamps();
     }
+
+    // ==================== SCOPES ====================
 
     public function scopeNormada($query)
     {
@@ -53,6 +66,8 @@ class Guru extends Model
     {
         return $query->where('kategori', 'produktif');
     }
+
+    // ==================== ACCESSOR & HELPER ====================
 
     public function getPhotoUrlAttribute()
     {
@@ -71,36 +86,50 @@ class Guru extends Model
         return "https://ui-avatars.com/api/?name={$initials}&background={$color}&color=fff&size=200&bold=true";
     }
 
-    // === METHOD INI WAJIB ADA AGAR TIDAK ERROR ===
-    public function getPersentasePartisipasiDiKelas(int $kelasId, ?int $periodeId = null): float
+    public function getPersentasePartisipasiDiKelas(?int $kelasId = null, ?int $periodeId = null): float
     {
-        $kelas = Kelas::find($kelasId);
-        if (!$kelas) return 0.0;
+        if ($kelasId) {
+            $kelas = Kelas::find($kelasId);
+            if (!$kelas || $kelas->jumlah_siswa <= 0) return 0.0;
+            $totalSiswa = $kelas->jumlah_siswa;
 
-        $totalSiswaDiKelas = $kelas->jumlah_siswa;
-        if ($totalSiswaDiKelas == 0) return 0.0;
+            $query = Penilaian::where('guru_id', $this->id)->where('class_id', $kelasId);
+            if ($periodeId) {
+                $query->where('periode_id', $periodeId);
+            }
+            $jumlahMenilai = $query->distinct('siswa_id')->count('siswa_id');
+            return round(($jumlahMenilai / $totalSiswa) * 100, 1);
+        }
 
-        $query = Penilaian::where('guru_id', $this->id)->where('class_id', $kelasId);
+        $totalSiswa = $this->kelas->sum('jumlah_siswa');
+        if ($totalSiswa <= 0) return 0.0;
+
+        $query = Penilaian::where('guru_id', $this->id);
         if ($periodeId) {
             $query->where('periode_id', $periodeId);
         }
-
-        $jumlahSiswaMenilai = $query->distinct('siswa_id')->count('siswa_id');
-        return round(($jumlahSiswaMenilai / $totalSiswaDiKelas) * 100, 1);
+        $jumlahMenilai = $query->distinct('siswa_id')->count('siswa_id');
+        return round(($jumlahMenilai / $totalSiswa) * 100, 1);
     }
 
-    public function getJumlahSiswaMenilaiDiKelas(int $kelasId, ?int $periodeId = null): int
+    public function getJumlahSiswaMenilaiDiKelas(?int $kelasId = null, ?int $periodeId = null): int
     {
-        $query = Penilaian::where('guru_id', $this->id)->where('class_id', $kelasId);
+        $query = Penilaian::where('guru_id', $this->id);
+        if ($kelasId) {
+            $query->where('class_id', $kelasId);
+        }
         if ($periodeId) {
             $query->where('periode_id', $periodeId);
         }
         return $query->distinct('siswa_id')->count('siswa_id');
     }
 
-    public function getRataRataEvaluasiDiKelas(int $kelasId, ?int $periodeId = null): float
+    public function getRataRataEvaluasiDiKelas(?int $kelasId = null, ?int $periodeId = null): float
     {
-        $query = Penilaian::where('guru_id', $this->id)->where('class_id', $kelasId);
+        $query = Penilaian::where('guru_id', $this->id);
+        if ($kelasId) {
+            $query->where('class_id', $kelasId);
+        }
         if ($periodeId) {
             $query->where('periode_id', $periodeId);
         }
@@ -113,7 +142,7 @@ class Guru extends Model
 
     public function updateRataRata()
     {
-        $penilaian = $this->penilaian;
+        $penilaian = $this->penilaian()->get();
         if ($penilaian->isEmpty()) {
             $this->update(['rata_rata_nilai' => 0, 'total_penilaian' => 0]);
             return;

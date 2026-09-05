@@ -2,15 +2,20 @@
 @section('title', 'Data Siswa')
 
 @section('content')
-<div class="page-header">
+<div class="page-header d-flex justify-content-between align-items-center">
     <div>
         <div class="page-label">MANAJEMEN DATA</div>
         <h1 class="page-title">Data Siswa</h1>
         <p class="page-subtitle">Kelola data siswa dan filter berdasarkan kelas.</p>
     </div>
-    <a href="{{ route('admin.siswa.create') }}" class="btn btn-primary-custom">
-        <i class="bi bi-plus-circle me-1"></i> Tambah Siswa
-    </a>
+    <div class="d-flex gap-2">
+        <a href="{{ route('admin.sipintu.siswa') }}" class="btn btn-outline-success">
+            <i class="bi bi-cloud-arrow-down me-1"></i> Tarik dari SiPintu
+        </a>
+        <a href="{{ route('admin.siswa.create') }}" class="btn btn-primary-custom">
+            <i class="bi bi-plus-circle me-1"></i> Tambah Siswa
+        </a>
+    </div>
 </div>
 
 {{-- FILTER BERDASARKAN KELAS --}}

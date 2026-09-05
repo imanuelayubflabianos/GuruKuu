@@ -61,7 +61,7 @@
                 </div>
                 @endforeach
             @else
-                <p class="text-muted text-center">Belum ada data penilaian.</p>
+                <p class="text-muted text-center py-4">Belum ada data penilaian.</p>
             @endif
         </div>
     </div>
@@ -71,18 +71,20 @@
             <h5 class="fw-bold mb-3"><i class="bi bi-chat-dots-fill me-2 text-primary"></i>Kritik & Saran Terbaru</h5>
             @if(isset($feedbacks) && count($feedbacks) > 0)
                 @foreach($feedbacks as $f)
-                <div class="mb-3 p-2 rounded" style="background:var(--bg-light);">
-                    <div class="d-flex justify-content-between">
-                        <strong class="small">{{ $f->siswa->name ?? 'Anonim' }}</strong>
+                <div class="mb-3 p-3 rounded" style="background:var(--bg-light);">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <strong class="small text-dark">{{ $f->siswa->name ?? 'Anonim' }} ({{ $f->kelas?->nama_kelas ?? '-' }})</strong>
                         <small class="text-muted">{{ $f->created_at->format('d M Y') }}</small>
                     </div>
-                    <p class="mb-0 small">{{ Str::limit($f->kritik ?? $f->saran, 80) }}</p>
-                    <small class="text-muted">Untuk: {{ $f->guru->nama ?? '-' }}</small>
+                    <p class="mb-1 small text-secondary">
+                        {{ Str::limit($f->kritik ?: $f->saran, 90) }}
+                    </p>
+                    <small class="text-muted font-mono" style="font-size: 0.75rem;">Untuk: <strong>{{ $f->guru->nama ?? '-' }}</strong></small>
                 </div>
                 @endforeach
-                <a href="{{ route('admin.kritik-saran.index') }}" class="btn btn-sm btn-outline-primary w-100 mt-2">Lihat Semua</a>
+                <a href="{{ route('admin.kritik-saran.index') }}" class="btn btn-sm btn-outline-primary w-100 mt-2">Lihat Semua Ulasan</a>
             @else
-                <p class="text-muted text-center">Belum ada kritik & saran.</p>
+                <p class="text-muted text-center py-4">Belum ada kritik & saran masuk.</p>
             @endif
         </div>
     </div>

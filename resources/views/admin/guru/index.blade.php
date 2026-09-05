@@ -6,10 +6,16 @@
     <div>
         <div class="page-label">MANAJEMEN DATA</div>
         <h1 class="page-title">Data Guru</h1>
+        <p class="page-subtitle">Kelola master data guru pengajar SMK Negeri 1 Bangsri.</p>
     </div>
-    <a href="{{ route('admin.guru.create') }}" class="btn btn-primary-custom">
-        <i class="bi bi-plus-circle me-1"></i> Tambah Guru
-    </a>
+    <div class="d-flex gap-2">
+        <a href="{{ route('admin.sipintu.guru') }}" class="btn btn-outline-primary">
+            <i class="bi bi-cloud-arrow-down me-1"></i> Tarik dari SiPintu
+        </a>
+        <a href="{{ route('admin.guru.create') }}" class="btn btn-primary-custom">
+            <i class="bi bi-plus-circle me-1"></i> Tambah Guru
+        </a>
+    </div>
 </div>
 
 <div class="card-custom p-3 mb-4">
@@ -44,7 +50,9 @@
             <thead>
                 <tr>
                     <th>NIP</th>
-                    <th>NAMA</th>
+                    <th>NAMA GURU</th>
+                    <th>EMAIL</th>
+                    <th>KONTAK / HP</th>
                     <th>KATEGORI</th>
                     <th>JURUSAN</th>
                     <th>PENILAIAN</th>
@@ -54,12 +62,26 @@
             <tbody>
                 @forelse($guru as $g)
                 <tr>
-                    <td class="font-mono">{{ $g->nip }}</td>
+                    <td class="font-mono fw-bold text-primary">{{ $g->nip }}</td>
                     <td>
                         <div class="d-flex align-items-center gap-2">
-                            <img src="{{ $g->photo_url }}" class="rounded-circle" style="width: 36px; height: 36px; object-fit: cover;">
+                            <img src="{{ $g->photo_url }}" class="rounded-circle border" style="width: 38px; height: 38px; object-fit: cover;">
                             <strong>{{ $g->nama }}</strong>
                         </div>
+                    </td>
+                    <td>
+                        @if($g->email)
+                            <span class="text-dark small"><i class="bi bi-envelope text-primary me-1"></i>{{ $g->email }}</span>
+                        @else
+                            <span class="text-muted small">-</span>
+                        @endif
+                    </td>
+                    <td>
+                        @if($g->phone)
+                            <span class="text-dark small"><i class="bi bi-telephone text-success me-1"></i>{{ $g->phone }}</span>
+                        @else
+                            <span class="text-muted small">-</span>
+                        @endif
                     </td>
                     <td>
                         <span class="badge bg-{{ $g->kategori == 'normada' ? 'primary' : 'success' }}">
@@ -72,16 +94,16 @@
                         <small class="text-muted d-block">({{ number_format($g->rata_rata_nilai, 1) }}/5)</small>
                     </td>
                     <td class="text-center">
-                        <a href="{{ route('admin.guru.edit', $g) }}" class="btn btn-sm btn-outline-primary me-1"><i class="bi bi-pencil"></i></a>
-                        <form action="{{ route('admin.guru.destroy', $g) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin hapus guru ini?')">
+                        <a href="{{ route('admin.guru.edit', $g) }}" class="btn btn-sm btn-outline-primary me-1" title="Edit Guru"><i class="bi bi-pencil"></i></a>
+                        <form action="{{ route('admin.guru.destroy', $g) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin hapus guru {{ $g->nama }}?')">
                             @csrf @method('DELETE')
-                            <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                            <button class="btn btn-sm btn-outline-danger" title="Hapus Guru"><i class="bi bi-trash"></i></button>
                         </form>
                     </td>
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="6" class="text-center py-5 text-muted">Belum ada data guru.</td>
+                    <td colspan="8" class="text-center py-5 text-muted">Belum ada data guru.</td>
                 </tr>
                 @endforelse
             </tbody>

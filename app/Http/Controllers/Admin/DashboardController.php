@@ -21,17 +21,17 @@ class DashboardController extends Controller
             ->limit(3)
             ->get();
             
-        // Ambil feedback dari tabel penilaian (yang punya kritik atau saran)
-        $feedbacks = Penilaian::with(['guru', 'siswa'])
-            ->where(function($q) {
-                $q->whereNotNull('kritik')
-                  ->where('kritik', '!=', '')
-                  ->orWhere(function($q2) {
-                      $q2->whereNotNull('saran')->where('saran', '!=', '');
-                  });
+        // Ambil ulasan terbaru dari tabel penilaian (yang memiliki teks kritik atau saran)
+        $feedbacks = Penilaian::with(['guru', 'siswa', 'kelas'])
+            ->where(function ($query) {
+                $query->where(function ($q) {
+                    $q->whereNotNull('kritik')->whereRaw("TRIM(kritik) != ''");
+                })->orWhere(function ($q) {
+                    $q->whereNotNull('saran')->whereRaw("TRIM(saran) != ''");
+                });
             })
             ->latest()
-            ->limit(3)
+            ->limit(5)
             ->get();
 
         return view('admin.dashboard', compact(

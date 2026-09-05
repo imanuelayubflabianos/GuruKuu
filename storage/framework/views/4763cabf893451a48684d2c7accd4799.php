@@ -1,7 +1,7 @@
-@extends('layouts.auth')
-@section('title', 'Login')
 
-@section('content')
+<?php $__env->startSection('title', 'Login'); ?>
+
+<?php $__env->startSection('content'); ?>
 <div class="d-flex align-items-center justify-content-center" style="min-height: 100vh; padding: 40px 0;">
     <div class="container">
         <div class="row justify-content-center">
@@ -13,16 +13,16 @@
                         <p class="text-muted mb-0" style="font-size: 0.9rem;">Pilih peran dan masukkan kredensial Anda</p>
                     </div>
 
-                    @if($errors->any())
+                    <?php if($errors->any()): ?>
                         <div class="alert alert-danger border-0 mb-3" style="background: #fee2e2; color: #991b1b;">
-                            @foreach($errors->all() as $error)
-                                <div class="small"><i class="bi bi-exclamation-triangle"></i> {{ $error }}</div>
-                            @endforeach
+                            <?php $__currentLoopData = $errors->all(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $error): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <div class="small"><i class="bi bi-exclamation-triangle"></i> <?php echo e($error); ?></div>
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         </div>
-                    @endif
+                    <?php endif; ?>
 
-                    <form action="{{ route('login.post') }}" method="POST" id="loginForm">
-                        @csrf
+                    <form action="<?php echo e(route('login.post')); ?>" method="POST" id="loginForm">
+                        <?php echo csrf_field(); ?>
                         
                         <!-- PILIHAN PERAN LOGIN -->
                         <div class="mb-3">
@@ -51,7 +51,7 @@
                             <div class="input-group">
                                 <span class="input-group-text bg-white border-end-0"><i class="bi bi-person-badge text-muted"></i></span>
                                 <input type="text" name="nis" id="nisInput" class="form-control border-start-0 ps-0" 
-                                    value="{{ old('nis') }}" placeholder="Masukkan NIS" required style="border-radius: 0 8px 8px 0; padding: 0.65rem 1rem;">
+                                    value="<?php echo e(old('nis')); ?>" placeholder="Masukkan NIS" required style="border-radius: 0 8px 8px 0; padding: 0.65rem 1rem;">
                             </div>
                         </div>
 
@@ -61,7 +61,7 @@
                             <div class="input-group">
                                 <span class="input-group-text bg-white border-end-0"><i class="bi bi-calendar-event text-muted"></i></span>
                                 <input type="date" name="tanggal_lahir" id="dobInput" class="form-control border-start-0 ps-0" 
-                                    value="{{ old('tanggal_lahir') }}" style="border-radius: 0 8px 8px 0; padding: 0.65rem 1rem;">
+                                    value="<?php echo e(old('tanggal_lahir')); ?>" style="border-radius: 0 8px 8px 0; padding: 0.65rem 1rem;">
                             </div>
                         </div>
 
@@ -85,14 +85,14 @@
 
                     <div class="text-center mt-4 pt-3 border-top">
                         <small class="text-muted d-block mb-2">Ada masalah dengan login?</small>
-                        <a href="{{ route('kontak.guest.page') }}" class="text-decoration-none" style="color: var(--primary); font-size: 0.85rem;">
+                        <a href="<?php echo e(route('kontak.guest.page')); ?>" class="text-decoration-none" style="color: var(--primary); font-size: 0.85rem;">
                             <i class="bi bi-chat-dots me-1"></i> Hubungi Admin
                         </a>
                     </div>
                 </div>
 
                 <div class="text-center mt-4">
-                    <a href="{{ route('landing.index') }}" class="text-decoration-none text-muted fw-medium" style="font-size: 0.9rem;">
+                    <a href="<?php echo e(route('landing.index')); ?>" class="text-decoration-none text-muted fw-medium" style="font-size: 0.9rem;">
                         <i class="bi bi-arrow-left me-1"></i> Kembali ke Beranda
                     </a>
                 </div>
@@ -188,4 +188,5 @@ document.getElementById('loginForm').addEventListener('submit', function(e) {
     }
 });
 </script>
-@endsection
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layouts.auth', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\Users\ADVAN\PROJEK\Laravel\GuruKuu\resources\views/auth/login.blade.php ENDPATH**/ ?>

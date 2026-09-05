@@ -1,4 +1,4 @@
-@extends('layouts.landing')
+@extends('layouts.auth')
 @section('title', 'Ganti Password')
 
 @section('content')

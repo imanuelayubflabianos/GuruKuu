@@ -46,14 +46,27 @@
             </a>
             
             <div class="sidebar-link" data-bs-toggle="collapse" data-bs-target="#menuData">
-                <i class="bi bi-database"></i> Data
+                <i class="bi bi-database"></i> Data Lokal
                 <i class="bi bi-chevron-down ms-auto" style="font-size:0.8rem;"></i>
             </div>
-            <div class="collapse" id="menuData">
+            <div class="collapse {{ request()->routeIs('admin.guru.*', 'admin.siswa.*', 'admin.jurusan.*') ? 'show' : '' }}" id="menuData">
                 <div class="sidebar-submenu">
                     <a href="{{ route('admin.guru.index') }}" class="sidebar-link {{ request()->routeIs('admin.guru.*') ? 'active' : '' }}">Data Guru</a>
                     <a href="{{ route('admin.siswa.index') }}" class="sidebar-link {{ request()->routeIs('admin.siswa.*') ? 'active' : '' }}">Data Siswa</a>
                     <a href="{{ route('admin.jurusan.index') }}" class="sidebar-link {{ request()->routeIs('admin.jurusan.*') ? 'active' : '' }}">Data Jurusan</a>
+                </div>
+            </div>
+
+            <div class="sidebar-link" data-bs-toggle="collapse" data-bs-target="#menuSiPintu">
+                <i class="bi bi-cloud-arrow-down text-primary"></i> Gateway SiPintu
+                <span class="badge bg-primary ms-auto me-1" style="font-size: 0.65rem;">API</span>
+                <i class="bi bi-chevron-down" style="font-size:0.8rem;"></i>
+            </div>
+            <div class="collapse {{ request()->routeIs('admin.sipintu.*') ? 'show' : '' }}" id="menuSiPintu">
+                <div class="sidebar-submenu">
+                    <a href="{{ route('admin.sipintu.index') }}" class="sidebar-link {{ request()->routeIs('admin.sipintu.index') ? 'active' : '' }}">Status Gateway</a>
+                    <a href="{{ route('admin.sipintu.guru') }}" class="sidebar-link {{ request()->routeIs('admin.sipintu.guru*') ? 'active' : '' }}">Data Guru SiPintu</a>
+                    <a href="{{ route('admin.sipintu.siswa') }}" class="sidebar-link {{ request()->routeIs('admin.sipintu.siswa*') ? 'active' : '' }}">Data Siswa SiPintu</a>
                 </div>
             </div>
 

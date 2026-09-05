@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'GuruKuu') - Sistem Penilaian Guru</title>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <title><?php echo $__env->yieldContent('title', 'GuruKuu'); ?> - Sistem Penilaian Guru</title>
+    <?php echo app('Illuminate\Foundation\Vite')(['resources/css/app.css', 'resources/js/app.js']); ?>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -109,7 +109,7 @@
 <body>
     <nav class="navbar navbar-expand-lg navbar-custom fixed-top">
         <div class="container">
-            <a class="navbar-brand navbar-brand-custom" href="{{ route('landing.index') }}">GuruKuu</a>
+            <a class="navbar-brand navbar-brand-custom" href="<?php echo e(route('landing.index')); ?>">GuruKuu</a>
             <button class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navMenu"><span class="navbar-toggler-icon"></span></button>
             <div class="collapse navbar-collapse" id="navMenu">
                 <div class="nav-menu-center">
@@ -119,8 +119,8 @@
                     <a class="nav-link nav-link-custom" href="#tentang">Tentang</a>
                 </div>
                                 <div class="nav-actions">
-                 @auth
-    @php
+                 <?php if(auth()->guard()->check()): ?>
+    <?php
         $userRole = Auth::user()->role;
         $dashboardUrl = match($userRole) {
             'admin' => route('admin.dashboard'),
@@ -134,29 +134,30 @@
             'siswa' => 'Dashboard Siswa',
             default => 'Dashboard'
         };
-    @endphp
+    ?>
     
-    <a href="{{ $dashboardUrl }}" class="btn btn-dashboard">
-        <i class="bi bi-speedometer2 me-1"></i> {{ $dashboardLabel }}
+    <a href="<?php echo e($dashboardUrl); ?>" class="btn btn-dashboard">
+        <i class="bi bi-speedometer2 me-1"></i> <?php echo e($dashboardLabel); ?>
+
     </a>
     
-    <form action="{{ route('logout') }}" method="POST" class="d-inline">
-        @csrf
+    <form action="<?php echo e(route('logout')); ?>" method="POST" class="d-inline">
+        <?php echo csrf_field(); ?>
         <button type="submit" class="btn btn-danger btn-sm">
             <i class="bi bi-box-arrow-right me-1"></i> Keluar
         </button>
     </form>
-@else
-    <a href="{{ route('login') }}" class="btn btn-primary">
+<?php else: ?>
+    <a href="<?php echo e(route('login')); ?>" class="btn btn-primary">
         <i class="bi bi-box-arrow-in-right me-1"></i> Masuk
     </a>
-@endauth
+<?php endif; ?>
                 </div>
             </div>
         </div>
     </nav>
 
-    @yield('content')
+    <?php echo $__env->yieldContent('content'); ?>
 
     <footer class="footer-custom">
         <div class="container">
@@ -169,15 +170,15 @@
                 </div>
                 <div class="col-lg-5 mb-4 text-lg-end">
                     <div class="footer-label">LEGAL & BANTUAN</div>
-                    <a href="{{ route('legal.privacy') }}" class="footer-link me-3">Kebijakan Privasi</a>
-                    <a href="{{ route('legal.terms') }}" class="footer-link me-3">Syarat & Ketentuan</a>
-                    <a href="{{ route('kontak.guest.page') }}" class="footer-link">Hubungi Admin</a>
+                    <a href="<?php echo e(route('legal.privacy')); ?>" class="footer-link me-3">Kebijakan Privasi</a>
+                    <a href="<?php echo e(route('legal.terms')); ?>" class="footer-link me-3">Syarat & Ketentuan</a>
+                    <a href="<?php echo e(route('kontak.guest.page')); ?>" class="footer-link">Hubungi Admin</a>
                 </div>
             </div>
             <hr class="border-secondary my-4">
             <div class="row">
                 <div class="col-12 text-center">
-                    <p class="text-muted mb-0" style="font-size: 0.85rem;">&copy; {{ date('Y') }} GuruKuu. All rights reserved.</p>
+                    <p class="text-muted mb-0" style="font-size: 0.85rem;">&copy; <?php echo e(date('Y')); ?> GuruKuu. All rights reserved.</p>
                 </div>
             </div>
         </div>
@@ -255,4 +256,4 @@
         });
     </script>
 </body>
-</html>
+</html><?php /**PATH C:\Users\ADVAN\PROJEK\Laravel\GuruKuu\resources\views/layouts/landing.blade.php ENDPATH**/ ?>

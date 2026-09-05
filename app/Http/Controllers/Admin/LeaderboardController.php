@@ -17,7 +17,7 @@ class LeaderboardController extends Controller
         $filterKelasId = $request->get('kelas_id', null);
         $periodeId = Periode::where('status', 'aktif')->value('id');
 
-        $query = Guru::query();
+        $query = Guru::query()->with(['jurusan', 'kelas']);
 
         if ($filterKategori === 'normada') {
             $query->where('kategori', 'normada');
@@ -34,40 +34,34 @@ class LeaderboardController extends Controller
         $guruList = $query->get();
 
         $guruWithData = $guruList->map(function($guru) use ($filterKelasId, $periodeId) {
-            if ($filterKelasId) {
-                $kelas = Kelas::find($filterKelasId);
-                $totalSiswa = $kelas ? $kelas->jumlah_siswa : 0;
-                
-                $jumlahMenilai = Penilaian::where('guru_id', $guru->id)
-                    ->where('class_id', $filterKelasId)
-                    ->where('periode_id', $periodeId)
-                    ->distinct('siswa_id')
-                    ->count('siswa_id');
-            } else {
-                $totalSiswa = $guru->kelas->sum('jumlah_siswa');
-                
-                $jumlahMenilai = Penilaian::where('guru_id', $guru->id)
-                    ->where('periode_id', $periodeId)
-                    ->distinct('siswa_id')
-                    ->count('siswa_id');
-            }
-
-            $persentase = $totalSiswa > 0 ? round(($jumlahMenilai / $totalSiswa) * 100, 1) : 0;
-
-            $guru->persentase = $persentase;
-            $guru->jumlah_siswa = $jumlahMenilai;
-            $guru->total_siswa = $totalSiswa;
-
+            $guru->persentase = $guru->getPersentasePartisipasiDiKelas($filterKelasId, $periodeId);
+            $guru->jumlah_siswa = $guru->getJumlahSiswaMenilaiDiKelas($filterKelasId, $periodeId);
+            $guru->total_siswa = $filterKelasId 
+                ? (Kelas::find($filterKelasId)?->jumlah_siswa ?? 0) 
+                : $guru->kelas->sum('jumlah_siswa');
+            $guru->rata_evaluasi = $filterKelasId 
+                ? $guru->getRataRataEvaluasiDiKelas($filterKelasId, $periodeId) 
+                : ($guru->rata_rata_nilai ?? 0);
             return $guru;
         });
 
-        $rankedGuru = $guruWithData->sortByDesc('persentase')->values();
-        $top3 = $rankedGuru->take(3);
+        // Urutkan peringkat stabil: Persentase DESC, Rata Evaluasi DESC, Jumlah Siswa DESC, Nama ASC
+        $rankedGuru = $guruWithData->sort(function($a, $b) {
+            if ($b->persentase != $a->persentase) {
+                return $b->persentase <=> $a->persentase;
+            }
+            if ($b->rata_evaluasi != $a->rata_evaluasi) {
+                return $b->rata_evaluasi <=> $a->rata_evaluasi;
+            }
+            if ($b->jumlah_siswa != $a->jumlah_siswa) {
+                return $b->jumlah_siswa <=> $a->jumlah_siswa;
+            }
+            return strcmp($a->nama, $b->nama);
+        })->values();
 
         $semuaKelas = Kelas::with('jurusan')->orderBy('tingkat')->orderBy('nama_kelas')->get();
 
         return view('admin.leaderboard.index', compact(
-            'top3',
             'rankedGuru',
             'semuaKelas',
             'filterKategori',

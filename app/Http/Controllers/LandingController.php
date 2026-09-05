@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Guru;
+use App\Models\Penilaian;
 use App\Models\Periode;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class LandingController extends Controller
@@ -12,15 +14,21 @@ class LandingController extends Controller
     {
         $periodeAktif = Periode::where('status', 'aktif')->first();
         
-        // Top 3 guru terbaik (gunakan query langsung, bukan scope)
-        $topGuru = Guru::where('total_penilaian', '>', 0)
+        $totalGuru = Guru::count();
+        $totalSiswa = User::where('role', 'siswa')->count();
+        $totalPenilaian = Penilaian::count();
+
+        // Top 3 guru terbaik secara keseluruhan
+        $topGuru = Guru::with('jurusan')
+            ->where('total_penilaian', '>', 0)
             ->orderBy('rata_rata_nilai', 'desc')
             ->orderBy('total_penilaian', 'desc')
             ->limit(3)
             ->get();
 
         // Top 3 guru normada
-        $topNormada = Guru::where('kategori', 'normada')
+        $topNormada = Guru::with('jurusan')
+            ->where('kategori', 'normada')
             ->where('total_penilaian', '>', 0)
             ->orderBy('rata_rata_nilai', 'desc')
             ->orderBy('total_penilaian', 'desc')
@@ -28,7 +36,8 @@ class LandingController extends Controller
             ->get();
 
         // Top 3 guru produktif
-        $topProduktif = Guru::where('kategori', 'produktif')
+        $topProduktif = Guru::with('jurusan')
+            ->where('kategori', 'produktif')
             ->where('total_penilaian', '>', 0)
             ->orderBy('rata_rata_nilai', 'desc')
             ->orderBy('total_penilaian', 'desc')
@@ -37,6 +46,9 @@ class LandingController extends Controller
 
         return view('landing.index', compact(
             'periodeAktif',
+            'totalGuru',
+            'totalSiswa',
+            'totalPenilaian',
             'topGuru',
             'topNormada',
             'topProduktif'
@@ -47,13 +59,40 @@ class LandingController extends Controller
     {
         $periodeAktif = Periode::where('status', 'aktif')->first();
         
-        $topGuru = Guru::where('total_penilaian', '>', 0)
+        $leaderboardNormada = Guru::with('jurusan')
+            ->where('kategori', 'normada')
+            ->where('total_penilaian', '>', 0)
             ->orderBy('rata_rata_nilai', 'desc')
             ->orderBy('total_penilaian', 'desc')
-            ->limit(10)
             ->get();
 
-        return view('landing.leaderboard', compact('periodeAktif', 'topGuru'));
+        $leaderboardProduktif = Guru::with('jurusan')
+            ->where('kategori', 'produktif')
+            ->where('total_penilaian', '>', 0)
+            ->orderBy('rata_rata_nilai', 'desc')
+            ->orderBy('total_penilaian', 'desc')
+            ->get();
+
+        // Fallback jika belum ada penilaian
+        if ($leaderboardNormada->isEmpty()) {
+            $leaderboardNormada = Guru::with('jurusan')
+                ->where('kategori', 'normada')
+                ->orderBy('nama', 'asc')
+                ->get();
+        }
+
+        if ($leaderboardProduktif->isEmpty()) {
+            $leaderboardProduktif = Guru::with('jurusan')
+                ->where('kategori', 'produktif')
+                ->orderBy('nama', 'asc')
+                ->get();
+        }
+
+        return view('landing.leaderboard', compact(
+            'periodeAktif',
+            'leaderboardNormada',
+            'leaderboardProduktif'
+        ));
     }
 
     public function search(Request $request)
