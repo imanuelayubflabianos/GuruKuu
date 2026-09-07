@@ -23,63 +23,51 @@
 
                     <form action="{{ route('login.post') }}" method="POST" id="loginForm">
                         @csrf
-                        
-                        <!-- PILIHAN PERAN LOGIN -->
+
                         <div class="mb-3">
                             <label class="form-label font-mono" style="font-size: 0.75rem; font-weight: 600; letter-spacing: 1px;">PERAN LOGIN</label>
                             <div class="d-flex gap-2">
-                                <input type="radio" class="btn-check" name="login_role" id="roleSiswa" value="siswa" checked onchange="updateLoginForm()">
+                                <input type="radio" class="btn-check" name="login_role" id="roleSiswa" value="siswa" checked onchange="updateForm()">
                                 <label class="btn btn-outline-primary flex-fill py-2" for="roleSiswa">
                                     <i class="bi bi-person-fill me-1"></i> Siswa
                                 </label>
 
-                                <input type="radio" class="btn-check" name="login_role" id="roleGuru" value="guru" onchange="updateLoginForm()">
+                                <input type="radio" class="btn-check" name="login_role" id="roleGuru" value="guru" onchange="updateForm()">
                                 <label class="btn btn-outline-primary flex-fill py-2" for="roleGuru">
-                                    <i class="bi bi-chalkboard-teacher me-1"></i> Guru
-                                </label>
-
-                                <input type="radio" class="btn-check" name="login_role" id="roleAdmin" value="admin" onchange="updateLoginForm()">
-                                <label class="btn btn-outline-primary flex-fill py-2" for="roleAdmin">
-                                    <i class="bi bi-shield-lock-fill me-1"></i> Admin
+                                    <i class="bi bi-chalkboard-teacher me-1"></i> Guru 
                                 </label>
                             </div>
                         </div>
 
-                        <!-- NIS (Label sudah diubah, tanpa "NIY") -->
                         <div class="mb-3">
-                            <label class="form-label font-mono" style="font-size: 0.75rem; font-weight: 600; letter-spacing: 1px;">NIS</label>
+                            <label class="form-label font-mono" id="labelNis" style="font-size: 0.75rem; font-weight: 600; letter-spacing: 1px;">NIS</label>
                             <div class="input-group">
                                 <span class="input-group-text bg-white border-end-0"><i class="bi bi-person-badge text-muted"></i></span>
-                                <input type="text" name="nis" id="nisInput" class="form-control border-start-0 ps-0" 
-                                    value="{{ old('nis') }}" placeholder="Masukkan NIS" required style="border-radius: 0 8px 8px 0; padding: 0.65rem 1rem;">
+                                <input type="text" name="nis" id="inputNis" class="form-control border-start-0 ps-0"
+                                    value="{{ old('nis') }}" placeholder="Masukkan NIS" required 
+                                    style="border-radius: 0 8px 8px 0; padding: 0.65rem 1rem;">
                             </div>
                         </div>
 
-                        <!-- CONTAINER TANGGAL LAHIR (Hanya untuk Siswa) -->
-                        <div class="mb-3" id="containerTanggalLahir">
-                            <label class="form-label font-mono" style="font-size: 0.75rem; font-weight: 600; letter-spacing: 1px;">TANGGAL LAHIR</label>
-                            <div class="input-group">
-                                <span class="input-group-text bg-white border-end-0"><i class="bi bi-calendar-event text-muted"></i></span>
-                                <input type="date" name="tanggal_lahir" id="dobInput" class="form-control border-start-0 ps-0" 
-                                    value="{{ old('tanggal_lahir') }}" style="border-radius: 0 8px 8px 0; padding: 0.65rem 1rem;">
-                            </div>
-                        </div>
-
-                        <!-- CONTAINER PASSWORD (Untuk Guru & Admin) -->
-                        <div class="mb-4" id="containerPassword" style="display: none;">
+                        <div class="mb-4">
                             <label class="form-label font-mono" style="font-size: 0.75rem; font-weight: 600; letter-spacing: 1px;">PASSWORD</label>
                             <div class="input-group">
                                 <span class="input-group-text bg-white border-end-0"><i class="bi bi-lock text-muted"></i></span>
-                                <input type="password" name="password" id="passwordInput" class="form-control border-start-0 border-end-0 ps-0" 
-                                    placeholder="Masukkan Password" style="border-radius: 0; padding: 0.65rem 1rem;">
-                                <button type="button" class="input-group-text bg-white border-start-0" id="togglePassword" style="border-radius: 0 8px 8px 0; cursor: pointer; border-left: none;">
-                                    <i class="bi bi-eye text-muted" id="toggleIcon"></i>
+                                <input type="password" name="password" id="inputPassword" class="form-control border-start-0 border-end-0 ps-0"
+                                    placeholder="Masukkan Password" required 
+                                    style="border-radius: 0; padding: 0.65rem 1rem;">
+                                <button type="button" class="input-group-text bg-white border-start-0" id="togglePassword" 
+                                    style="border-radius: 0 8px 8px 0; cursor: pointer; border-left: none;">
+                                    <i class="bi bi-eye text-muted" id="iconEye"></i>
                                 </button>
                             </div>
+                            <!-- <small class="text-muted mt-1 d-block" id="hintPassword">
+                                Password default: <strong>password</strong>
+                            </small> -->
                         </div>
 
-                        <button type="submit" id="submitBtn" class="btn btn-masuk w-100 py-2" style="font-size: 1rem;">
-                            <i class="bi bi-box-arrow-in-right me-2"></i> Lanjutkan
+                        <button type="submit" id="btnSubmit" class="btn btn-masuk w-100 py-2" style="font-size: 1rem;">
+                            <i class="bi bi-box-arrow-in-right me-2"></i> Masuk sebagai Siswa
                         </button>
                     </form>
 
@@ -102,90 +90,42 @@
 </div>
 
 <script>
-function updateLoginForm() {
+function updateForm() {
     const roleSiswa = document.getElementById('roleSiswa');
     const roleGuru = document.getElementById('roleGuru');
-    const roleAdmin = document.getElementById('roleAdmin');
-    const containerTanggalLahir = document.getElementById('containerTanggalLahir');
-    const containerPassword = document.getElementById('containerPassword');
-    const dobInput = document.getElementById('dobInput');
-    const passwordInput = document.getElementById('passwordInput');
-    const submitBtn = document.getElementById('submitBtn');
-    
-    let selectedRole = 'siswa';
-    
-    if (roleGuru.checked) {
-        selectedRole = 'guru';
-    } else if (roleAdmin.checked) {
-        selectedRole = 'admin';
-    }
-    
-    if (selectedRole === 'guru' || selectedRole === 'admin') {
-        containerTanggalLahir.style.display = 'none';
-        dobInput.removeAttribute('required');
-        
-        containerPassword.style.display = 'block';
-        passwordInput.setAttribute('required', 'required');
-        
-        if (selectedRole === 'admin') {
-            submitBtn.innerHTML = '<i class="bi bi-shield-lock-fill me-2"></i> Masuk sebagai Admin';
-        } else {
-            submitBtn.innerHTML = '<i class="bi bi-chalkboard-teacher me-2"></i> Masuk sebagai Guru';
-        }
-        
-        setTimeout(function() {
-            passwordInput.focus();
-        }, 300);
-        
+    const labelNis = document.getElementById('labelNis');
+    const inputNis = document.getElementById('inputNis');
+    const hintPassword = document.getElementById('hintPassword');
+    const btnSubmit = document.getElementById('btnSubmit');
+
+    if (roleSiswa.checked) {
+        labelNis.textContent = 'NIS';
+        inputNis.placeholder = 'Masukkan NIS';
+        btnSubmit.innerHTML = '<i class="bi bi-box-arrow-in-right me-2"></i> Masuk sebagai Siswa';
     } else {
-        containerTanggalLahir.style.display = 'block';
-        dobInput.setAttribute('required', 'required');
-        
-        containerPassword.style.display = 'none';
-        passwordInput.removeAttribute('required');
-        submitBtn.innerHTML = '<i class="bi bi-box-arrow-in-right me-2"></i> Lanjutkan';
+        labelNis.textContent = 'NIP';
+        inputNis.placeholder = 'Masukkan NIP';
+        btnSubmit.innerHTML = '<i class="bi bi-chalkboard-teacher me-2"></i> Masuk sebagai Guru';
     }
 }
 
-document.getElementById('togglePassword').addEventListener('click', function(e) {
-    e.preventDefault();
-    const passwordInput = document.getElementById('passwordInput');
-    const toggleIcon = document.getElementById('toggleIcon');
+document.getElementById('togglePassword').addEventListener('click', function() {
+    const passwordInput = document.getElementById('inputPassword');
+    const iconEye = document.getElementById('iconEye');
     
     if (passwordInput.type === 'password') {
         passwordInput.type = 'text';
-        toggleIcon.classList.remove('bi-eye');
-        toggleIcon.classList.add('bi-eye-slash');
+        iconEye.classList.remove('bi-eye');
+        iconEye.classList.add('bi-eye-slash');
     } else {
         passwordInput.type = 'password';
-        toggleIcon.classList.remove('bi-eye-slash');
-        toggleIcon.classList.add('bi-eye');
+        iconEye.classList.remove('bi-eye-slash');
+        iconEye.classList.add('bi-eye');
     }
 });
 
 document.addEventListener('DOMContentLoaded', function() {
-    updateLoginForm();
-});
-
-document.getElementById('loginForm').addEventListener('submit', function(e) {
-    const roleGuru = document.getElementById('roleGuru');
-    const roleAdmin = document.getElementById('roleAdmin');
-    const passwordInput = document.getElementById('passwordInput');
-    const dobInput = document.getElementById('dobInput');
-    
-    if (roleGuru.checked || roleAdmin.checked) {
-        if (!passwordInput.value) {
-            e.preventDefault();
-            passwordInput.classList.add('is-invalid');
-            passwordInput.focus();
-        }
-    } else {
-        if (!dobInput.value) {
-            e.preventDefault();
-            dobInput.classList.add('is-invalid');
-            dobInput.focus();
-        }
-    }
+    updateForm();
 });
 </script>
 @endsection

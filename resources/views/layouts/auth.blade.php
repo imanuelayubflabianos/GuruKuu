@@ -3,45 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Login') - GuruKuu</title>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    
     <style>
-        :root {
-            --primary: #003366;
-            --primary-light: #004080;
-            --bg-light: #f5f7fa;
-            --text-dark: #1a1a2e;
-            --text-muted: #64748b;
-            --border: #e2e8f0;
+        :root { 
+            --primary: #003366; 
+            --bg-light: #f5f7fa; 
         }
-        * { font-family: 'Inter', sans-serif; }
-        .font-mono { font-family: 'JetBrains Mono', monospace; }
-        body { background-color: var(--bg-light); }
-        
-        .card-custom {
-            background: white;
-            border-radius: 12px;
-            border: 1px solid var(--border);
-            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+        body { 
+            background-color: var(--bg-light); 
+            font-family: 'Inter', sans-serif; 
+        }
+        .card-custom { 
+            background: white; 
+            border-radius: 12px; 
+            border: 1px solid #e2e8f0; 
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05); 
         }
         .btn-masuk {
-            background: var(--primary);
+            background-color: var(--primary);
             color: white;
-            padding: 0.6rem 1.25rem;
+            border: none;
             border-radius: 8px;
             font-weight: 600;
-            border: none;
-            text-decoration: none;
-            transition: all 0.3s;
+            transition: all 0.2s;
         }
-        .btn-masuk:hover { background: var(--primary-light); color: white; }
+        .btn-masuk:hover {
+            background-color: #002244;
+            color: white;
+        }
+        .font-mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
     </style>
 </head>
 <body>
-    {{-- ✅ BAGIAN ATAS SUDAH DIHAPUS --}}
 
     @yield('content')
 

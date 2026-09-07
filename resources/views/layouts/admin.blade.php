@@ -85,7 +85,10 @@
             <a href="{{ route('admin.pengaturan.index') }}" class="sidebar-link {{ request()->routeIs('admin.pengaturan.*') ? 'active' : '' }}">
                 <i class="bi bi-gear"></i> Pengaturan
             </a>
-            
+
+          <a href="{{ route('auth.ganti-password') }}" class="sidebar-link {{ request()->routeIs('auth.ganti-password') ? 'active' : '' }}">
+    <i class="bi bi-key"></i> Ganti Password
+</a>
             <div class="mt-4 px-3">
                 <form action="{{ route('logout') }}" method="POST">
                     @csrf
@@ -100,6 +103,9 @@
     <div class="main-content">
         @if(session('success'))
             <div class="alert alert-success alert-dismissible fade show">{{ session('success') }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>
+        @endif
+        @if(session('error'))
+            <div class="alert alert-danger alert-dismissible fade show">{{ session('error') }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>
         @endif
         @yield('content')
     </div>

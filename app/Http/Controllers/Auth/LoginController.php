@@ -5,25 +5,30 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\Guru;
 use App\Models\User;
+use App\Services\SiPintuService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 
 class LoginController extends Controller
 {
+    protected SiPintuService $siPintu;
+
+    // Inject SiPintuService agar bisa tarik data otomatis
+    public function __construct(SiPintuService $siPintu)
+    {
+        $this->siPintu = $siPintu;
+    }
+
     public function showLoginForm()
     {
         if (Auth::check()) {
             $user = Auth::user();
-            if (!empty($user->force_change_password)) {
-                return redirect()->route('auth.ganti-password');
-            }
-            
-            if ($user->role === 'guru') {
-                return redirect()->route('guru.dashboard');
-            }
-            if ($user->role === 'admin' && !session('login_as_siswa')) {
+            if ($user->role === 'admin') {
                 return redirect()->route('admin.dashboard');
+            } elseif ($user->role === 'guru') {
+                return redirect()->route('guru.dashboard');
             }
             return redirect()->route('siswa.dashboard');
         }
@@ -34,152 +39,160 @@ class LoginController extends Controller
     {
         $request->validate([
             'nis' => 'required|string',
-            'login_role' => 'required|in:siswa,admin,guru',
-            'tanggal_lahir' => 'nullable|date',
-            'password' => 'nullable|string',
+            'login_role' => 'required|in:siswa,guru',
+            'password' => 'required|string',
         ]);
 
         $nis = $request->nis;
+        $password = $request->password;
+        $role = $request->login_role;
 
-        if ($request->login_role === 'guru') {
-            return $this->handleGuruLogin($nis, $request);
+        // ==========================================
+        // 1. LOGIN SISWA (NIS + Password)
+        // ==========================================
+        if ($role === 'siswa') {
+            $user = User::where('nis', $nis)->where('role', 'siswa')->first();
+
+            // 🔄 AUTO-PROVISIONING: Jika tidak ada di lokal, tarik dari SiPintu
+            if (!$user) {
+                Log::info("Siswa tidak ditemukan di lokal, mencoba tarik dari SiPintu: NIS {$nis}");
+                $studentData = $this->siPintu->getStudentByNis($nis);
+                
+                if ($studentData) {
+                    $syncResult = $this->siPintu->syncStudentToLocal($studentData);
+                    if ($syncResult['success']) {
+                        $user = User::where('nis', $nis)->where('role', 'siswa')->first();
+                        
+                        // Pastikan password default adalah "password" untuk akun baru
+                        if ($user) {
+                            $user->password = Hash::make('password');
+                            $user->save();
+                        }
+                    }
+                }
+            }
+
+            if (!$user) {
+                return back()->withErrors(['nis' => 'NIS tidak ditemukan. Pastikan data sudah disinkronisasi oleh Admin melalui menu Gateway SiPintu.'])->withInput();
+            }
+
+            if (!Hash::check($password, $user->password)) {
+                return back()->withErrors(['password' => 'Password salah.'])->withInput();
+            }
+
+            Auth::login($user, $request->boolean('remember'));
+            $request->session()->regenerate();
+
+            return redirect()->intended(route('siswa.dashboard'))
+                ->with('success', 'Selamat datang, ' . $user->name . '!');
         }
 
-        if ($request->login_role === 'admin') {
-            return $this->handleAdminLogin($nis, $request);
-        }
+        // ==========================================
+        // 2. LOGIN GURU (NIP + Password) ATAU ADMIN
+        // ==========================================
+        if ($role === 'guru') {
+            // Cek apakah ini login admin
+            if (strtolower($nis) === 'admin') {
+                if ($password !== 'eskasaba') {
+                    return back()->withErrors(['password' => 'Password admin salah.'])->withInput();
+                }
 
-        if ($request->login_role === 'siswa') {
-            return $this->handleSiswaLogin($nis, $request);
+                $admin = User::where('nis', 'admin')->where('role', 'admin')->first();
+                if (!$admin) {
+                    $admin = User::create([
+                        'name' => 'Administrator',
+                        'nis' => 'admin',
+                        'email' => 'admin@gurukuu.com',
+                        'password' => Hash::make('eskasaba'),
+                        'role' => 'admin',
+                        'is_active' => true,
+                    ]);
+                }
+
+                Auth::login($admin, $request->boolean('remember'));
+                $request->session()->regenerate();
+
+                return redirect()->intended(route('admin.dashboard'))
+                    ->with('success', 'Selamat datang, Administrator!');
+            }
+
+            // Login sebagai Guru
+            $guru = Guru::where('nip', $nis)->first();
+
+            // 🔄 AUTO-PROVISIONING: Jika tidak ada di lokal, tarik dari SiPintu
+            if (!$guru) {
+                Log::info("Guru tidak ditemukan di lokal, mencoba tarik dari SiPintu: NIP {$nis}");
+                $teacherData = $this->siPintu->getTeacherByNip($nis);
+                
+                if ($teacherData) {
+                    $syncResult = $this->siPintu->syncTeacherToLocal($teacherData);
+                    if ($syncResult['success']) {
+                        $guru = Guru::where('nip', $nis)->first();
+                    }
+                }
+            }
+
+            if (!$guru) {
+                return back()->withErrors(['nis' => 'NIP tidak ditemukan. Pastikan data sudah disinkronisasi oleh Admin melalui menu Gateway SiPintu.'])->withInput();
+            }
+
+            $user = User::where('nis', $nis)->where('role', 'guru')->first();
+
+            if (!$user) {
+                $user = User::create([
+                    'name' => $guru->nama,
+                    'nis' => $nis,
+                    'email' => $nis . '@gurukuu.local',
+                    'password' => Hash::make('password'), // Default password
+                    'role' => 'guru',
+                    'is_active' => true,
+                ]);
+            }
+
+            if (!Hash::check($password, $user->password)) {
+                return back()->withErrors(['password' => 'Password Guru salah.'])->withInput();
+            }
+
+            Auth::login($user, $request->boolean('remember'));
+            $request->session()->regenerate();
+
+            return redirect()->intended(route('guru.dashboard'))
+                ->with('success', 'Selamat datang, ' . $user->name . '!');
         }
 
         return back()->withErrors(['nis' => 'Peran login tidak valid.'])->withInput();
     }
 
-    /**
-     * Handle login Guru - Auto-create user dari tabel guru jika belum ada
-     */
-    protected function handleGuruLogin($nis, Request $request)
-    {
-        // 1. Cek apakah user sudah ada di tabel users
-        $user = User::where('nis', $nis)->where('role', 'guru')->first();
-
-        // 2. Jika belum ada, ambil data dari tabel guru dan buat user otomatis
-        if (!$user) {
-            $guru = Guru::where('nip', $nis)->first();
-            
-            if (!$guru) {
-                return back()->withErrors(['nis' => 'NIP / NIY tidak ditemukan di data Guru.'])->withInput();
-            }
-
-            // Buat akun user baru secara otomatis
-            $user = User::create([
-                'name' => $guru->nama,
-                'nis' => $nis,
-                'email' => $guru->email ?? ($nis . '@gurukuu.local'),
-                'password' => Hash::make('password'), // Password default
-                'role' => 'guru',
-                'tanggal_lahir' => '1970-01-01',
-                'force_change_password' => true,
-                'is_active' => true,
-            ]);
-        }
-
-        // 3. Validasi password
-        if (!$request->password || !Hash::check($request->password, $user->password)) {
-            return back()->withErrors(['password' => 'Password Guru salah.'])->withInput();
-        }
-
-        // 4. Proses login
-        Auth::login($user, $request->boolean('remember'));
-        $request->session()->forget('login_as_siswa');
-        $request->session()->regenerate();
-
-        return $this->handlePostLoginRedirect($user);
-    }
-
-    protected function handleAdminLogin($nis, Request $request)
-    {
-        $user = User::where('nis', $nis)->where('role', 'admin')->first();
-
-        if (!$user) {
-            return back()->withErrors(['nis' => 'NIS/Akun ini bukan akun Admin.'])->withInput();
-        }
-
-        if (!$request->password || !Hash::check($request->password, $user->password)) {
-            return back()->withErrors(['password' => 'Password Admin salah.'])->withInput();
-        }
-
-        Auth::login($user, $request->boolean('remember'));
-        $request->session()->forget('login_as_siswa');
-        $request->session()->regenerate();
-
-        return $this->handlePostLoginRedirect($user);
-    }
-
-    protected function handleSiswaLogin($nis, Request $request)
-    {
-        $user = User::where('nis', $nis)->whereIn('role', ['siswa', 'admin'])->first();
-
-        if (!$user) {
-            return back()->withErrors(['nis' => 'NIS ini tidak terdaftar sebagai Siswa.'])->withInput();
-        }
-
-        if (!$request->tanggal_lahir || !$user->tanggal_lahir || 
-            $user->tanggal_lahir->format('Y-m-d') !== $request->tanggal_lahir) {
-            return back()->withErrors(['tanggal_lahir' => 'Tanggal lahir tidak cocok.'])->withInput();
-        }
-
-        Auth::login($user, $request->boolean('remember'));
-        $request->session()->put('login_as_siswa', true);
-        $request->session()->regenerate();
-
-        return $this->handlePostLoginRedirect($user);
-    }
-
-    protected function handlePostLoginRedirect($user)
-    {
-        if (!empty($user->force_change_password)) {
-            return redirect()->route('auth.ganti-password');
-        }
-
-        if ($user->role === 'guru') {
-            return redirect()->route('guru.dashboard');
-        } elseif ($user->role === 'admin' && !session('login_as_siswa')) {
-            return redirect()->route('admin.dashboard');
-        }
-        
-        return redirect()->route('siswa.dashboard');
-    }
-
     public function showGantiPassword()
     {
-        $user = Auth::user();
-        if (!$user || empty($user->force_change_password)) {
-            return $this->handlePostLoginRedirect($user);
-        }
         return view('auth.ganti-password');
     }
 
     public function gantiPassword(Request $request)
     {
         $request->validate([
+            'old_password' => 'required|string',
             'password' => 'required|min:8|confirmed',
         ], [
+            'old_password.required' => 'Password lama wajib diisi.',
             'password.required' => 'Password baru wajib diisi.',
-            'password.min' => 'Password minimal harus 8 karakter.',
+            'password.min' => 'Password minimal 8 karakter.',
             'password.confirmed' => 'Konfirmasi password tidak cocok.',
         ]);
 
         $user = Auth::user();
+
+        if (!Hash::check($request->old_password, $user->password)) {
+            return back()->withErrors(['old_password' => 'Password lama salah.'])->withInput();
+        }
+
         $user->password = Hash::make($request->password);
-        $user->force_change_password = false;
         $user->save();
 
-        $dashboardRoute = $user->role === 'guru' ? 'guru.dashboard' : 
-                         ($user->role === 'admin' && !session('login_as_siswa') ? 'admin.dashboard' : 'siswa.dashboard');
+        $dashboard = $user->role === 'admin' ? 'admin.dashboard' : 'guru.dashboard';
 
-        return redirect()->route($dashboardRoute)->with('success', 'Password berhasil diubah. Selamat datang, ' . $user->name . '!');
+        return redirect()->route($dashboard)
+            ->with('success', 'Password berhasil diubah!');
     }
 
     public function logout(Request $request)
@@ -187,7 +200,7 @@ class LoginController extends Controller
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-        
+
         return redirect()->route('landing.index');
     }
 }
