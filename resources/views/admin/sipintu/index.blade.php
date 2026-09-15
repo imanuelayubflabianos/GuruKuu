@@ -184,9 +184,24 @@
             </div>
 
             <div class="border-top pt-3">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h6 class="fw-bold small text-uppercase text-muted mb-0">Sinkronisasi Instan Seluruh Data</h6>
+                </div>
+                <form action="{{ route('admin.sipintu.sync-all-full') }}" method="POST" onsubmit="return confirm('Mulai sinkronisasi seluruh Guru, Siswa Aktif, Jurusan, dan Kelas dari SiPintu Gateway?')">
+                    @csrf
+                    <button type="submit" class="btn btn-success w-100 py-2 fw-bold shadow-sm">
+                        <i class="bi bi-cloud-arrow-down-fill me-1"></i> Sinkronkan Semua Data dari SiPintu Sekarang
+                    </button>
+                </form>
+                <div class="mt-2 text-muted small">
+                    <i class="bi bi-info-circle me-1"></i> Menarik seluruh 70 Guru dan 1.130 Siswa Aktif langsung ke database lokal.
+                </div>
+            </div>
+
+            <div class="border-top pt-3 mt-3">
                 <h6 class="fw-bold small text-uppercase text-muted mb-2">Artisan CLI Command</h6>
                 <div class="bg-dark text-white p-2 rounded font-mono" style="font-size: 0.85rem;">
-                    <code>php artisan sipintu:fetch all --sync</code>
+                    <code>php artisan sipintu:sync-all</code>
                 </div>
             </div>
         </div>

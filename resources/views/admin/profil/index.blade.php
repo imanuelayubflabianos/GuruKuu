@@ -15,13 +15,11 @@
             <form action="{{ route('admin.profil.update') }}" method="POST" enctype="multipart/form-data">
                 @csrf @method('PUT')
                 <div class="text-center mb-4">
-                    <img src="{{ auth()->user()->photo_url }}" class="rounded-circle mb-3" style="width: 120px; height: 120px; object-fit: cover; border: 4px solid var(--primary);">
-                    <div>
-                        <label class="btn btn-sm btn-outline-primary">
-                            <i class="bi bi-camera"></i> Ganti Foto
-                            <input type="file" name="photo" class="d-none" accept="image/*" onchange="this.form.submit()">
-                        </label>
+                    <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-primary text-white" style="width: 80px; height: 80px; font-size: 2rem;">
+                        <i class="bi bi-person-fill"></i>
                     </div>
+                    <div class="fw-bold fs-5 mt-2">{{ auth()->user()->name }}</div>
+                    <div class="text-muted small font-mono">Administrator</div>
                 </div>
 
                 <div class="mb-3">

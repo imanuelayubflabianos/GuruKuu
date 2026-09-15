@@ -41,13 +41,14 @@ class GuruController extends Controller
             'nama'       => 'required|string|max:255',
             'email'      => 'nullable|email|max:255|unique:guru,email',
             'phone'      => 'nullable|string|max:50',
-            'kategori'   => 'required|in:normada,produktif',
+            'kategori'   => 'nullable|in:normada,produktif',
             'jurusan_id' => 'nullable|exists:jurusan,id',
             'bio'        => 'nullable|string',
             'photo'      => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
         $data = $request->except(['photo']);
+        $data['kategori'] = $request->input('kategori') ?: 'normada';
 
         if ($request->hasFile('photo')) {
             $path = $request->file('photo')->store('guru', 'public');
@@ -71,13 +72,14 @@ class GuruController extends Controller
             'nama'       => 'required|string|max:255',
             'email'      => 'nullable|email|max:255|unique:guru,email,' . $guru->id,
             'phone'      => 'nullable|string|max:50',
-            'kategori'   => 'required|in:normada,produktif',
+            'kategori'   => 'nullable|in:normada,produktif',
             'jurusan_id' => 'nullable|exists:jurusan,id',
             'bio'        => 'nullable|string',
             'photo'      => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
         $data = $request->except(['photo']);
+        $data['kategori'] = $request->input('kategori') ?: ($guru->kategori ?: 'normada');
 
         if ($request->hasFile('photo')) {
             if ($guru->photo && Storage::disk('public')->exists($guru->photo)) {
@@ -88,7 +90,25 @@ class GuruController extends Controller
         }
 
         $guru->update($data);
-        return redirect()->route('admin.guru.index')->with('success', 'Guru berhasil diperbarui!');
+
+        // Sinkronkan ke akun User jika guru ini memiliki akun login sistem
+        $linkedUser = \App\Models\User::where('nis', $guru->nip)
+            ->orWhere('email', $guru->email)
+            ->where('role', 'guru')
+            ->first();
+
+        if ($linkedUser) {
+            $userUpdate = ['name' => $guru->nama];
+            if (!empty($data['photo'])) {
+                $userUpdate['photo'] = $data['photo'];
+            }
+            if (!empty($data['email'])) {
+                $userUpdate['email'] = $data['email'];
+            }
+            $linkedUser->update($userUpdate);
+        }
+
+        return redirect()->route('admin.guru.index')->with('success', 'Data guru dan sinkronisasi akun berhasil diperbarui!');
     }
 
     public function destroy(Guru $guru)

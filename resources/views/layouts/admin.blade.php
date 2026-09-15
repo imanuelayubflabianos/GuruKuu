@@ -39,7 +39,13 @@
 </head>
 <body>
     <div class="sidebar">
-        <a href="{{ route('admin.dashboard') }}" class="sidebar-brand">GuruKuu Admin</a>
+        <a href="{{ route('admin.dashboard') }}" class="sidebar-brand d-flex align-items-center gap-2">
+            @if(!empty($siteLogo))
+                <img src="{{ $siteLogo }}" alt="{{ $siteTitle ?? 'GuruKuu' }}" style="height: 32px; max-width: 150px; object-fit: contain;">
+            @else
+                <span>{{ $siteTitle ?? 'GuruKuu' }} Admin</span>
+            @endif
+        </a>
         <div class="sidebar-menu">
             <a href="{{ route('admin.dashboard') }}" class="sidebar-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
                 <i class="bi bi-speedometer2"></i> Dashboard
@@ -86,9 +92,9 @@
                 <i class="bi bi-gear"></i> Pengaturan
             </a>
 
-          <a href="{{ route('auth.ganti-password') }}" class="sidebar-link {{ request()->routeIs('auth.ganti-password') ? 'active' : '' }}">
-    <i class="bi bi-key"></i> Ganti Password
-</a>
+            <a href="{{ url('/') }}" class="sidebar-link text-primary fw-semibold mt-2 pt-2 border-top">
+                <i class="bi bi-house-door text-primary"></i> Ke Beranda Publik
+            </a>
             <div class="mt-4 px-3">
                 <form action="{{ route('logout') }}" method="POST">
                     @csrf

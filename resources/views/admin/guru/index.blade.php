@@ -9,6 +9,23 @@
         <p class="page-subtitle">Kelola master data guru pengajar SMK Negeri 1 Bangsri.</p>
     </div>
     <div class="d-flex gap-2">
+        <div class="dropdown">
+            <button class="btn btn-outline-custom dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="bi bi-download me-1"></i> Export Data
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                <li>
+                    <a class="dropdown-item" href="{{ route('admin.export.guru.excel') }}">
+                        <i class="bi bi-file-earmark-excel text-success me-2"></i> Export Excel (.xlsx)
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item" href="{{ route('admin.export.guru.pdf') }}">
+                        <i class="bi bi-file-earmark-pdf text-danger me-2"></i> Export PDF (.pdf)
+                    </a>
+                </li>
+            </ul>
+        </div>
         <a href="{{ route('admin.sipintu.guru') }}" class="btn btn-outline-primary">
             <i class="bi bi-cloud-arrow-down me-1"></i> Tarik dari SiPintu
         </a>
@@ -20,15 +37,7 @@
 
 <div class="card-custom p-3 mb-4">
     <form method="GET" action="{{ route('admin.guru.index') }}" class="row g-3 align-items-end">
-        <div class="col-md-4">
-            <label class="form-label small fw-bold text-muted">Filter Kategori</label>
-            <select name="kategori" class="form-select" style="border-radius: 8px;">
-                <option value="">Semua Kategori</option>
-                <option value="normada" {{ request('kategori') == 'normada' ? 'selected' : '' }}>Guru Normada</option>
-                <option value="produktif" {{ request('kategori') == 'produktif' ? 'selected' : '' }}>Guru Produktif</option>
-            </select>
-        </div>
-        <div class="col-md-4">
+        <div class="col-md-8">
             <label class="form-label small fw-bold text-muted">Filter Jurusan</label>
             <select name="jurusan_id" class="form-select" style="border-radius: 8px;">
                 <option value="">Semua Jurusan</option>
@@ -53,9 +62,8 @@
                     <th>NAMA GURU</th>
                     <th>EMAIL</th>
                     <th>KONTAK / HP</th>
-                    <th>KATEGORI</th>
                     <th>JURUSAN</th>
-                    <th>PENILAIAN</th>
+                    <th>KEPUASAN (RATING)</th>
                     <th class="text-center">AKSI</th>
                 </tr>
             </thead>
@@ -83,15 +91,14 @@
                             <span class="text-muted small">-</span>
                         @endif
                     </td>
-                    <td>
-                        <span class="badge bg-{{ $g->kategori == 'normada' ? 'primary' : 'success' }}">
-                            {{ ucfirst($g->kategori) }}
-                        </span>
-                    </td>
                     <td>{{ $g->jurusan->nama_jurusan ?? '-' }}</td>
                     <td>
-                        <strong>{{ $g->total_penilaian }}</strong>
-                        <small class="text-muted d-block">({{ number_format($g->rata_rata_nilai, 1) }}/5)</small>
+                        @php $pct = round(($g->rata_rata_nilai / 5) * 100); @endphp
+                        <div class="fw-bold font-mono text-primary" style="font-size: 0.85rem;">{{ $pct }}%</div>
+                        <div class="progress" style="height: 5px; width: 75px; border-radius: 10px;">
+                            <div class="progress-bar bg-primary rounded-pill" style="width: {{ $pct }}%;"></div>
+                        </div>
+                        <small class="text-muted d-block mt-1 font-mono" style="font-size: 0.7rem;">{{ $g->total_penilaian }} ulasan</small>
                     </td>
                     <td class="text-center">
                         <a href="{{ route('admin.guru.edit', $g) }}" class="btn btn-sm btn-outline-primary me-1" title="Edit Guru"><i class="bi bi-pencil"></i></a>

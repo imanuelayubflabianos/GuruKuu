@@ -414,6 +414,36 @@ class SiPintuService
         return $fallback?->id;
     }
 
+    public function ensureDefaultJurusans(): void
+    {
+        $defaultJurusans = [
+            ['nama_jurusan' => 'Pengembangan Perangkat Lunak dan Gim', 'kode_jurusan' => 'PPLG', 'deskripsi' => 'Jurusan Rekayasa Perangkat Lunak dan Gim'],
+            ['nama_jurusan' => 'Teknik Otomotif', 'kode_jurusan' => 'TO', 'deskripsi' => 'Jurusan Teknik Kendaraan Ringan dan Sepeda Motor'],
+            ['nama_jurusan' => 'Manajemen Perkantoran dan Layanan Bisnis', 'kode_jurusan' => 'MPLB', 'deskripsi' => 'Jurusan Manajemen Perkantoran dan Layanan Bisnis'],
+            ['nama_jurusan' => 'Pemasaran', 'kode_jurusan' => 'PM', 'deskripsi' => 'Jurusan Bisnis Digital dan Pemasaran'],
+            ['nama_jurusan' => 'Akuntansi dan Keuangan Lembaga', 'kode_jurusan' => 'AKL', 'deskripsi' => 'Jurusan Akuntansi dan Keuangan Lembaga'],
+        ];
+
+        foreach ($defaultJurusans as $dj) {
+            Jurusan::firstOrCreate(['kode_jurusan' => $dj['kode_jurusan']], $dj);
+        }
+    }
+
+    public function parseClassroomString(string $rawName): array
+    {
+        $tingkat = '10';
+        $namaClean = trim($rawName);
+        if (preg_match('/^(XII|XI|X)\s+(.+)$/i', $rawName, $m)) {
+            $roman = strtoupper($m[1]);
+            $tingkat = match ($roman) { 'X' => '10', 'XI' => '11', 'XII' => '12', default => '10' };
+            $namaClean = trim($m[2]);
+        }
+        return [
+            'tingkat' => $tingkat,
+            'nama_kelas' => $namaClean,
+        ];
+    }
+
     public function syncTeacherToLocal(array $teacherData, ?int $jurusanId = null): array
     {
         try {
@@ -425,6 +455,7 @@ class SiPintuService
             $email = $teacherData['user']['email'] ?? $teacherData['email'] ?? null;
             $phone = $teacherData['hp'] ?? $teacherData['phone'] ?? $teacherData['telepon'] ?? null;
             $bio = $teacherData['bio'] ?? $teacherData['alamat'] ?? $teacherData['mapel'] ?? null;
+            $photo = $teacherData['photo'] ?? $teacherData['foto'] ?? null;
             $kategori = strtolower($teacherData['kategori'] ?? $teacherData['category'] ?? 'normada');
             if (!in_array($kategori, ['normada', 'produktif'])) $kategori = 'normada';
 
@@ -435,9 +466,27 @@ class SiPintuService
             }
 
             $guru = Guru::updateOrCreate(['nip' => (string) $nip], [
-                'nama' => $nama, 'email' => $email, 'phone' => $phone,
-                'kategori' => $kategori, 'jurusan_id' => $jurusanId, 'bio' => $bio,
+                'nama' => $nama,
+                'email' => $email,
+                'phone' => $phone,
+                'photo' => $photo,
+                'kategori' => $kategori,
+                'jurusan_id' => $jurusanId,
+                'bio' => $bio,
             ]);
+
+            // Sync or create User account for Guru so teacher can log in
+            $guruUserEmail = $email ?: ($nip . '@gurukuu.local');
+            User::updateOrCreate(
+                ['nis' => (string) $nip],
+                [
+                    'name' => $nama,
+                    'email' => $guruUserEmail,
+                    'role' => 'guru',
+                    'password' => Hash::make((string) $nip),
+                    'is_active' => true,
+                ]
+            );
 
             return ['success' => true, 'guru' => $guru, 'message' => "Guru {$guru->nama} berhasil disinkronkan."];
         } catch (\Exception $e) {
@@ -470,9 +519,24 @@ class SiPintuService
             $user = User::where('nis', $nis)->orWhere('email', $email)->first();
 
             if ($user) {
-                $user->update(['name' => $name, 'nis' => $nis, 'email' => $email, 'tanggal_lahir' => $tanggalLahir, 'role' => 'siswa', 'is_active' => true]);
+                $user->update([
+                    'name' => $name,
+                    'nis' => $nis,
+                    'email' => $email,
+                    'tanggal_lahir' => $tanggalLahir,
+                    'role' => 'siswa',
+                    'is_active' => true,
+                ]);
             } else {
-                $user = User::create(['name' => $name, 'nis' => $nis, 'email' => $email, 'password' => Hash::make($nis), 'role' => 'siswa', 'tanggal_lahir' => $tanggalLahir, 'is_active' => true]);
+                $user = User::create([
+                    'name' => $name,
+                    'nis' => $nis,
+                    'email' => $email,
+                    'password' => Hash::make($nis, ['rounds' => 4]),
+                    'role' => 'siswa',
+                    'tanggal_lahir' => $tanggalLahir,
+                    'is_active' => true,
+                ]);
             }
 
             if ($kelasId) {
@@ -485,5 +549,134 @@ class SiPintuService
             Log::error("SiPintu syncStudentToLocal Error: " . $e->getMessage());
             return ['success' => false, 'message' => 'Gagal sinkron siswa: ' . $e->getMessage()];
         }
+    }
+
+    /**
+     * Sinkronisasi menyeluruh dari SiPintu:
+     * - Opsi membersihkan data lokal lama (menjaga akun Admin tetap utuh)
+     * - Mengisi Jurusan & Kelas otomatis dari SiPintu
+     * - Menarik dan menyinkronkan seluruh 71 Guru
+     * - Menarik dan menyinkronkan seluruh Siswa Aktif (1.130 siswa)
+     */
+    public function syncAllFromSiPintu(bool $clean = false, bool $onlyActive = true): array
+    {
+        @set_time_limit(0);
+        @ini_set('max_execution_time', '0');
+        @ini_set('memory_limit', '1024M');
+
+        $this->ensureDefaultJurusans();
+
+        if ($clean) {
+            \Illuminate\Support\Facades\DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+            \App\Models\Penilaian::truncate();
+            \Illuminate\Support\Facades\DB::table('siswa_kelas')->truncate();
+            \Illuminate\Support\Facades\DB::table('guru_kelas')->truncate();
+            
+            // Hapus user role siswa dan guru, pertahankan admin
+            User::where('role', '!=', 'admin')->delete();
+            Guru::truncate();
+            Kelas::truncate();
+            Jurusan::truncate();
+            \Illuminate\Support\Facades\DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+        }
+
+        $this->ensureDefaultJurusans();
+
+        // 1. Ambil data guru dari SiPintu
+        $teachersRes = $this->getTeachers(['refresh' => true]);
+        $teachers = $teachersRes['data'] ?? [];
+
+        // 2. Ambil data siswa aktif dari SiPintu
+        $studentsRes = $this->getStudents(['only_active' => $onlyActive, 'refresh' => true]);
+        $students = $studentsRes['data'] ?? [];
+
+        // 3. Ekstrak dan buat seluruh Kelas dari data siswa
+        $allJurusans = Jurusan::all();
+
+        foreach ($students as $s) {
+            $rawKelas = null;
+            if (!empty($s['classroom'])) {
+                $rawKelas = is_array($s['classroom']) ? ($s['classroom']['name'] ?? null) : $s['classroom'];
+            } elseif (!empty($s['kelas'])) {
+                $rawKelas = is_array($s['kelas']) ? ($s['kelas']['nama_kelas'] ?? null) : $s['kelas'];
+            }
+
+            if ($rawKelas) {
+                $parsed = $this->parseClassroomString($rawKelas);
+                $tingkat = $parsed['tingkat'];
+                $namaKelas = $parsed['nama_kelas'];
+
+                $jurusanId = null;
+                foreach ($allJurusans as $j) {
+                    if (str_contains(strtoupper($rawKelas), strtoupper($j->kode_jurusan)) ||
+                        str_contains(strtoupper($namaKelas), strtoupper($j->kode_jurusan))) {
+                        $jurusanId = $j->id;
+                        break;
+                    }
+                }
+                if (!$jurusanId) {
+                    $jurusanId = $allJurusans->first()?->id ?? 1;
+                }
+
+                Kelas::firstOrCreate(
+                    ['nama_kelas' => $namaKelas, 'tingkat' => $tingkat],
+                    ['jurusan_id' => $jurusanId, 'jumlah_siswa' => 36]
+                );
+            }
+        }
+
+        // Siapkan lookup map Kelas in-memory untuk kecepatan maksimal
+        $kelasMap = [];
+        foreach (Kelas::all() as $k) {
+            $kelasMap[strtoupper($k->tingkat . '_' . $k->nama_kelas)] = $k->id;
+            $kelasMap[strtoupper($k->nama_kelas)] = $k->id;
+        }
+
+        // 4. Sinkronisasi Guru
+        $guruCount = 0;
+        foreach ($teachers as $t) {
+            $res = $this->syncTeacherToLocal($t);
+            if ($res['success']) {
+                $guruCount++;
+            }
+        }
+
+        // 5. Sinkronisasi Siswa Aktif dengan In-Memory Map
+        $siswaCount = 0;
+        $tahunAjaran = now()->year . '/' . (now()->year + 1);
+        $periodeAktif = \App\Models\Periode::where('status', 'aktif')->first();
+        if ($periodeAktif) {
+            $tahunAjaran = $periodeAktif->tahun_ajaran;
+        }
+
+        foreach ($students as $s) {
+            $rawKelas = null;
+            if (!empty($s['classroom'])) {
+                $rawKelas = is_array($s['classroom']) ? ($s['classroom']['name'] ?? null) : $s['classroom'];
+            } elseif (!empty($s['kelas'])) {
+                $rawKelas = is_array($s['kelas']) ? ($s['kelas']['nama_kelas'] ?? null) : $s['kelas'];
+            }
+
+            $kelasId = null;
+            if ($rawKelas) {
+                $parsed = $this->parseClassroomString($rawKelas);
+                $key = strtoupper($parsed['tingkat'] . '_' . $parsed['nama_kelas']);
+                $kelasId = $kelasMap[$key] ?? ($kelasMap[strtoupper($parsed['nama_kelas'])] ?? null);
+            }
+
+            $res = $this->syncStudentToLocal($s, $kelasId);
+            if ($res['success']) {
+                $siswaCount++;
+            }
+        }
+
+        return [
+            'success'      => true,
+            'guru_count'   => $guruCount,
+            'siswa_count'  => $siswaCount,
+            'jurusan_count'=> Jurusan::count(),
+            'kelas_count'  => Kelas::count(),
+            'message'      => "Sinkronisasi berhasil! {$guruCount} Guru, {$siswaCount} Siswa aktif, " . Kelas::count() . " Kelas, dan " . Jurusan::count() . " Jurusan tersinkronkan.",
+        ];
     }
 }

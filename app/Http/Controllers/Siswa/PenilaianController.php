@@ -23,10 +23,6 @@ class PenilaianController extends Controller
                           ->wherePivot('tahun_ajaran', $periodeAktif->tahun_ajaran)
                           ->first();
 
-        if (!$kelasAktif || !$kelasAktif->guru->contains($guru->id)) {
-            return redirect()->route('siswa.guru.index')->with('error', 'Guru ini tidak mengajar di kelas Anda.');
-        }
-
         // Cek apakah sudah menilai (unique constraint)
         $sudahMenilai = Penilaian::where('siswa_id', $user->id)
                                  ->where('guru_id', $guru->id)
@@ -64,10 +60,6 @@ class PenilaianController extends Controller
                           ->wherePivot('tahun_ajaran', $periodeAktif->tahun_ajaran)
                           ->first();
 
-        if (!$kelasAktif) {
-            return back()->with('error', 'Anda belum terdaftar di kelas manapun.');
-        }
-
         // Cek unique constraint
         $sudahMenilai = Penilaian::where('siswa_id', $user->id)
                                  ->where('guru_id', $guru->id)
@@ -84,7 +76,7 @@ class PenilaianController extends Controller
             'siswa_id' => $user->id,
             'guru_id' => $guru->id,
             'periode_id' => $periodeAktif->id,
-            'class_id' => $kelasAktif->id, // ✅ Simpan class_id
+            'class_id' => $kelasAktif?->id, // ✅ Simpan class_id jika ada, null jika belum dipetakan
             'kedisiplinan' => $request->kedisiplinan,
             'cara_mengajar' => $request->cara_mengajar,
             'komunikasi' => $request->komunikasi,

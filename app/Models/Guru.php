@@ -72,6 +72,9 @@ class Guru extends Model
     public function getPhotoUrlAttribute()
     {
         if ($this->photo) {
+            if (filter_var($this->photo, FILTER_VALIDATE_URL) || str_starts_with($this->photo, 'http://') || str_starts_with($this->photo, 'https://')) {
+                return $this->photo;
+            }
             return asset('storage/' . $this->photo);
         }
         
@@ -140,16 +143,35 @@ class Guru extends Model
         return round($penilaian->avg('total_nilai') / 6, 2);
     }
 
-    public function updateRataRata()
+    public function updateRataRata(?int $periodeId = null)
     {
-        $penilaian = $this->penilaian()->get();
+        if ($periodeId === null) {
+            $periodeAktif = Periode::where('status', 'aktif')->first();
+            $periodeId = $periodeAktif?->id;
+        }
+
+        $query = $this->penilaian();
+        if ($periodeId) {
+            $query->where('periode_id', $periodeId);
+        }
+
+        $penilaian = $query->get();
         if ($penilaian->isEmpty()) {
             $this->update(['rata_rata_nilai' => 0, 'total_penilaian' => 0]);
             return;
         }
+
         $this->update([
             'rata_rata_nilai' => round($penilaian->avg('total_nilai') / 6, 2),
             'total_penilaian' => $penilaian->count(),
         ]);
+    }
+
+    public static function recalculateAll(?int $periodeId = null): void
+    {
+        $gurus = self::all();
+        foreach ($gurus as $guru) {
+            $guru->updateRataRata($periodeId);
+        }
     }
 }

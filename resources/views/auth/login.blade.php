@@ -8,8 +8,12 @@
             <div class="col-xl-4 col-lg-5 col-md-7">
                 <div class="card-custom p-4 p-md-5">
                     <div class="text-center mb-4">
-                        <i class="bi bi-mortarboard-fill" style="font-size: 3rem; color: var(--primary);"></i>
-                        <h3 class="fw-bold mt-3" style="color: var(--primary); font-size: 1.5rem;">Masuk ke GuruKuu</h3>
+                        @if(!empty($siteLogo))
+                            <img src="{{ $siteLogo }}" alt="{{ $siteTitle ?? 'GuruKuu' }}" style="max-height: 55px; max-width: 180px; object-fit: contain;" class="mb-2">
+                        @else
+                            <i class="bi bi-mortarboard-fill" style="font-size: 3rem; color: var(--primary);"></i>
+                        @endif
+                        <h3 class="fw-bold mt-2" style="color: var(--primary); font-size: 1.5rem;">Masuk ke {{ $siteTitle ?? 'GuruKuu' }}</h3>
                         <p class="text-muted mb-0" style="font-size: 0.9rem;">Pilih peran dan masukkan kredensial Anda</p>
                     </div>
 

@@ -282,4 +282,22 @@ class SiPintuController extends Controller
             'validation' => $validation,
         ]);
     }
+
+    /**
+     * Sinkronisasi menyeluruh (Guru, Siswa Aktif, Jurusan, Kelas)
+     */
+    public function syncAllDirect(Request $request)
+    {
+        $clean = $request->boolean('clean', false);
+        $res = $this->siPintu->syncAllFromSiPintu($clean, true);
+
+        if ($request->wantsJson()) {
+            return response()->json($res);
+        }
+
+        if ($res['success']) {
+            return back()->with('success', $res['message']);
+        }
+        return back()->with('error', $res['message'] ?? 'Gagal melakukan sinkronisasi.');
+    }
 }

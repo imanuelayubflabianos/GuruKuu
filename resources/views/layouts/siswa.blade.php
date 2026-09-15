@@ -62,12 +62,19 @@
 </head>
 <body>
     <aside class="sidebar">
-        <div class="sidebar-brand">GuruKuu</div>
+        <div class="sidebar-brand d-flex align-items-center gap-2">
+            @if(!empty($siteLogo))
+                <img src="{{ $siteLogo }}" alt="{{ $siteTitle ?? 'GuruKuu' }}" style="height: 32px; max-width: 150px; object-fit: contain;">
+            @else
+                <span>{{ $siteTitle ?? 'GuruKuu' }}</span>
+            @endif
+        </div>
         <div class="sidebar-subtitle">Student Portal</div>
         
-        {{-- ✅ KLIK PROFIL LANGSUNG KE HALAMAN PROFIL --}}
-                <a href="{{ route('siswa.profil.index') }}" class="sidebar-profile">
-            <img src="{{ auth()->user()->photo_url }}" alt="avatar">
+        <a href="{{ route('siswa.pengaturan') }}" class="sidebar-profile">
+            <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-3" style="width: 48px; height: 48px; font-size: 1.5rem; flex-shrink: 0;">
+                <i class="bi bi-person-fill"></i>
+            </div>
             <div>
                 <div class="sidebar-profile-name">{{ auth()->user()->name }}</div>
                 <div class="sidebar-profile-role">
@@ -85,7 +92,12 @@
             <li><a href="{{ route('siswa.guru.index') }}" class="{{ request()->routeIs('siswa.guru.*') ? 'active' : '' }}"><i class="bi bi-person-badge"></i> Daftar Guru</a></li>
             <li><a href="{{ route('siswa.riwayat') }}" class="{{ request()->routeIs('siswa.riwayat') ? 'active' : '' }}"><i class="bi bi-clock-history"></i> Riwayat Penilaian</a></li>
             <li><a href="{{ route('siswa.leaderboard.index') }}" class="{{ request()->routeIs('siswa.leaderboard.*') ? 'active' : '' }}"><i class="bi bi-trophy"></i> Leaderboard</a></li>
-            <li><a href="{{ route('siswa.kontak.index') }}" class="{{ request()->routeIs('siswa.kontak.*') ? 'active' : '' }}"><i class="bi bi-chat-dots"></i> Chat Admin</a></li>
+            <li><a href="{{ route('siswa.pengaturan') }}" class="{{ request()->routeIs('siswa.pengaturan*') ? 'active' : '' }}"><i class="bi bi-gear"></i> Pengaturan</a></li>
+            <li class="mt-3 pt-3 border-top">
+                <a href="{{ url('/') }}" class="text-primary fw-semibold">
+                    <i class="bi bi-house-door text-primary"></i> Ke Beranda Publik
+                </a>
+            </li>
         </ul>
 
         <div class="sidebar-logout">

@@ -4,17 +4,30 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Guru;
+use App\Models\Jurusan;
+use App\Models\Kelas;
 use App\Models\Penilaian;
+use App\Models\Periode;
+use App\Models\Setting;
 use App\Models\User;
+use App\Services\SiPintuService;
 
 class DashboardController extends Controller
 {
-    public function index()
+    public function index(SiPintuService $siPintu)
     {
         $totalGuru = Guru::count();
         $totalSiswa = User::where('role', 'siswa')->count();
         $totalPenilaian = Penilaian::count();
+        $totalJurusan = Jurusan::count();
+        $totalKelas = Kelas::count();
         
+        $periodeAktif = Periode::where('status', 'aktif')->first();
+        $heroThumbnail = Setting::get('hero_image', 'https://images.unsplash.com/photo-1562774053-701939374585?w=1920');
+        $heroTitle = Setting::get('hero_title', 'Bangun Sekolah yang Lebih Baik Melalui Penilaian Guru yang Objektif');
+
+        $ping = $siPintu->ping();
+
         $topGuru = Guru::with('jurusan')
             ->where('total_penilaian', '>', 0)
             ->orderBy('rata_rata_nilai', 'desc')
@@ -38,6 +51,12 @@ class DashboardController extends Controller
             'totalGuru', 
             'totalSiswa', 
             'totalPenilaian', 
+            'totalJurusan',
+            'totalKelas',
+            'periodeAktif',
+            'heroThumbnail',
+            'heroTitle',
+            'ping',
             'topGuru', 
             'feedbacks'
         ));

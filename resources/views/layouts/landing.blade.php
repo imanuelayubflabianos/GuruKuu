@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'GuruKuu') - Sistem Penilaian Guru</title>
+    <title>@yield('title', \App\Models\Setting::get('site_title', 'GuruKuu')) - {{ \App\Models\Setting::get('site_title', 'GuruKuu') }}</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
@@ -109,7 +109,14 @@
 <body>
     <nav class="navbar navbar-expand-lg navbar-custom fixed-top">
         <div class="container">
-            <a class="navbar-brand navbar-brand-custom" href="{{ route('landing.index') }}">GuruKuu</a>
+            <a class="navbar-brand navbar-brand-custom d-flex align-items-center gap-2" href="{{ route('landing.index') }}">
+                @if($logo = \App\Models\Setting::get('site_logo'))
+                    <img src="{{ $logo }}" alt="Logo" style="height: 36px; max-width: 140px; object-fit: contain;">
+                @else
+                    <i class="bi bi-mortarboard-fill text-primary fs-3"></i>
+                @endif
+                <span>{{ \App\Models\Setting::get('site_title', 'GuruKuu') }}</span>
+            </a>
             <button class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navMenu"><span class="navbar-toggler-icon"></span></button>
             <div class="collapse navbar-collapse" id="navMenu">
                 <div class="nav-menu-center">
@@ -162,9 +169,14 @@
         <div class="container">
             <div class="row align-items-start">
                 <div class="col-lg-7 mb-4">
-                    <div class="footer-title">GuruKuu</div>
+                    <div class="footer-title d-flex align-items-center gap-2">
+                        @if($logo = \App\Models\Setting::get('site_logo'))
+                            <img src="{{ $logo }}" alt="Logo" style="height: 32px; object-fit: contain;">
+                        @endif
+                        <span>{{ \App\Models\Setting::get('site_title', 'GuruKuu') }}</span>
+                    </div>
                     <p class="text-muted mb-0" style="font-size: 0.9rem; max-width: 500px;">
-                        Sistem Manajemen Penilaian Guru Berbasis Siswa untuk SMK unggulan di seluruh Indonesia.
+                        {{ \App\Models\Setting::get('footer_about', 'Sistem Manajemen Penilaian Guru Berbasis Siswa untuk SMK unggulan di seluruh Indonesia.') }}
                     </p>
                 </div>
                 <div class="col-lg-5 mb-4 text-lg-end">
@@ -177,7 +189,9 @@
             <hr class="border-secondary my-4">
             <div class="row">
                 <div class="col-12 text-center">
-                    <p class="text-muted mb-0" style="font-size: 0.85rem;">&copy; {{ date('Y') }} GuruKuu. All rights reserved.</p>
+                    <p class="text-muted mb-0" style="font-size: 0.85rem;">
+                        &copy; {{ date('Y') }} {{ \App\Models\Setting::get('site_title', 'GuruKuu') }}. {{ \App\Models\Setting::get('footer_copyright', 'All rights reserved.') }}
+                    </p>
                 </div>
             </div>
         </div>

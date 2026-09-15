@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+use App\Http\Controllers\Admin\ExportController;
 use App\Http\Controllers\Admin\GuruController as AdminGuruController;
 use App\Http\Controllers\Admin\JurusanController as AdminJurusanController;
 use App\Http\Controllers\Admin\KontakController as AdminKontakController;
@@ -24,6 +25,14 @@ use Illuminate\Support\Facades\Route;
 // ==================== 1. GURU ROUTES (WAJIB DI ATAS /guru/{guru}) ====================
 Route::middleware(['auth', 'role:guru'])->prefix('guru')->name('guru.')->group(function () {
     Route::get('/dashboard', [GuruDashboardController::class, 'index'])->name('dashboard');
+    Route::get('/leaderboard', [GuruDashboardController::class, 'leaderboard'])->name('leaderboard');
+    Route::post('/penilaian/{penilaian}/reply', [GuruDashboardController::class, 'replyPenilaian'])->name('penilaian.reply');
+    Route::get('/pengaturan', [\App\Http\Controllers\Guru\PengaturanController::class, 'index'])->name('pengaturan');
+    Route::post('/pengaturan/profil', [\App\Http\Controllers\Guru\PengaturanController::class, 'updateProfil'])->name('pengaturan.profil');
+    Route::post('/pengaturan/ganti-password', [\App\Http\Controllers\Guru\PengaturanController::class, 'gantiPassword'])->name('pengaturan.password');
+    Route::post('/pengaturan/chat', [\App\Http\Controllers\Guru\PengaturanController::class, 'kirimPesanAdmin'])->name('pengaturan.chat');
+    Route::put('/pengaturan/chat/{kontak}', [\App\Http\Controllers\Guru\PengaturanController::class, 'editPesanAdmin'])->name('pengaturan.chat.edit');
+    Route::delete('/pengaturan/chat/{kontak}', [\App\Http\Controllers\Guru\PengaturanController::class, 'hapusPesanAdmin'])->name('pengaturan.chat.destroy');
 });
 
 // ==================== 2. PUBLIC ROUTES ====================
@@ -75,13 +84,29 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     
     Route::get('/leaderboard', [AdminLeaderboardController::class, 'index'])->name('leaderboard.index');
     Route::get('/pengaturan', [PengaturanController::class, 'index'])->name('pengaturan.index');
+    Route::post('/pengaturan/landing', [PengaturanController::class, 'updateLanding'])->name('pengaturan.landing');
+    Route::post('/pengaturan/landing/reset', [PengaturanController::class, 'resetLandingHero'])->name('pengaturan.landing.reset');
     Route::post('/pengaturan/reset', [PengaturanController::class, 'reset'])->name('pengaturan.reset');
+    Route::post('/pengaturan/ganti-password', [PengaturanController::class, 'gantiPassword'])->name('pengaturan.password');
+    Route::post('/pengaturan/periode', [PengaturanController::class, 'simpanPeriode'])->name('pengaturan.periode');
+    Route::post('/pengaturan/periode/{periode}/aktifkan', [PengaturanController::class, 'aktifkanPeriode'])->name('pengaturan.periode.aktifkan');
     
     Route::get('/kontak', [AdminKontakController::class, 'index'])->name('kontak.index');
     Route::post('/kontak/{kontak}/reply', [AdminKontakController::class, 'reply'])->name('kontak.reply');
     Route::put('/kontak/{kontak}/reply', [AdminKontakController::class, 'editReply'])->name('kontak.edit-reply');
     Route::delete('/kontak/{kontak}', [AdminKontakController::class, 'destroy'])->name('kontak.destroy');
     Route::delete('/kontak/{kontak}/reply', [AdminKontakController::class, 'destroyReply'])->name('kontak.destroy-reply');
+
+    // EXPORTS
+    Route::prefix('export')->name('export.')->group(function () {
+        Route::get('/leaderboard/excel', [ExportController::class, 'leaderboardExcel'])->name('leaderboard.excel');
+        Route::get('/leaderboard/pdf', [ExportController::class, 'leaderboardPdf'])->name('leaderboard.pdf');
+        Route::get('/guru/excel', [ExportController::class, 'guruExcel'])->name('guru.excel');
+        Route::get('/guru/pdf', [ExportController::class, 'guruPdf'])->name('guru.pdf');
+        Route::get('/siswa/excel', [ExportController::class, 'siswaExcel'])->name('siswa.excel');
+        Route::get('/siswa/pdf', [ExportController::class, 'siswaPdf'])->name('siswa.pdf');
+        Route::get('/all/zip', [ExportController::class, 'allZip'])->name('all.zip');
+    });
 
     Route::prefix('sipintu')->name('sipintu.')->group(function () {
         Route::get('/', [\App\Http\Controllers\Admin\SiPintuController::class, 'index'])->name('index');
@@ -93,6 +118,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
         Route::post('/siswa/import', [\App\Http\Controllers\Admin\SiPintuController::class, 'importStudent'])->name('siswa.import');
         Route::post('/guru/sync-all', [\App\Http\Controllers\Admin\SiPintuController::class, 'syncAllTeachers'])->name('guru.sync-all');
         Route::post('/siswa/sync-all', [\App\Http\Controllers\Admin\SiPintuController::class, 'syncAllStudents'])->name('siswa.sync-all');
+        Route::post('/sync-all-full', [\App\Http\Controllers\Admin\SiPintuController::class, 'syncAllDirect'])->name('sync-all-full');
         Route::post('/check-connection', [\App\Http\Controllers\Admin\SiPintuController::class, 'checkConnection'])->name('check-connection');
     });
 });
@@ -109,10 +135,12 @@ Route::middleware(['auth', 'role:siswa'])->prefix('siswa')->name('siswa.')->grou
     Route::get('/riwayat', [PenilaianController::class, 'riwayat'])->name('riwayat');
     Route::delete('/riwayat/{penilaian}', [PenilaianController::class, 'destroy'])->name('riwayat.destroy');
     Route::get('/leaderboard', [SiswaLeaderboardController::class, 'index'])->name('leaderboard.index');
-    Route::get('/profil', [SiswaProfilController::class, 'index'])->name('profil.index');
-    Route::put('/profil', [SiswaProfilController::class, 'update'])->name('profil.update');
+    Route::get('/pengaturan', [\App\Http\Controllers\Siswa\PengaturanController::class, 'index'])->name('pengaturan');
+    Route::post('/pengaturan/ganti-password', [\App\Http\Controllers\Siswa\PengaturanController::class, 'gantiPassword'])->name('pengaturan.password');
+    Route::post('/pengaturan/chat', [\App\Http\Controllers\Siswa\PengaturanController::class, 'kirimPesanAdmin'])->name('pengaturan.chat');
+    Route::get('/profil', function() { return redirect()->route('siswa.pengaturan'); })->name('profil.index');
     
-    Route::get('/kontak', [KontakController::class, 'siswaIndex'])->name('kontak.index');
+    Route::get('/kontak', function() { return redirect()->to(route('siswa.pengaturan') . '#tabChat'); })->name('kontak.index');
     Route::post('/kontak', [KontakController::class, 'storeSiswa'])->name('kontak.store');
     Route::put('/kontak/{kontak}', [KontakController::class, 'editSiswa'])->name('kontak.edit');
     Route::delete('/kontak/{kontak}', [KontakController::class, 'siswaDestroy'])->name('kontak.destroy');

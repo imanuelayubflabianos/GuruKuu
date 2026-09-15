@@ -27,8 +27,7 @@ class PeriodeController extends Controller
 
         Periode::create($validated);
 
-        return redirect()->route('admin.periode.index')
-            ->with('success', 'Periode berhasil ditambahkan!');
+        return back()->with('success', 'Periode berhasil ditambahkan!');
     }
 
     public function update(Request $request, Periode $periode)
@@ -43,28 +42,27 @@ class PeriodeController extends Controller
 
         $periode->update($validated);
 
-        return redirect()->route('admin.periode.index')
-            ->with('success', 'Periode berhasil diperbarui!');
+        return back()->with('success', 'Periode berhasil diperbarui!');
     }
 
     public function toggleStatus(Periode $periode)
     {
-        // Nonaktifkan semua periode lain dulu
+        // Nonaktifkan semua periode lain jika periode ini diaktifkan
         if ($periode->status === 'nonaktif') {
             Periode::where('id', '!=', $periode->id)->update(['status' => 'nonaktif']);
             $periode->update(['status' => 'aktif']);
+            \App\Models\Guru::recalculateAll($periode->id);
         } else {
             $periode->update(['status' => 'nonaktif']);
+            \App\Models\Guru::recalculateAll();
         }
 
-        return redirect()->route('admin.periode.index')
-            ->with('success', 'Status periode berhasil diubah!');
+        return back()->with('success', 'Status periode ' . $periode->nama_periode . ' berhasil diubah menjadi ' . strtoupper($periode->status) . '!');
     }
 
     public function destroy(Periode $periode)
     {
         $periode->delete();
-        return redirect()->route('admin.periode.index')
-            ->with('success', 'Periode berhasil dihapus!');
+        return back()->with('success', 'Periode berhasil dihapus!');
     }
 }

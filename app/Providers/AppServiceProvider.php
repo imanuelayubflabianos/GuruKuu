@@ -19,6 +19,17 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        \Illuminate\Support\Facades\View::composer('*', function ($view) {
+            try {
+                $siteLogo = \App\Models\Setting::get('site_logo', '');
+                $siteTitle = \App\Models\Setting::get('site_title', 'GuruKuu');
+                $view->with(compact('siteLogo', 'siteTitle'));
+            } catch (\Throwable $e) {
+                $view->with([
+                    'siteLogo' => '',
+                    'siteTitle' => 'GuruKuu',
+                ]);
+            }
+        });
     }
 }

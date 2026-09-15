@@ -9,7 +9,7 @@
         @if($kelasAktif)
             <p class="page-subtitle">Kelas: <strong>{{ $kelasAktif->nama_kelas }} - Tingkat {{ $kelasAktif->tingkat }}</strong> ({{ $kelasAktif->jurusan->nama_jurusan }})</p>
         @else
-            <p class="page-subtitle text-warning">Anda belum terdaftar di kelas manapun untuk periode ini.</p>
+            <p class="page-subtitle text-muted">Akses seluruh data guru sekolah untuk evaluasi pengajaran objektif.</p>
         @endif
     </div>
     <div>
@@ -27,7 +27,7 @@
                 <i class="bi bi-people-fill fs-4"></i>
             </div>
             <div>
-                <div class="text-muted small font-mono">TOTAL GURU DI KELAS</div>
+                <div class="text-muted small font-mono">TOTAL GURU TERSEDIA</div>
                 <div class="fw-bold fs-4">{{ $totalGuru }}</div>
             </div>
         </div>
@@ -57,18 +57,18 @@
 </div>
 
 <div class="row g-4">
-    {{-- TOP GURU DI KELAS ANDA --}}
+    {{-- TOP GURU SEKOLAH --}}
     <div class="col-lg-8">
         <div class="card-custom p-4 h-100">
             <div class="d-flex justify-content-between align-items-center mb-4">
-                <h5 class="fw-bold mb-0"><i class="bi bi-trophy-fill text-warning me-2"></i>Top Guru di Kelas Anda</h5>
+                <h5 class="fw-bold mb-0"><i class="bi bi-trophy-fill text-warning me-2"></i>Top Guru Sekolah</h5>
                 <a href="{{ route('siswa.leaderboard.index') }}" class="btn btn-sm btn-outline-custom">Lihat Semua</a>
             </div>
 
             @if($topGuru->isEmpty())
                 <div class="text-center py-5 text-muted">
                     <i class="bi bi-inbox fs-1 d-block mb-2"></i>
-                    <p class="mb-0">Belum ada data penilaian di kelas Anda.</p>
+                    <p class="mb-0">Belum ada data evaluasi guru untuk periode ini.</p>
                 </div>
             @else
                 <div class="row g-3">

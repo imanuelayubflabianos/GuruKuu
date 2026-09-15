@@ -26,32 +26,16 @@ class LandingController extends Controller
             ->limit(3)
             ->get();
 
-        // Top 3 guru normada
-        $topNormada = Guru::with('jurusan')
-            ->where('kategori', 'normada')
-            ->where('total_penilaian', '>', 0)
-            ->orderBy('rata_rata_nilai', 'desc')
-            ->orderBy('total_penilaian', 'desc')
-            ->limit(3)
-            ->get();
-
-        // Top 3 guru produktif
-        $topProduktif = Guru::with('jurusan')
-            ->where('kategori', 'produktif')
-            ->where('total_penilaian', '>', 0)
-            ->orderBy('rata_rata_nilai', 'desc')
-            ->orderBy('total_penilaian', 'desc')
-            ->limit(3)
-            ->get();
+        if ($topGuru->isEmpty()) {
+            $topGuru = Guru::with('jurusan')->orderBy('nama', 'asc')->limit(3)->get();
+        }
 
         return view('landing.index', compact(
             'periodeAktif',
             'totalGuru',
             'totalSiswa',
             'totalPenilaian',
-            'topGuru',
-            'topNormada',
-            'topProduktif'
+            'topGuru'
         ));
     }
 
@@ -59,39 +43,22 @@ class LandingController extends Controller
     {
         $periodeAktif = Periode::where('status', 'aktif')->first();
         
-        $leaderboardNormada = Guru::with('jurusan')
-            ->where('kategori', 'normada')
-            ->where('total_penilaian', '>', 0)
-            ->orderBy('rata_rata_nilai', 'desc')
-            ->orderBy('total_penilaian', 'desc')
-            ->get();
-
-        $leaderboardProduktif = Guru::with('jurusan')
-            ->where('kategori', 'produktif')
+        $leaderboard = Guru::with('jurusan')
             ->where('total_penilaian', '>', 0)
             ->orderBy('rata_rata_nilai', 'desc')
             ->orderBy('total_penilaian', 'desc')
             ->get();
 
         // Fallback jika belum ada penilaian
-        if ($leaderboardNormada->isEmpty()) {
-            $leaderboardNormada = Guru::with('jurusan')
-                ->where('kategori', 'normada')
-                ->orderBy('nama', 'asc')
-                ->get();
-        }
-
-        if ($leaderboardProduktif->isEmpty()) {
-            $leaderboardProduktif = Guru::with('jurusan')
-                ->where('kategori', 'produktif')
+        if ($leaderboard->isEmpty()) {
+            $leaderboard = Guru::with('jurusan')
                 ->orderBy('nama', 'asc')
                 ->get();
         }
 
         return view('landing.leaderboard', compact(
             'periodeAktif',
-            'leaderboardNormada',
-            'leaderboardProduktif'
+            'leaderboard'
         ));
     }
 

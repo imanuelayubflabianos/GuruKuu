@@ -16,6 +16,11 @@ class Penilaian extends Model
         'kedisiplinan', 'cara_mengajar', 'komunikasi',
         'tanggung_jawab', 'kreativitas', 'keramahan',
         'total_nilai', 'kritik', 'saran',
+        'balasan_guru', 'balasan_guru_at',
+    ];
+
+    protected $casts = [
+        'balasan_guru_at' => 'datetime',
     ];
 
     // ==================== RELASI ====================

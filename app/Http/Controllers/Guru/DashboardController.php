@@ -25,16 +25,8 @@ class DashboardController extends Controller
         }
 
         $periodeAktif = Periode::where('status', 'aktif')->first();
-        $periodeId = $periodeAktif?->id;
 
-        // Ambil kelas yang diampu beserta perhitungan partisipasi
-        $kelasList = $guru->kelas()->withPivot('mata_pelajaran')->get()->map(function($kelas) use ($guru, $periodeId) {
-            $kelas->partisipasi = $guru->getPersentasePartisipasiDiKelas($kelas->id, $periodeId);
-            $kelas->sudah_menilai = $guru->getJumlahSiswaMenilaiDiKelas($kelas->id, $periodeId);
-            return $kelas;
-        });
-
-        // Ambil ulasan & kritik saran dari siswa untuk guru ini
+        // Ambil ulasan & kritik saran dari siswa untuk guru ini (100% Anonim)
         $ulasanTerbaru = Penilaian::where('guru_id', $guru->id)
             ->where(function ($query) {
                 $query->where(function ($q) {
@@ -43,15 +35,60 @@ class DashboardController extends Controller
                     $q->whereNotNull('saran')->whereRaw("TRIM(saran) != ''");
                 });
             })
-            ->with(['siswa', 'kelas', 'periode'])
+            ->with(['periode'])
             ->latest()
             ->get();
 
         return view('guru.dashboard', compact(
             'guru',
-            'kelasList',
             'ulasanTerbaru',
             'periodeAktif'
+        ));
+    }
+
+    public function replyPenilaian(Request $request, Penilaian $penilaian)
+    {
+        $request->validate([
+            'balasan_guru' => 'required|string|max:1000',
+        ]);
+
+        $user = Auth::user();
+        $guru = Guru::where('nip', $user->nis)
+            ->orWhere('email', $user->email)
+            ->first();
+
+        if (!$guru || $penilaian->guru_id !== $guru->id) {
+            return back()->with('error', 'Anda hanya dapat membalas ulasan yang ditujukan untuk profil Anda.');
+        }
+
+        $penilaian->update([
+            'balasan_guru' => trim($request->balasan_guru),
+            'balasan_guru_at' => now(),
+        ]);
+
+        return back()->with('success', 'Balasan ulasan berhasil disimpan dan ditampilkan!');
+    }
+
+    public function leaderboard()
+    {
+        $periodeAktif = Periode::where('status', 'aktif')->first();
+        
+        $leaderboard = Guru::with('jurusan')
+            ->where('total_penilaian', '>', 0)
+            ->orderBy('rata_rata_nilai', 'desc')
+            ->orderBy('total_penilaian', 'desc')
+            ->get();
+
+        // Fallback jika belum ada penilaian
+        if ($leaderboard->isEmpty()) {
+            $leaderboard = Guru::with('jurusan')
+                ->orderBy('nama', 'asc')
+                ->get();
+        }
+
+        return view('guru.leaderboard', compact(
+            'periodeAktif',
+            'leaderboard'
         ));
     }
 }

@@ -11,7 +11,6 @@ class JurusanController extends Controller
 {
     public function index()
     {
-        // Gunakan $jurusans agar tidak bentrok dengan variable $jurusan (model)
         $jurusans = Jurusan::all();
         return view('admin.jurusan.index', compact('jurusans'));
     }
@@ -24,12 +23,13 @@ class JurusanController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'kode_jurusan' => 'required|string|unique:jurusan,kode_jurusan',
+            'kode_jurusan' => 'required|string|max:50|unique:jurusan,kode_jurusan',
             'nama_jurusan' => 'required|string|max:255',
-            'logo' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'deskripsi'    => 'nullable|string',
+            'logo'         => 'nullable|image|mimes:jpeg,png,jpg,webp|max:3072',
         ]);
 
-        $data = $request->only(['kode_jurusan', 'nama_jurusan']);
+        $data = $request->only(['kode_jurusan', 'nama_jurusan', 'deskripsi']);
         if ($request->hasFile('logo')) {
             $data['logo'] = $request->file('logo')->store('jurusan', 'public');
         }
@@ -46,14 +46,15 @@ class JurusanController extends Controller
     public function update(Request $request, Jurusan $jurusan)
     {
         $request->validate([
-            'kode_jurusan' => 'required|string|unique:jurusan,kode_jurusan,' . $jurusan->id,
+            'kode_jurusan' => 'required|string|max:50|unique:jurusan,kode_jurusan,' . $jurusan->id,
             'nama_jurusan' => 'required|string|max:255',
-            'logo' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'deskripsi'    => 'nullable|string',
+            'logo'         => 'nullable|image|mimes:jpeg,png,jpg,webp|max:3072',
         ]);
 
-        $data = $request->only(['kode_jurusan', 'nama_jurusan']);
+        $data = $request->only(['kode_jurusan', 'nama_jurusan', 'deskripsi']);
         if ($request->hasFile('logo')) {
-            if ($jurusan->logo) {
+            if ($jurusan->logo && Storage::disk('public')->exists($jurusan->logo)) {
                 Storage::disk('public')->delete($jurusan->logo);
             }
             $data['logo'] = $request->file('logo')->store('jurusan', 'public');
@@ -65,7 +66,7 @@ class JurusanController extends Controller
 
     public function destroy(Jurusan $jurusan)
     {
-        if ($jurusan->logo) {
+        if ($jurusan->logo && Storage::disk('public')->exists($jurusan->logo)) {
             Storage::disk('public')->delete($jurusan->logo);
         }
         $jurusan->delete();

@@ -37,8 +37,8 @@
                         </div>
                     </td>
                     <td>
-                        <div class="fw-bold">{{ $f->siswa->name ?? 'Anonim' }}</div>
-                        <small class="text-muted font-mono">NIS: {{ $f->siswa->nis ?? '-' }}</small>
+                        <div class="fw-bold"><i class="bi bi-incognito me-1"></i>Siswa (Anonim)</div>
+                        <small class="text-muted">Identitas Terlindungi</small>
                     </td>
                     <td>
                         <span class="badge bg-light text-dark border">{{ $f->kelas?->nama_kelas ?? '-' }}</span>

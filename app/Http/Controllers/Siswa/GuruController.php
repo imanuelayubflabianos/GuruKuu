@@ -10,7 +10,7 @@ use Illuminate\Http\Request;
 
 class GuruController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $user = auth()->user();
         $periodeAktif = Periode::where('status', 'aktif')->first();
@@ -20,12 +20,28 @@ class GuruController extends Controller
             ->wherePivot('tahun_ajaran', $periodeAktif?->tahun_ajaran)
             ->first();
 
-        $guru = collect();
-        if ($kelasAktif) {
-            $guru = $kelasAktif->guru()->with('jurusan')->get();
+        $query = Guru::with('jurusan')->orderBy('nama');
+
+        if ($request->filled('search')) {
+            $search = trim($request->search);
+            $query->where(function($q) use ($search) {
+                $q->where('nama', 'LIKE', "%{$search}%")
+                  ->orWhere('nip', 'LIKE', "%{$search}%")
+                  ->orWhere('bio', 'LIKE', "%{$search}%");
+            });
         }
 
-        return view('siswa.guru.index', compact('guru', 'kelasAktif', 'periodeId'));
+        if ($request->filled('kategori') && in_array($request->kategori, ['normada', 'produktif'])) {
+            $query->where('kategori', $request->kategori);
+        }
+
+        $guru = $query->get();
+
+        $sudahMenilaiIds = $periodeId
+            ? Penilaian::where('siswa_id', $user->id)->where('periode_id', $periodeId)->pluck('guru_id')->toArray()
+            : [];
+
+        return view('siswa.guru.index', compact('guru', 'kelasAktif', 'periodeId', 'sudahMenilaiIds'));
     }
 
     public function show(Guru $guru)
@@ -39,7 +55,7 @@ class GuruController extends Controller
             ->first();
 
         $sudahMenilai = false;
-        if ($kelasAktif && $periodeId) {
+        if ($periodeId) {
             $sudahMenilai = Penilaian::where('siswa_id', $user->id)
                 ->where('guru_id', $guru->id)
                 ->where('periode_id', $periodeId)

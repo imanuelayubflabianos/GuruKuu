@@ -1,111 +1,167 @@
 @extends('layouts.siswa')
-@section('title', 'Leaderboard')
+@section('title', 'Leaderboard Guru')
 
 @section('content')
-<div class="page-header">
+<div class="page-header d-flex justify-content-between align-items-center flex-wrap gap-3">
     <div>
-        <div class="page-label">PERINGKAT GURU</div>
-        <h1 class="page-title">Leaderboard Partisipasi Penilaian</h1>
-        <p class="page-subtitle">Peringkat guru berdasarkan persentase partisipasi evaluasi dari siswa.</p>
+        <div class="page-label">PENCAPAIAN TERTINGGI</div>
+        <h1 class="page-title">Leaderboard Guru</h1>
+        <p class="page-subtitle">Peringkat guru terbaik berdasarkan evaluasi dan ulasan objektif siswa.</p>
+    </div>
+    <div>
+        <a href="{{ url('/') }}" class="btn btn-outline-custom">
+            <i class="bi bi-house-door me-1"></i> Ke Beranda Publik
+        </a>
     </div>
 </div>
 
-<div class="card-custom p-3 mb-4">
-    <form method="GET" action="{{ route('siswa.leaderboard.index') }}" class="row g-3 align-items-end">
-        <div class="col-md-3">
-            <label class="form-label small fw-bold text-muted">Kategori</label>
-            <select name="kategori" class="form-select form-select-sm">
-                <option value="semua" {{ $filterKategori == 'semua' ? 'selected' : '' }}>Semua Kategori</option>
-                <option value="normada" {{ $filterKategori == 'normada' ? 'selected' : '' }}>Normada</option>
-                <option value="produktif" {{ $filterKategori == 'produktif' ? 'selected' : '' }}>Produktif</option>
-            </select>
-        </div>
-        <div class="col-md-4">
-            <label class="form-label small fw-bold text-muted">Kelas</label>
-            <select name="kelas_id" class="form-select form-select-sm">
-                <option value="">Semua Kelas</option>
-                @foreach($semuaKelas as $kelas)
-                    <option value="{{ $kelas->id }}" {{ $filterKelasId == $kelas->id ? 'selected' : '' }}>
-                        {{ $kelas->nama_kelas }} (Tingkat {{ $kelas->tingkat }})
-                    </option>
-                @endforeach
-            </select>
-        </div>
-        <div class="col-md-3 d-flex gap-2">
-            <button type="submit" class="btn btn-primary-custom btn-sm flex-grow-1"><i class="bi bi-funnel"></i> Filter</button>
-            <a href="{{ route('siswa.leaderboard.index') }}" class="btn btn-outline-custom btn-sm" title="Reset Filter"><i class="bi bi-arrow-counterclockwise"></i></a>
-        </div>
-    </form>
-</div>
+{{-- Podium Top 3 --}}
+@php
+    $list = $leaderboard ?? collect();
+    $top1 = $list->get(0);
+    $top2 = $list->get(1);
+    $top3 = $list->get(2);
+@endphp
 
+@if($top1)
+<div class="row g-4 mb-5 align-items-end">
+    {{-- #2 --}}
+    <div class="col-md-4">
+        @if($top2)
+        @php $pct2 = round(($top2->rata_rata_nilai / 5) * 100); @endphp
+        <div class="card-custom p-4 text-center">
+            <div class="position-relative d-inline-block mb-3">
+                <img src="{{ $top2->photo_url }}" class="rounded-circle" width="100" height="100" style="object-fit: cover; border: 4px solid var(--border);">
+                <span class="position-absolute bottom-0 end-0 bg-secondary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; font-weight: 700;">2</span>
+            </div>
+            <h5 class="fw-bold mb-1">{{ $top2->nama }}</h5>
+            <div class="font-mono" style="font-size: 0.7rem; color: var(--text-muted); letter-spacing: 1px;">{{ strtoupper($top2->jurusan?->nama_jurusan ?? 'UMUM') }}</div>
+            <div class="mt-3 px-3">
+                <div class="d-flex justify-content-between font-mono mb-1" style="font-size: 0.75rem;">
+                    <span class="text-muted">Rating:</span>
+                    <span class="fw-bold text-primary">{{ $pct2 }}%</span>
+                </div>
+                <div class="progress" style="height: 6px; border-radius: 10px;">
+                    <div class="progress-bar bg-primary rounded-pill" style="width: {{ $pct2 }}%;"></div>
+                </div>
+                <small class="text-muted mt-2 d-block">{{ $top2->total_penilaian }} Ulasan</small>
+            </div>
+        </div>
+        @endif
+    </div>
+
+    {{-- #1 --}}
+    <div class="col-md-4">
+        @php $pct1 = round(($top1->rata_rata_nilai / 5) * 100); @endphp
+        <div class="card-custom p-5 text-center" style="background: var(--primary); color: white; border: none;">
+            <div class="position-relative d-inline-block mb-3">
+                <img src="{{ $top1->photo_url }}" class="rounded-circle" width="120" height="120" style="object-fit: cover; border: 4px solid var(--secondary);">
+                <span class="position-absolute bottom-0 end-0 rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; font-weight: 700; background: var(--secondary); color: var(--primary);">1</span>
+            </div>
+            <h4 class="fw-bold mb-1 text-white">{{ $top1->nama }}</h4>
+            <div class="font-mono" style="font-size: 0.75rem; letter-spacing: 2px; color: var(--secondary);">{{ strtoupper($top1->jurusan?->nama_jurusan ?? 'UMUM') }}</div>
+            <div class="row g-3 mt-3">
+                <div class="col-6">
+                    <div class="font-mono" style="font-size: 0.65rem; letter-spacing: 1px; opacity: 0.8;">KEPUASAN</div>
+                    <div class="fw-bold fs-3 text-warning">{{ $pct1 }}%</div>
+                </div>
+                <div class="col-6">
+                    <div class="font-mono" style="font-size: 0.65rem; letter-spacing: 1px; opacity: 0.8;">TOTAL ULASAN</div>
+                    <div class="fw-bold fs-3 text-white">{{ $top1->total_penilaian }}</div>
+                </div>
+            </div>
+            <div class="progress mt-3" style="height: 7px; background-color: rgba(255,255,255,0.2); border-radius: 10px;">
+                <div class="progress-bar bg-warning rounded-pill" style="width: {{ $pct1 }}%;"></div>
+            </div>
+        </div>
+    </div>
+
+    {{-- #3 --}}
+    <div class="col-md-4">
+        @if($top3)
+        @php $pct3 = round(($top3->rata_rata_nilai / 5) * 100); @endphp
+        <div class="card-custom p-4 text-center">
+            <div class="position-relative d-inline-block mb-3">
+                <img src="{{ $top3->photo_url }}" class="rounded-circle" width="100" height="100" style="object-fit: cover; border: 4px solid var(--border);">
+                <span class="position-absolute bottom-0 end-0 bg-warning text-dark rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; font-weight: 700;">3</span>
+            </div>
+            <h5 class="fw-bold mb-1">{{ $top3->nama }}</h5>
+            <div class="font-mono" style="font-size: 0.7rem; color: var(--text-muted); letter-spacing: 1px;">{{ strtoupper($top3->jurusan?->nama_jurusan ?? 'UMUM') }}</div>
+            <div class="mt-3 px-3">
+                <div class="d-flex justify-content-between font-mono mb-1" style="font-size: 0.75rem;">
+                    <span class="text-muted">Rating:</span>
+                    <span class="fw-bold text-primary">{{ $pct3 }}%</span>
+                </div>
+                <div class="progress" style="height: 6px; border-radius: 10px;">
+                    <div class="progress-bar bg-primary rounded-pill" style="width: {{ $pct3 }}%;"></div>
+                </div>
+                <small class="text-muted mt-2 d-block">{{ $top3->total_penilaian }} Ulasan</small>
+            </div>
+        </div>
+        @endif
+    </div>
+</div>
+@endif
+
+{{-- Tabel Ranking Unified --}}
 <div class="card-custom">
+    <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
+        <h6 class="fw-bold mb-0"><i class="bi bi-trophy-fill text-warning me-2"></i>Daftar Peringkat Guru</h6>
+        <span class="badge bg-primary">{{ $list->count() }} Guru</span>
+    </div>
     <div class="table-responsive">
-        <table class="table table-custom mb-0" id="leaderboardTable">
+        <table class="table table-custom mb-0">
             <thead>
                 <tr>
-                    <th class="text-center" style="width: 70px;">PERINGKAT</th>
+                    <th style="width: 80px;" class="text-center">RANKING</th>
                     <th>NAMA GURU</th>
-                    <th>KATEGORI</th>
-                    <th>PARTISIPASI SISWA</th>
-                    <th>PROGRESS</th>
-                    <th class="text-center" style="width: 150px;">AKSI</th>
+                    <th>JURUSAN / KEAHLIAN</th>
+                    <th style="width: 200px;">RATING KEPUASAN</th>
+                    <th class="text-center">TOTAL ULASAN</th>
+                    <th class="text-center" style="width: 140px;">AKSI</th>
                 </tr>
             </thead>
             <tbody>
-                @forelse($rankedGuru as $index => $guru)
+                @forelse($list as $index => $g)
+                @php $pct = round(($g->rata_rata_nilai / 5) * 100); @endphp
                 <tr>
-                    <td class="text-center fw-bold">
-                        @if($index == 0)
-                            <span class="fs-5">🥇</span> <span class="badge bg-warning text-dark">#1</span>
-                        @elseif($index == 1)
-                            <span class="fs-5">🥈</span> <span class="badge bg-secondary text-white">#2</span>
-                        @elseif($index == 2)
-                            <span class="fs-5">🥉</span> <span class="badge bg-danger bg-opacity-75 text-white">#3</span>
-                        @else
-                            <span class="badge bg-light text-dark border">#{{ $index + 1 }}</span>
+                    <td class="text-center">
+                        @if($index === 0) <span class="fs-4">🥇</span>
+                        @elseif($index === 1) <span class="fs-4">🥈</span>
+                        @elseif($index === 2) <span class="fs-4">🥉</span>
+                        @else <span class="badge bg-light text-dark border font-mono">#{{ $index + 1 }}</span>
                         @endif
                     </td>
                     <td>
-                        <div class="d-flex align-items-center gap-3">
-                            <img src="{{ $guru->photo_url }}" class="rounded-circle border" style="width: 42px; height: 42px; object-fit: cover;">
+                        <div class="d-flex align-items-center">
+                            <img src="{{ $g->photo_url }}" class="rounded-circle me-3" width="44" height="44" style="object-fit: cover;">
                             <div>
-                                <div class="fw-bold text-dark">{{ $guru->nama }}</div>
-                                <small class="text-muted">{{ $guru->jurusan?->nama_jurusan ?? 'Umum / Normada' }}</small>
+                                <strong>{{ $g->nama }}</strong>
+                                <div class="text-muted small font-mono">{{ $g->nip }}</div>
                             </div>
                         </div>
                     </td>
+                    <td class="font-mono" style="font-size: 0.75rem;">{{ strtoupper($g->jurusan?->nama_jurusan ?? 'Umum') }}</td>
                     <td>
-                        <span class="badge bg-{{ $guru->kategori === 'normada' ? 'info' : 'success' }} bg-opacity-10 text-{{ $guru->kategori === 'normada' ? 'info' : 'success' }} border border-{{ $guru->kategori === 'normada' ? 'info' : 'success' }}-subtle px-2 py-1">
-                            {{ ucfirst($guru->kategori) }}
-                        </span>
-                    </td>
-                    <td>
-                        <div class="fw-bold text-dark">{{ $guru->jumlah_siswa ?? 0 }} / {{ $guru->total_siswa ?? 0 }} Siswa</div>
-                        <small class="text-muted">Partisipasi Kelas</small>
-                    </td>
-                    <td>
-                        @php
-                            $p = $guru->persentase ?? 0;
-                            $warna = $p >= 70 ? '#22c55e' : ($p >= 40 ? '#f59e0b' : '#ef4444');
-                        @endphp
-                        <div class="d-flex align-items-center gap-2" style="min-width: 140px;">
-                            <div class="progress flex-grow-1" style="height: 8px;">
-                                <div class="progress-bar" style="width: {{ $p }}%; background: {{ $warna }};"></div>
-                            </div>
-                            <span class="fw-bold small" style="color: {{ $warna }}; min-width: 45px;">{{ number_format($p, 1) }}%</span>
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <span class="fw-bold font-mono text-primary" style="font-size: 0.85rem;">{{ $pct }}%</span>
+                        </div>
+                        <div class="progress" style="height: 6px; border-radius: 10px;">
+                            <div class="progress-bar bg-primary rounded-pill" style="width: {{ $pct }}%;"></div>
                         </div>
                     </td>
+                    <td class="text-center font-mono">{{ $g->total_penilaian }}</td>
                     <td class="text-center">
-                        <a href="{{ route('siswa.guru.show', $guru->id) }}" class="btn btn-sm btn-primary-custom d-inline-flex align-items-center gap-1">
-                            <i class="bi bi-eye"></i> Lihat Detail
+                        <a href="{{ route('siswa.guru.show', $g->id) }}" class="btn btn-sm btn-outline-primary">
+                            <i class="bi bi-info-circle me-1"></i> Detail Guru
                         </a>
                     </td>
                 </tr>
                 @empty
                 <tr>
                     <td colspan="6" class="text-center py-5 text-muted">
-                        <i class="bi bi-inbox fs-1 d-block mb-2"></i>
-                        Tidak ada data guru untuk kriteria filter ini.
+                        <i class="bi bi-inbox fs-2 d-block mb-2"></i>
+                        Belum ada data penilaian guru.
                     </td>
                 </tr>
                 @endforelse
@@ -114,15 +170,3 @@
     </div>
 </div>
 @endsection
-
-@push('scripts')
-<script>
-$(document).ready(function() {
-    $('#leaderboardTable').DataTable({
-        language: { url: '//cdn.datatables.net/plug-ins/1.13.8/i18n/id.json' },
-        ordering: false,
-        pageLength: 10
-    });
-});
-</script>
-@endpush

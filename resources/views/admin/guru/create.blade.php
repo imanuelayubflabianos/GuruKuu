@@ -44,15 +44,6 @@
                         @error('phone')<div class="text-danger small">{{ $message }}</div>@enderror
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label font-mono small fw-bold text-muted">KATEGORI <span class="text-danger">*</span></label>
-                        <select name="kategori" class="form-select" required style="border-radius: 8px;">
-                            <option value="">Pilih Kategori</option>
-                            <option value="normada" {{ old('kategori') == 'normada' ? 'selected' : '' }}>Normada</option>
-                            <option value="produktif" {{ old('kategori') == 'produktif' ? 'selected' : '' }}>Produktif</option>
-                        </select>
-                        @error('kategori')<div class="text-danger small">{{ $message }}</div>@enderror
-                    </div>
-                    <div class="col-md-6">
                         <label class="form-label font-mono small fw-bold text-muted">JURUSAN</label>
                         <select name="jurusan_id" class="form-select" style="border-radius: 8px;">
                             <option value="">Pilih Jurusan (Opsional)</option>

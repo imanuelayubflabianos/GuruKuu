@@ -9,6 +9,23 @@
         <p class="page-subtitle">Kelola data siswa dan filter berdasarkan kelas.</p>
     </div>
     <div class="d-flex gap-2">
+        <div class="dropdown">
+            <button class="btn btn-outline-custom dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="bi bi-download me-1"></i> Export Siswa
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                <li>
+                    <a class="dropdown-item" href="{{ route('admin.export.siswa.excel') }}">
+                        <i class="bi bi-file-earmark-excel text-success me-2"></i> Export Excel (.xlsx)
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item" href="{{ route('admin.export.siswa.pdf') }}">
+                        <i class="bi bi-file-earmark-pdf text-danger me-2"></i> Export PDF (.pdf)
+                    </a>
+                </li>
+            </ul>
+        </div>
         <a href="{{ route('admin.sipintu.siswa') }}" class="btn btn-outline-success">
             <i class="bi bi-cloud-arrow-down me-1"></i> Tarik dari SiPintu
         </a>

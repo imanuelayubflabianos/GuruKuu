@@ -2,14 +2,22 @@
 @section('title', 'Beranda')
 
 @section('content')
+@php
+    $heroImage = \App\Models\Setting::get('hero_image', 'https://images.unsplash.com/photo-1562774053-701939374585?w=1920');
+    $heroTitle = \App\Models\Setting::get('hero_title', 'Bangun Sekolah yang Lebih Baik Melalui Penilaian Guru yang Objektif');
+    $heroSubtitle = \App\Models\Setting::get('hero_subtitle', 'Suarakan aspirasimu secara aman untuk meningkatkan kualitas pengajaran dan menciptakan lingkungan belajar yang inspiratif.');
+    $heroCtaText = \App\Models\Setting::get('hero_cta_text', 'Siap Memulai?');
+    $heroCtaUrl = \App\Models\Setting::get('hero_cta_url', route('login'));
+@endphp
+
 {{-- 1. HERO SECTION (id="home") --}}
-<section id="home" class="hero-section">
+<section id="home" class="hero-section" style="background: linear-gradient(rgba(0,51,102,0.85), rgba(0,51,102,0.7)), url('{{ $heroImage }}') center/cover no-repeat;">
     <div class="container">
         <div class="row">
             <div class="col-lg-8" data-aos="fade-right">
-                <h1 class="hero-title">Bangun Sekolah yang Lebih Baik Melalui Penilaian Guru yang Objektif</h1>
-                <p class="hero-subtitle">Suarakan aspirasimu secara aman untuk meningkatkan kualitas pengajaran dan menciptakan lingkungan belajar yang inspiratif.</p>
-                <a href="{{ route('login') }}" class="btn btn-cta">Siap Memulai?</a>
+                <h1 class="hero-title">{{ $heroTitle }}</h1>
+                <p class="hero-subtitle">{{ $heroSubtitle }}</p>
+                <a href="{{ $heroCtaUrl }}" class="btn btn-cta">{{ $heroCtaText }}</a>
             </div>
         </div>
     </div>
@@ -72,95 +80,80 @@
             <p class="text-muted">Guru dengan persentase partisipasi penilaian tertinggi dari siswa</p>
         </div>
 
-        <ul class="nav nav-pills justify-content-center mb-5" role="tablist" data-aos="fade-up">
-            <li class="nav-item"><button class="nav-link active" data-bs-toggle="pill" data-bs-target="#normada" style="border-radius: 8px; padding: 0.75rem 1.5rem; font-weight: 600;">Guru Normada</button></li>
-            <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#produktif" style="border-radius: 8px; padding: 0.75rem 1.5rem; font-weight: 600;">Guru Produktif</button></li>
-        </ul>
+        @php
+            // Ambil guru dengan persentase kepuasan / partisipasi tertinggi secara keseluruhan
+            $allTeachers = \App\Models\Guru::with('jurusan')->where('total_penilaian', '>', 0)->get();
+            if ($allTeachers->isEmpty()) {
+                $allTeachers = \App\Models\Guru::with('jurusan')->get();
+            }
+            
+            $topList = $allTeachers->map(function($guru) {
+                $guru->persentase = round(($guru->rata_rata_nilai / 5) * 100);
+                return $guru;
+            })->sortByDesc('rata_rata_nilai')->take(3)->values();
+        @endphp
 
-        <div class="tab-content">
-            @php
-                // Ambil guru dengan persentase partisipasi tertinggi
-                $allNormada = \App\Models\Guru::with('jurusan')->where('kategori', 'normada')->where('total_penilaian', '>', 0)->get();
-                $allProduktif = \App\Models\Guru::with('jurusan')->where('kategori', 'produktif')->where('total_penilaian', '>', 0)->get();
-                
-                // Hitung persentase partisipasi untuk setiap guru
-                $topNormada = $allNormada->map(function($guru) {
-                    $totalSiswa = $guru->kelas->sum('jumlah_siswa');
-                    $jumlahMenilai = $guru->total_penilaian;
-                    $guru->persentase = $totalSiswa > 0 ? round(($jumlahMenilai / $totalSiswa) * 100, 1) : 0;
-                    return $guru;
-                })->sortByDesc('persentase')->take(3)->values();
-                
-                $topProduktif = $allProduktif->map(function($guru) {
-                    $totalSiswa = $guru->kelas->sum('jumlah_siswa');
-                    $jumlahMenilai = $guru->total_penilaian;
-                    $guru->persentase = $totalSiswa > 0 ? round(($jumlahMenilai / $totalSiswa) * 100, 1) : 0;
-                    return $guru;
-                })->sortByDesc('persentase')->take(3)->values();
-            @endphp
-
-            @foreach(['normada' => $topNormada, 'produktif' => $topProduktif] as $key => $list)
-            <div class="tab-pane fade {{ $key === 'normada' ? 'show active' : '' }}" id="{{ $key }}">
-                <div class="row g-4 justify-content-center align-items-end mb-5">
-                    @if($list->count() > 0)
-                        @if($list->count() > 1)
-                        <div class="col-md-3 order-md-1" data-aos="fade-right">
-                            <div class="card-custom p-4 text-center" style="border: 1px solid var(--border);">
-                                <div class="position-relative d-inline-block mb-3">
-                                    <img src="{{ $list[1]->photo_url }}" class="rounded-circle" width="80" height="80" style="object-fit: cover; border: 3px solid #C0C0C0;">
-                                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill" style="background: #C0C0C0; color: #fff; font-size: 0.9rem; padding: 0.5rem 0.75rem;">#2</span>
-                                </div>
-                                <h6 class="fw-bold mb-1">{{ $list[1]->nama }}</h6>
-                                <div class="mb-2">
-                                    <div class="fw-bold" style="color: var(--primary); font-size: 1.3rem;">{{ number_format($list[1]->persentase, 0) }}%</div>
-                                    <small class="text-muted">{{ $list[1]->total_penilaian }} siswa menilai</small>
-                                </div>
-                            </div>
+        <div class="row g-4 justify-content-center align-items-end mb-5">
+            @if($topList->count() > 0)
+                @if($topList->count() > 1)
+                <div class="col-md-3 order-md-1" data-aos="fade-right">
+                    <div class="card-custom p-4 text-center" style="border: 1px solid var(--border);">
+                        <div class="position-relative d-inline-block mb-3">
+                            <img src="{{ $topList[1]->photo_url }}" class="rounded-circle" width="85" height="85" style="object-fit: cover; border: 3px solid #C0C0C0;">
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill" style="background: #C0C0C0; color: #fff; font-size: 0.9rem; padding: 0.5rem 0.75rem;">#2</span>
                         </div>
-                        @endif
-
-                        @if($list->count() > 0)
-                        <div class="col-md-4 order-md-2 mt-md-4" data-aos="zoom-in">
-                            <div class="card-custom p-5 text-center" style="background: var(--primary); border: none; color: white;">
-                                <div class="position-relative d-inline-block mb-3">
-                                    <img src="{{ $list[0]->photo_url }}" class="rounded-circle" width="110" height="110" style="object-fit: cover; border: 4px solid var(--secondary);">
-                                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill" style="background: #FFD700; color: #000; font-size: 1rem; padding: 0.6rem 0.85rem;">#1</span>
-                                </div>
-                                <h5 class="fw-bold mb-1">{{ $list[0]->nama }}</h5>
-                                <div class="font-mono mb-2" style="font-size: 0.7rem; letter-spacing: 1px; color: rgba(255,255,255,0.7);">{{ strtoupper($list[0]->jurusan?->nama_jurusan ?? 'UMUM') }}</div>
-                                <div class="mb-2">
-                                    <div class="fw-bold" style="color: var(--secondary); font-size: 2rem;">{{ number_format($list[0]->persentase, 0) }}%</div>
-                                    <small style="opacity: 0.8;">{{ $list[0]->total_penilaian }} siswa menilai</small>
-                                </div>
-                            </div>
+                        <h6 class="fw-bold mb-1">{{ $topList[1]->nama }}</h6>
+                        <div class="font-mono mb-2" style="font-size: 0.7rem; color: var(--text-muted);">{{ strtoupper($topList[1]->jurusan?->nama_jurusan ?? 'UMUM') }}</div>
+                        <div class="mb-2">
+                            <div class="fw-bold text-primary" style="font-size: 1.4rem;">{{ $topList[1]->persentase }}%</div>
+                            <small class="text-muted">{{ $topList[1]->total_penilaian }} ulasan</small>
                         </div>
-                        @endif
-
-                        @if($list->count() > 2)
-                        <div class="col-md-3 order-md-3" data-aos="fade-left">
-                            <div class="card-custom p-4 text-center" style="border: 1px solid var(--border);">
-                                <div class="position-relative d-inline-block mb-3">
-                                    <img src="{{ $list[2]->photo_url }}" class="rounded-circle" width="80" height="80" style="object-fit: cover; border: 3px solid #CD7F32;">
-                                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill" style="background: #CD7F32; color: #fff; font-size: 0.9rem; padding: 0.5rem 0.75rem;">#3</span>
-                                </div>
-                                <h6 class="fw-bold mb-1">{{ $list[2]->nama }}</h6>
-                                <div class="mb-2">
-                                    <div class="fw-bold" style="color: var(--primary); font-size: 1.3rem;">{{ number_format($list[2]->persentase, 0) }}%</div>
-                                    <small class="text-muted">{{ $list[2]->total_penilaian }} siswa menilai</small>
-                                </div>
-                            </div>
-                        </div>
-                        @endif
-                    @else
-                        <div class="col-12 text-center text-muted py-5">Belum ada data penilaian untuk kategori ini.</div>
-                    @endif
+                    </div>
                 </div>
-            </div>
-            @endforeach
+                @endif
+
+                @if($topList->count() > 0)
+                <div class="col-md-4 order-md-2 mt-md-4" data-aos="zoom-in">
+                    <div class="card-custom p-5 text-center" style="background: var(--primary); border: none; color: white;">
+                        <div class="position-relative d-inline-block mb-3">
+                            <img src="{{ $topList[0]->photo_url }}" class="rounded-circle" width="115" height="115" style="object-fit: cover; border: 4px solid var(--secondary);">
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill" style="background: #FFD700; color: #000; font-size: 1rem; padding: 0.6rem 0.85rem;">#1</span>
+                        </div>
+                        <h5 class="fw-bold mb-1 text-white">{{ $topList[0]->nama }}</h5>
+                        <div class="font-mono mb-2" style="font-size: 0.75rem; letter-spacing: 1px; color: var(--secondary);">{{ strtoupper($topList[0]->jurusan?->nama_jurusan ?? 'UMUM') }}</div>
+                        <div class="mb-2">
+                            <div class="fw-bold text-warning" style="font-size: 2.2rem;">{{ $topList[0]->persentase }}%</div>
+                            <small style="opacity: 0.85;">{{ $topList[0]->total_penilaian }} ulasan</small>
+                        </div>
+                    </div>
+                </div>
+                @endif
+
+                @if($topList->count() > 2)
+                <div class="col-md-3 order-md-3" data-aos="fade-left">
+                    <div class="card-custom p-4 text-center" style="border: 1px solid var(--border);">
+                        <div class="position-relative d-inline-block mb-3">
+                            <img src="{{ $topList[2]->photo_url }}" class="rounded-circle" width="85" height="85" style="object-fit: cover; border: 3px solid #CD7F32;">
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill" style="background: #CD7F32; color: #fff; font-size: 0.9rem; padding: 0.5rem 0.75rem;">#3</span>
+                        </div>
+                        <h6 class="fw-bold mb-1">{{ $topList[2]->nama }}</h6>
+                        <div class="font-mono mb-2" style="font-size: 0.7rem; color: var(--text-muted);">{{ strtoupper($topList[2]->jurusan?->nama_jurusan ?? 'UMUM') }}</div>
+                        <div class="mb-2">
+                            <div class="fw-bold text-primary" style="font-size: 1.4rem;">{{ $topList[2]->persentase }}%</div>
+                            <small class="text-muted">{{ $topList[2]->total_penilaian }} ulasan</small>
+                        </div>
+                    </div>
+                </div>
+                @endif
+            @else
+                <div class="col-12 text-center text-muted py-5">Belum ada data evaluasi guru.</div>
+            @endif
         </div>
 
         <div class="text-center" data-aos="zoom-in">
-            <a href="{{ route('login') }}" class="btn btn-cta"><i class="bi bi-box-arrow-in-right"></i> Login untuk Lihat Lengkap & Beri Penilaian</a>
+            <a href="{{ route('landing.leaderboard') }}" class="btn btn-cta">
+                <i class="bi bi-trophy-fill me-2"></i> Lihat Leaderboard Selengkapnya
+            </a>
         </div>
     </div>
 </section>
@@ -204,7 +197,7 @@
     <div class="container">
         <div class="text-center mb-5" data-aos="fade-up">
             <div class="section-label">TENTANG KAMI</div>
-            <h2 class="section-title">Mengapa GuruKuu Ada?</h2>
+            <h2 class="section-title">Mengapa {{ \App\Models\Setting::get('site_title', 'GuruKuu') }} Ada?</h2>
             <p class="text-muted" style="max-width: 700px; margin: 0 auto;">
                 Platform evaluasi terintegrasi untuk SMK yang membangun jembatan komunikasi positif antara siswa, guru, dan manajemen sekolah.
             </p>
@@ -220,7 +213,7 @@
                         <h4 class="fw-bold mb-0">Visi Kami</h4>
                     </div>
                     <p class="text-muted mb-0" style="line-height: 1.8; font-size: 0.95rem;">
-                        Menjadi standar nasional dalam evaluasi pengajaran berbasis data untuk menciptakan ekosistem pendidikan yang responsif, transparan, dan berkelanjutan di seluruh SMK Indonesia.
+                        {{ \App\Models\Setting::get('visi_text', 'Menjadi standar nasional dalam evaluasi pengajaran berbasis data untuk menciptakan ekosistem pendidikan yang responsif, transparan, dan berkelanjutan di seluruh SMK Indonesia.') }}
                     </p>
                 </div>
             </div>
@@ -232,10 +225,14 @@
                         </div>
                         <h4 class="fw-bold mb-0">Misi Kami</h4>
                     </div>
+                    @php
+                        $misiRaw = \App\Models\Setting::get('misi_text', "Memberikan saluran aspirasi yang aman dan anonim bagi siswa.\nMenyediakan data analitik yang dapat ditindaklanjuti oleh manajemen sekolah.\nMendorong pengembangan profesional guru secara berkelanjutan.");
+                        $misiList = array_filter(array_map('trim', explode("\n", $misiRaw)));
+                    @endphp
                     <ul class="text-muted mb-0 ps-3" style="line-height: 2; font-size: 0.95rem;">
-                        <li>Memberikan saluran aspirasi yang aman dan anonim bagi siswa.</li>
-                        <li>Menyediakan data analitik yang dapat ditindaklanjuti oleh manajemen sekolah.</li>
-                        <li>Mendorong pengembangan profesional guru secara berkelanjutan.</li>
+                        @foreach($misiList as $misiItem)
+                            <li>{{ ltrim($misiItem, '-*• ') }}</li>
+                        @endforeach
                     </ul>
                 </div>
             </div>

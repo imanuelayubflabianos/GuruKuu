@@ -21,18 +21,11 @@ class ProfilController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'photo' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
         $user = auth()->user();
-        $data = ['name' => $request->name];
+        $user->update(['name' => $request->name]);
 
-        if ($request->hasFile('photo')) {
-            if ($user->photo) Storage::disk('public')->delete($user->photo);
-            $data['photo'] = $request->file('photo')->store('profil', 'public');
-        }
-
-        $user->update($data);
         return back()->with('success', 'Profil berhasil diperbarui!');
     }
 }

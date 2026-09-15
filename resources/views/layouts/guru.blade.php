@@ -59,7 +59,13 @@
 </head>
 <body>
     <aside class="sidebar">
-        <a href="{{ route('guru.dashboard') }}" class="sidebar-brand">GuruKuu</a>
+        <a href="{{ route('guru.dashboard') }}" class="sidebar-brand d-flex align-items-center gap-2">
+            @if(!empty($siteLogo))
+                <img src="{{ $siteLogo }}" alt="{{ $siteTitle ?? 'GuruKuu' }}" style="height: 32px; max-width: 150px; object-fit: contain;">
+            @else
+                <span>{{ $siteTitle ?? 'GuruKuu' }}</span>
+            @endif
+        </a>
         <div class="sidebar-subtitle">Teacher Portal</div>
         
         <div class="sidebar-profile">
@@ -72,8 +78,13 @@
 
         <ul class="sidebar-menu">
             <li><a href="{{ route('guru.dashboard') }}" class="{{ request()->routeIs('guru.dashboard') ? 'active' : '' }}"><i class="bi bi-grid"></i> Dashboard</a></li>
-            <li><a href="{{ route('landing.leaderboard') }}" target="_blank"><i class="bi bi-trophy"></i> Leaderboard Publik</a></li>
-            <li><a href="{{ route('auth.ganti-password') }}"><i class="bi bi-key"></i> Ganti Password</a></li>
+            <li><a href="{{ route('guru.leaderboard') }}" class="{{ request()->routeIs('guru.leaderboard*') ? 'active' : '' }}"><i class="bi bi-trophy"></i> Leaderboard</a></li>
+            <li><a href="{{ route('guru.pengaturan') }}" class="{{ request()->routeIs('guru.pengaturan*') ? 'active' : '' }}"><i class="bi bi-gear"></i> Pengaturan</a></li>
+            <li class="mt-3 pt-3 border-top">
+                <a href="{{ url('/') }}" class="text-primary fw-semibold">
+                    <i class="bi bi-house-door text-primary"></i> Ke Beranda Publik
+                </a>
+            </li>
         </ul>
 
         <div class="sidebar-logout">

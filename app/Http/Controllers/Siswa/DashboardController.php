@@ -18,21 +18,24 @@ class DashboardController extends Controller
             ? $user->kelas()->wherePivot('tahun_ajaran', $periodeAktif->tahun_ajaran)->first()
             : null;
 
-        // Guru di kelas siswa
-        $guruDiKelas = $kelasAktif ? $kelasAktif->guru()->with('jurusan')->get() : collect();
-        $guruNormada = $guruDiKelas->where('kategori', 'normada');
-        $guruProduktif = $guruDiKelas->where('kategori', 'produktif');
+        // Semua Guru di sekolah
+        $semuaGuru = \App\Models\Guru::with('jurusan')->get();
+        $guruDiKelas = $semuaGuru; // Kompatibel dengan view
+        $guruNormada = $semuaGuru->where('kategori', 'normada');
+        $guruProduktif = $semuaGuru->where('kategori', 'produktif');
 
-        // ✅ TOP GURU DI KELAS (RUMUS SAMA DENGAN LEADERBOARD = SINKRON)
-        $topGuru = $guruDiKelas->where('total_penilaian', '>', 0)
+        // ✅ TOP GURU SEKOLAH
+        $topGuruRated = $semuaGuru->where('total_penilaian', '>', 0)
             ->sortByDesc(fn($g) => ($g->rata_rata_nilai * 0.7) + ($g->rasio_penilaian * 0.3))
             ->values()->take(3);
+        
+        $topGuru = $topGuruRated->isNotEmpty() ? $topGuruRated : $semuaGuru->take(3);
 
         // Status penilaian siswa
         $sudahDinilai = $periodeAktif
             ? Penilaian::where('siswa_id', $user->id)->where('periode_id', $periodeAktif->id)->pluck('guru_id')->toArray()
             : [];
-        $totalGuru = $guruDiKelas->count();
+        $totalGuru = $semuaGuru->count();
         $jumlahSudah = count($sudahDinilai);
 
         // Riwayat terakhir
