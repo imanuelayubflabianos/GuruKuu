@@ -36,9 +36,15 @@ class SiswaExport implements FromCollection, WithHeadings, WithMapping, WithTitl
     public function map($siswa): array
     {
         $this->no++;
-        $kelasName = $siswa->kelas->isNotEmpty() 
-            ? $siswa->kelas->first()->nama_kelas 
-            : ($siswa->kelas_raw ?? 'Kelas Siswa');
+        $kelasRel = $siswa->relationLoaded('kelas') ? $siswa->getRelation('kelas') : null;
+        if ($kelasRel && $kelasRel->isNotEmpty()) {
+            $first = $kelasRel->first();
+            $kelasName = $first->nama_kelas . ($first->tingkat ? ' Kelas ' . $first->tingkat : '');
+        } elseif (is_string($siswa->kelas) && !empty($siswa->kelas)) {
+            $kelasName = $siswa->kelas;
+        } else {
+            $kelasName = '-';
+        }
 
         return [
             $this->no,

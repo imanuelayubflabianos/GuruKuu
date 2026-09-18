@@ -59,6 +59,44 @@ class GuruController extends Controller
         return redirect()->route('admin.guru.index')->with('success', 'Guru berhasil ditambahkan!');
     }
 
+    public function show(Guru $guru)
+    {
+        $periodeAktif = \App\Models\Periode::where('status', 'aktif')->first();
+        $periodeId = $periodeAktif?->id;
+
+        $allPenilaian = \App\Models\Penilaian::where('guru_id', $guru->id)
+            ->when($periodeId, fn($q) => $q->where('periode_id', $periodeId))
+            ->get();
+
+        $stats = [
+            'total_penilaian' => $allPenilaian->count(),
+            'rata_kedisiplinan' => $allPenilaian->avg('kedisiplinan') ?? 0,
+            'rata_cara_mengajar' => $allPenilaian->avg('cara_mengajar') ?? 0,
+            'rata_komunikasi' => $allPenilaian->avg('komunikasi') ?? 0,
+            'rata_tanggung_jawab' => $allPenilaian->avg('tanggung_jawab') ?? 0,
+            'rata_kreativitas' => $allPenilaian->avg('kreativitas') ?? 0,
+            'rata_keramahan' => $allPenilaian->avg('keramahan') ?? 0,
+        ];
+
+        $semuaFeedback = \App\Models\Penilaian::with('siswa')
+            ->where('guru_id', $guru->id)
+            ->when($periodeId, fn($q) => $q->where('periode_id', $periodeId))
+            ->latest()
+            ->get();
+
+        $arsipPeriode = \App\Models\Periode::where('id', '!=', $periodeId)
+            ->whereHas('penilaian', function($q) use ($guru) {
+                $q->where('guru_id', $guru->id);
+            })
+            ->with(['penilaian' => function($q) use ($guru) {
+                $q->where('guru_id', $guru->id)->latest();
+            }])
+            ->latest('tanggal_mulai')
+            ->get();
+
+        return view('admin.guru.show', compact('guru', 'periodeAktif', 'stats', 'semuaFeedback', 'arsipPeriode'));
+    }
+
     public function edit(Guru $guru)
     {
         $jurusans = Jurusan::orderBy('nama_jurusan')->get();
@@ -118,5 +156,76 @@ class GuruController extends Controller
         }
         $guru->delete();
         return redirect()->route('admin.guru.index')->with('success', 'Guru berhasil dihapus!');
+    }
+
+    public function resetPassword(Request $request, Guru $guru)
+    {
+        $request->validate([
+            'password' => 'required|min:6|confirmed',
+        ]);
+
+        $linkedUser = \App\Models\User::where('nis', $guru->nip)
+            ->orWhere('email', $guru->email)
+            ->where('role', 'guru')
+            ->first();
+
+        if ($linkedUser) {
+            $linkedUser->update([
+                'password' => \Illuminate\Support\Facades\Hash::make($request->password),
+            ]);
+            return back()->with('success', "Password akun login guru {$guru->nama} berhasil direset!");
+        }
+
+        return back()->with('error', "Akun login pengguna untuk guru {$guru->nama} belum terdaftar.");
+    }
+
+    public function toggleStatus(Request $request, Guru $guru)
+    {
+        $linkedUser = \App\Models\User::where('nis', $guru->nip)
+            ->orWhere('email', $guru->email)
+            ->where('role', 'guru')
+            ->first();
+
+        if (!$linkedUser) {
+            return back()->with('error', "Akun login pengguna untuk guru {$guru->nama} belum terdaftar di sistem.");
+        }
+
+        if ($linkedUser->is_active) {
+            $deactivationType = $request->input('deactivation_type', 'permanen');
+            $reason = $request->input('deactivated_reason', 'Akun dinonaktifkan oleh Admin / Operator Sekolah.');
+            $deactivatedUntil = null;
+
+            if ($deactivationType === 'berkala') {
+                if ($request->filled('custom_until')) {
+                    $deactivatedUntil = \Carbon\Carbon::parse($request->input('custom_until'))->endOfDay();
+                } else {
+                    $days = (int) $request->input('duration_days', 3);
+                    $deactivatedUntil = now()->addDays($days);
+                }
+            }
+
+            $linkedUser->update([
+                'is_active' => false,
+                'deactivation_type' => $deactivationType,
+                'deactivated_until' => $deactivatedUntil,
+                'deactivated_reason' => $reason,
+            ]);
+
+            $typeLabel = $deactivationType === 'berkala'
+                ? "secara berkala hingga " . $deactivatedUntil->format('d M Y H:i')
+                : "secara permanen";
+
+            return back()->with('success', "Akun login guru {$guru->nama} berhasil dinonaktifkan {$typeLabel}.");
+        } else {
+            // Aktifkan kembali
+            $linkedUser->update([
+                'is_active' => true,
+                'deactivation_type' => null,
+                'deactivated_until' => null,
+                'deactivated_reason' => null,
+            ]);
+
+            return back()->with('success', "Akun login guru {$guru->nama} berhasil diaktifkan kembali!");
+        }
     }
 }

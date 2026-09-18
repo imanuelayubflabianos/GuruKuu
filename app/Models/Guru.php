@@ -69,6 +69,13 @@ class Guru extends Model
 
     // ==================== ACCESSOR & HELPER ====================
 
+    public function getLinkedUserAttribute()
+    {
+        return User::where(function($q) {
+            $q->where('nis', $this->nip)->orWhere('email', $this->email);
+        })->where('role', 'guru')->first();
+    }
+
     public function getPhotoUrlAttribute()
     {
         if ($this->photo) {

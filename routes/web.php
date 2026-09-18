@@ -25,11 +25,13 @@ use Illuminate\Support\Facades\Route;
 // ==================== 1. GURU ROUTES (WAJIB DI ATAS /guru/{guru}) ====================
 Route::middleware(['auth', 'role:guru'])->prefix('guru')->name('guru.')->group(function () {
     Route::get('/dashboard', [GuruDashboardController::class, 'index'])->name('dashboard');
+    Route::get('/ulasan', [GuruDashboardController::class, 'ulasan'])->name('ulasan');
     Route::get('/leaderboard', [GuruDashboardController::class, 'leaderboard'])->name('leaderboard');
+    Route::get('/detail-guru/{guru}', [GuruDashboardController::class, 'detailGuru'])->name('detail');
     Route::post('/penilaian/{penilaian}/reply', [GuruDashboardController::class, 'replyPenilaian'])->name('penilaian.reply');
+    Route::delete('/penilaian/{penilaian}/reply', [GuruDashboardController::class, 'deleteReplyPenilaian'])->name('penilaian.reply.delete');
     Route::get('/pengaturan', [\App\Http\Controllers\Guru\PengaturanController::class, 'index'])->name('pengaturan');
     Route::post('/pengaturan/profil', [\App\Http\Controllers\Guru\PengaturanController::class, 'updateProfil'])->name('pengaturan.profil');
-    Route::post('/pengaturan/ganti-password', [\App\Http\Controllers\Guru\PengaturanController::class, 'gantiPassword'])->name('pengaturan.password');
     Route::post('/pengaturan/chat', [\App\Http\Controllers\Guru\PengaturanController::class, 'kirimPesanAdmin'])->name('pengaturan.chat');
     Route::put('/pengaturan/chat/{kontak}', [\App\Http\Controllers\Guru\PengaturanController::class, 'editPesanAdmin'])->name('pengaturan.chat.edit');
     Route::delete('/pengaturan/chat/{kontak}', [\App\Http\Controllers\Guru\PengaturanController::class, 'hapusPesanAdmin'])->name('pengaturan.chat.destroy');
@@ -60,6 +62,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/ganti-password', [LoginController::class, 'showGantiPassword'])->name('auth.ganti-password');
     Route::post('/ganti-password', [LoginController::class, 'gantiPassword'])->name('auth.ganti-password.post');
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+
+    // THREADED BALASAN ULASAN (SISWA, GURU, ADMIN)
+    Route::post('/penilaian/{penilaian}/balasan', [\App\Http\Controllers\PenilaianBalasanController::class, 'store'])->name('penilaian.balasan.store');
+    Route::delete('/penilaian-balasan/{balasan}', [\App\Http\Controllers\PenilaianBalasanController::class, 'destroy'])->name('penilaian.balasan.destroy');
 });
 
 // ==================== 4. ADMIN ROUTES ====================
@@ -68,10 +74,14 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/profil', [AdminProfilController::class, 'index'])->name('profil.index');
     Route::put('/profil', [AdminProfilController::class, 'update'])->name('profil.update');
     Route::resource('guru', AdminGuruController::class);
+    Route::patch('/guru/{guru}/toggle', [AdminGuruController::class, 'toggleStatus'])->name('guru.toggle');
+    Route::post('/guru/{guru}/reset-password', [AdminGuruController::class, 'resetPassword'])->name('guru.reset-password');
     Route::resource('siswa', AdminSiswaController::class);
     Route::patch('/siswa/{siswa}/toggle', [AdminSiswaController::class, 'toggleStatus'])->name('siswa.toggle');
+    Route::post('/siswa/{siswa}/reset-password', [AdminSiswaController::class, 'resetPassword'])->name('siswa.reset-password');
     Route::get('/jurusan', [AdminJurusanController::class, 'index'])->name('jurusan.index');
     Route::post('/jurusan', [AdminJurusanController::class, 'store'])->name('jurusan.store');
+    Route::get('/jurusan/{jurusan}', [AdminJurusanController::class, 'show'])->name('jurusan.show');
     Route::get('/jurusan/{jurusan}/edit', [AdminJurusanController::class, 'edit'])->name('jurusan.edit');
     Route::put('/jurusan/{jurusan}', [AdminJurusanController::class, 'update'])->name('jurusan.update');
     Route::delete('/jurusan/{jurusan}', [AdminJurusanController::class, 'destroy'])->name('jurusan.destroy');
@@ -81,6 +91,14 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/kritik-saran', [KritikSaranController::class, 'index'])->name('kritik-saran.index');
     Route::delete('/kritik-saran/{kritikSaran}', [KritikSaranController::class, 'destroy'])->name('kritik-saran.destroy');
     Route::post('/kritik-saran/{kritikSaran}/warn', [KritikSaranController::class, 'warn'])->name('kritik-saran.warn');
+    Route::post('/kritik-saran/{kritikSaran}/unwarn', [KritikSaranController::class, 'unwarn'])->name('kritik-saran.unwarn');
+
+    // NOTIFIKASI & LOG PELANGGARAN ATURAN
+    Route::get('/pelanggaran', [\App\Http\Controllers\Admin\PelanggaranController::class, 'index'])->name('pelanggaran.index');
+    Route::patch('/pelanggaran/{pelanggaran}/read', [\App\Http\Controllers\Admin\PelanggaranController::class, 'markAsRead'])->name('pelanggaran.read');
+    Route::post('/pelanggaran/read-all', [\App\Http\Controllers\Admin\PelanggaranController::class, 'markAllAsRead'])->name('pelanggaran.read-all');
+    Route::delete('/pelanggaran/{pelanggaran}', [\App\Http\Controllers\Admin\PelanggaranController::class, 'destroy'])->name('pelanggaran.destroy');
+    Route::post('/pelanggaran/{pelanggaran}/warn-siswa', [\App\Http\Controllers\Admin\PelanggaranController::class, 'warnSiswa'])->name('pelanggaran.warn-siswa');
     
     Route::get('/leaderboard', [AdminLeaderboardController::class, 'index'])->name('leaderboard.index');
     Route::get('/pengaturan', [PengaturanController::class, 'index'])->name('pengaturan.index');
@@ -136,7 +154,6 @@ Route::middleware(['auth', 'role:siswa'])->prefix('siswa')->name('siswa.')->grou
     Route::delete('/riwayat/{penilaian}', [PenilaianController::class, 'destroy'])->name('riwayat.destroy');
     Route::get('/leaderboard', [SiswaLeaderboardController::class, 'index'])->name('leaderboard.index');
     Route::get('/pengaturan', [\App\Http\Controllers\Siswa\PengaturanController::class, 'index'])->name('pengaturan');
-    Route::post('/pengaturan/ganti-password', [\App\Http\Controllers\Siswa\PengaturanController::class, 'gantiPassword'])->name('pengaturan.password');
     Route::post('/pengaturan/chat', [\App\Http\Controllers\Siswa\PengaturanController::class, 'kirimPesanAdmin'])->name('pengaturan.chat');
     Route::get('/profil', function() { return redirect()->route('siswa.pengaturan'); })->name('profil.index');
     

@@ -31,15 +31,51 @@ class KontakController extends Controller
 
     public function storeGuest(Request $request)
     {
-        $request->validate(['pesan' => 'required|min:10', 'captcha' => 'required|numeric']);
+        // 🛡️ Honeypot bot detection
+        if ($request->filled('website_hp')) {
+            return back()->withErrors(['pesan' => 'Aktivitas mencurigakan terdeteksi.'])->withInput();
+        }
+
+        // 🛡️ Rate limiting: Maksimal 5 pengiriman dalam 5 menit per IP
+        $throttleKey = 'guest_contact:' . $request->ip();
+        if (\Illuminate\Support\Facades\RateLimiter::tooManyAttempts($throttleKey, 5)) {
+            $seconds = \Illuminate\Support\Facades\RateLimiter::availableIn($throttleKey);
+            return back()->withErrors([
+                'pesan' => "Terlalu banyak pesan terkirim. Mohon tunggu {$seconds} detik sebelum mengirim pesan kembali demi kenyamanan bersama."
+            ])->withInput();
+        }
+
+        $request->validate(['pesan' => 'required|min:10|max:1000', 'captcha' => 'required|numeric']);
         if ($request->captcha != session('captcha_answer')) return back()->withErrors(['captcha' => 'Jawaban salah.'])->withInput();
+
+        $pesanBersih = strip_tags(trim($request->pesan));
+        $profanity = \App\Services\ProfanityFilterService::check($pesanBersih);
+        if (!$profanity['clean']) {
+            try {
+                \App\Models\Pelanggaran::create([
+                    'user_id' => null,
+                    'tipe' => 'kontak_toxic',
+                    'kata_terdeteksi' => $profanity['detected'],
+                    'isi_teks' => $pesanBersih,
+                    'ip_address' => $request->ip(),
+                    'user_agent' => $request->userAgent(),
+                    'is_read' => false,
+                    'tindakan' => 'diblokir_otomatis',
+                ]);
+            } catch (\Throwable $e) {}
+
+            return back()->withInput()->with('error', $profanity['message']);
+        }
         
         Kontak::create([
             'pengirim' => 'Tamu', 
             'identifier' => $this->getOrCreateDeviceId($request),
-            'pesan' => $request->pesan, 
+            'pesan' => $pesanBersih, 
             'is_siswa' => false
         ]);
+
+        \Illuminate\Support\Facades\RateLimiter::hit($throttleKey, 300);
+
         return redirect()->route('kontak.guest.page')->with('success', 'Pesan terkirim!');
     }
 
@@ -50,6 +86,12 @@ class KontakController extends Controller
             return back()->with('error', 'Akses ditolak.');
         }
         $request->validate(['pesan' => 'required|min:10']);
+
+        $profanity = \App\Services\ProfanityFilterService::check($request->pesan);
+        if (!$profanity['clean']) {
+            return back()->withInput()->with('error', $profanity['message']);
+        }
+
         $kontak->update(['pesan' => $request->pesan]);
         return back()->with('success', 'Pesan berhasil diperbarui!');
     }
@@ -76,17 +118,49 @@ class KontakController extends Controller
 
     public function storeSiswa(Request $request)
     {
-        $request->validate(['pesan' => 'required|min:10', 'captcha' => 'required|numeric']);
+        // 🛡️ Rate limiting: Maksimal 10 pesan per menit per siswa
+        $throttleKey = 'siswa_chat:' . Auth::id();
+        if (\Illuminate\Support\Facades\RateLimiter::tooManyAttempts($throttleKey, 10)) {
+            $seconds = \Illuminate\Support\Facades\RateLimiter::availableIn($throttleKey);
+            return back()->withErrors([
+                'pesan' => "Pengiriman pesan terlalu cepat. Tunggu {$seconds} detik sebelum mengirim kembali."
+            ])->withInput();
+        }
+
+        $request->validate(['pesan' => 'required|min:10|max:1000', 'captcha' => 'required|numeric']);
         if ($request->captcha != session('siswa_chat_captcha')) {
             return back()->withErrors(['captcha' => 'Jawaban verifikasi matematika salah.'])->withInput();
         }
+
+        $pesanBersih = strip_tags(trim($request->pesan));
+        $profanity = \App\Services\ProfanityFilterService::check($pesanBersih);
+        if (!$profanity['clean']) {
+            try {
+                \App\Models\Pelanggaran::create([
+                    'user_id' => Auth::id(),
+                    'tipe' => 'kontak_toxic',
+                    'kata_terdeteksi' => $profanity['detected'],
+                    'isi_teks' => $pesanBersih,
+                    'ip_address' => $request->ip(),
+                    'user_agent' => $request->userAgent(),
+                    'is_read' => false,
+                    'tindakan' => 'diblokir_otomatis',
+                ]);
+            } catch (\Throwable $e) {}
+
+            return back()->withInput()->with('error', $profanity['message']);
+        }
+
         $user = Auth::user();
         Kontak::create([
             'pengirim' => $user->name, 
             'identifier' => $user->nis,
-            'pesan' => $request->pesan, 
+            'pesan' => $pesanBersih, 
             'is_siswa' => true,
         ]);
+
+        \Illuminate\Support\Facades\RateLimiter::hit($throttleKey, 60);
+
         return back()->with('success', 'Pesan berhasil dikirim ke Admin!');
     }
 

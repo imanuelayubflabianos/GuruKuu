@@ -28,7 +28,7 @@
                 </div>
                 <div class="mb-3">
                     <label class="form-label font-mono small fw-bold text-muted">KELAS</label>
-                    <input type="text" class="form-control" value="{{ $kelasAktif ? $kelasAktif->nama_kelas . ' - Tingkat ' . $kelasAktif->tingkat : (auth()->user()->kelas ?? 'Belum ditentukan') }}" disabled style="background: var(--bg-light);">
+                    <input type="text" class="form-control" value="{{ $kelasAktif ? $kelasAktif->nama_kelas . ' Kelas ' . $kelasAktif->tingkat : (auth()->user()->kelas ?? 'Belum ditentukan') }}" disabled style="background: var(--bg-light);">
                 </div>
                 <div class="mb-3">
                     <label class="form-label font-mono small fw-bold text-muted">NAMA LENGKAP</label>

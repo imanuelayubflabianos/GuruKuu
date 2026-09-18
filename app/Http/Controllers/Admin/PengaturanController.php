@@ -18,6 +18,10 @@ class PengaturanController extends Controller
 
         $settings = [
             'site_title'        => Setting::get('site_title', 'GuruKuu'),
+            'site_title_part1'  => Setting::get('site_title_part1', 'Guru'),
+            'site_title_part2'  => Setting::get('site_title_part2', 'Kuu'),
+            'site_title_color1' => Setting::get('site_title_color1', '#003366'),
+            'site_title_color2' => Setting::get('site_title_color2', '#FFC107'),
             'site_logo'         => Setting::get('site_logo', ''),
             'hero_image'        => Setting::get('hero_image', 'https://images.unsplash.com/photo-1562774053-701939374585?w=1920'),
             'hero_title'        => Setting::get('hero_title', 'Bangun Sekolah yang Lebih Baik Melalui Penilaian Guru yang Objektif'),
@@ -26,10 +30,10 @@ class PengaturanController extends Controller
             'hero_cta_url'      => Setting::get('hero_cta_url', '/login'),
             'visi_text'         => Setting::get('visi_text', 'Menjadi standar nasional dalam evaluasi pengajaran berbasis data untuk menciptakan ekosistem pendidikan yang responsif, transparan, dan berkelanjutan di seluruh SMK Indonesia.'),
             'misi_text'         => Setting::get('misi_text', "Memberikan saluran aspirasi yang aman dan anonim bagi siswa.\nMenyediakan data analitik yang dapat ditindaklanjuti oleh manajemen sekolah.\nMendorong pengembangan profesional guru secara berkelanjutan."),
-            'footer_about'      => Setting::get('footer_about', 'Sistem Manajemen Penilaian Guru Berbasis Siswa untuk SMK unggulan di seluruh Indonesia.'),
-            'footer_copyright'  => Setting::get('footer_copyright', 'All rights reserved.'),
-            'kebijakan_privasi' => Setting::get('kebijakan_privasi', ''),
-            'syarat_ketentuan'  => Setting::get('syarat_ketentuan', ''),
+            'footer_about'      => Setting::get('footer_about', 'Sistem Manajemen Penilaian Guru Berbasis Siswa untuk SMK N 1 Bangsri.'),
+            'footer_copyright'  => Setting::get('footer_copyright', '© ' . date('Y') . ' GuruKuu. All rights reserved.'),
+            'kebijakan_privasi' => Setting::get('kebijakan_privasi', "1. Pengumpulan Data\nKami hanya mengumpulkan data yang diperlukan untuk proses penilaian, yaitu NIS, nama, dan kelas siswa. Data pribadi seperti tanggal lahir hanya digunakan untuk verifikasi identitas saat login.\n\n2. Anonimitas Penilaian\nSeluruh penilaian yang diberikan siswa bersifat anonim. Guru dan pihak lain tidak dapat mengetahui identitas siswa yang memberikan nilai tertentu. Ini menjamin kejujuran dan objektivitas dalam setiap penilaian.\n\n3. Penyimpanan Data\nSemua data disimpan di server yang aman dengan enkripsi standar industri. Password pengguna di-hash menggunakan algoritma bcrypt yang tidak dapat dibaca kembali.\n\n4. Penggunaan Data\nData penilaian hanya digunakan untuk keperluan internal sekolah, seperti evaluasi kinerja guru dan pengambilan keputusan oleh manajemen. Data tidak akan dibagikan kepada pihak ketiga tanpa persetujuan."),
+            'syarat_ketentuan'  => Setting::get('syarat_ketentuan', "1. Eligibilitas\nPlatform ini hanya dapat digunakan oleh siswa dan guru yang terdaftar resmi di sekolah. Akun harus diaktifkan oleh administrator sekolah sebelum dapat digunakan.\n\n2. Tanggung Jawab Pengguna\nSiswa wajib memberikan penilaian secara jujur dan objektif. Dilarang memberikan penilaian berdasarkan dendam pribadi, SARA, atau konten yang tidak pantas.\n\n3. Keamanan Akun\nPengguna bertanggung jawab penuh atas kerahasiaan password akun mereka. Dilarang membagikan password kepada orang lain.\n\n4. Kontak & Pengaduan\nJika Anda menemukan pelanggaran atau memiliki keluhan, silakan hubungi administrator sekolah melalui fitur Chat Admin yang tersedia di footer website ini."),
         ];
 
         $semuaPeriode = Periode::orderBy('tahun_ajaran', 'desc')->orderBy('semester', 'desc')->get();
@@ -41,6 +45,10 @@ class PengaturanController extends Controller
     {
         $request->validate([
             'site_title'        => 'required|string|max:100',
+            'site_title_part1'  => 'nullable|string|max:50',
+            'site_title_part2'  => 'nullable|string|max:50',
+            'site_title_color1' => 'nullable|string|max:20',
+            'site_title_color2' => 'nullable|string|max:20',
             'site_logo_file'    => 'nullable|image|mimes:jpeg,png,jpg,webp,svg|max:2048',
             'site_logo_url'     => 'nullable|string|max:1000',
             'hero_title'        => 'required|string|max:255',
@@ -65,7 +73,11 @@ class PengaturanController extends Controller
             if (!File::exists($uploadDir)) {
                 File::makeDirectory($uploadDir, 0755, true);
             }
-            $filename = 'logo_' . time() . '.' . $file->getClientOriginalExtension();
+            $ext = strtolower($file->guessExtension() ?? 'png');
+            if (!in_array($ext, ['jpeg', 'jpg', 'png', 'webp', 'svg'])) {
+                $ext = 'png';
+            }
+            $filename = 'logo_' . \Illuminate\Support\Str::random(24) . '.' . $ext;
             $file->move($uploadDir, $filename);
             Setting::set('site_logo', asset('uploads/logo/' . $filename));
         } elseif ($request->filled('site_logo_url')) {
@@ -79,7 +91,11 @@ class PengaturanController extends Controller
             if (!File::exists($uploadDir)) {
                 File::makeDirectory($uploadDir, 0755, true);
             }
-            $filename = 'hero_' . time() . '.' . $file->getClientOriginalExtension();
+            $ext = strtolower($file->guessExtension() ?? 'jpg');
+            if (!in_array($ext, ['jpeg', 'jpg', 'png', 'webp'])) {
+                $ext = 'jpg';
+            }
+            $filename = 'hero_' . \Illuminate\Support\Str::random(24) . '.' . $ext;
             $file->move($uploadDir, $filename);
             Setting::set('hero_image', asset('uploads/hero/' . $filename));
         } elseif ($request->filled('hero_image_url')) {
@@ -88,6 +104,18 @@ class PengaturanController extends Controller
 
         // 3. Teks & Konten Beranda
         Setting::set('site_title', trim($request->site_title));
+        if ($request->filled('site_title_part1')) {
+            Setting::set('site_title_part1', trim($request->site_title_part1));
+        }
+        if ($request->filled('site_title_part2')) {
+            Setting::set('site_title_part2', trim($request->site_title_part2));
+        }
+        if ($request->filled('site_title_color1')) {
+            Setting::set('site_title_color1', trim($request->site_title_color1));
+        }
+        if ($request->filled('site_title_color2')) {
+            Setting::set('site_title_color2', trim($request->site_title_color2));
+        }
         Setting::set('hero_title', trim($request->hero_title));
         Setting::set('hero_subtitle', trim($request->hero_subtitle));
         Setting::set('hero_cta_text', trim($request->hero_cta_text));
@@ -128,7 +156,7 @@ class PengaturanController extends Controller
         Setting::set('hero_cta_url', '/login');
         Setting::set('visi_text', 'Menjadi standar nasional dalam evaluasi pengajaran berbasis data untuk menciptakan ekosistem pendidikan yang responsif, transparan, dan berkelanjutan di seluruh SMK Indonesia.');
         Setting::set('misi_text', "Memberikan saluran aspirasi yang aman dan anonim bagi siswa.\nMenyediakan data analitik yang dapat ditindaklanjuti oleh manajemen sekolah.\nMendorong pengembangan profesional guru secara berkelanjutan.");
-        Setting::set('footer_about', 'Sistem Manajemen Penilaian Guru Berbasis Siswa untuk SMK unggulan di seluruh Indonesia.');
+        Setting::set('footer_about', 'Sistem Manajemen Penilaian Guru Berbasis Siswa untuk SMK N 1 Bangsri.');
         Setting::set('footer_copyright', 'All rights reserved.');
         Setting::set('kebijakan_privasi', '');
         Setting::set('syarat_ketentuan', '');

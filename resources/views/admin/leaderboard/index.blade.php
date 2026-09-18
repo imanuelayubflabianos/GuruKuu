@@ -24,12 +24,6 @@
                         <i class="bi bi-file-earmark-pdf text-danger me-2"></i> Export PDF (.pdf)
                     </a>
                 </li>
-                <li><hr class="dropdown-divider"></li>
-                <li>
-                    <a class="dropdown-item" href="{{ route('admin.export.all.zip') }}">
-                        <i class="bi bi-file-earmark-zip text-warning me-2"></i> Download Semua (.zip)
-                    </a>
-                </li>
             </ul>
         </div>
         <a href="{{ url('/') }}" class="btn btn-outline-custom">
@@ -47,79 +41,88 @@
 @endphp
 
 @if($top1)
-<div class="row g-4 mb-5 align-items-end">
-    {{-- #2 --}}
-    <div class="col-md-4">
+<div class="row g-2 g-md-4 mb-4 mb-md-5 align-items-end justify-content-center gk-podium-row">
+    {{-- #2 PERAK --}}
+    <div class="col-4 col-md-4 order-1 order-md-1 gk-podium-col gk-podium-2">
         @if($top2)
         @php $pct2 = round(($top2->rata_rata_nilai / 5) * 100); @endphp
-        <div class="card-custom p-4 text-center">
-            <div class="position-relative d-inline-block mb-3">
-                <img src="{{ $top2->photo_url }}" class="rounded-circle" width="100" height="100" style="object-fit: cover; border: 4px solid var(--border);">
-                <span class="position-absolute bottom-0 end-0 bg-secondary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; font-weight: 700;">2</span>
+        <div class="card-custom gk-podium-card p-2 p-md-4 text-center h-100" style="border: 1px solid rgba(148, 163, 184, 0.4); box-shadow: 0 8px 24px rgba(0,0,0,0.04);">
+            <div class="mb-2 mb-md-3">
+                <span class="badge rounded-pill px-2.5 py-1 fw-bold" style="background: #94a3b8; color: #fff; font-size: 0.75rem;">
+                    <i class="bi bi-award-fill me-1"></i> #2 PERAK
+                </span>
             </div>
-            <h5 class="fw-bold mb-1">{{ $top2->nama }}</h5>
-            <div class="font-mono" style="font-size: 0.7rem; color: var(--text-muted); letter-spacing: 1px;">{{ strtoupper($top2->jurusan?->nama_jurusan ?? 'UMUM') }}</div>
-            <div class="mt-3 px-3">
-                <div class="d-flex justify-content-between font-mono mb-1" style="font-size: 0.75rem;">
-                    <span class="text-muted">Rating:</span>
-                    <span class="fw-bold text-primary">{{ $pct2 }}%</span>
-                </div>
-                <div class="progress" style="height: 6px; border-radius: 10px;">
+            <div class="position-relative d-inline-block mb-2 mb-md-3">
+                <img src="{{ $top2->photo_url }}" class="rounded-circle shadow-sm gk-podium-avatar-2" width="90" height="90" style="object-fit: cover; border: 3px solid #94a3b8;">
+            </div>
+            <h5 class="fw-bold mb-1 gk-podium-nama" title="{{ $top2->nama }}">{{ $top2->nama }}</h5>
+            <div class="font-mono mb-2 mb-md-3 gk-podium-jurusan" style="font-size: 0.72rem; color: var(--text-muted);" title="{{ strtoupper($top2->jurusan?->nama_jurusan ?? 'UMUM') }}">{{ strtoupper($top2->jurusan?->nama_jurusan ?? 'UMUM') }}</div>
+            <div class="p-1.5 p-md-3 rounded-3 mb-2 mb-md-3 gk-podium-statbox" style="background: var(--bg-light);">
+                <div class="fw-bold text-primary gk-podium-score" style="font-size: 1.8rem; line-height: 1;">{{ $pct2 }}%</div>
+                <div class="progress mt-1 mt-md-2 mb-1" style="height: 5px; border-radius: 10px;">
                     <div class="progress-bar bg-primary rounded-pill" style="width: {{ $pct2 }}%;"></div>
                 </div>
-                <small class="text-muted mt-2 d-block">{{ $top2->total_penilaian }} Ulasan</small>
+                <small class="text-muted font-mono gk-podium-reviews" style="font-size: 0.72rem;">{{ $top2->total_penilaian }} ulasan</small>
             </div>
+            <a href="{{ route('admin.guru.show', $top2->id) }}" class="btn btn-outline-custom btn-sm btn-podium w-100 rounded-pill">
+                <i class="bi bi-eye me-1"></i> Detail
+            </a>
         </div>
         @endif
     </div>
 
-    {{-- #1 --}}
-    <div class="col-md-4">
+    {{-- #1 EMAS (CENTER PODIUM) --}}
+    <div class="col-4 col-md-4 order-2 order-md-2 mb-0 gk-podium-col gk-podium-1">
         @php $pct1 = round(($top1->rata_rata_nilai / 5) * 100); @endphp
-        <div class="card-custom p-5 text-center" style="background: var(--primary); color: white; border: none;">
-            <div class="position-relative d-inline-block mb-3">
-                <img src="{{ $top1->photo_url }}" class="rounded-circle" width="120" height="120" style="object-fit: cover; border: 4px solid var(--secondary);">
-                <span class="position-absolute bottom-0 end-0 rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; font-weight: 700; background: var(--secondary); color: var(--primary);">1</span>
+        <div class="card-custom gk-podium-card p-2.5 p-md-5 text-center position-relative" style="border: 2px solid #f59e0b; box-shadow: 0 16px 36px rgba(245, 158, 11, 0.16); background: var(--bg-card); transform: translateY(-8px);">
+            <div class="mb-2 mb-md-3">
+                <span class="badge rounded-pill px-2.5 px-md-3.5 py-1 py-md-1.5 fw-bold shadow-sm" style="background: linear-gradient(135deg, #f59e0b, #d97706); color: #ffffff; font-size: 0.8rem; letter-spacing: 0.5px;">
+                    <i class="bi bi-trophy-fill me-1"></i> #1 EMAS
+                </span>
             </div>
-            <h4 class="fw-bold mb-1 text-white">{{ $top1->nama }}</h4>
-            <div class="font-mono" style="font-size: 0.75rem; letter-spacing: 2px; color: var(--secondary);">{{ strtoupper($top1->jurusan?->nama_jurusan ?? 'UMUM') }}</div>
-            <div class="row g-3 mt-3">
-                <div class="col-6">
-                    <div class="font-mono" style="font-size: 0.65rem; letter-spacing: 1px; opacity: 0.8;">KEPUASAN</div>
-                    <div class="fw-bold fs-3 text-warning">{{ $pct1 }}%</div>
+            <div class="position-relative d-inline-block mb-2 mb-md-3">
+                <img src="{{ $top1->photo_url }}" class="rounded-circle shadow gk-podium-avatar-1" width="115" height="115" style="object-fit: cover; border: 4px solid #f59e0b;">
+            </div>
+            <h4 class="fw-bold mb-1 gk-podium-nama" title="{{ $top1->nama }}">{{ $top1->nama }}</h4>
+            <div class="font-mono mb-2 mb-md-3 gk-podium-jurusan" style="font-size: 0.75rem; letter-spacing: 1px; color: var(--secondary);" title="{{ strtoupper($top1->jurusan?->nama_jurusan ?? 'UMUM') }}">{{ strtoupper($top1->jurusan?->nama_jurusan ?? 'UMUM') }}</div>
+            <div class="p-2 p-md-3 rounded-3 mb-2 mb-md-3 gk-podium-statbox" style="background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.2);">
+                <div class="fw-bold text-warning gk-podium-score" style="font-size: 2.3rem; line-height: 1;">{{ $pct1 }}%</div>
+                <div class="progress mt-1 mt-md-2 mb-1" style="height: 6px; background-color: rgba(245, 158, 11, 0.2); border-radius: 10px;">
+                    <div class="progress-bar bg-warning rounded-pill" style="width: {{ $pct1 }}%;"></div>
                 </div>
-                <div class="col-6">
-                    <div class="font-mono" style="font-size: 0.65rem; letter-spacing: 1px; opacity: 0.8;">TOTAL ULASAN</div>
-                    <div class="fw-bold fs-3 text-white">{{ $top1->total_penilaian }}</div>
-                </div>
+                <small class="text-muted font-mono d-block mt-0.5 mt-md-1 gk-podium-reviews" style="font-size: 0.75rem;">{{ $top1->total_penilaian }} ulasan</small>
             </div>
-            <div class="progress mt-3" style="height: 7px; background-color: rgba(255,255,255,0.2); border-radius: 10px;">
-                <div class="progress-bar bg-warning rounded-pill" style="width: {{ $pct1 }}%;"></div>
-            </div>
+            <a href="{{ route('admin.guru.show', $top1->id) }}" class="btn btn-primary-custom btn-podium w-100 rounded-pill py-1.5 py-md-2 fw-semibold">
+                <i class="bi bi-eye me-1"></i> Detail
+            </a>
         </div>
     </div>
 
-    {{-- #3 --}}
-    <div class="col-md-4">
+    {{-- #3 PERUNGGU --}}
+    <div class="col-4 col-md-4 order-3 order-md-3 gk-podium-col gk-podium-3">
         @if($top3)
         @php $pct3 = round(($top3->rata_rata_nilai / 5) * 100); @endphp
-        <div class="card-custom p-4 text-center">
-            <div class="position-relative d-inline-block mb-3">
-                <img src="{{ $top3->photo_url }}" class="rounded-circle" width="100" height="100" style="object-fit: cover; border: 4px solid var(--border);">
-                <span class="position-absolute bottom-0 end-0 bg-warning text-dark rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; font-weight: 700;">3</span>
+        <div class="card-custom gk-podium-card p-2 p-md-4 text-center h-100" style="border: 1px solid rgba(217, 119, 6, 0.3); box-shadow: 0 8px 24px rgba(0,0,0,0.04);">
+            <div class="mb-2 mb-md-3">
+                <span class="badge rounded-pill px-2.5 py-1 fw-bold" style="background: #d97706; color: #fff; font-size: 0.75rem;">
+                    <i class="bi bi-award-fill me-1"></i> #3 PERUNGGU
+                </span>
             </div>
-            <h5 class="fw-bold mb-1">{{ $top3->nama }}</h5>
-            <div class="font-mono" style="font-size: 0.7rem; color: var(--text-muted); letter-spacing: 1px;">{{ strtoupper($top3->jurusan?->nama_jurusan ?? 'UMUM') }}</div>
-            <div class="mt-3 px-3">
-                <div class="d-flex justify-content-between font-mono mb-1" style="font-size: 0.75rem;">
-                    <span class="text-muted">Rating:</span>
-                    <span class="fw-bold text-primary">{{ $pct3 }}%</span>
-                </div>
-                <div class="progress" style="height: 6px; border-radius: 10px;">
+            <div class="position-relative d-inline-block mb-2 mb-md-3">
+                <img src="{{ $top3->photo_url }}" class="rounded-circle shadow-sm gk-podium-avatar-3" width="90" height="90" style="object-fit: cover; border: 3px solid #d97706;">
+            </div>
+            <h5 class="fw-bold mb-1 gk-podium-nama" title="{{ $top3->nama }}">{{ $top3->nama }}</h5>
+            <div class="font-mono mb-2 mb-md-3 gk-podium-jurusan" style="font-size: 0.72rem; color: var(--text-muted);" title="{{ strtoupper($top3->jurusan?->nama_jurusan ?? 'UMUM') }}">{{ strtoupper($top3->jurusan?->nama_jurusan ?? 'UMUM') }}</div>
+            <div class="p-1.5 p-md-3 rounded-3 mb-2 mb-md-3 gk-podium-statbox" style="background: var(--bg-light);">
+                <div class="fw-bold text-primary gk-podium-score" style="font-size: 1.8rem; line-height: 1;">{{ $pct3 }}%</div>
+                <div class="progress mt-1 mt-md-2 mb-1" style="height: 5px; border-radius: 10px;">
                     <div class="progress-bar bg-primary rounded-pill" style="width: {{ $pct3 }}%;"></div>
                 </div>
-                <small class="text-muted mt-2 d-block">{{ $top3->total_penilaian }} Ulasan</small>
+                <small class="text-muted font-mono gk-podium-reviews" style="font-size: 0.72rem;">{{ $top3->total_penilaian }} ulasan</small>
             </div>
+            <a href="{{ route('admin.guru.show', $top3->id) }}" class="btn btn-outline-custom btn-sm btn-podium w-100 rounded-pill">
+                <i class="bi bi-eye me-1"></i> Detail
+            </a>
         </div>
         @endif
     </div>
@@ -175,7 +178,7 @@
                     </td>
                     <td class="text-center font-mono">{{ $g->total_penilaian }}</td>
                     <td class="text-center">
-                        <a href="{{ route('landing.guru.detail', $g->id) }}" class="btn btn-sm btn-outline-primary" target="_blank">
+                        <a href="{{ route('admin.guru.show', $g->id) }}" class="btn btn-sm btn-outline-primary">
                             <i class="bi bi-eye me-1"></i> Lihat Detail
                         </a>
                     </td>

@@ -18,16 +18,16 @@
         </button>
     </li>
     <li class="nav-item">
-        <button class="nav-link fw-bold" id="password-tab" data-bs-toggle="pill" data-bs-target="#tabPassword" type="button">
-            <i class="bi bi-shield-lock-fill me-1"></i> 2. Ganti Password
-        </button>
-    </li>
-    <li class="nav-item">
         <button class="nav-link fw-bold" id="chat-tab" data-bs-toggle="pill" data-bs-target="#tabChat" type="button">
-            <i class="bi bi-chat-dots-fill me-1"></i> 3. Chat Admin
+            <i class="bi bi-chat-dots-fill me-1"></i> 2. Chat Admin
             @if(isset($pesanChat) && $pesanChat->whereNotNull('balasan')->count() > 0)
                 <span class="badge bg-success ms-1">{{ $pesanChat->whereNotNull('balasan')->count() }} Balasan</span>
             @endif
+        </button>
+    </li>
+    <li class="nav-item">
+        <button class="nav-link fw-bold" id="legal-tab" data-bs-toggle="pill" data-bs-target="#tabLegalGuru" type="button">
+            <i class="bi bi-shield-check me-1"></i> 3. Kebijakan Privasi & Ketentuan
         </button>
     </li>
 </ul>
@@ -44,7 +44,7 @@
                         <div>
                             <h6 class="fw-bold mb-3 font-mono text-muted text-uppercase" style="letter-spacing: 1px;">Foto Profil Pengajar</h6>
                             <div class="position-relative d-inline-block mb-3">
-                                <img id="avatarPreview" src="{{ $guru->photo_url ?? $user->photo_url }}" class="rounded-circle shadow-sm" width="140" height="140" style="object-fit: cover; border: 4px solid var(--primary);">
+                                <img id="avatarPreview" src="{{ $guru->photo_url ?? $user->photo_url }}" class="shadow-sm" width="160" height="160" style="object-fit: cover; border-radius: 16px; border: 4px solid var(--primary);">
                             </div>
                             <p class="text-muted small mb-3">Gunakan foto resmi atau formal dengan format PNG/JPG (Maks 2MB).</p>
                         </div>
@@ -112,47 +112,7 @@
         </form>
     </div>
 
-    {{-- TAB 2: GANTI PASSWORD --}}
-    <div class="tab-pane fade" id="tabPassword">
-        <div class="row justify-content-center">
-            <div class="col-lg-8">
-                <div class="card-custom p-4">
-                    <h5 class="fw-bold mb-1" style="color: var(--text-dark);">
-                        <i class="bi bi-shield-lock-fill text-warning me-2"></i>Pembaruan Password Akun
-                    </h5>
-                    <p class="text-muted small mb-4">Jaga kerahasiaan kata sandi portal pengajar Anda demi keamanan evaluasi.</p>
-
-                    <form action="{{ route('guru.pengaturan.password') }}" method="POST">
-                        @csrf
-                        <div class="mb-3">
-                            <label class="form-label small fw-bold">Password Saat Ini</label>
-                            <input type="password" name="current_password" class="form-control @error('current_password') is-invalid @enderror" placeholder="Masukkan password lama" required>
-                            @error('current_password') <div class="invalid-feedback">{{ $message }}</div> @enderror
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label small fw-bold">Password Baru</label>
-                            <input type="password" name="password" class="form-control @error('password') is-invalid @enderror" placeholder="Minimal 6 karakter" required>
-                            @error('password') <div class="invalid-feedback">{{ $message }}</div> @enderror
-                        </div>
-
-                        <div class="mb-4">
-                            <label class="form-label small fw-bold">Konfirmasi Password Baru</label>
-                            <input type="password" name="password_confirmation" class="form-control" placeholder="Ketik ulang password baru" required>
-                        </div>
-
-                        <div class="d-flex justify-content-end">
-                            <button type="submit" class="btn btn-primary-custom px-4">
-                                <i class="bi bi-key me-1"></i> Simpan Password Baru
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    {{-- TAB 3: CHAT ADMIN --}}
+    {{-- TAB 2: CHAT ADMIN --}}
     <div class="tab-pane fade" id="tabChat">
         <div class="row justify-content-center">
             <div class="col-lg-10">
@@ -225,7 +185,7 @@
                                         <div class="d-flex align-items-center justify-content-center rounded-circle flex-shrink-0" style="width: 36px; height: 36px; background: var(--primary); color: white;">
                                             <i class="bi bi-person-badge-fill" style="font-size: 0.9rem;"></i>
                                         </div>
-                                        <div style="background: white; border: 1px solid var(--border); padding: 0.85rem 1.25rem; border-radius: 18px 18px 18px 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+                                        <div style="background: var(--bg-card); border: 1px solid var(--border); padding: 0.85rem 1.25rem; border-radius: 18px 18px 18px 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
                                             <div class="fw-bold mb-1" style="color: var(--primary); font-size: 0.8rem;">
                                                 <i class="bi bi-patch-check-fill me-1 text-primary"></i> Administrator Sekolah
                                             </div>
@@ -242,7 +202,7 @@
                     </div>
 
                     {{-- FORM INPUT PESAN & VERIFIKASI ANTI-SPAM --}}
-                    <div class="border-top p-3" style="background: white;">
+                    <div class="border-top p-3" style="background: var(--bg-card);">
                         <form action="{{ route('guru.pengaturan.chat') }}" method="POST">
                             @csrf
                             <div class="d-flex gap-2 align-items-end mb-2">
@@ -264,6 +224,41 @@
                                 </div>
                             </div>
                         </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- TAB 3: KEBIJAKAN PRIVASI & SYARAT KETENTUAN --}}
+    <div class="tab-pane fade" id="tabLegalGuru">
+        <div class="row g-4">
+            <div class="col-lg-6">
+                <div class="card-custom p-4 h-100">
+                    <h5 class="fw-bold mb-3 d-flex align-items-center text-primary">
+                        <i class="bi bi-shield-lock-fill me-2"></i>Kebijakan Privasi
+                    </h5>
+                    <p class="text-muted small mb-3">Ketentuan perlindungan data dan privasi penilaian guru & siswa.</p>
+                    <div class="p-3 bg-light rounded border text-muted small" style="line-height: 1.8; max-height: 480px; overflow-y: auto;">
+                        @php
+                            $privacy = \App\Models\Setting::get('kebijakan_privasi', "1. Pengumpulan Data\nKami hanya mengumpulkan data yang diperlukan untuk proses penilaian, yaitu NIS, nama, dan kelas siswa. Data pribadi seperti tanggal lahir hanya digunakan untuk verifikasi identitas saat login.\n\n2. Anonimitas Penilaian\nSeluruh penilaian yang diberikan siswa bersifat anonim. Guru dan pihak lain tidak dapat mengetahui identitas siswa yang memberikan nilai tertentu. Ini menjamin kejujuran dan objektivitas dalam setiap penilaian.\n\n3. Penyimpanan Data\nSemua data disimpan di server yang aman dengan enkripsi standar industri. Password pengguna di-hash menggunakan algoritma bcrypt yang tidak dapat dibaca kembali.\n\n4. Penggunaan Data\nData penilaian hanya digunakan untuk keperluan internal sekolah, seperti evaluasi kinerja guru dan pengambilan keputusan oleh manajemen. Data tidak akan dibagikan kepada pihak ketiga tanpa persetujuan.");
+                        @endphp
+                        {!! nl2br(e($privacy)) !!}
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="card-custom p-4 h-100">
+                    <h5 class="fw-bold mb-3 d-flex align-items-center text-primary">
+                        <i class="bi bi-file-earmark-text-fill me-2"></i>Syarat & Ketentuan
+                    </h5>
+                    <p class="text-muted small mb-3">Aturan penggunaan platform evaluasi GuruKuu bagi tenaga pendidik.</p>
+                    <div class="p-3 bg-light rounded border text-muted small" style="line-height: 1.8; max-height: 480px; overflow-y: auto;">
+                        @php
+                            $terms = \App\Models\Setting::get('syarat_ketentuan', "1. Eligibilitas\nPlatform ini hanya dapat digunakan oleh siswa dan guru yang terdaftar resmi di sekolah. Akun harus diaktifkan oleh administrator sekolah sebelum dapat digunakan.\n\n2. Tanggung Jawab Pengguna\nSiswa wajib memberikan penilaian secara jujur dan objektif. Dilarang memberikan penilaian berdasarkan dendam pribadi, SARA, atau konten yang tidak pantas.\n\n3. Keamanan Akun\nPengguna bertanggung jawab penuh atas kerahasiaan password akun mereka. Dilarang membagikan password kepada orang lain.\n\n4. Kontak & Pengaduan\nJika Anda menemukan pelanggaran atau memiliki keluhan, silakan hubungi administrator sekolah melalui fitur Chat Admin yang tersedia di footer website ini.");
+                        @endphp
+                        {!! nl2br(e($terms)) !!}
                     </div>
                 </div>
             </div>

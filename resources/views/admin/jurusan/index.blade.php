@@ -18,11 +18,13 @@
         <table class="table table-custom mb-0" id="jurusanTable">
             <thead>
                 <tr>
-                    <th style="width: 80px;">LOGO</th>
+                    <th style="width: 70px;">LOGO</th>
                     <th>KODE</th>
                     <th>NAMA JURUSAN</th>
+                    <th class="text-center">KELAS</th>
+                    <th class="text-center">SISWA</th>
                     <th>DESKRIPSI</th>
-                    <th class="text-center" style="width: 160px;">AKSI</th>
+                    <th class="text-center" style="width: 220px;">AKSI</th>
                 </tr>
             </thead>
             <tbody>
@@ -34,16 +36,29 @@
                     </td>
                     <td class="font-mono fw-bold text-primary">{{ $j->kode_jurusan }}</td>
                     <td><strong>{{ $j->nama_jurusan }}</strong></td>
+                    <td class="text-center">
+                        <span class="badge bg-light text-dark border font-mono">{{ $j->kelas_count }} Rombel</span>
+                    </td>
+                    <td class="text-center">
+                        <span class="badge bg-primary-subtle text-primary fw-bold font-mono">{{ $j->siswa_count }} Siswa</span>
+                    </td>
                     <td>
                         <span class="text-muted small">
-                            {{ Str::limit($j->deskripsi ?: 'Tidak ada deskripsi.', 60) }}
+                            {{ Str::limit($j->deskripsi ?: 'Tidak ada deskripsi.', 50) }}
                         </span>
                     </td>
                     <td class="text-center">
-                        <a href="{{ route('admin.jurusan.edit', $j) }}" class="btn btn-sm btn-outline-primary me-1" title="Edit Jurusan & Foto">
-                            <i class="bi bi-pencil me-1"></i> Edit
+                        <a href="{{ route('admin.jurusan.show', $j) }}" class="btn btn-sm btn-info text-white me-1" title="Lihat Detail Rombel & Siswa">
+                            <i class="bi bi-eye"></i> Detail
                         </a>
-                        <form action="{{ route('admin.jurusan.destroy', $j) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus jurusan {{ $j->nama_jurusan }}?')">
+                        <a href="{{ route('admin.jurusan.edit', $j) }}" class="btn btn-sm btn-outline-primary me-1" title="Edit Jurusan & Foto">
+                            <i class="bi bi-pencil"></i>
+                        </a>
+                        <form action="{{ route('admin.jurusan.destroy', $j) }}" method="POST" class="d-inline"
+                              data-confirm="Yakin ingin menghapus jurusan {{ addslashes($j->nama_jurusan) }}? Data rombel dan siswa terkait akan terdampak."
+                              data-confirm-title="Hapus Jurusan"
+                              data-confirm-btn="Ya, Hapus"
+                              data-confirm-type="danger">
                             @csrf @method('DELETE')
                             <button class="btn btn-sm btn-outline-danger" title="Hapus Jurusan">
                                 <i class="bi bi-trash"></i>

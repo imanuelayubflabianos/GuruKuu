@@ -29,22 +29,49 @@ class KritikSaranController extends Controller
         $kritikSaran->update([
             'kritik' => null,
             'saran' => null,
+            'is_censored' => false,
+            'censored_reason' => null,
         ]);
 
-        return back()->with('success', 'Ulasan kritik & saran berhasil dihapus.');
+        return back()->with('success', 'Ulasan kritik & saran berhasil dihapus permanen.');
     }
 
     public function warn(Penilaian $kritikSaran)
     {
         $kritikSaran->update([
-            'kritik' => 'Pesan ini telah dihapus oleh Admin karena melanggar etika dan tata tertib.',
-            'saran' => null,
+            'is_censored' => true,
+            'censored_reason' => 'Ulasan ini tidak memenuhi kriteria kebijakan komunitas.',
         ]);
 
         if ($kritikSaran->siswa) {
             $kritikSaran->siswa->increment('warning_count');
         }
 
-        return back()->with('success', 'Peringatan berhasil dikirim kepada siswa dan ulasan telah dimoderasi.');
+        // Catat ke log pelanggaran
+        try {
+            \App\Models\Pelanggaran::create([
+                'user_id' => $kritikSaran->siswa_id,
+                'tipe' => 'komentar_disensor',
+                'guru_id' => $kritikSaran->guru_id,
+                'penilaian_id' => $kritikSaran->id,
+                'kata_terdeteksi' => ['disensor_admin'],
+                'isi_teks' => "Kritik: " . ($kritikSaran->kritik ?? '-') . " | Saran: " . ($kritikSaran->saran ?? '-'),
+                'is_read' => true,
+                'read_at' => now(),
+                'tindakan' => 'diberi_peringatan',
+            ]);
+        } catch (\Throwable $e) {}
+
+        return back()->with('success', 'Peringatan berhasil dikirim kepada siswa dan ulasan telah disensor/disembunyikan.');
+    }
+
+    public function unwarn(Penilaian $kritikSaran)
+    {
+        $kritikSaran->update([
+            'is_censored' => false,
+            'censored_reason' => null,
+        ]);
+
+        return back()->with('success', 'Status sensor ulasan berhasil dibatalkan.');
     }
 }

@@ -1,175 +1,330 @@
 {{-- resources/views/landing/guru-detail.blade.php --}}
 @extends('layouts.landing')
-@section('title', $guru->nama)
+@section('title', 'Detail Guru - ' . $guru->nama)
 
 @section('content')
-<section style="background: var(--bg-light); padding: 140px 0 80px; min-height: 100vh;">
-    <div class="container">
-        <nav aria-label="breadcrumb" class="mb-4">
-            <ol class="breadcrumb" style="font-size: 0.85rem;">
-                <li class="breadcrumb-item"><a href="/" class="text-decoration-none" style="color: var(--text-muted);">Beranda</a></li>
-                <li class="breadcrumb-item"><a href="{{ route('landing.leaderboard') }}" class="text-decoration-none" style="color: var(--text-muted);">Leaderboard</a></li>
-                <li class="breadcrumb-item active">{{ $guru->nama }}</li>
-            </ol>
-        </nav>
+<style>
+    .btn-primary-custom {
+        background: var(--primary);
+        color: white !important;
+        border: none;
+        padding: 0.7rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 4px 12px rgba(0, 51, 102, 0.15);
+    }
+    .btn-primary-custom:hover {
+        background: var(--primary-light);
+        color: white !important;
+        transform: translateY(-1px);
+        box-shadow: 0 6px 16px rgba(0, 51, 102, 0.25);
+    }
+    .page-title {
+        font-size: 1.85rem;
+        font-weight: 800;
+        color: var(--text-dark);
+        margin: 0;
+    }
+    .card-custom {
+        background: white;
+        border-radius: 12px;
+        border: 1px solid var(--border);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+</style>
 
-        <div class="row g-4">
-            <div class="col-lg-4">
-                <img src="{{ $guru->photo_url }}" class="rounded w-100 mb-3" style="height: 400px; object-fit: cover;">
-                <div class="card-custom p-3">
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <div class="font-mono" style="font-size: 0.7rem; font-weight: 600; color: var(--text-muted); letter-spacing: 2px;">TINGKAT KEPUASAN</div>
-                        <div class="text-primary font-mono fw-bold" style="font-size: 1.1rem;">
-                            {{ round(($guru->rata_rata_nilai / 5) * 100) }}%
+<section style="background: var(--bg-light); padding: 110px 0 70px; min-height: 100vh;">
+    <div class="container">
+        {{-- BREADCRUMB & HEADER --}}
+        <div class="page-header mb-4">
+            <div>
+                <a href="{{ url()->previous() != url()->current() ? url()->previous() : route('landing.index') . '#guru' }}" class="text-decoration-none text-muted small">
+                    <i class="bi bi-arrow-left me-1"></i> Kembali
+                </a>
+                <h1 class="page-title mt-2">{{ $guru->nama }}</h1>
+                <p class="page-subtitle mb-0 mt-1">
+                    @if($guru->jurusan)
+                        <span class="badge bg-primary text-white">{{ $guru->jurusan->nama_jurusan }}</span>
+                    @else
+                        <span class="badge bg-secondary text-white">Guru Pengajar</span>
+                    @endif
+                </p>
+            </div>
+        </div>
+
+        <div class="row g-4 mb-4">
+            {{-- PROFIL GURU (KOTAK BESAR DENGAN SUDUT MELENGKUNG, TANPA NIP / NO HP / EMAIL) --}}
+            <div class="col-md-5 col-lg-4">
+                <div class="card-custom p-4 text-center">
+                    <div class="position-relative d-inline-block mb-3">
+                        <img src="{{ $guru->photo_url }}" class="shadow-sm" style="width: 180px; height: 180px; object-fit: cover; border-radius: 16px; border: 4px solid var(--primary);" alt="{{ $guru->nama }}">
+                    </div>
+                    <h4 class="fw-bold mb-1" style="color: var(--text-dark);">{{ $guru->nama }}</h4>
+                    <div class="mb-3">
+                        <span class="badge bg-light text-primary border border-primary border-opacity-25 px-3 py-1 font-mono">
+                            <i class="bi bi-mortarboard-fill me-1"></i>{{ $guru->jurusan ? $guru->jurusan->nama_jurusan : 'Guru Pengajar' }}
+                        </span>
+                    </div>
+
+                    {{-- DESKRIPSI & TENTANG GURU --}}
+                    <div class="text-start p-3 rounded" style="background: var(--bg-light); border: 1px solid var(--border);">
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <i class="bi bi-person-lines-fill text-primary"></i>
+                            <strong class="small text-dark">Tentang Guru & Deskripsi Pengajaran</strong>
                         </div>
+                        <p class="small text-muted mb-0" style="line-height: 1.6;">
+                            {{ $guru->bio ?: 'Guru pengajar yang berdedikasi membimbing dan mendidik siswa-siswi berakhlak mulia serta berprestasi unggul di lingkungan sekolah.' }}
+                        </p>
                     </div>
-                    <div class="progress" style="height: 8px; border-radius: 6px;">
-                        <div class="progress-bar bg-primary" style="width: {{ round(($guru->rata_rata_nilai / 5) * 100) }}%;"></div>
-                    </div>
-                    <small class="text-muted mt-2 d-block">Berdasarkan {{ $guru->total_penilaian }} penilaian siswa</small>
                 </div>
             </div>
 
-            <div class="col-lg-8">
-                <div class="mb-3">
-                    <span class="badge-custom" style="background: var(--primary); color: white; padding: 0.5rem 1rem; border-radius: 6px; font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; letter-spacing: 1px;">
-                        {{ strtoupper($guru->jurusan?->nama_jurusan ?? 'GURU PENGAJAR') }}
-                    </span>
-                    @if($guru->jurusan)
-                    <span class="badge-custom" style="background: var(--bg-light); color: var(--text-dark); border: 1px solid var(--border); padding: 0.5rem 1rem; border-radius: 6px; font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; letter-spacing: 1px;">
-                        {{ strtoupper($guru->jurusan->kode_jurusan) }}
-                    </span>
-                    @endif
+            {{-- STATISTIK EVALUASI PERIODE BERJALAN --}}
+            <div class="col-md-7 col-lg-8">
+                <div class="card-custom p-4 h-100 d-flex flex-column justify-content-between">
+                    <div>
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="fw-bold mb-0">
+                                <i class="bi bi-graph-up-arrow me-2 text-primary"></i>Statistik Penilaian Periode Berjalan
+                            </h5>
+                            @if($periodeAktif)
+                                <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25">
+                                    <i class="bi bi-calendar-check me-1"></i>{{ $periodeAktif->nama_periode }}
+                                </span>
+                            @endif
+                        </div>
+                        
+                        @if($stats['total_penilaian'] > 0)
+                        <div class="row g-3">
+                            @php
+                                $aspects = [
+                                    'Kedisiplinan' => $stats['rata_kedisiplinan'],
+                                    'Cara Mengajar' => $stats['rata_cara_mengajar'],
+                                    'Komunikasi' => $stats['rata_komunikasi'],
+                                    'Tanggung Jawab' => $stats['rata_tanggung_jawab'],
+                                    'Kreativitas' => $stats['rata_kreativitas'],
+                                    'Keramahan' => $stats['rata_keramahan'],
+                                ];
+                            @endphp
+                            @foreach($aspects as $label => $value)
+                            @php $valPct = round(($value / 5) * 100); @endphp
+                            <div class="col-md-6">
+                                <div class="d-flex justify-content-between mb-1">
+                                    <small class="fw-bold text-dark">{{ $label }}</small>
+                                    <small class="text-primary fw-bold font-mono">{{ $valPct }}%</small>
+                                </div>
+                                <div class="progress" style="height: 8px; border-radius: 10px; background-color: #e9ecef;">
+                                    <div class="progress-bar rounded-pill" style="width: {{ $valPct }}%; background: var(--primary);"></div>
+                                </div>
+                            </div>
+                            @endforeach
+                        </div>
+                        <div class="mt-3 p-2 rounded text-center" style="background: var(--bg-light); border: 1px solid var(--border);">
+                            <small class="text-muted">Total <strong>{{ $stats['total_penilaian'] }} siswa</strong> telah memberikan penilaian pada semester aktif ini</small>
+                        </div>
+                        @else
+                        <div class="text-center py-5 text-muted">
+                            <i class="bi bi-bar-chart fs-1 d-block mb-2 text-muted opacity-50"></i>
+                            <p class="mb-1 fw-semibold">Belum Ada Penilaian Pada Semester Ini</p>
+                            <small>Penilaian dihitung berdasarkan semester aktif yang sedang berjalan.</small>
+                        </div>
+                        @endif
+                    </div>
+
+                    {{-- CTA ACTION PENILAIAN / LOGIN --}}
+                    <div class="mt-4">
+                        @auth
+                            @if(auth()->user()->role === 'siswa')
+                                @if($periodeAktif)
+                                    @if($sudahMenilai)
+                                        <div class="alert alert-success mb-0 d-flex align-items-center">
+                                            <i class="bi bi-check-circle-fill fs-4 me-3 text-success"></i>
+                                            <div>
+                                                <strong class="text-success">Penilaian Anda Sudah Tercatat!</strong>
+                                                <div class="small text-muted">Anda telah memberikan penilaian untuk guru ini pada periode <strong>{{ $periodeAktif->nama_periode }}</strong>. Anda dapat memberikan penilaian kembali pada periode semester berikutnya.</div>
+                                            </div>
+                                        </div>
+                                    @else
+                                        <a href="{{ route('siswa.penilaian.create', $guru) }}" class="btn btn-primary-custom w-100 py-2 fs-6 fw-semibold">
+                                            <i class="bi bi-pencil-square me-1"></i> Beri Penilaian untuk Guru Ini
+                                        </a>
+                                    @endif
+                                @else
+                                    <div class="alert alert-warning mb-0 small">
+                                        <i class="bi bi-exclamation-triangle me-1"></i> Belum ada periode semester yang aktif saat ini.
+                                    </div>
+                                @endif
+                            @elseif(auth()->user()->role === 'guru')
+                                @if(auth()->user()->nis === $guru->nip || auth()->user()->email === $guru->email)
+                                    <div class="alert alert-info mb-0 small d-flex align-items-center gap-2">
+                                        <i class="bi bi-person-check-fill fs-5 text-primary"></i>
+                                        <span>Ini adalah laman profil penilaian Anda sebagai Guru. Masuk ke <a href="{{ route('guru.dashboard') }}" class="fw-bold text-decoration-none">Dashboard Guru</a> untuk melihat rekapitulasi lengkap.</span>
+                                    </div>
+                                @else
+                                    <div class="alert alert-light border mb-0 small text-muted">
+                                        <i class="bi bi-info-circle me-1 text-primary"></i> Anda login sebagai Guru. Penilaian dilakukan oleh siswa yang terdaftar.
+                                    </div>
+                                @endif
+                            @else
+                                <div class="alert alert-light border mb-0 small text-muted">
+                                    <i class="bi bi-shield-check me-1 text-primary"></i> Anda login sebagai Administrator. Masuk ke <a href="{{ route('admin.dashboard') }}" class="fw-bold text-decoration-none">Dashboard Admin</a> untuk mengelola sistem.
+                                </div>
+                            @endif
+                        @else
+                            <a href="{{ route('login') }}" class="btn btn-primary-custom w-100 py-2.5 fs-6 fw-semibold">
+                                <i class="bi bi-box-arrow-in-right me-2"></i> Login untuk Memberi Penilaian
+                            </a>
+                        @endauth
+                    </div>
                 </div>
+            </div>
+        </div>
 
-                <h1 class="fw-bold mb-2" style="font-size: 2.5rem;">{{ $guru->nama }}</h1>
-                <h5 class="mb-4" style="color: var(--primary); font-weight: 600;">{{ $guru->jurusan?->nama_jurusan }}</h5>
+        {{-- ULASAN SISWA PERIODE BERJALAN --}}
+        <div class="card-custom p-4 mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="fw-bold mb-0">
+                    <i class="bi bi-chat-left-quote me-2 text-primary"></i>Ulasan & Masukan Siswa (Periode Berjalan)
+                    <span class="badge bg-primary ms-2">{{ $semuaFeedback->count() }}</span>
+                </h5>
+                <small class="text-muted"><i class="bi bi-shield-lock-fill text-success me-1"></i>Anonimitas Terjamin</small>
+            </div>
 
-                <p class="text-muted mb-4" style="line-height: 1.7; font-size: 1.05rem;">
-                    {{ $guru->bio ?? 'Berdedikasi dalam mendidik siswa SMK untuk menjadi tenaga profesional di bidangnya.' }}
-                </p>
-
-                <div class="row g-3 mb-4">
-                    <div class="col-md-3 col-6">
-                        <div class="card-custom p-3 text-center">
-                            <div class="font-mono" style="font-size: 0.65rem; color: var(--text-muted); letter-spacing: 1px;">KEPUASAN</div>
-                            <div class="fw-bold fs-5 text-primary">{{ round(($guru->rata_rata_nilai / 5) * 100) }}%</div>
-                        </div>
-                    </div>
-                    <div class="col-md-3 col-6">
-                        <div class="card-custom p-3 text-center">
-                            <div class="font-mono" style="font-size: 0.65rem; color: var(--text-muted); letter-spacing: 1px;">TOTAL ULASAN</div>
-                            <div class="fw-bold fs-5">{{ $guru->total_penilaian }}</div>
-                        </div>
-                    </div>
-                    <div class="col-md-3 col-6">
-                        <div class="card-custom p-3 text-center">
-                            <div class="font-mono" style="font-size: 0.65rem; color: var(--text-muted); letter-spacing: 1px;">STATUS</div>
-                            <div class="fw-bold fs-6 text-success">Aktif Mengajar</div>
-                        </div>
-                    </div>
-                    <div class="col-md-3 col-6">
-                        <div class="card-custom p-3 text-center">
-                            <div class="font-mono" style="font-size: 0.65rem; color: var(--text-muted); letter-spacing: 1px;">BADGE</div>
-                            <div class="fw-bold fs-5">{{ $guru->penghargaan->count() }}</div>
-                        </div>
-                    </div>
-                </div>
-
-                @auth
-                    @if(auth()->user()->role === 'siswa')
-                        <a href="{{ route('siswa.penilaian.create', $guru->id) }}" class="btn btn-primary-custom" style="padding: 0.75rem 2rem;">
-                            <i class="bi bi-pencil-square me-1"></i> Beri Penilaian untuk Guru Ini
-                        </a>
-                    @elseif(auth()->user()->role === 'guru' && (auth()->user()->nis === $guru->nip || auth()->user()->email === $guru->email))
-                        <span class="badge bg-success px-3 py-2 fs-6">
-                            <i class="bi bi-person-check-fill me-1"></i> Ini adalah Profil Anda (Guru)
-                        </span>
-                    @endif
-                @else
-                    <a href="{{ route('login') }}" class="btn btn-primary-custom" style="padding: 0.75rem 2rem;">
-                        <i class="bi bi-box-arrow-in-right me-1"></i> Login untuk Memberi Penilaian
-                    </a>
-                @endauth
-
-                {{-- Penilaian Terbaru (100% Anonim & Guru Bisa Balas Langsung) --}}
+            @if($semuaFeedback->count() > 0)
+                @foreach($semuaFeedback as $fb)
                 @php
-                    $isCurrentGuru = auth()->check() && auth()->user()->role === 'guru' && (auth()->user()->nis === $guru->nip || auth()->user()->email === $guru->email);
+                    $fbScore = round(($fb->total_nilai / 30) * 100);
+                    $fbColor = $fbScore >= 80 ? 'bg-success' : ($fbScore >= 60 ? 'bg-info' : ($fbScore >= 40 ? 'bg-warning' : 'bg-danger'));
                 @endphp
-
-                @if($guru->penilaian->isNotEmpty())
-                <h4 class="fw-bold mt-5 mb-3">Penilaian & Ulasan Siswa</h4>
-                @foreach($guru->penilaian->take(15) as $p)
-                <div class="card-custom p-4 mb-3">
-                    <div class="d-flex justify-content-between mb-2">
-                        <div class="d-flex align-items-center">
-                            <div class="rounded-circle bg-secondary bg-opacity-10 text-secondary d-flex align-items-center justify-content-center me-2" style="width: 40px; height: 40px;">
+                <div class="border rounded p-3 mb-3" style="background: #fdfdfd;">
+                    <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="rounded-circle d-flex align-items-center justify-content-center bg-secondary bg-opacity-10 text-secondary" style="width: 38px; height: 38px;">
                                 <i class="bi bi-incognito fs-5"></i>
                             </div>
                             <div>
-                                <div class="fw-bold">Siswa (Anonim)</div>
-                                <div class="font-mono" style="font-size: 0.7rem; color: var(--text-muted); letter-spacing: 1px;">
-                                    {{ $p->created_at->format('d M Y') }}
+                                <div class="d-flex align-items-center gap-2">
+                                    <strong class="small text-dark">Siswa (Anonim)</strong>
+                                    <span class="badge {{ $fbColor }} text-white font-mono" style="font-size: 0.72rem;">
+                                        Skor: {{ $fbScore }}%
+                                    </span>
                                 </div>
+                                <small class="text-muted d-block font-mono" style="font-size: 0.72rem;">{{ $fb->created_at->diffForHumans() }}</small>
                             </div>
                         </div>
-                        @php
-                            $pScore = round(($p->total_nilai / 30) * 100);
-                            $pBadge = $pScore >= 80 ? 'bg-success' : ($pScore >= 60 ? 'bg-info' : ($pScore >= 40 ? 'bg-warning' : 'bg-danger'));
-                        @endphp
-                        <div class="text-end" style="min-width: 120px;">
-                            <span class="badge {{ $pBadge }} text-white font-mono mb-1">Nilai: {{ $pScore }}%</span>
-                            <div class="progress" style="height: 5px; background: #e2e8f0; border-radius: 3px;">
-                                <div class="progress-bar {{ $pBadge }}" style="width: {{ $pScore }}%;"></div>
+                        <div style="min-width: 140px;">
+                            <div class="d-flex justify-content-between mb-1">
+                                <small class="text-muted" style="font-size: 0.7rem;">Nilai Diberikan:</small>
+                                <small class="fw-bold font-mono text-dark" style="font-size: 0.7rem;">{{ $fbScore }}% ({{ $fb->total_nilai }}/30)</small>
+                            </div>
+                            <div class="progress" style="height: 6px; background-color: #dee2e6; border-radius: 3px;">
+                                <div class="progress-bar {{ $fbColor }}" style="width: {{ $fbScore }}%;"></div>
                             </div>
                         </div>
                     </div>
-                    @if($p->kritik)
-                        <p class="mb-2" style="font-size: 0.95rem;">"{{ $p->kritik }}"</p>
-                    @endif
-                    @if($p->saran)
-                        <p class="mb-0 text-muted" style="font-size: 0.9rem;"><strong>Saran:</strong> {{ $p->saran }}</p>
+
+                    @if($fb->is_censored)
+                        <div class="p-2 rounded small mb-2 bg-light border text-muted fst-italic">
+                            <i class="bi bi-shield-exclamation text-warning me-1"></i> Ulasan ini disembunyikan karena tidak memenuhi kriteria kebijakan.
+                        </div>
+                    @else
+                        @if($fb->kritik)
+                            <div class="p-2 rounded small mb-2" style="background: #fff8e1; border-left: 3px solid #ffc107;">
+                                <strong class="text-warning-emphasis">Kritik Membangun:</strong> {{ $fb->kritik }}
+                            </div>
+                        @endif
+                        @if($fb->saran)
+                            <div class="p-2 rounded small mb-2" style="background: #e1f5fe; border-left: 3px solid #0288d1;">
+                                <strong class="text-primary">Saran Perbaikan:</strong> {{ $fb->saran }}
+                            </div>
+                        @endif
                     @endif
 
-                    {{-- Balasan Guru (Jika Ada) --}}
-                    @if($p->balasan_guru)
-                    <div class="mt-3 p-3 rounded bg-light border-start border-4 border-primary">
-                        <div class="d-flex justify-content-between align-items-center mb-1">
-                            <strong class="text-primary small">
-                                <i class="bi bi-reply-fill me-1"></i>Balasan dari {{ $guru->nama }}
-                            </strong>
-                            <small class="text-muted font-mono" style="font-size: 0.7rem;">
-                                {{ $p->balasan_guru_at?->diffForHumans() }}
-                            </small>
-                        </div>
-                        <p class="mb-0 small text-dark">{{ $p->balasan_guru }}</p>
-                    </div>
-                    @endif
-
-                    {{-- Form Balas Langsung Bagi Guru Yang Bersangkutan --}}
-                    @if($isCurrentGuru)
-                    <div class="mt-3 pt-2 border-top">
-                        <button class="btn btn-sm btn-outline-primary" type="button" data-bs-toggle="collapse" data-bs-target="#replyBox-{{ $p->id }}">
-                            <i class="bi bi-reply me-1"></i> {{ $p->balasan_guru ? 'Ubah Balasan' : 'Balas Ulasan Siswa' }}
-                        </button>
-                        <div class="collapse mt-2" id="replyBox-{{ $p->id }}">
-                            <form action="{{ route('guru.penilaian.reply', $p->id) }}" method="POST">
-                                @csrf
-                                <div class="mb-2">
-                                    <textarea name="balasan_guru" class="form-control form-control-sm" rows="2" placeholder="Tulis tanggapan atau apresiasi Anda kepada siswa..." required>{{ old('balasan_guru', $p->balasan_guru) }}</textarea>
-                                </div>
-                                <div class="d-flex justify-content-end gap-1">
-                                    <button type="button" class="btn btn-sm btn-light border" data-bs-toggle="collapse" data-bs-target="#replyBox-{{ $p->id }}">Batal</button>
-                                    <button type="submit" class="btn btn-sm btn-primary-custom">Kirim Balasan</button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                    @endif
+                    {{-- Thread Diskusi Ulasan Bertingkat --}}
+                    <x-penilaian-thread :penilaian="$fb" />
                 </div>
                 @endforeach
-                @endif
+            @else
+                <div class="text-center py-4 text-muted">
+                    <i class="bi bi-chat-dots fs-2 d-block mb-2 text-muted opacity-50"></i>
+                    <p class="mb-0">Belum ada ulasan kritik dan saran pada periode berjalan.</p>
+                </div>
+            @endif
+        </div>
+
+        {{-- ARSIP PENILAIAN PERIODE LALU (HISTORI SEMESTER SEBELUMNYA) --}}
+        <div class="card-custom p-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="fw-bold mb-0 text-muted">
+                    <i class="bi bi-archive-fill me-2 text-secondary"></i>Arsip Penilaian Periode Lalu
+                    <span class="badge bg-secondary ms-2">{{ $arsipPeriode->count() }} Periode</span>
+                </h5>
+                <small class="text-muted"><i class="bi bi-info-circle me-1"></i>Data histori semester lampau tetap tersimpan aman</small>
             </div>
+
+            @if($arsipPeriode->count() > 0)
+                <div class="accordion" id="accordionArsip">
+                    @foreach($arsipPeriode as $index => $periodeLalu)
+                        <div class="accordion-item mb-2 border rounded overflow-hidden">
+                            <h2 class="accordion-header" id="headingArsip{{ $periodeLalu->id }}">
+                                <button class="accordion-button collapsed py-3" type="button" data-bs-toggle="collapse" data-bs-target="#collapseArsip{{ $periodeLalu->id }}">
+                                    <div class="d-flex justify-content-between align-items-center w-100 me-3">
+                                        <div>
+                                            <strong>{{ $periodeLalu->nama_periode }}</strong>
+                                            <span class="badge bg-light text-dark border ms-2 font-mono">{{ $periodeLalu->tahun_ajaran }}</span>
+                                        </div>
+                                        <span class="badge bg-secondary font-mono">{{ $periodeLalu->penilaian->count() }} Penilaian</span>
+                                    </div>
+                                </button>
+                            </h2>
+                            <div id="collapseArsip{{ $periodeLalu->id }}" class="accordion-collapse collapse" data-bs-parent="#accordionArsip">
+                                <div class="accordion-body bg-light">
+                                    @forelse($periodeLalu->penilaian as $fbLalu)
+                                        @php
+                                            $scoreLalu = round(($fbLalu->total_nilai / 30) * 100);
+                                        @endphp
+                                        <div class="p-3 bg-white rounded border mb-2">
+                                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                                <div class="d-flex align-items-center gap-2">
+                                                    <i class="bi bi-incognito text-muted"></i>
+                                                    <span class="small fw-bold">Siswa (Anonim)</span>
+                                                    <span class="badge bg-light text-dark border font-mono">Nilai: {{ $scoreLalu }}%</span>
+                                                </div>
+                                                <small class="text-muted font-mono" style="font-size: 0.72rem;">{{ $fbLalu->created_at->format('d M Y') }}</small>
+                                            </div>
+                                            @if($fbLalu->is_censored)
+                                                <div class="small text-muted fst-italic mb-1"><i class="bi bi-shield-exclamation text-warning me-1"></i>Ulasan ini disembunyikan karena tidak memenuhi kriteria kebijakan.</div>
+                                            @else
+                                                @if($fbLalu->kritik)
+                                                    <div class="small text-muted mb-1"><strong>Kritik:</strong> {{ $fbLalu->kritik }}</div>
+                                                @endif
+                                                @if($fbLalu->saran)
+                                                    <div class="small text-muted mb-1"><strong>Saran:</strong> {{ $fbLalu->saran }}</div>
+                                                @endif
+                                            @endif
+                                            @if($fbLalu->balasan_guru || ($fbLalu->balasans && $fbLalu->balasans->count() > 0))
+                                                <x-penilaian-thread :penilaian="$fbLalu" />
+                                            @endif
+                                        </div>
+                                    @empty
+                                        <div class="text-center py-2 text-muted small">Tidak ada ulasan teks pada periode ini.</div>
+                                    @endforelse
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            @else
+                <div class="text-center py-4 text-muted">
+                    <i class="bi bi-folder-x fs-2 d-block mb-2 text-muted opacity-50"></i>
+                    <p class="mb-0 small">Belum ada arsip ulasan dari periode lampau.</p>
+                </div>
+            @endif
         </div>
     </div>
 </section>

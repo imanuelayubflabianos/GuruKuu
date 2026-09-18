@@ -93,7 +93,8 @@ class SiPintuService
         $startTime = microtime(true);
 
         try {
-            $http = Http::timeout($this->timeout)->acceptJson();
+            $pingTimeout = min($this->timeout, 3);
+            $http = Http::timeout($pingTimeout)->acceptJson();
             if (!$this->verifySsl) {
                 $http = $http->withoutVerifying();
             }
@@ -542,6 +543,10 @@ class SiPintuService
             if ($kelasId) {
                 $tahunAjaran = now()->year . '/' . (now()->year + 1);
                 $user->kelas()->syncWithoutDetaching([$kelasId => ['tahun_ajaran' => $tahunAjaran]]);
+                $kelasObj = Kelas::find($kelasId);
+                if ($kelasObj && $kelasObj->jurusan_id) {
+                    $user->update(['jurusan_id' => $kelasObj->jurusan_id]);
+                }
             }
 
             return ['success' => true, 'siswa' => $user, 'message' => "Siswa {$user->name} berhasil disinkronkan."];

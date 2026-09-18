@@ -29,7 +29,8 @@
                         </div>
                         <div class="mb-0">
                             <h5 class="fw-bold mb-3"><i class="bi bi-telephone me-2" style="color: var(--accent);"></i>4. Kontak & Pengaduan</h5>
-                            <p class="text-muted mb-0">Jika Anda menemukan pelanggaran atau memiliki keluhan, silakan hubungi administrator sekolah melalui fitur <strong>Chat Admin</strong> yang tersedia di footer website ini.</p>
+                            <p class="text-muted mb-0">Jika Anda menemukan kendala akun, pelanggaran etika, atau memiliki keluhan, silakan hubungi Admin Operator Sekolah melalui formulir <strong>Hubungi Admin Operator Sekolah</strong> yang tersedia.</p>
+
                         </div>
                     @endif
                 </div>

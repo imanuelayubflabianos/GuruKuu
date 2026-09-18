@@ -88,9 +88,20 @@ class GuruController extends Controller
             'rata_keramahan' => $allPenilaian->avg('keramahan') ?? 0,
         ];
 
+        // Arsip penilaian dari periode-periode lampau
+        $arsipPeriode = Periode::where('id', '!=', $periodeId)
+            ->whereHas('penilaian', function($q) use ($guru) {
+                $q->where('guru_id', $guru->id);
+            })
+            ->with(['penilaian' => function($q) use ($guru) {
+                $q->where('guru_id', $guru->id)->latest();
+            }])
+            ->latest('tanggal_mulai')
+            ->get();
+
         return view('siswa.guru.show', compact(
             'guru', 'kelasAktif', 'periodeId', 'sudahMenilai', 
-            'semuaFeedback', 'stats'
+            'semuaFeedback', 'stats', 'arsipPeriode'
         ));
     }
 }

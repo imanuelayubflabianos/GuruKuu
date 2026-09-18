@@ -10,10 +10,6 @@
     </div>
 </div>
 
-@if(session('success'))
-    <div class="alert alert-success border-0 mb-4"><i class="bi bi-check-circle me-2"></i> {{ session('success') }}</div>
-@endif
-
 <div class="row g-4">
     @forelse($riwayat as $item)
     <div class="col-md-6 col-lg-4">
@@ -35,20 +31,34 @@
                 </div>
             </div>
 
+            @php
+                $pct = round(($item->total_nilai / 30) * 100);
+                $pctBadge = $pct >= 80 ? 'bg-success' : ($pct >= 60 ? 'bg-info' : ($pct >= 40 ? 'bg-warning' : 'bg-danger'));
+            @endphp
             <div class="mb-3">
-                <div class="d-flex justify-content-between mb-1">
-                    <small class="text-muted">Total Nilai</small>
-                    <strong style="color: var(--secondary);">{{ number_format($item->total_nilai / 6, 1) }} / 5.0</strong>
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                    <small class="text-muted fw-semibold">Tingkat Kepuasan</small>
+                    <span class="badge {{ $pctBadge }} font-mono">{{ $pct }}% ({{ $item->total_nilai }}/30)</span>
                 </div>
-                <small class="text-muted d-block">Periode: {{ $item->periode->nama_periode }}</small>
+                <div class="progress mb-2" style="height: 6px; border-radius: 4px; background-color: #e9ecef;">
+                    <div class="progress-bar {{ $pctBadge }} rounded-pill" style="width: {{ $pct }}%;"></div>
+                </div>
+                <div class="d-flex justify-content-between align-items-center">
+                    <small class="text-muted font-mono" style="font-size: 0.72rem;">Periode: {{ $item->periode->nama_periode }}</small>
+                    <small class="text-muted font-mono" style="font-size: 0.72rem;">{{ $item->created_at->diffForHumans() }}</small>
+                </div>
             </div>
 
             @if($item->kritik || $item->saran)
-                <div class="p-2 rounded small" style="background: var(--bg-light);">
-                    @if($item->kritik)<div class="mb-1"><strong>Kritik:</strong> {{ Str::limit($item->kritik, 50) }}</div>@endif
-                    @if($item->saran)<div><strong>Saran:</strong> {{ Str::limit($item->saran, 50) }}</div>@endif
+                <div class="p-2 rounded small mb-3" style="background: var(--bg-light);">
+                    @if($item->kritik)<div class="mb-1"><strong>Kritik:</strong> {{ Str::limit($item->kritik, 60) }}</div>@endif
+                    @if($item->saran)<div><strong>Saran:</strong> {{ Str::limit($item->saran, 60) }}</div>@endif
                 </div>
             @endif
+
+            <a href="{{ route('siswa.guru.show', $item->guru->id) }}" class="btn btn-sm btn-outline-custom w-100 rounded-pill">
+                <i class="bi bi-eye me-1"></i> Lihat Detail Guru
+            </a>
         </div>
     </div>
     @empty

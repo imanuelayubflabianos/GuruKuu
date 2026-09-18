@@ -9,7 +9,7 @@
         <p class="page-subtitle mb-0">
             Akses seluruh data guru sekolah untuk memberikan evaluasi pengajaran yang objektif dan transparan.
             @if($kelasAktif)
-                <span class="badge bg-primary ms-2">{{ $kelasAktif->nama_kelas }} - Tingkat {{ $kelasAktif->tingkat }}</span>
+                <span class="badge bg-primary ms-2">{{ $kelasAktif->nama_kelas }} Kelas {{ $kelasAktif->tingkat }}</span>
             @endif
         </p>
     </div>

@@ -1,12 +1,12 @@
 @extends('layouts.siswa')
-@section('title', 'Chat dengan Admin')
+@section('title', 'Hubungi Admin Operator Sekolah')
 
 @section('content')
 <div class="page-header">
     <div>
         <div class="page-label">PUSAT BANTUAN</div>
-        <h1 class="page-title">Chat dengan Admin</h1>
-        <p class="page-subtitle">Sampaikan kendala atau pertanyaan Anda langsung kepada Admin.</p>
+        <h1 class="page-title">Hubungi Admin Operator Sekolah</h1>
+        <p class="page-subtitle">Sampaikan kendala, permohonan pembukaan akun, atau pertanyaan langsung kepada Admin Operator Sekolah.</p>
     </div>
 </div>
 
@@ -20,9 +20,10 @@
                     <i class="bi bi-headset-fill fs-4"></i>
                 </div>
                 <div class="flex-grow-1">
-                    <h6 class="fw-bold mb-0">Administrator GuruKuu</h6>
+                    <h6 class="fw-bold mb-0">Admin Operator Sekolah</h6>
                     <small style="opacity: 0.9;"><i class="bi bi-circle-fill text-success me-1" style="font-size: 0.5rem;"></i> Online • Siap membantu Anda</small>
                 </div>
+
                 <div class="d-none d-md-block">
                     <span class="badge bg-light text-dark px-3 py-2">
                         <i class="bi bi-shield-lock-fill me-1"></i> Terenkripsi
@@ -101,12 +102,6 @@
 
             {{-- FORM KIRIM PESAN DENGAN CAPTCHA DI BAWAH --}}
             <div class="border-top" style="background: white;">
-                @if(session('success'))
-                    <div class="alert alert-success border-0 mb-0 py-2 px-3 small d-flex align-items-center">
-                        <i class="bi bi-check-circle-fill me-2"></i> {{ session('success') }}
-                    </div>
-                @endif
-                
                 @if($errors->any())
                     <div class="alert alert-danger border-0 mb-0 py-2 px-3 small">
                         @foreach($errors->all() as $error)

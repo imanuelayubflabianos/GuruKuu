@@ -18,16 +18,17 @@
         </button>
     </li>
     <li class="nav-item">
-        <button class="nav-link fw-bold" id="password-tab" data-bs-toggle="pill" data-bs-target="#tabPassword" type="button">
-            <i class="bi bi-shield-lock-fill me-1"></i> 2. Ganti Password
-        </button>
-    </li>
-    <li class="nav-item">
         <button class="nav-link fw-bold" id="chat-tab" data-bs-toggle="pill" data-bs-target="#tabChat" type="button">
-            <i class="bi bi-chat-dots-fill me-1"></i> 3. Chat Admin
+            <i class="bi bi-chat-dots-fill me-1"></i> 2. Hubungi Admin Operator Sekolah
             @if(isset($pesanChat) && $pesanChat->whereNotNull('balasan')->count() > 0)
                 <span class="badge bg-success ms-1">{{ $pesanChat->whereNotNull('balasan')->count() }} Balasan</span>
             @endif
+
+        </button>
+    </li>
+    <li class="nav-item">
+        <button class="nav-link fw-bold" id="legal-tab" data-bs-toggle="pill" data-bs-target="#tabLegalSiswa" type="button">
+            <i class="bi bi-shield-check me-1"></i> 3. Kebijakan Privasi & Ketentuan
         </button>
     </li>
 </ul>
@@ -55,13 +56,15 @@
 
                     <div class="mb-3">
                         <label class="form-label small text-muted font-mono" style="letter-spacing: 1px;">KELAS AKTIF</label>
-                        <div class="fw-bold p-2 rounded bg-light border">{{ $kelasAktif?->nama_kelas ?? $user->kelas ?? 'Kelas Siswa' }}</div>
+                        <div class="fw-bold p-2 rounded bg-light border">{{ $kelasAktif ? $kelasAktif->nama_kelas . ' Kelas ' . $kelasAktif->tingkat : ($user->kelas ?? 'Kelas Siswa') }}</div>
                     </div>
 
+                    @if($user->jurusan && $user->jurusan->nama_jurusan && !str_contains(strtolower($user->jurusan->nama_jurusan), 'semua jurusan'))
                     <div>
                         <label class="form-label small text-muted font-mono" style="letter-spacing: 1px;">JURUSAN</label>
-                        <div class="fw-bold p-2 rounded bg-light border">{{ $user->jurusan?->nama_jurusan ?? 'Semua Jurusan' }}</div>
+                        <div class="fw-bold p-2 rounded bg-light border text-primary">{{ $user->jurusan->nama_jurusan }}</div>
                     </div>
+                    @endif
                 </div>
             </div>
 
@@ -91,65 +94,25 @@
                     </div>
 
                     <div class="text-muted small mt-4 pt-3 border-top">
-                        Jika terdapat kesalahan nama, NIS, atau rombel kelas, silakan hubungi admin melalui tab <strong>Chat Admin</strong>.
+                        Jika terdapat kesalahan nama, NIS, atau rombel kelas, silakan hubungi melalui tab <strong>Hubungi Admin Operator Sekolah</strong>.
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    {{-- TAB 2: GANTI PASSWORD --}}
-    <div class="tab-pane fade" id="tabPassword">
-        <div class="row justify-content-center">
-            <div class="col-lg-8">
-                <div class="card-custom p-4">
-                    <h5 class="fw-bold mb-1" style="color: var(--text-dark);">
-                        <i class="bi bi-shield-lock-fill text-warning me-2"></i>Ganti Kata Sandi Siswa
-                    </h5>
-                    <p class="text-muted small mb-4">Perbarui password Anda secara berkala dan jangan bagikan kepada rekan lain.</p>
-
-                    <form action="{{ route('siswa.pengaturan.password') }}" method="POST">
-                        @csrf
-                        <div class="mb-3">
-                            <label class="form-label small fw-bold">Password Saat Ini</label>
-                            <input type="password" name="current_password" class="form-control @error('current_password') is-invalid @enderror" placeholder="Masukkan password lama" required>
-                            @error('current_password') <div class="invalid-feedback">{{ $message }}</div> @enderror
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label small fw-bold">Password Baru</label>
-                            <input type="password" name="password" class="form-control @error('password') is-invalid @enderror" placeholder="Minimal 6 karakter" required>
-                            @error('password') <div class="invalid-feedback">{{ $message }}</div> @enderror
-                        </div>
-
-                        <div class="mb-4">
-                            <label class="form-label small fw-bold">Konfirmasi Password Baru</label>
-                            <input type="password" name="password_confirmation" class="form-control" placeholder="Ketik ulang password baru" required>
-                        </div>
-
-                        <div class="d-flex justify-content-end">
-                            <button type="submit" class="btn btn-primary-custom px-4">
-                                <i class="bi bi-check2-circle me-1"></i> Simpan Password Baru
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    {{-- TAB 3: CHAT ADMIN --}}
+    {{-- TAB 2: HUBUNGI ADMIN OPERATOR SEKOLAH --}}
     <div class="tab-pane fade" id="tabChat">
         <div class="row justify-content-center">
             <div class="col-lg-10">
-                {{-- HEADER CHAT DENGAN ADMIN --}}
+                {{-- HEADER CHAT DENGAN ADMIN OPERATOR --}}
                 <div class="card-custom mb-3" style="overflow: hidden;">
                     <div class="p-3 d-flex align-items-center gap-3" style="background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%); color: white;">
                         <div class="d-flex align-items-center justify-content-center rounded-circle" style="width: 48px; height: 48px; background: rgba(255,255,255,0.2); backdrop-filter: blur(10px);">
                             <i class="bi bi-headset-fill fs-4"></i>
                         </div>
                         <div class="flex-grow-1">
-                            <h6 class="fw-bold mb-0 text-white">Administrator GuruKuu</h6>
+                            <h6 class="fw-bold mb-0 text-white">Admin Operator Sekolah GuruKuu</h6>
                             <small style="opacity: 0.9;"><i class="bi bi-circle-fill text-success me-1" style="font-size: 0.5rem;"></i> Online • Siap membantu kendala Anda</small>
                         </div>
                         <div class="d-none d-md-block">
@@ -169,9 +132,10 @@
                                 <div class="d-inline-flex align-items-center justify-content-center rounded-circle mb-3" style="width: 70px; height: 70px; background: rgba(0,51,102,0.08);">
                                     <i class="bi bi-chat-square-dots-fill fs-2" style="color: var(--primary);"></i>
                                 </div>
-                                <h6 class="fw-bold mb-1">Mulai Percakapan dengan Admin</h6>
+                                <h6 class="fw-bold mb-1">Mulai Percakapan dengan Admin Operator Sekolah</h6>
                                 <p class="text-muted small mb-0">Tanyakan kendala penilaian, verifikasi kelas, atau bantuan akun di formulir bawah ini.</p>
                             </div>
+
                         @else
                             @foreach($pesan as $chat)
                                 {{-- PESAN SISWA (KANAN) --}}
@@ -211,7 +175,7 @@
                                         <div class="d-flex align-items-center justify-content-center rounded-circle flex-shrink-0" style="width: 36px; height: 36px; background: var(--primary); color: white;">
                                             <i class="bi bi-person-badge-fill" style="font-size: 0.9rem;"></i>
                                         </div>
-                                        <div style="background: white; border: 1px solid var(--border); padding: 0.85rem 1.25rem; border-radius: 18px 18px 18px 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+                                        <div style="background: var(--bg-card); border: 1px solid var(--border); padding: 0.85rem 1.25rem; border-radius: 18px 18px 18px 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
                                             <div class="fw-bold mb-1" style="color: var(--primary); font-size: 0.8rem;">
                                                 <i class="bi bi-patch-check-fill me-1 text-primary"></i> Administrator Sekolah
                                             </div>
@@ -228,7 +192,7 @@
                     </div>
 
                     {{-- FORM INPUT PESAN & VERIFIKASI ANTI-SPAM --}}
-                    <div class="border-top p-3" style="background: white;">
+                    <div class="border-top p-3" style="background: var(--bg-card);">
                         <form action="{{ route('siswa.pengaturan.chat') }}" method="POST">
                             @csrf
                             <div class="d-flex gap-2 align-items-end mb-2">
@@ -250,6 +214,41 @@
                                 </div>
                             </div>
                         </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- TAB 3: KEBIJAKAN PRIVASI & SYARAT KETENTUAN --}}
+    <div class="tab-pane fade" id="tabLegalSiswa">
+        <div class="row g-4">
+            <div class="col-lg-6">
+                <div class="card-custom p-4 h-100">
+                    <h5 class="fw-bold mb-3 d-flex align-items-center text-primary">
+                        <i class="bi bi-shield-lock-fill me-2"></i>Kebijakan Privasi
+                    </h5>
+                    <p class="text-muted small mb-3">Ketentuan perlindungan data dan privasi penilaian siswa.</p>
+                    <div class="p-3 bg-light rounded border text-muted small" style="line-height: 1.8; max-height: 480px; overflow-y: auto;">
+                        @php
+                            $privacy = \App\Models\Setting::get('kebijakan_privasi', "1. Pengumpulan Data\nKami hanya mengumpulkan data yang diperlukan untuk proses penilaian, yaitu NIS, nama, dan kelas siswa. Data pribadi seperti tanggal lahir hanya digunakan untuk verifikasi identitas saat login.\n\n2. Anonimitas Penilaian\nSeluruh penilaian yang diberikan siswa bersifat anonim. Guru dan pihak lain tidak dapat mengetahui identitas siswa yang memberikan nilai tertentu. Ini menjamin kejujuran dan objektivitas dalam setiap penilaian.\n\n3. Penyimpanan Data\nSemua data disimpan di server yang aman dengan enkripsi standar industri. Password pengguna di-hash menggunakan algoritma bcrypt yang tidak dapat dibaca kembali.\n\n4. Penggunaan Data\nData penilaian hanya digunakan untuk keperluan internal sekolah, seperti evaluasi kinerja guru dan pengambilan keputusan oleh manajemen. Data tidak akan dibagikan kepada pihak ketiga tanpa persetujuan.");
+                        @endphp
+                        {!! nl2br(e($privacy)) !!}
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="card-custom p-4 h-100">
+                    <h5 class="fw-bold mb-3 d-flex align-items-center text-primary">
+                        <i class="bi bi-file-earmark-text-fill me-2"></i>Syarat & Ketentuan
+                    </h5>
+                    <p class="text-muted small mb-3">Aturan penggunaan platform evaluasi GuruKuu bagi siswa.</p>
+                    <div class="p-3 bg-light rounded border text-muted small" style="line-height: 1.8; max-height: 480px; overflow-y: auto;">
+                        @php
+                            $terms = \App\Models\Setting::get('syarat_ketentuan', "1. Eligibilitas\nPlatform ini hanya dapat digunakan oleh siswa dan guru yang terdaftar resmi di sekolah. Akun harus diaktifkan oleh administrator sekolah sebelum dapat digunakan.\n\n2. Tanggung Jawab Pengguna\nSiswa wajib memberikan penilaian secara jujur dan objektif. Dilarang memberikan penilaian berdasarkan dendam pribadi, SARA, atau konten yang tidak pantas.\n\n3. Keamanan Akun\nPengguna bertanggung jawab penuh atas kerahasiaan password akun mereka. Dilarang membagikan password kepada orang lain.\n\n4. Kontak & Pengaduan\nJika Anda menemukan pelanggaran atau memiliki keluhan, silakan hubungi administrator sekolah melalui fitur Chat Admin yang tersedia di footer website ini.");
+                        @endphp
+                        {!! nl2br(e($terms)) !!}
                     </div>
                 </div>
             </div>

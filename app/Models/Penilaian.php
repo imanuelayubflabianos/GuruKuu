@@ -16,10 +16,12 @@ class Penilaian extends Model
         'kedisiplinan', 'cara_mengajar', 'komunikasi',
         'tanggung_jawab', 'kreativitas', 'keramahan',
         'total_nilai', 'kritik', 'saran',
+        'is_censored', 'censored_reason',
         'balasan_guru', 'balasan_guru_at',
     ];
 
     protected $casts = [
+        'is_censored' => 'boolean',
         'balasan_guru_at' => 'datetime',
     ];
 
@@ -43,6 +45,11 @@ class Penilaian extends Model
     public function kelas()
     {
         return $this->belongsTo(Kelas::class, 'class_id');
+    }
+
+    public function balasans()
+    {
+        return $this->hasMany(PenilaianBalasan::class, 'penilaian_id')->oldest();
     }
 
     // ==================== METHOD ====================

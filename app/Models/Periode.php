@@ -19,8 +19,8 @@ class Periode extends Model
     ];
 
     protected $casts = [
-        'tanggal_mulai' => 'date',
-        'tanggal_selesai' => 'date',
+        'tanggal_mulai' => 'datetime',
+        'tanggal_selesai' => 'datetime',
     ];
 
     public function penilaian(): HasMany

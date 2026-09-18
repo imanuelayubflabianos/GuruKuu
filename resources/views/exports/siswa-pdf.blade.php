@@ -39,9 +39,15 @@
         <tbody>
             @forelse($siswa as $index => $s)
             @php
-                $kelasName = $s->kelas->isNotEmpty() 
-                    ? $s->kelas->first()->nama_kelas 
-                    : ($s->kelas_raw ?? 'Kelas Siswa');
+                $kelasRel = $s->relationLoaded('kelas') ? $s->getRelation('kelas') : null;
+                if ($kelasRel && $kelasRel->isNotEmpty()) {
+                    $first = $kelasRel->first();
+                    $kelasName = $first->nama_kelas . ($first->tingkat ? ' Kelas ' . $first->tingkat : '');
+                } elseif (is_string($s->kelas) && !empty($s->kelas)) {
+                    $kelasName = $s->kelas;
+                } else {
+                    $kelasName = '-';
+                }
             @endphp
             <tr>
                 <td class="text-center">{{ $index + 1 }}</td>

@@ -37,15 +37,50 @@
                         </div>
                     </td>
                     <td>
-                        <div class="fw-bold"><i class="bi bi-incognito me-1"></i>Siswa (Anonim)</div>
-                        <small class="text-muted">Identitas Terlindungi</small>
+                        @if($f->siswa)
+                            <div class="fw-bold text-dark">{{ $f->siswa->name }}</div>
+                            <small class="text-muted font-mono">NIS: {{ $f->siswa->nis }}</small>
+                            <div>
+                                <span class="badge bg-secondary-subtle text-secondary border mt-1" style="font-size: 0.65rem;" title="Identitas siswa disembunyikan dari guru dan sesama siswa">
+                                    <i class="bi bi-shield-lock-fill me-1"></i>Anonim bagi Guru & Siswa Lain
+                                </span>
+                            </div>
+                        @else
+                            <div class="fw-bold"><i class="bi bi-incognito me-1"></i>Siswa (Anonim)</div>
+                            <small class="text-muted">Data Akun Siswa</small>
+                        @endif
                     </td>
                     <td>
-                        <span class="badge bg-light text-dark border">{{ $f->kelas?->nama_kelas ?? '-' }}</span>
+                        <span class="badge bg-light text-dark border">{{ $f->kelas ? $f->kelas->nama_kelas . ' Kelas ' . $f->kelas->tingkat : '-' }}</span>
                     </td>
                     <td>
-                        @if(str_contains($f->kritik ?? '', 'melanggar'))
-                            <div class="text-danger fw-bold small"><i class="bi bi-exclamation-triangle-fill me-1"></i>{{ $f->kritik }}</div>
+                        @php
+                            $isCensored = $f->is_censored || str_contains($f->kritik ?? '', 'melanggar');
+                        @endphp
+                        @if($isCensored)
+                            <div class="p-2 rounded border border-warning-subtle bg-warning-subtle text-dark small mb-2">
+                                <div class="fw-bold text-warning-emphasis d-flex align-items-center gap-1 mb-1">
+                                    <i class="bi bi-shield-exclamation text-warning"></i>
+                                    <span>Ulasan Disembunyikan (Disensor)</span>
+                                </div>
+                                <div class="text-muted" style="font-size: 0.8rem;">
+                                    {{ $f->censored_reason ?: 'Ulasan ini tidak memenuhi kriteria kebijakan komunitas.' }}
+                                </div>
+                            </div>
+                            
+                            <details class="mt-1">
+                                <summary class="text-muted small" style="cursor: pointer; font-size: 0.78rem;">
+                                    <i class="bi bi-eye me-1"></i>Lihat ulasan asli (Khusus Admin)
+                                </summary>
+                                <div class="p-2 mt-1 rounded bg-light border small">
+                                    @if($f->kritik)
+                                        <div class="mb-1"><strong class="text-danger small">Kritik:</strong> <span class="text-dark">{{ $f->kritik }}</span></div>
+                                    @endif
+                                    @if($f->saran)
+                                        <div><strong class="text-success small">Saran:</strong> <span class="text-dark">{{ $f->saran }}</span></div>
+                                    @endif
+                                </div>
+                            </details>
                         @else
                             @if($f->kritik)
                                 <div class="mb-1">
@@ -65,25 +100,43 @@
                         </div>
                     </td>
                     <td class="text-center">
-                        @if(!str_contains($f->kritik ?? '', 'melanggar'))
                         <div class="d-flex justify-content-center gap-1">
-                            <form action="{{ route('admin.kritik-saran.warn', $f->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Peringatkan siswa dan hapus isi ulasan ini?')">
-                                @csrf
-                                <button type="submit" class="btn btn-sm btn-outline-warning" title="Beri Peringatan & Sensor">
-                                    <i class="bi bi-shield-exclamation"></i> Peringatan
-                                </button>
-                            </form>
-                            <form action="{{ route('admin.kritik-saran.destroy', $f->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Apakah Anda yakin ingin menghapus ulasan ini?')">
+                            @if(!$isCensored)
+                                <form action="{{ route('admin.kritik-saran.warn', $f->id) }}" method="POST" class="d-inline"
+                                      data-confirm="Beri peringatan kepada {{ $f->siswa ? $f->siswa->name : 'siswa ini' }} dan sensor ulasan agar disembunyikan dari publik & guru?"
+                                      data-confirm-title="Beri Peringatan & Sensor Ulasan"
+                                      data-confirm-btn="Beri Peringatan"
+                                      data-confirm-type="warning">
+                                    @csrf
+                                    <button type="submit" class="btn btn-sm btn-outline-warning" title="Beri Peringatan & Sensor Ulasan">
+                                        <i class="bi bi-shield-exclamation me-1"></i>Peringatan
+                                    </button>
+                                </form>
+                            @else
+                                <form action="{{ route('admin.kritik-saran.unwarn', $f->id) }}" method="POST" class="d-inline"
+                                      data-confirm="Batalkan status sensor dan tampilkan kembali ulasan ini?"
+                                      data-confirm-title="Batalkan Sensor"
+                                      data-confirm-btn="Buka Sensor"
+                                      data-confirm-type="question">
+                                    @csrf
+                                    <button type="submit" class="btn btn-sm btn-outline-success" title="Batalkan Sensor">
+                                        <i class="bi bi-shield-check me-1"></i>Buka Sensor
+                                    </button>
+                                </form>
+                            @endif
+
+                            <form action="{{ route('admin.kritik-saran.destroy', $f->id) }}" method="POST" class="d-inline"
+                                  data-confirm="Apakah Anda yakin ingin menghapus permanen ulasan ini? Data yang dihapus tidak dapat dipulihkan."
+                                  data-confirm-title="Hapus Ulasan Permanen"
+                                  data-confirm-btn="Hapus Permanen"
+                                  data-confirm-type="danger">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Hapus Ulasan">
+                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Hapus Ulasan Permanen">
                                     <i class="bi bi-trash"></i>
                                 </button>
                             </form>
                         </div>
-                        @else
-                            <span class="badge bg-secondary">Telah Dimoderasi</span>
-                        @endif
                     </td>
                 </tr>
                 @empty

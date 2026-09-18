@@ -1,5 +1,5 @@
 @extends('layouts.landing')
-@section('title', 'Hubungi Admin')
+@section('title', 'Hubungi Admin Operator Sekolah')
 
 @section('content')
 <div style="padding-top: 120px; padding-bottom: 80px; background: var(--bg-light); min-height: 80vh;">
@@ -7,8 +7,8 @@
         <div class="row justify-content-center">
             <div class="col-lg-8">
                 <div class="text-center mb-5">
-                    <h2 class="fw-bold" style="color: var(--primary);">Hubungi Admin</h2>
-                    <p class="text-muted">Punya masalah saat login atau pertanyaan lainnya? Kirim pesan di sini.</p>
+                    <h2 class="fw-bold" style="color: var(--primary);">Hubungi Admin Operator Sekolah</h2>
+                    <p class="text-muted">Punya kendala saat login, akun dinonaktifkan, atau pertanyaan lainnya? Kirim pesan di sini.</p>
                 </div>
 
                 @if(session('success'))
@@ -35,9 +35,9 @@
 
                             @if($chat->is_replied && $chat->balasan)
                             <div class="d-flex justify-content-start mb-3">
-                                <div style="background: white; border: 1px solid var(--border); padding: 1rem; border-radius: 12px 12px 12px 0; max-width: 80%;">
+                                <div style="background: var(--bg-card); border: 1px solid var(--border); padding: 1rem; border-radius: 12px 12px 12px 0; max-width: 80%;">
                                     <div class="fw-bold mb-1" style="color: var(--primary); font-size: 0.85rem;">
-                                        <i class="bi bi-person-badge"></i> Admin
+                                        <i class="bi bi-person-badge"></i> Admin Operator Sekolah
                                     </div>
                                     <p class="mb-1">{{ $chat->balasan }}</p>
                                     <small class="text-muted">{{ $chat->updated_at->format('d M Y, H:i') }}</small>
@@ -71,6 +71,9 @@
 
                     <form action="{{ route('kontak.guest.store') }}" method="POST">
                         @csrf
+                        <div style="display:none !important; position:absolute; left:-9999px;" aria-hidden="true">
+                            <input type="text" name="website_hp" id="website_hp" tabindex="-1" autocomplete="off">
+                        </div>
                         <input type="hidden" name="_device_id" value="{{ $deviceId }}">
                         
                         <div class="mb-3">

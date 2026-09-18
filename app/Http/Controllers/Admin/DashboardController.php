@@ -26,7 +26,10 @@ class DashboardController extends Controller
         $heroThumbnail = Setting::get('hero_image', 'https://images.unsplash.com/photo-1562774053-701939374585?w=1920');
         $heroTitle = Setting::get('hero_title', 'Bangun Sekolah yang Lebih Baik Melalui Penilaian Guru yang Objektif');
 
-        $ping = $siPintu->ping();
+        // Cache status ping selama 60 detik agar tidak membebani loading admin dashboard (0ms latency)
+        $ping = \Illuminate\Support\Facades\Cache::remember('sipintu_gateway_ping', 60, function () use ($siPintu) {
+            return $siPintu->ping();
+        });
 
         $topGuru = Guru::with('jurusan')
             ->where('total_penilaian', '>', 0)

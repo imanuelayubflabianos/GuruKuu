@@ -301,7 +301,7 @@
                     <select name="kelas_id" id="impKelasSelect" class="form-select">
                         <option value="">-- Otomatis Cocokkan Kelas dari SiPintu --</option>
                         @foreach($kelasList as $k)
-                            <option value="{{ $k->id }}">Tingkat {{ $k->tingkat }} - {{ $k->nama_kelas }}</option>
+                            <option value="{{ $k->id }}">{{ $k->nama_kelas }} Kelas {{ $k->tingkat }}</option>
                         @endforeach
                     </select>
                     <small class="text-muted">Jika dibiarkan default, sistem akan otomatis mencocokkan kelas berdasarkan nama kelas SiPintu.</small>

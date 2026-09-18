@@ -50,6 +50,31 @@ class PenilaianController extends Controller
         ]);
 
         $user = auth()->user();
+
+        // 🛡️ FILTER OTOMATIS KATA KASAR, EJEKAN, & TOXIC (Bilingual: ID & EN)
+        $combinedText = trim(($request->kritik ?? '') . ' ' . ($request->saran ?? ''));
+        $profanityResult = \App\Services\ProfanityFilterService::check($combinedText);
+        if (!$profanityResult['clean']) {
+            // Catat log pelanggaran etika untuk notifikasi Admin
+            try {
+                \App\Models\Pelanggaran::create([
+                    'user_id' => $user->id,
+                    'tipe' => 'penilaian_toxic',
+                    'guru_id' => $guru->id,
+                    'kata_terdeteksi' => $profanityResult['detected'],
+                    'isi_teks' => $combinedText,
+                    'ip_address' => $request->ip(),
+                    'user_agent' => $request->userAgent(),
+                    'is_read' => false,
+                    'tindakan' => 'diblokir_otomatis',
+                ]);
+            } catch (\Throwable $e) {
+                \Illuminate\Support\Facades\Log::error('Gagal mencatat log pelanggaran: ' . $e->getMessage());
+            }
+
+            return back()->withInput()->with('error', $profanityResult['message']);
+        }
+
         $periodeAktif = Periode::where('status', 'aktif')->first();
 
         if (!$periodeAktif) {
@@ -84,8 +109,8 @@ class PenilaianController extends Controller
             'kreativitas' => $request->kreativitas,
             'keramahan' => $request->keramahan,
             'total_nilai' => $totalNilai,
-            'kritik' => $request->kritik,
-            'saran' => $request->saran,
+            'kritik' => $request->filled('kritik') ? strip_tags(trim($request->kritik)) : null,
+            'saran' => $request->filled('saran') ? strip_tags(trim($request->saran)) : null,
         ]);
 
         $guru->updateRataRata();

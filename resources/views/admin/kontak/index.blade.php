@@ -5,17 +5,10 @@
 <div class="page-header">
     <div>
         <div class="page-label">LAYANAN PENGADUAN</div>
-        <h1 class="page-title">Pesan Masuk</h1>
-        <p class="page-subtitle">Kelola pesan masuk dari siswa atau tamu.</p>
+        <h1 class="page-title">Pesan Masuk & Chat</h1>
+        <p class="page-subtitle">Kelola pesan masuk dan komunikasi bantuan dari siswa, guru, atau tamu.</p>
     </div>
 </div>
-
-@if(session('success'))
-    <div class="alert alert-success alert-dismissible fade show">
-        <i class="bi bi-check-circle me-2"></i>{{ session('success') }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    </div>
-@endif
 
 <div class="card-custom">
     <div class="table-responsive">
@@ -34,9 +27,9 @@
                 <tr>
                     <td>
                         <strong>{{ $k->pengirim }}</strong>
-                        <br><small class="text-muted font-mono">{{ $k->is_siswa ? 'Siswa (NIS: ' . $k->identifier . ')' : 'Tamu' }}</small>
+                        <br><small class="text-muted font-mono">{{ $k->is_siswa ? 'Siswa (NIS: ' . $k->identifier . ')' : 'Pengguna / Tamu' }}</small>
                     </td>
-                    <td style="max-width: 300px;">
+                    <td style="max-width: 320px;">
                         @if($k->pesan === '[Pesan Dihapus]')
                             <span class="fst-italic text-muted">[Pesan Dihapus]</span>
                         @else
@@ -45,8 +38,8 @@
                         
                         @if($k->balasan)
                             <div class="mt-2 p-2 small rounded" style="background: #d1e7dd; border-left: 3px solid #198754;">
-                                <strong>Balasan:</strong><br>
-                                {{ Str::limit($k->balasan, 60) }}
+                                <strong class="text-success">Balasan:</strong><br>
+                                {{ Str::limit($k->balasan, 70) }}
                             </div>
                         @endif
                     </td>
@@ -59,44 +52,17 @@
                     </td>
                     <td class="font-mono small">{{ $k->created_at->format('d M Y, H:i') }}</td>
                     <td class="text-center">
-                        <button class="btn btn-sm btn-primary-custom mb-1" data-bs-toggle="modal" data-bs-target="#modalBalas{{ $k->id }}" title="Balas / Edit">
+                        <button type="button" class="btn btn-sm btn-primary-custom mb-1" 
+                                onclick='openReplyModal(@json($k))' 
+                                title="Balas / Edit Balasan">
                             <i class="bi bi-reply"></i> {{ $k->balasan ? 'Edit' : 'Balas' }}
                         </button>
                         <form action="{{ route('admin.kontak.destroy', $k) }}" method="POST" class="d-inline" onsubmit="return confirm('Hapus pesan ini secara permanen?')">
                             @csrf @method('DELETE')
-                            <button class="btn btn-sm btn-outline-danger" title="Hapus Pesan"><i class="bi bi-trash"></i></button>
+                            <button class="btn btn-sm btn-outline-danger mb-1" title="Hapus Pesan"><i class="bi bi-trash"></i></button>
                         </form>
                     </td>
                 </tr>
-
-                {{-- MODAL BALAS / EDIT BALASAN --}}
-                <div class="modal fade" id="modalBalas{{ $k->id }}" tabindex="-1">
-                    <div class="modal-dialog modal-dialog-centered">
-                        <div class="modal-content">
-                            <form action="{{ route('admin.kontak.reply', $k) }}" method="POST">
-                                @csrf
-                                <div class="modal-header">
-                                    <h5 class="modal-title">{{ $k->balasan ? 'Edit' : 'Kirim' }} Balasan</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                </div>
-                                <div class="modal-body">
-                                    <p class="small text-muted mb-2"><strong>Pesan Asli:</strong><br>"{{ $k->pesan }}"</p>
-                                    <textarea name="balasan" class="form-control" rows="3" required placeholder="Tulis balasan...">{{ $k->balasan }}</textarea>
-                                </div>
-                                <div class="modal-footer">
-                                    @if($k->balasan)
-                                        <form action="{{ route('admin.kontak.destroy-reply', $k) }}" method="POST" class="me-auto" onsubmit="return confirm('Hapus balasan ini?')">
-                                            @csrf @method('DELETE')
-                                            <button class="btn btn-outline-danger btn-sm">Hapus Balasan</button>
-                                        </form>
-                                    @endif
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                                    <button type="submit" class="btn btn-primary-custom">Kirim</button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
                 @empty
                 <tr>
                     <td colspan="5" class="text-center py-5 text-muted">
@@ -109,10 +75,92 @@
         </table>
     </div>
 </div>
+
+{{-- MODAL BALAS PESAN (DI LUAR TABEL & DI LUAR CARD UNTUK MENCEGAH FLICKER / BACKDROP BLINKING) --}}
+<div class="modal fade" id="modalBalasKontak" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title fs-6 fw-bold" id="modalBalasTitle">Balas Pesan</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            
+            <form id="formBalasKontak" method="POST">
+                @csrf
+                <div class="modal-body">
+                    <div class="p-3 bg-light rounded border mb-3">
+                        <small class="text-muted d-block mb-1">
+                            <strong id="modalBalasPengirim" class="text-dark">Nama Pengirim</strong>
+                        </small>
+                        <p class="small text-muted mb-0 font-italic" id="modalBalasPesanAsli" style="max-height: 120px; overflow-y: auto;">
+                            "Pesan asli..."
+                        </p>
+                    </div>
+
+                    <div class="mb-2">
+                        <label class="form-label small fw-bold text-dark">Tulis Tanggapan / Jawaban Administrator:</label>
+                        <textarea name="balasan" id="modalBalasTextarea" class="form-control" rows="4" required placeholder="Tuliskan solusi atau jawaban resmi..."></textarea>
+                    </div>
+                </div>
+                
+                <div class="modal-footer bg-light d-flex justify-content-between align-items-center">
+                    <div>
+                        <button type="button" class="btn btn-outline-danger btn-sm" id="btnHapusBalasan" style="display: none;" onclick="submitHapusBalasan()">
+                            <i class="bi bi-trash me-1"></i> Hapus Balasan
+                        </button>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Batal</button>
+                        <button type="submit" class="btn btn-primary-custom btn-sm px-3 fw-semibold">
+                            <i class="bi bi-send me-1"></i> Kirim Balasan
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{{-- FORM TERPISAH UNTUK HAPUS BALASAN (MENCEGAH NESTED FORM) --}}
+<form id="formHapusBalasan" method="POST" style="display: none;">
+    @csrf
+    @method('DELETE')
+</form>
 @endsection
 
 @push('scripts')
 <script>
+let activeKontakId = null;
+
+function openReplyModal(k) {
+    activeKontakId = k.id;
+    const form = document.getElementById('formBalasKontak');
+    form.action = '/admin/kontak/' + k.id + '/reply';
+    
+    document.getElementById('modalBalasTitle').innerText = (k.balasan ? 'Edit' : 'Kirim') + ' Balasan';
+    document.getElementById('modalBalasPengirim').innerText = k.pengirim + (k.is_siswa ? ' (Siswa NIS: ' + k.identifier + ')' : ' (Pengguna/Tamu)');
+    document.getElementById('modalBalasPesanAsli').innerText = '"' + k.pesan + '"';
+    document.getElementById('modalBalasTextarea').value = k.balasan || '';
+
+    const btnHapus = document.getElementById('btnHapusBalasan');
+    if (k.balasan) {
+        btnHapus.style.display = 'inline-block';
+    } else {
+        btnHapus.style.display = 'none';
+    }
+
+    new bootstrap.Modal(document.getElementById('modalBalasKontak')).show();
+}
+
+function submitHapusBalasan() {
+    if (!activeKontakId) return;
+    if (confirm('Yakin ingin menghapus balasan pesan ini?')) {
+        const delForm = document.getElementById('formHapusBalasan');
+        delForm.action = '/admin/kontak/' + activeKontakId + '/reply';
+        delForm.submit();
+    }
+}
+
 $(document).ready(function() {
     $('#kontakTable').DataTable({
         language: { url: '//cdn.datatables.net/plug-ins/1.13.8/i18n/id.json' },
