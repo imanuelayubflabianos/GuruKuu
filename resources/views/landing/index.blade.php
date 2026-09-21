@@ -113,10 +113,8 @@
         </div>
 
         @php
-            $allTeachers = \App\Models\Guru::with('jurusan')->where('total_penilaian', '>', 0)->get();
-            if ($allTeachers->isEmpty()) {
-                $allTeachers = \App\Models\Guru::with('jurusan')->get();
-            }
+            $allTeachers = \App\Models\Guru::with('jurusan')->withRatings()
+                ->orderByDesc('rata_rata_nilai')->orderByDesc('total_penilaian')->limit(3)->get();
             
             $topList = $allTeachers->map(function($guru) {
                 $guru->persentase = round(($guru->rata_rata_nilai / 5) * 100);

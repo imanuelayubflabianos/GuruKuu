@@ -23,6 +23,25 @@
     $pctSelesai = $totalGuru > 0 ? round(($jumlahSudah / $totalGuru) * 100) : 0;
 @endphp
 
+@if(($notifikasiPelanggaran ?? collect())->isNotEmpty())
+    <div class="alert alert-warning border-warning shadow-sm mb-4">
+        <div class="d-flex align-items-center gap-2 mb-2">
+            <i class="bi bi-shield-exclamation fs-5"></i>
+            <strong>Notifikasi pelanggaran</strong>
+        </div>
+        @foreach($notifikasiPelanggaran as $notifikasi)
+            <div class="d-flex align-items-start justify-content-between gap-3 border-top border-warning-subtle pt-2 mt-2">
+                <span class="small">{{ $notifikasi->notifikasi_siswa ?: 'Anda menerima notifikasi pelanggaran dari sistem.' }}</span>
+                <form action="{{ route('siswa.notifikasi.read', $notifikasi) }}" method="POST" class="flex-shrink-0">
+                    @csrf
+                    @method('PATCH')
+                    <button type="submit" class="btn btn-sm btn-outline-dark">Mengerti</button>
+                </form>
+            </div>
+        @endforeach
+    </div>
+@endif
+
 {{-- STATISTIK CEPAT (FROSTED GLASS CARDS) --}}
 <div class="row g-2 g-md-4 mb-3 mb-md-4">
     <div class="col-4 col-md-4">

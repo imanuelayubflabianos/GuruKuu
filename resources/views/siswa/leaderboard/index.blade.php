@@ -15,6 +15,8 @@
     </div>
 </div>
 
+@include('components.leaderboard-filter')
+
 {{-- Podium Top 3 --}}
 @php
     $list = $leaderboard ?? collect();
@@ -41,11 +43,11 @@
             <h5 class="fw-bold mb-1 gk-podium-nama" title="{{ $top2->nama }}">{{ $top2->nama }}</h5>
             <div class="font-mono mb-2 mb-md-3 gk-podium-jurusan" style="font-size: 0.72rem; color: var(--text-muted);" title="{{ strtoupper($top2->jurusan?->nama_jurusan ?? 'UMUM') }}">{{ strtoupper($top2->jurusan?->nama_jurusan ?? 'UMUM') }}</div>
             <div class="p-1.5 p-md-3 rounded-3 mb-2 mb-md-3 gk-podium-statbox" style="background: var(--bg-light);">
-                <div class="fw-bold text-primary gk-podium-score" style="font-size: 1.8rem; line-height: 1;">{{ $pct2 }}%</div>
+                <div class="fw-bold text-primary gk-podium-score" style="font-size: 1.8rem; line-height: 1;">{{ $pct2 }}% <span class="text-warning fs-6">@for($star = 1; $star <= 5; $star++){{ $star <= round($pct2 / 20) ? '★' : '☆' }}@endfor</span></div>
                 <div class="progress mt-1 mt-md-2 mb-1" style="height: 5px; border-radius: 10px;">
                     <div class="progress-bar bg-primary rounded-pill" style="width: {{ $pct2 }}%;"></div>
                 </div>
-                <small class="text-muted font-mono gk-podium-reviews" style="font-size: 0.72rem;">{{ $top2->total_penilaian }} ulasan</small>
+                <small class="text-muted font-mono gk-podium-reviews" style="font-size: 0.72rem;">{{ $top2->total_penilaian }} {{ $mode === 'partisipasi' ? 'siswa memilih' : 'ulasan' }}</small>
             </div>
             <a href="{{ route('siswa.guru.show', $top2->id) }}" class="btn btn-outline-custom btn-sm btn-podium w-100 rounded-pill">
                 <i class="bi bi-info-circle me-1"></i> Detail
@@ -69,11 +71,11 @@
             <h4 class="fw-bold mb-1 gk-podium-nama" title="{{ $top1->nama }}">{{ $top1->nama }}</h4>
             <div class="font-mono mb-2 mb-md-3 gk-podium-jurusan" style="font-size: 0.75rem; letter-spacing: 1px; color: var(--secondary);" title="{{ strtoupper($top1->jurusan?->nama_jurusan ?? 'UMUM') }}">{{ strtoupper($top1->jurusan?->nama_jurusan ?? 'UMUM') }}</div>
             <div class="p-2 p-md-3 rounded-3 mb-2 mb-md-3 gk-podium-statbox" style="background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.2);">
-                <div class="fw-bold text-warning gk-podium-score" style="font-size: 2.3rem; line-height: 1;">{{ $pct1 }}%</div>
+                <div class="fw-bold text-warning gk-podium-score" style="font-size: 2.3rem; line-height: 1;">{{ $pct1 }}% <span class="text-warning fs-6">@for($star = 1; $star <= 5; $star++){{ $star <= round($pct1 / 20) ? '★' : '☆' }}@endfor</span></div>
                 <div class="progress mt-1 mt-md-2 mb-1" style="height: 6px; background-color: rgba(245, 158, 11, 0.2); border-radius: 10px;">
                     <div class="progress-bar bg-warning rounded-pill" style="width: {{ $pct1 }}%;"></div>
                 </div>
-                <small class="text-muted font-mono d-block mt-0.5 mt-md-1 gk-podium-reviews" style="font-size: 0.75rem;">{{ $top1->total_penilaian }} ulasan</small>
+                <small class="text-muted font-mono d-block mt-0.5 mt-md-1 gk-podium-reviews" style="font-size: 0.75rem;">{{ $top1->total_penilaian }} {{ $mode === 'partisipasi' ? 'siswa memilih' : 'ulasan' }}</small>
             </div>
             <a href="{{ route('siswa.guru.show', $top1->id) }}" class="btn btn-primary-custom btn-podium w-100 rounded-pill py-1.5 py-md-2 fw-semibold">
                 <i class="bi bi-info-circle me-1"></i> Detail
@@ -97,11 +99,11 @@
             <h5 class="fw-bold mb-1 gk-podium-nama" title="{{ $top3->nama }}">{{ $top3->nama }}</h5>
             <div class="font-mono mb-2 mb-md-3 gk-podium-jurusan" style="font-size: 0.72rem; color: var(--text-muted);" title="{{ strtoupper($top3->jurusan?->nama_jurusan ?? 'UMUM') }}">{{ strtoupper($top3->jurusan?->nama_jurusan ?? 'UMUM') }}</div>
             <div class="p-1.5 p-md-3 rounded-3 mb-2 mb-md-3 gk-podium-statbox" style="background: var(--bg-light);">
-                <div class="fw-bold text-primary gk-podium-score" style="font-size: 1.8rem; line-height: 1;">{{ $pct3 }}%</div>
+                <div class="fw-bold text-primary gk-podium-score" style="font-size: 1.8rem; line-height: 1;">{{ $pct3 }}% <span class="text-warning fs-6">@for($star = 1; $star <= 5; $star++){{ $star <= round($pct3 / 20) ? '★' : '☆' }}@endfor</span></div>
                 <div class="progress mt-1 mt-md-2 mb-1" style="height: 5px; border-radius: 10px;">
                     <div class="progress-bar bg-primary rounded-pill" style="width: {{ $pct3 }}%;"></div>
                 </div>
-                <small class="text-muted font-mono gk-podium-reviews" style="font-size: 0.72rem;">{{ $top3->total_penilaian }} ulasan</small>
+                <small class="text-muted font-mono gk-podium-reviews" style="font-size: 0.72rem;">{{ $top3->total_penilaian }} {{ $mode === 'partisipasi' ? 'siswa memilih' : 'ulasan' }}</small>
             </div>
             <a href="{{ route('siswa.guru.show', $top3->id) }}" class="btn btn-outline-custom btn-sm btn-podium w-100 rounded-pill">
                 <i class="bi bi-info-circle me-1"></i> Detail
@@ -125,8 +127,8 @@
                     <th style="width: 80px;" class="text-center">RANKING</th>
                     <th>NAMA GURU</th>
                     <th>JURUSAN / KEAHLIAN</th>
-                    <th style="width: 200px;">RATING KEPUASAN</th>
-                    <th class="text-center">TOTAL ULASAN</th>
+                    <th style="width: 200px;">{{ $mode === 'partisipasi' ? 'PARTISIPASI KELAS' : 'RATING KEPUASAN' }}</th>
+                    <th class="text-center">{{ $mode === 'partisipasi' ? 'SISWA MEMILIH' : 'TOTAL ULASAN' }}</th>
                     <th class="text-center" style="width: 140px;">AKSI</th>
                 </tr>
             </thead>
@@ -153,7 +155,7 @@
                     <td class="font-mono" style="font-size: 0.75rem;">{{ strtoupper($g->jurusan?->nama_jurusan ?? 'Umum') }}</td>
                     <td>
                         <div class="d-flex justify-content-between align-items-center mb-1">
-                            <span class="fw-bold font-mono text-primary" style="font-size: 0.85rem;">{{ $pct }}%</span>
+                            <span class="fw-bold font-mono text-primary" style="font-size: 0.85rem;">{{ $pct }}% <span class="text-warning" aria-label="{{ round($pct / 20) }} dari 5 bintang">@for($star = 1; $star <= 5; $star++){{ $star <= round($pct / 20) ? '★' : '☆' }}@endfor</span></span>
                         </div>
                         <div class="progress" style="height: 6px; border-radius: 10px;">
                             <div class="progress-bar bg-primary rounded-pill" style="width: {{ $pct }}%;"></div>

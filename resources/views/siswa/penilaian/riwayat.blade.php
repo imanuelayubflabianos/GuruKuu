@@ -21,6 +21,7 @@
                     <th>PERIODE</th>
                     <th class="text-center">TOTAL NILAI</th>
                     <th class="text-center">TANGGAL</th>
+                    <th class="text-center">AKSI</th>
                 </tr>
             </thead>
             <tbody>
@@ -64,10 +65,19 @@
                             {{ $r->created_at->diffForHumans() }}
                         </small>
                     </td>
+                    <td class="text-center">
+                        <form action="{{ route('siswa.riwayat.destroy', $r) }}" method="POST" onsubmit="return confirm('Hapus riwayat penilaian ini? Rating guru akan dihitung ulang dan Anda dapat menilai kembali.')">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="btn btn-sm btn-outline-danger" title="Hapus riwayat" aria-label="Hapus riwayat">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </form>
+                    </td>
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="5" class="text-center py-5">
+                    <td colspan="6" class="text-center py-5">
                         <i class="bi bi-inbox fs-1 text-muted d-block mb-3"></i>
                         <p class="text-muted mb-0">Anda belum memberikan penilaian apapun.</p>
                         <a href="{{ route('siswa.guru.index') }}" class="btn btn-primary-custom mt-3">

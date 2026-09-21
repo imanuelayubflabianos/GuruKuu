@@ -21,13 +21,16 @@ class Pelanggaran extends Model
         'ip_address',
         'user_agent',
         'is_read',
+        'siswa_is_read',
         'read_at',
         'tindakan',
+        'notifikasi_siswa',
     ];
 
     protected $casts = [
         'kata_terdeteksi' => 'array',
         'is_read' => 'boolean',
+        'siswa_is_read' => 'boolean',
         'read_at' => 'datetime',
     ];
 
@@ -65,6 +68,7 @@ class Pelanggaran extends Model
             'penilaian_toxic' => 'Percobaan Ulasan Kasar / Toxic',
             'kontak_toxic' => 'Pesan Kontak Mengandung Kata Terlarang',
             'komentar_disensor' => 'Ulasan Disensor oleh Admin',
+            'ulasan_dihapus' => 'Penilaian Dihapus oleh Admin',
             'peringatan_manual' => 'Peringatan Pelanggaran Manual',
             default => 'Pelanggaran Kebijakan',
         };
@@ -79,6 +83,7 @@ class Pelanggaran extends Model
             'penilaian_toxic' => 'bg-danger text-white',
             'kontak_toxic' => 'bg-warning text-dark',
             'komentar_disensor' => 'bg-secondary text-white',
+            'ulasan_dihapus' => 'bg-danger text-white',
             'peringatan_manual' => 'bg-info text-white',
             default => 'bg-dark text-white',
         };

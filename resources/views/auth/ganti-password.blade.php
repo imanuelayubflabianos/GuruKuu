@@ -34,8 +34,11 @@
                             <label class="form-label font-mono" style="font-size: 0.75rem; font-weight: 600; letter-spacing: 1px;">PASSWORD LAMA</label>
                             <div class="input-group">
                                 <span class="input-group-text bg-white border-end-0"><i class="bi bi-lock text-muted"></i></span>
-                                <input type="password" name="old_password" class="form-control border-start-0 ps-0"
-                                    placeholder="Masukkan password lama" required style="border-radius: 0 8px 8px 0; padding: 0.65rem 1rem;">
+                                <input type="password" name="old_password" id="oldPassword" class="form-control border-start-0 border-end-0 ps-0"
+                                    placeholder="Masukkan password lama" required style="border-radius: 0; padding: 0.65rem 1rem;">
+                                <button type="button" class="input-group-text bg-white border-start-0" onclick="togglePass('oldPassword', 'iconOld')" aria-label="Tampilkan password lama" style="border-radius: 0 8px 8px 0; cursor: pointer; border-left: none;">
+                                    <i class="bi bi-eye text-muted" id="iconOld"></i>
+                                </button>
                             </div>
                         </div>
 

@@ -11,8 +11,12 @@
 </div>
 
 <div class="card-custom">
+    <div class="d-flex justify-content-between align-items-center px-3 px-md-4 py-3 border-bottom">
+        <span class="small text-muted">Menampilkan {{ $kontak->firstItem() ?? 0 }}–{{ $kontak->lastItem() ?? 0 }} dari {{ $kontak->total() }} pesan</span>
+        <span class="badge bg-light text-dark border">15 per halaman</span>
+    </div>
     <div class="table-responsive">
-        <table class="table table-custom mb-0" id="kontakTable">
+        <table class="table table-custom mb-0">
             <thead>
                 <tr>
                     <th>PENGIRIM</th>
@@ -74,6 +78,9 @@
             </tbody>
         </table>
     </div>
+    @if($kontak->hasPages())
+        <div class="px-3 px-md-4 py-3 border-top d-flex justify-content-center">{{ $kontak->links() }}</div>
+    @endif
 </div>
 
 {{-- MODAL BALAS PESAN (DI LUAR TABEL & DI LUAR CARD UNTUK MENCEGAH FLICKER / BACKDROP BLINKING) --}}
@@ -161,13 +168,5 @@ function submitHapusBalasan() {
     }
 }
 
-$(document).ready(function() {
-    $('#kontakTable').DataTable({
-        language: { url: '//cdn.datatables.net/plug-ins/1.13.8/i18n/id.json' },
-        searching: true,
-        order: [[3, 'desc']],
-        pageLength: 10
-    });
-});
 </script>
 @endpush

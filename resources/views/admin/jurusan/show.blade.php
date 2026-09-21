@@ -76,7 +76,9 @@
                         @forelse($kelas as $k)
                         <tr>
                             <td>
-                                <strong class="text-dark">{{ $k->nama_kelas }} Kelas {{ $k->tingkat }}</strong>
+                                <a href="{{ route('admin.jurusan.show', [$jurusan, 'kelas_id' => $k->id]) }}" class="text-decoration-none">
+                                    <strong class="text-dark">{{ $k->label_singkat }}</strong>
+                                </a>
                             </td>
                             <td class="text-center">
                                 <span class="badge bg-light text-dark border">Kelas {{ $k->tingkat }}</span>
@@ -105,7 +107,20 @@
                 </h5>
                 <span class="badge bg-light text-dark border">{{ $jurusan->siswa_count }} Terdaftar</span>
             </div>
-            <p class="text-muted small mb-3">Siswa aktif yang terhubung dengan jurusan <strong>{{ $jurusan->nama_jurusan }}</strong>.</p>
+                <p class="text-muted small mb-3">Siswa aktif yang terhubung dengan jurusan <strong>{{ $jurusan->nama_jurusan }}</strong>.</p>
+                <form method="GET" action="{{ route('admin.jurusan.show', $jurusan) }}" class="row g-2 mb-3">
+                    <div class="col-sm-8">
+                        <select name="kelas_id" class="form-select form-select-sm" onchange="this.form.submit()">
+                            <option value="">Semua kelas</option>
+                            @foreach($kelas as $k)
+                                <option value="{{ $k->id }}" {{ (string) $kelasId === (string) $k->id ? 'selected' : '' }}>{{ $k->label_singkat }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-sm-4">
+                        <a href="{{ route('admin.jurusan.show', $jurusan) }}" class="btn btn-sm btn-outline-custom w-100">Reset kelas</a>
+                    </div>
+                </form>
 
             <div class="table-responsive">
                 <table class="table table-custom mb-0">
@@ -130,7 +145,7 @@
                                     $k = ($kelasRel && $kelasRel->isNotEmpty()) ? $kelasRel->first() : null;
                                 @endphp
                                 @if($k)
-                                    <span class="badge bg-light text-dark border fw-bold">{{ $k->nama_kelas }} Kelas {{ $k->tingkat }}</span>
+                                    <span class="badge bg-light text-dark border fw-bold">{{ $k->label_singkat }}</span>
                                 @elseif(is_string($s->kelas) && $s->kelas)
                                     <span class="badge bg-light text-dark border fw-bold">{{ $s->kelas }}</span>
                                 @else

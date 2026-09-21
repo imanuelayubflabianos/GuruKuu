@@ -8,7 +8,10 @@ use App\Models\Penilaian;
 use App\Models\Periode;
 use App\Models\Setting;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
 
 class PengaturanController extends Controller
 {
@@ -34,11 +37,13 @@ class PengaturanController extends Controller
             'footer_copyright'  => Setting::get('footer_copyright', '© ' . date('Y') . ' GuruKuu. All rights reserved.'),
             'kebijakan_privasi' => Setting::get('kebijakan_privasi', "1. Pengumpulan Data\nKami hanya mengumpulkan data yang diperlukan untuk proses penilaian, yaitu NIS, nama, dan kelas siswa. Data pribadi seperti tanggal lahir hanya digunakan untuk verifikasi identitas saat login.\n\n2. Anonimitas Penilaian\nSeluruh penilaian yang diberikan siswa bersifat anonim. Guru dan pihak lain tidak dapat mengetahui identitas siswa yang memberikan nilai tertentu. Ini menjamin kejujuran dan objektivitas dalam setiap penilaian.\n\n3. Penyimpanan Data\nSemua data disimpan di server yang aman dengan enkripsi standar industri. Password pengguna di-hash menggunakan algoritma bcrypt yang tidak dapat dibaca kembali.\n\n4. Penggunaan Data\nData penilaian hanya digunakan untuk keperluan internal sekolah, seperti evaluasi kinerja guru dan pengambilan keputusan oleh manajemen. Data tidak akan dibagikan kepada pihak ketiga tanpa persetujuan."),
             'syarat_ketentuan'  => Setting::get('syarat_ketentuan', "1. Eligibilitas\nPlatform ini hanya dapat digunakan oleh siswa dan guru yang terdaftar resmi di sekolah. Akun harus diaktifkan oleh administrator sekolah sebelum dapat digunakan.\n\n2. Tanggung Jawab Pengguna\nSiswa wajib memberikan penilaian secara jujur dan objektif. Dilarang memberikan penilaian berdasarkan dendam pribadi, SARA, atau konten yang tidak pantas.\n\n3. Keamanan Akun\nPengguna bertanggung jawab penuh atas kerahasiaan password akun mereka. Dilarang membagikan password kepada orang lain.\n\n4. Kontak & Pengaduan\nJika Anda menemukan pelanggaran atau memiliki keluhan, silakan hubungi administrator sekolah melalui fitur Chat Admin yang tersedia di footer website ini."),
+            'profanity_words'   => Setting::get('profanity_words', ''),
         ];
 
         $semuaPeriode = Periode::orderBy('tahun_ajaran', 'desc')->orderBy('semester', 'desc')->get();
+        $jumlahPenilaian = Penilaian::count();
 
-        return view('admin.pengaturan.index', compact('periodeAktif', 'semuaPeriode', 'settings'));
+        return view('admin.pengaturan.index', compact('periodeAktif', 'semuaPeriode', 'jumlahPenilaian', 'settings'));
     }
 
     public function updateLanding(Request $request)
@@ -62,6 +67,7 @@ class PengaturanController extends Controller
             'footer_copyright'  => 'nullable|string|max:255',
             'kebijakan_privasi' => 'nullable|string',
             'syarat_ketentuan'  => 'nullable|string',
+            'profanity_words'   => 'nullable|string|max:10000',
         ]);
 
         // 1. Logo
@@ -141,8 +147,31 @@ class PengaturanController extends Controller
         if ($request->has('syarat_ketentuan')) {
             Setting::set('syarat_ketentuan', trim($request->syarat_ketentuan));
         }
+        if ($request->has('profanity_words')) {
+            $words = collect(preg_split('/[\r\n,]+/', (string) $request->profanity_words, -1, PREG_SPLIT_NO_EMPTY))
+                ->map(fn ($word) => mb_strtolower(trim($word), 'UTF-8'))
+                ->filter(fn ($word) => mb_strlen($word) >= 2)
+                ->unique()
+                ->implode("\n");
+            Setting::set('profanity_words', $words);
+        }
 
         return back()->with('success', 'Seluruh konten dan identitas tampilan beranda berhasil diperbarui!');
+    }
+
+    public function updateProfanityWords(Request $request)
+    {
+        $request->validate(['profanity_words' => 'nullable|string|max:10000']);
+
+        $words = collect(preg_split('/[\r\n,]+/', (string) $request->profanity_words, -1, PREG_SPLIT_NO_EMPTY))
+            ->map(fn ($word) => mb_strtolower(trim($word), 'UTF-8'))
+            ->filter(fn ($word) => mb_strlen($word) >= 2)
+            ->unique()
+            ->implode("\n");
+
+        Setting::set('profanity_words', $words);
+
+        return back()->with('success', 'Daftar kata toxic berhasil diperbarui dan langsung aktif.');
     }
 
     public function resetLandingHero()
@@ -166,13 +195,47 @@ class PengaturanController extends Controller
 
     public function reset(Request $request)
     {
-        Penilaian::truncate();
-        Guru::query()->update([
-            'rata_rata_nilai' => 0,
-            'total_penilaian' => 0,
+        $validator = Validator::make($request->all(), [
+            'reset_confirmation' => ['required', 'string', 'in:HAPUS PENILAIAN'],
+            'reset_acknowledged' => ['accepted'],
+            'reset_current_password' => ['required', 'string'],
+        ], [
+            'reset_confirmation.required' => 'Ketik HAPUS PENILAIAN untuk melanjutkan.',
+            'reset_confirmation.in' => 'Teks konfirmasi tidak sesuai.',
+            'reset_acknowledged.accepted' => 'Anda harus menyetujui peringatan penghapusan.',
+            'reset_current_password.required' => 'Password administrator wajib diisi.',
         ]);
 
-        return back()->with('success', 'Seluruh data penilaian siswa berhasil direset.');
+        $redirect = redirect()->to(route('admin.pengaturan.index') . '#tabAkun');
+
+        if ($validator->fails()) {
+            return $redirect->withErrors($validator)->withInput();
+        }
+
+        if (!Hash::check($request->input('reset_current_password'), $request->user()->password)) {
+            return $redirect
+                ->withErrors(['reset_current_password' => 'Password administrator tidak sesuai.'])
+                ->withInput();
+        }
+
+        try {
+            DB::transaction(function () {
+                // DELETE menghormati foreign key: balasan terhapus via cascade dan log
+                // pelanggaran dipertahankan sebagai audit dengan penilaian_id menjadi null.
+                Penilaian::query()->delete();
+
+                Guru::query()->update([
+                    'rata_rata_nilai' => 0,
+                    'total_penilaian' => 0,
+                ]);
+            });
+        } catch (\Throwable $e) {
+            report($e);
+
+            return $redirect->with('error', 'Reset tidak dapat diselesaikan. Tidak ada data yang diubah.');
+        }
+
+        return $redirect->with('success', 'Seluruh data penilaian telah dihapus. Log pelanggaran tetap tersimpan sebagai audit.');
     }
 
     public function gantiPassword(Request $request)
@@ -182,7 +245,7 @@ class PengaturanController extends Controller
             'password'         => 'required|min:6|confirmed',
         ]);
 
-        if (!\Illuminate\Support\Facades\Hash::check($request->current_password, auth()->user()->password)) {
+        if (!Hash::check($request->current_password, auth()->user()->password)) {
             return back()->withErrors(['current_password' => 'Password saat ini tidak sesuai.'])->with('error', 'Gagal memperbarui password: Password lama salah.');
         }
 

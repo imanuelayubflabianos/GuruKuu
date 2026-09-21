@@ -11,17 +11,28 @@ class JurusanController extends Controller
 {
     public function index()
     {
-        $jurusans = Jurusan::withCount(['kelas', 'siswa'])->get();
+        $jurusans = Jurusan::withCount(['kelas', 'siswa'])
+            ->orderBy('nama_jurusan')
+            ->paginate(15);
         return view('admin.jurusan.index', compact('jurusans'));
     }
 
-    public function show(Jurusan $jurusan)
+    public function show(Request $request, Jurusan $jurusan)
     {
         $jurusan->loadCount(['kelas', 'siswa', 'guru']);
-        $kelas = $jurusan->kelas()->withCount('siswa')->orderBy('tingkat')->orderBy('nama_kelas')->get();
-        $siswa = $jurusan->siswa()->with('kelas')->orderBy('name')->paginate(30);
+        $kelas = $jurusan->kelas()->with('jurusan')->withCount('siswa')->orderBy('tingkat')->orderBy('nama_kelas')->get();
+        $kelasId = $request->integer('kelas_id') ?: null;
+        if ($kelasId && !$kelas->contains('id', $kelasId)) {
+            $kelasId = null;
+        }
+        $siswa = $jurusan->siswa()
+            ->when($kelasId, fn ($query) => $query->whereHas('kelas', fn ($kelasQuery) => $kelasQuery->whereKey($kelasId)))
+            ->with('kelas')
+            ->orderBy('name')
+            ->paginate(30)
+            ->withQueryString();
 
-        return view('admin.jurusan.show', compact('jurusan', 'kelas', 'siswa'));
+        return view('admin.jurusan.show', compact('jurusan', 'kelas', 'siswa', 'kelasId'));
     }
 
     public function create()

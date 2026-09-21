@@ -1,871 +1,504 @@
 @extends('layouts.admin')
-@section('title', 'Pengaturan Sistem & Konten Beranda')
+
+@section('title', 'Pengaturan')
 
 @section('content')
-<div class="page-header d-flex justify-content-between align-items-center flex-wrap gap-3">
-    <div>
-        <div class="page-label">PENGATURAN</div>
-        <h1 class="page-title">Pengaturan Sistem & Konten Beranda</h1>
-        <p class="page-subtitle mb-0">Kelola identitas brand, logo, hero banner, visi & misi, footer, serta kebijakan privasi tanpa perlu mengubah kode.</p>
-    </div>
-    <div class="d-flex gap-2">
-        <a href="{{ url('/') }}" target="_blank" class="btn btn-outline-custom">
-            <i class="bi bi-box-arrow-up-right me-1"></i> Buka Beranda Publik
-        </a>
-    </div>
-</div>
+<style>
+    .settings-page { max-width: 1180px; }
+    .settings-nav { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: .5rem; margin-bottom: 1.25rem; }
+    .settings-nav__item { display: flex; align-items: center; justify-content: center; gap: .45rem; min-height: 44px; padding: .6rem .75rem; color: var(--text-muted); background: var(--bg-card); border: 1px solid var(--border); border-radius: .65rem; font-size: .84rem; font-weight: 600; transition: .18s ease; }
+    .settings-nav__item:hover { color: var(--primary); border-color: var(--primary); }
+    .settings-nav__item.active { color: #fff; background: var(--primary); border-color: var(--primary); }
+    .settings-card { padding: 1.25rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: .85rem; box-shadow: var(--card-shadow); }
+    .settings-card + .settings-card { margin-top: 1rem; }
+    .settings-heading { font-size: 1rem; font-weight: 700; margin: 0; color: var(--text-dark); }
+    .settings-heading i { color: var(--primary); }
+    .settings-preview { min-height: 112px; display: flex; align-items: center; padding: 1.25rem; border: 1px solid var(--border); border-radius: .7rem; background: var(--bg-light); }
+    .settings-hero { min-height: 190px; display: flex; align-items: end; padding: 1.25rem; color: #fff; background-position: center; background-size: cover; border-radius: .7rem; overflow: hidden; }
+    .settings-save { position: sticky; bottom: 1rem; z-index: 10; display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: .75rem 1rem; margin-top: 1rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: .75rem; box-shadow: var(--card-shadow); }
+    .settings-panel[hidden] { display: none !important; }
+    .settings-panel .form-label { margin-bottom: .35rem; font-size: .82rem; font-weight: 600; }
+    .settings-muted { color: var(--text-muted); font-size: .84rem; }
+    .settings-summary { cursor: pointer; color: var(--primary); font-size: .84rem; font-weight: 600; }
+    .settings-icon-button { width: 32px; height: 32px; padding: 0; display: inline-flex; align-items: center; justify-content: center; }
+    @media (max-width: 991.98px) { .settings-nav { display: flex; overflow-x: auto; padding-bottom: .25rem; } .settings-nav__item { flex: 0 0 auto; min-width: 110px; } }
+    @media (max-width: 575.98px) { .settings-card { padding: 1rem; } .settings-save { align-items: stretch; flex-direction: column; } .settings-save .btn { width: 100%; } }
+</style>
 
-{{-- NAV TABS PENGATURAN --}}
-<ul class="nav nav-pills mb-4 gap-2 flex-wrap" id="pengaturanTabs" role="tablist">
-        <li class="nav-item">
-            <button class="nav-link active fw-bold" id="brand-tab" data-bs-toggle="pill" data-bs-target="#tabBrand" type="button">
-                <i class="bi bi-stars me-1"></i> 1. Brand & Logo
-            </button>
-        </li>
-        <li class="nav-item">
-            <button class="nav-link fw-bold" id="hero-tab" data-bs-toggle="pill" data-bs-target="#tabHero" type="button">
-                <i class="bi bi-image me-1"></i> 2. Banner Hero
-            </button>
-        </li>
-        <li class="nav-item">
-            <button class="nav-link fw-bold" id="visimisi-tab" data-bs-toggle="pill" data-bs-target="#tabVisiMisi" type="button">
-                <i class="bi bi-bullseye me-1"></i> 3. Visi & Misi
-            </button>
-        </li>
-        <li class="nav-item">
-            <button class="nav-link fw-bold" id="footer-tab" data-bs-toggle="pill" data-bs-target="#tabFooter" type="button">
-                <i class="bi bi-layout-text-window-reverse me-1"></i> 4. Footer Web
-            </button>
-        </li>
-        <li class="nav-item">
-            <button class="nav-link fw-bold" id="legal-tab" data-bs-toggle="pill" data-bs-target="#tabLegal" type="button">
-                <i class="bi bi-shield-check me-1"></i> 5. Privasi & Ketentuan
-            </button>
-        </li>
-        <li class="nav-item">
-            <button class="nav-link fw-bold text-success border-success border-opacity-25" id="periode-tab" data-bs-toggle="pill" data-bs-target="#tabPeriode" type="button">
-                <i class="bi bi-calendar-range-fill me-1"></i> 6. Periode Semester
-                @if($periodeAktif)
-                    <span class="badge bg-success ms-1"><i class="bi bi-circle-fill me-1" style="font-size: 0.55rem;"></i>{{ $periodeAktif->semester == 'ganjil' ? 'Ganjil' : 'Genap' }}</span>
-                @else
-                    <span class="badge bg-danger ms-1">Nonaktif</span>
-                @endif
-            </button>
-        </li>
-        <li class="nav-item">
-            <button class="nav-link fw-bold text-dark border" id="akun-tab" data-bs-toggle="pill" data-bs-target="#tabAkun" type="button">
-                <i class="bi bi-shield-lock-fill me-1 text-primary"></i> 7. Keamanan & Akun
-            </button>
-        </li>
-    </ul>
+<div class="settings-page">
+    <div class="page-header d-flex justify-content-between align-items-center gap-3">
+        <div>
+            <div class="page-label">ADMIN</div>
+            <h1 class="page-title mb-0">Pengaturan</h1>
+        </div>
+        <a href="{{ url('/') }}" target="_blank" class="btn btn-outline-custom btn-sm settings-icon-button" title="Lihat beranda" aria-label="Lihat beranda"><i class="bi bi-box-arrow-up-right"></i></a>
+    </div>
+
+    <nav class="settings-nav" id="pengaturanTabs" aria-label="Kategori pengaturan">
+        <button class="settings-nav__item active" type="button" data-target="#tabBrand"><i class="bi bi-stars"></i> Identitas</button>
+        <button class="settings-nav__item" type="button" data-target="#tabHero"><i class="bi bi-image"></i> Beranda</button>
+        <button class="settings-nav__item" type="button" data-target="#tabVisiMisi"><i class="bi bi-bullseye"></i> Profil</button>
+        <button class="settings-nav__item" type="button" data-target="#tabFooter"><i class="bi bi-layout-text-window-reverse"></i> Footer</button>
+        <button class="settings-nav__item" type="button" data-target="#tabLegal"><i class="bi bi-file-earmark-lock"></i> Legal</button>
+        <button class="settings-nav__item" type="button" data-target="#tabModerasi"><i class="bi bi-shield-exclamation"></i> Moderasi</button>
+        <button class="settings-nav__item" type="button" data-target="#tabPeriode"><i class="bi bi-calendar-range"></i> Periode</button>
+        <button class="settings-nav__item" type="button" data-target="#tabAkun"><i class="bi bi-shield-lock"></i> Akun</button>
+    </nav>
 
     <form action="{{ route('admin.pengaturan.landing') }}" method="POST" enctype="multipart/form-data" id="landingForm">
         @csrf
-        <div class="tab-content mb-4">
-        {{-- TAB 1: IDENTITAS BRAND & LOGO --}}
-        <div class="tab-pane fade show active" id="tabBrand">
-            <div class="card-custom p-4">
-                <h5 class="fw-bold mb-1" style="color: var(--text-dark);">
-                    <i class="bi bi-shield-shaded text-primary me-2"></i>Identitas Brand & Logo Website
-                </h5>
-                <p class="text-muted small mb-4">Kustomisasi nama website dan logo yang tampil pada navbar atas dan footer.</p>
 
-                <div class="row g-4">
-                    <div class="col-lg-6">
-                        <div class="mb-3">
-                            <label class="form-label small fw-bold">Nama Website Penuh (Title Bar)</label>
-                            <input type="text" name="site_title" id="siteTitleInput" class="form-control" value="{{ $settings['site_title'] }}" placeholder="GuruKuu" required>
-                            <div class="form-text small">Nama ini tampil pada title bar tab browser dan metadata web.</div>
-                        </div>
-
-                        <div class="row g-2 mb-3">
-                            <div class="col-md-6">
-                                <label class="form-label small fw-bold">Kata Bagian 1 & Warna</label>
-                                <div class="input-group">
-                                    <input type="text" name="site_title_part1" id="part1Input" class="form-control" value="{{ $settings['site_title_part1'] ?? 'Guru' }}" placeholder="Guru">
-                                    <input type="color" name="site_title_color1" id="color1Input" class="form-control form-control-color" value="{{ $settings['site_title_color1'] ?? '#003366' }}" title="Pilih warna bagian 1">
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label small fw-bold">Kata Bagian 2 & Warna</label>
-                                <div class="input-group">
-                                    <input type="text" name="site_title_part2" id="part2Input" class="form-control" value="{{ $settings['site_title_part2'] ?? 'Kuu' }}" placeholder="Kuu">
-                                    <input type="color" name="site_title_color2" id="color2Input" class="form-control form-control-color" value="{{ $settings['site_title_color2'] ?? '#FFC107' }}" title="Pilih warna bagian 2">
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="p-3 rounded border" style="background: var(--bg-light);">
-                            <label class="form-label small fw-bold mb-2">Live Preview Navbar Brand:</label>
-                            <div class="p-3 bg-white border rounded d-flex align-items-center gap-2">
-                                <img id="brandLogoPreview" src="{{ $settings['site_logo'] ?: 'data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'32\' height=\'32\' fill=\'%23003366\' class=\'bi bi-mortarboard-fill\' viewBox=\'0 0 16 16\'><path d=\'M8.211 2.047a.5.5 0 0 0-.422 0l-7.5 3.5a.5.5 0 0 0 .025.917l7.5 3a.5.5 0 0 0 .372 0L14 7.14V13a1 1 0 0 0-1 1v2h3v-2a1 1 0 0 0-1-1V6.739l.686-.275a.5.5 0 0 0 .025-.917z\'/></svg>' }}" 
-                                     style="height: 36px; object-fit: contain;">
-                                <span class="fw-bold fs-4" id="brandTitlePreview">
-                                    <span id="previewPart1" style="color: {{ $settings['site_title_color1'] ?? '#003366' }};">{{ $settings['site_title_part1'] ?? 'Guru' }}</span><span id="previewPart2" style="color: {{ $settings['site_title_color2'] ?? '#FFC107' }};">{{ $settings['site_title_part2'] ?? 'Kuu' }}</span>
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-lg-6">
-                        <div class="p-3 rounded border h-100" style="background: var(--bg-light);">
-                            <h6 class="fw-bold mb-3"><i class="bi bi-image text-primary me-2"></i>Logo / Ikon Website</h6>
-                            
-                            <div class="mb-3">
-                                <label class="form-label small fw-bold">Unggah File Logo Baru</label>
-                                <input type="file" name="site_logo_file" id="siteLogoFileInput" class="form-control" accept="image/png, image/jpeg, image/jpg, image/webp, image/svg+xml">
-                                <div class="form-text small">Mendukung format PNG, JPG, WEBP, SVG (Maksimal 2 MB).</div>
-                            </div>
-
-                            <div class="text-center my-2 text-muted small fw-bold">— ATAU —</div>
-
-                            <div class="mb-3">
-                                <label class="form-label small fw-bold">Gunakan URL Logo Eksternal</label>
-                                <input type="url" name="site_logo_url" id="siteLogoUrlInput" class="form-control" value="{{ $settings['site_logo'] }}" placeholder="https://domain.com/logo.png">
-                            </div>
-
+        <section class="settings-panel" id="tabBrand">
+            <div class="settings-card">
+                <div class="d-flex align-items-center justify-content-between mb-4">
+                    <h2 class="settings-heading"><i class="bi bi-stars me-2"></i>Identitas website</h2>
+                    <span class="settings-muted">Tampilan brand</span>
+                </div>
+                <div class="row g-4 align-items-center">
+                    <div class="col-lg-5">
+                        <div class="settings-preview gap-3">
                             @if($settings['site_logo'])
-                            <div class="form-check mt-3">
-                                <input class="form-check-input" type="checkbox" name="remove_logo" value="1" id="removeLogoCheck">
-                                <label class="form-check-label text-danger small fw-bold" for="removeLogoCheck">
-                                    Hapus logo kustom (gunakan logo/ikon default sistem)
-                                </label>
-                            </div>
-                            @endif
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        {{-- TAB 2: HERO BANNER & THUMBNAIL --}}
-        <div class="tab-pane fade" id="tabHero">
-            <div class="card-custom p-4">
-                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 border-bottom pb-3 mb-4">
-                    <div>
-                        <h5 class="fw-bold mb-1" style="color: var(--text-dark);">
-                            <i class="bi bi-image-fill text-primary me-2"></i>Thumbnail & Hero Banner Beranda
-                        </h5>
-                        <p class="text-muted small mb-0">Sesuaikan foto latar belakang banner dan pesan sambutan di beranda.</p>
-                    </div>
-                </div>
-
-                {{-- LIVE PREVIEW CARD --}}
-                <div class="mb-4">
-                    <label class="form-label small fw-bold text-muted">PREVIEW TAMPILAN BANNER SAAT INI</label>
-                    <div id="heroPreviewBox" class="rounded-3 p-4 position-relative overflow-hidden shadow-sm" 
-                         style="background: linear-gradient(rgba(0,51,102,0.85), rgba(0,51,102,0.7)), url('{{ $settings['hero_image'] }}') center/cover no-repeat; min-height: 240px; display: flex; align-items: center; color: white;">
-                        <div style="max-width: 650px;">
-                            <span class="badge bg-warning text-dark px-2 py-1 mb-2 font-mono small">PREVIEW HERO BANNER</span>
-                            <h3 class="fw-bold mb-2" id="previewTitle" style="font-size: 1.6rem; line-height: 1.2;">{{ $settings['hero_title'] }}</h3>
-                            <p class="small opacity-75 mb-3" id="previewSubtitle">{{ $settings['hero_subtitle'] }}</p>
-                            <button type="button" class="btn btn-warning btn-sm fw-bold px-3 py-2 disabled text-dark" id="previewBtn">
-                                {{ $settings['hero_cta_text'] }}
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row g-4">
-                    {{-- Thumbnail Foto --}}
-                    <div class="col-lg-6">
-                        <div class="p-3 border rounded h-100" style="background: var(--bg-light);">
-                            <h6 class="fw-bold mb-3"><i class="bi bi-cloud-arrow-up-fill text-primary me-2"></i>Ganti Foto Thumbnail Hero</h6>
-                            
-                            <div class="mb-3">
-                                <label class="form-label small fw-bold">Opsi A: Unggah Foto Baru</label>
-                                <input type="file" name="hero_image_file" id="heroImageFileInput" class="form-control" accept="image/png, image/jpeg, image/jpg, image/webp">
-                                <div class="form-text small">Mendukung JPG, PNG, WEBP (Maksimal 5 MB). Disarankan rasio 16:9.</div>
-                            </div>
-
-                            <div class="text-center my-2 text-muted small fw-bold">— ATAU —</div>
-
-                            <div class="mb-3">
-                                <label class="form-label small fw-bold">Opsi B: Masukkan URL Gambar Eksternal</label>
-                                <input type="url" name="hero_image_url" id="heroImageUrlInput" class="form-control" value="{{ $settings['hero_image'] }}" placeholder="https://images.unsplash.com/...">
-                            </div>
-
-                            <div>
-                                <label class="form-label small fw-bold">Preset Gambar Cepat:</label>
-                                <div class="d-flex gap-2 flex-wrap">
-                                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="setHeroPreset('https://images.unsplash.com/photo-1562774053-701939374585?w=1920')">
-                                        Gedung Modern
-                                    </button>
-                                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="setHeroPreset('https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=1920')">
-                                        Kampus Akademik
-                                    </button>
-                                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="setHeroPreset('https://images.unsplash.com/photo-1509062522246-3755977927d7?w=1920')">
-                                        Ruang Kelas
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    {{-- Teks Hero --}}
-                    <div class="col-lg-6">
-                        <div class="p-3 border rounded h-100" style="background: var(--bg-light);">
-                            <h6 class="fw-bold mb-3"><i class="bi bi-fonts text-primary me-2"></i>Kustomisasi Teks Banner</h6>
-
-                            <div class="mb-3">
-                                <label class="form-label small fw-bold">Judul Utama (Hero Title)</label>
-                                <input type="text" name="hero_title" id="heroTitleInput" class="form-control" value="{{ $settings['hero_title'] }}" required>
-                            </div>
-
-                            <div class="mb-3">
-                                <label class="form-label small fw-bold">Subjudul / Deskripsi Singkat</label>
-                                <textarea name="hero_subtitle" id="heroSubtitleInput" rows="3" class="form-control" required>{{ $settings['hero_subtitle'] }}</textarea>
-                            </div>
-
-                            <div class="row g-2">
-                                <div class="col-md-6">
-                                    <label class="form-label small fw-bold">Teks Tombol CTA</label>
-                                    <input type="text" name="hero_cta_text" id="heroCtaInput" class="form-control" value="{{ $settings['hero_cta_text'] }}" required>
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label small fw-bold">Link Tombol CTA</label>
-                                    <input type="text" name="hero_cta_url" class="form-control" value="{{ $settings['hero_cta_url'] }}">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        {{-- TAB 3: VISI & MISI --}}
-        <div class="tab-pane fade" id="tabVisiMisi">
-            <div class="card-custom p-4">
-                <h5 class="fw-bold mb-1" style="color: var(--text-dark);">
-                    <i class="bi bi-bullseye text-primary me-2"></i>Visi & Misi Beranda
-                </h5>
-                <p class="text-muted small mb-4">Ubah konten visi dan misi sekolah yang ditampilkan pada seksi "Tentang Kami" di beranda.</p>
-
-                <div class="row g-4">
-                    <div class="col-md-6">
-                        <div class="p-3 border rounded h-100" style="background: var(--bg-light);">
-                            <h6 class="fw-bold mb-2"><i class="bi bi-eye-fill text-primary me-2"></i>Visi Sekolah / Platform</h6>
-                            <textarea name="visi_text" class="form-control" rows="6" placeholder="Tuliskan visi...">{{ $settings['visi_text'] }}</textarea>
-                            <div class="form-text small">Teks visi akan tampil di kolom sebelah kiri pada seksi Tentang Kami.</div>
-                        </div>
-                    </div>
-
-                    <div class="col-md-6">
-                        <div class="p-3 border rounded h-100" style="background: var(--bg-light);">
-                            <h6 class="fw-bold mb-2"><i class="bi bi-rocket-takeoff-fill text-success me-2"></i>Misi Sekolah / Platform</h6>
-                            <textarea name="misi_text" class="form-control" rows="6" placeholder="Tuliskan poin-poin misi (pisahkan dengan baris baru)...">{{ $settings['misi_text'] }}</textarea>
-                            <div class="form-text small">Setiap baris baru akan otomatis ditampilkan sebagai poin peluru (bullet point).</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        {{-- TAB 4: FOOTER & INFORMASI HAK CIPTA --}}
-        <div class="tab-pane fade" id="tabFooter">
-            <div class="card-custom p-4">
-                <h5 class="fw-bold mb-1" style="color: var(--text-dark);">
-                    <i class="bi bi-layout-text-window-reverse text-primary me-2"></i>Konten Footer Website
-                </h5>
-                <p class="text-muted small mb-4">Kelola teks penjelasan di footer dan hak cipta website.</p>
-
-                <div class="row g-4">
-                    <div class="col-md-8">
-                        <label class="form-label small fw-bold">Deskripsi Singkat Footer</label>
-                        <textarea name="footer_about" class="form-control" rows="3">{{ $settings['footer_about'] ?? '' }}</textarea>
-                        <div class="form-text small">Teks ini tampil di bawah nama brand pada footer beranda publik.</div>
-                    </div>
-
-                    <div class="col-md-4">
-                        <label class="form-label small fw-bold">Teks Hak Cipta (Copyright)</label>
-                        <input type="text" name="footer_copyright" class="form-control" value="{{ $settings['footer_copyright'] ?? '' }}">
-                        <div class="form-text small">Contoh: All rights reserved.</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        {{-- TAB 5: KEBIJAKAN PRIVASI & SYARAT KETENTUAN --}}
-        <div class="tab-pane fade" id="tabLegal">
-            <div class="card-custom p-4">
-                <h5 class="fw-bold mb-1" style="color: var(--text-dark);">
-                    <i class="bi bi-file-earmark-lock-fill text-primary me-2"></i>Kebijakan Privasi & Syarat Ketentuan
-                </h5>
-                <p class="text-muted small mb-4">Kelola isi teks lengkap halaman <code>/kebijakan-privasi</code> dan <code>/syarat-ketentuan</code>.</p>
-
-                <div class="row g-4">
-                    <div class="col-lg-6">
-                        <div class="p-3 border rounded h-100" style="background: var(--bg-light);">
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                <h6 class="fw-bold mb-0">Kebijakan Privasi (Privacy Policy)</h6>
-                                <a href="{{ route('legal.privacy') }}" target="_blank" class="small text-decoration-none">Lihat Halaman</a>
-                            </div>
-                            <textarea name="kebijakan_privasi" class="form-control font-mono" rows="12" placeholder="Kosongkan jika ingin memakai format bawaan sistem...">{{ $settings['kebijakan_privasi'] }}</textarea>
-                            <div class="form-text small">Mendukung teks biasa atau tag HTML sederhana (&lt;p&gt;, &lt;h5&gt;, &lt;ul&gt;, &lt;li&gt;). Jika dikosongkan, halaman akan menampilkan format bawaan.</div>
-                        </div>
-                    </div>
-
-                    <div class="col-lg-6">
-                        <div class="p-3 border rounded h-100" style="background: var(--bg-light);">
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                <h6 class="fw-bold mb-0">Syarat & Ketentuan (Terms & Conditions)</h6>
-                                <a href="{{ route('legal.terms') }}" target="_blank" class="small text-decoration-none">Lihat Halaman</a>
-                            </div>
-                            <textarea name="syarat_ketentuan" class="form-control font-mono" rows="12" placeholder="Kosongkan jika ingin memakai format bawaan sistem...">{{ $settings['syarat_ketentuan'] }}</textarea>
-                            <div class="form-text small">Mendukung teks biasa atau tag HTML sederhana (&lt;p&gt;, &lt;h5&gt;, &lt;ul&gt;, &lt;li&gt;). Jika dikosongkan, halaman akan menampilkan format bawaan.</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    {{-- TOMBOL SIMPAN SEMUA PENGATURAN --}}
-    <div id="landingSaveBar" class="card-custom p-3 d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
-        <span class="text-muted small">
-            <i class="bi bi-info-circle me-1"></i> Perubahan yang Anda simpan akan langsung diterapkan pada beranda publik.
-        </span>
-        <button type="submit" class="btn btn-primary-custom px-4">
-            <i class="bi bi-check2-circle me-1"></i> Simpan Seluruh Pengaturan
-        </button>
-    </div>
-</form>
-
-{{-- TAB CONTENT UNTUK PERIODE DAN KEAMANAN AKUN --}}
-<div class="tab-content mb-4" id="adminUtilityTabContent">
-{{-- TAB 6: PERIODE SEMESTER --}}
-<div class="tab-pane fade" id="tabPeriode">
-    {{-- STATUS PERIODE AKTIF SAAT INI --}}
-    <div class="card-custom p-4 mb-4 border-success border-opacity-25" style="background: linear-gradient(135deg, #f0fdf4 0%, #ffffff 100%);">
-        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
-            <div class="d-flex align-items-center gap-3">
-                <div class="rounded-circle d-flex align-items-center justify-content-center bg-success text-white" style="width: 52px; height: 52px; font-size: 1.5rem;">
-                    <i class="bi bi-calendar2-check-fill"></i>
-                </div>
-                <div>
-                    <div class="d-flex align-items-center gap-2 mb-1">
-                        <h4 class="fw-bold mb-0 text-dark">{{ $periodeAktif ? $periodeAktif->nama_periode : 'Belum Ada Periode Aktif' }}</h4>
-                        @if($periodeAktif)
-                            <span class="badge bg-success px-3 py-1 fw-bold">
-                                <i class="bi bi-circle-fill me-1" style="font-size: 0.55rem;"></i>Aktif Berjalan
-                            </span>
-                        @else
-                            <span class="badge bg-danger px-3 py-1">Nonaktif</span>
-                        @endif
-                    </div>
-                    @if($periodeAktif)
-                        <div class="text-muted small">
-                            Tahun Ajaran: <strong>{{ $periodeAktif->tahun_ajaran }}</strong> &bull; Semester: <strong class="text-capitalize">{{ $periodeAktif->semester }}</strong> &bull; Rentang: <span class="font-mono text-dark">{{ $periodeAktif->tanggal_mulai ? $periodeAktif->tanggal_mulai->format('d M Y H:i:s') : '-' }} s/d {{ $periodeAktif->tanggal_selesai ? $periodeAktif->tanggal_selesai->format('d M Y H:i:s') : '-' }}</span>
-                        </div>
-                    @else
-                        <div class="text-muted small">Silakan pilih atau tambahkan periode semester baru di bawah untuk mengaktifkan penilaian siswa.</div>
-                    @endif
-                </div>
-            </div>
-            @if($periodeAktif)
-                <div class="d-flex gap-2">
-                    <span class="badge bg-white text-dark border p-2 font-mono">
-                        <i class="bi bi-file-earmark-text text-primary me-1"></i>{{ $periodeAktif->penilaian()->count() }} Penilaian Masuk
-                    </span>
-                </div>
-            @endif
-        </div>
-    </div>
-
-    {{-- KARTU FORM ATUR & UBAH PERIODE --}}
-    <div class="card-custom p-4 mb-4">
-        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
-            <div>
-                <h5 class="fw-bold mb-1" id="formPeriodeTitle">
-                    <i class="bi bi-sliders2-vertical text-primary me-2"></i>Atur & Tambah Periode Semester
-                </h5>
-                <p class="text-muted small mb-0">Tentukan periode evaluasi. Siswa hanya dapat menilai 1 kali per periode aktif.</p>
-            </div>
-            {{-- TEMPLATE PRESET CEPAT --}}
-            <div class="d-flex gap-2 flex-wrap">
-                <button type="button" class="btn btn-sm btn-outline-primary fw-semibold" onclick="applyPeriodePreset('ganjil')">
-                    <i class="bi bi-lightning-charge-fill text-warning me-1"></i> Template: Ganjil (01 Juli - 31 Des)
-                </button>
-                <button type="button" class="btn btn-sm btn-outline-primary fw-semibold" onclick="applyPeriodePreset('genap')">
-                    <i class="bi bi-lightning-charge-fill text-warning me-1"></i> Template: Genap (01 Jan - 30 Juni)
-                </button>
-                <button type="button" class="btn btn-sm btn-outline-success fw-semibold" onclick="applyPeriodePreset('test_1min')">
-                    <i class="bi bi-stopwatch text-success me-1"></i> Uji Coba: 1 Menit Kedepan
-                </button>
-            </div>
-        </div>
-
-        <form action="{{ route('admin.pengaturan.periode') }}" method="POST" id="formPeriode">
-            @csrf
-            <input type="hidden" name="periode_id" id="periodeIdInput" value="">
-            
-            <div class="row g-3">
-                <div class="col-md-6">
-                    <label class="form-label small fw-bold">Nama Periode</label>
-                    <input type="text" name="nama_periode" id="namaPeriodeInput" class="form-control" placeholder="Contoh: Semester Ganjil 2026/2027" required>
-                    <div class="form-text small">Nama resmi yang tampil di header dan portal siswa.</div>
-                </div>
-
-                <div class="col-md-3">
-                    <label class="form-label small fw-bold">Tahun Ajaran</label>
-                    <input type="text" name="tahun_ajaran" id="tahunAjaranInput" class="form-control font-mono" placeholder="2026/2027" required>
-                </div>
-
-                <div class="col-md-3">
-                    <label class="form-label small fw-bold">Semester</label>
-                    <select name="semester" id="semesterSelect" class="form-select" required>
-                        <option value="ganjil">Semester Ganjil</option>
-                        <option value="genap">Semester Genap</option>
-                    </select>
-                </div>
-
-                <div class="col-md-5">
-                    <label class="form-label small fw-bold">Waktu Mulai (Tanggal, Jam, Menit, Detik)</label>
-                    <input type="datetime-local" step="1" name="tanggal_mulai" id="tanggalMulaiInput" class="form-control font-mono" required>
-                    <div class="form-text small">Penilaian dimulai sejak waktu ini.</div>
-                </div>
-
-                <div class="col-md-5">
-                    <label class="form-label small fw-bold">Waktu Berakhir (Tanggal, Jam, Menit, Detik)</label>
-                    <input type="datetime-local" step="1" name="tanggal_selesai" id="tanggalSelesaiInput" class="form-control font-mono" required>
-                    <div class="form-text small">Setelah waktu ini, form penilaian terkunci.</div>
-                </div>
-
-                <div class="col-md-2">
-                    <label class="form-label small fw-bold">Status Periode</label>
-                    <select name="status" id="statusSelect" class="form-select" required>
-                        <option value="aktif">Aktif</option>
-                        <option value="nonaktif">Nonaktif</option>
-                    </select>
-                </div>
-
-                <div class="col-12 mt-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
-                    <button type="button" class="btn btn-outline-secondary btn-sm" onclick="resetPeriodeForm()">
-                        <i class="bi bi-arrow-counterclockwise me-1"></i> Reset Form (Buat Baru)
-                    </button>
-                    <button type="submit" class="btn btn-primary-custom px-4" id="btnSimpanPeriode">
-                        <i class="bi bi-check2-circle me-1"></i> Simpan Periode
-                    </button>
-                </div>
-            </div>
-        </form>
-
-        <div class="mt-4 p-3 rounded bg-light border">
-            <div class="d-flex align-items-start gap-2">
-                <i class="bi bi-info-circle-fill text-primary mt-1"></i>
-                <div class="small text-muted" style="line-height: 1.6;">
-                    <strong>Aturan Otomasi Semester & Reset Nilai:</strong><br>
-                    1. Saat semester baru diaktifkan, statistik & persentase guru pada dashboard dan leaderboard akan dihitung khusus untuk periode tersebut (otomatis mulai dari 0% jika belum ada ulasan).<br>
-                    2. Seluruh ulasan, kritik, saran, dan nilai siswa pada periode-periode sebelumnya tetap tersimpan aman di database sebagai histori permanen.<br>
-                    3. Setiap siswa hanya dapat memberikan nilai 1 kali per guru pada semester yang aktif.
-                </div>
-            </div>
-        </div>
-    </div>
-
-    {{-- TABEL SEMUA PERIODE --}}
-    <div class="card-custom p-4">
-        <h5 class="fw-bold mb-3"><i class="bi bi-clock-history me-2 text-primary"></i>Daftar Riwayat Periode Semester</h5>
-        <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
-                <thead class="table-light">
-                    <tr>
-                        <th>NAMA PERIODE</th>
-                        <th>SEMESTER & TAHUN</th>
-                        <th>RENTANG WAKTU</th>
-                        <th class="text-center">PENILAIAN MASUK</th>
-                        <th class="text-center">STATUS</th>
-                        <th class="text-end">AKSI</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse($semuaPeriode as $p)
-                    <tr class="{{ $p->status === 'aktif' ? 'table-success bg-opacity-10' : '' }}">
-                        <td>
-                            <strong class="text-dark">{{ $p->nama_periode }}</strong>
-                        </td>
-                        <td>
-                            <span class="badge {{ $p->semester === 'ganjil' ? 'bg-primary' : 'bg-info text-dark' }} text-uppercase">{{ $p->semester }}</span>
-                            <span class="font-mono small ms-1">{{ $p->tahun_ajaran }}</span>
-                        </td>
-                        <td class="small font-mono">
-                            <div>{{ $p->tanggal_mulai ? $p->tanggal_mulai->format('d/m/Y H:i:s') : '-' }}</div>
-                            <div class="text-muted">s/d {{ $p->tanggal_selesai ? $p->tanggal_selesai->format('d/m/Y H:i:s') : '-' }}</div>
-                        </td>
-                        <td class="text-center">
-                            <span class="badge bg-light text-dark border">{{ $p->penilaian()->count() }} Penilaian</span>
-                        </td>
-                        <td class="text-center">
-                            @if($p->status === 'aktif')
-                                <span class="badge bg-success"><i class="bi bi-circle-fill me-1" style="font-size: 0.5rem;"></i>Aktif</span>
+                                <img id="brandLogoPreview" src="{{ $settings['site_logo'] }}" alt="Logo" style="width:42px;height:42px;object-fit:contain;">
                             @else
-                                <span class="badge bg-secondary">Nonaktif</span>
+                                <i id="brandLogoIcon" class="bi bi-mortarboard-fill fs-2 text-primary"></i>
+                                <img id="brandLogoPreview" src="" alt="Logo" class="d-none" style="width:42px;height:42px;object-fit:contain;">
                             @endif
-                        </td>
-                        <td class="text-end">
-                            <div class="d-flex justify-content-end gap-1">
-                                @if($p->status !== 'aktif')
-                                    <form action="{{ route('admin.pengaturan.periode.aktifkan', $p->id) }}" method="POST" class="d-inline"
-                                          data-confirm="Aktifkan periode {{ $p->nama_periode }}? Statistik leaderboard akan dihitung berdasarkan periode ini."
-                                          data-confirm-title="Aktifkan Periode Penilaian"
-                                          data-confirm-btn="Aktifkan"
-                                          data-confirm-type="question">
-                                        @csrf
-                                        <button type="submit" class="btn btn-sm btn-success" title="Jadikan Aktif">
-                                            <i class="bi bi-check-lg me-1"></i> Aktifkan
-                                        </button>
-                                    </form>
-                                @endif
-                                <button type="button" class="btn btn-sm btn-outline-primary" onclick='editPeriode(@json($p))' title="Ubah Data">
-                                    <i class="bi bi-pencil"></i> Edit
-                                </button>
+                            <span class="fw-bold fs-4" id="brandTitlePreview"><span id="previewPart1" style="color: {{ $settings['site_title_color1'] }};">{{ $settings['site_title_part1'] }}</span><span id="previewPart2" style="color: {{ $settings['site_title_color2'] }};">{{ $settings['site_title_part2'] }}</span></span>
+                        </div>
+                    </div>
+                    <div class="col-lg-7">
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label class="form-label" for="siteTitleInput">Nama website</label>
+                                <input type="text" name="site_title" id="siteTitleInput" class="form-control" value="{{ $settings['site_title'] }}" required>
                             </div>
-                        </td>
-                    </tr>
-                    @empty
-                    <tr>
-                        <td colspan="6" class="text-center py-4 text-muted">Belum ada data periode semester.</td>
-                    </tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
-    </div>
-</div>
-
-{{-- TAB 7: KEAMANAN & AKUN --}}
-<div class="tab-pane fade" id="tabAkun">
-    {{-- INFORMASI AKUN ADMIN AKTIF --}}
-    <div class="card-custom p-4 mb-4 border-primary border-opacity-25" style="background: linear-gradient(135deg, #f0f7ff 0%, #ffffff 100%);">
-        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
-            <div class="d-flex align-items-center gap-3">
-                <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center shadow-sm" style="width: 56px; height: 56px; font-size: 1.6rem;">
-                    <i class="bi bi-shield-lock-fill"></i>
-                </div>
-                <div>
-                    <div class="d-flex align-items-center gap-2 mb-1">
-                        <h4 class="fw-bold mb-0 text-dark">{{ auth()->user()->name }}</h4>
-                        <span class="badge bg-primary px-2 py-1">Administrator Sistem</span>
-                        <span class="badge bg-success px-2 py-1"><i class="bi bi-circle-fill me-1" style="font-size: 0.5rem;"></i>Aktif</span>
-                    </div>
-                    <div class="text-muted small">
-                        Email Login: <strong class="text-dark font-mono">{{ auth()->user()->email }}</strong> &bull; Hak Akses: <strong>Superadmin (Manajemen Penuh Sistem)</strong>
+                            <div class="col-sm-6">
+                                <label class="form-label" for="part1Input">Nama bagian 1</label>
+                                <div class="input-group">
+                                    <input type="text" name="site_title_part1" id="part1Input" class="form-control" value="{{ $settings['site_title_part1'] }}">
+                                    <input type="color" name="site_title_color1" id="color1Input" class="form-control form-control-color" value="{{ $settings['site_title_color1'] }}" title="Warna bagian 1">
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <label class="form-label" for="part2Input">Nama bagian 2</label>
+                                <div class="input-group">
+                                    <input type="text" name="site_title_part2" id="part2Input" class="form-control" value="{{ $settings['site_title_part2'] }}">
+                                    <input type="color" name="site_title_color2" id="color2Input" class="form-control form-control-color" value="{{ $settings['site_title_color2'] }}" title="Warna bagian 2">
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label" for="siteLogoFileInput">Logo</label>
+                                <input type="file" name="site_logo_file" id="siteLogoFileInput" class="form-control" accept="image/png,image/jpeg,image/jpg,image/webp,image/svg+xml">
+                            </div>
+                            <div class="col-12">
+                                <details>
+                                    <summary class="settings-summary">Opsi logo</summary>
+                                    <div class="row g-3 pt-3">
+                                        <div class="col-sm-8">
+                                            <label class="form-label" for="siteLogoUrlInput">URL logo</label>
+                                            <input type="url" name="site_logo_url" id="siteLogoUrlInput" class="form-control" value="{{ $settings['site_logo'] }}" placeholder="https://...">
+                                        </div>
+                                        @if($settings['site_logo'])
+                                            <div class="col-sm-4 d-flex align-items-end">
+                                                <div class="form-check mb-2">
+                                                    <input class="form-check-input" type="checkbox" name="remove_logo" value="1" id="removeLogoCheck">
+                                                    <label class="form-check-label small" for="removeLogoCheck">Gunakan ikon bawaan</label>
+                                                </div>
+                                            </div>
+                                        @endif
+                                    </div>
+                                </details>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-            <span class="badge bg-light text-dark border p-2 font-mono">
-                <i class="bi bi-clock-history me-1 text-primary"></i> Sesi Aktif
-            </span>
-        </div>
-    </div>
+        </section>
 
-    <div class="row g-4 mb-4">
-        <div class="col-lg-8">
-            <div class="card-custom p-4 h-100">
-                <h5 class="fw-bold mb-1" style="color: var(--text-dark);">
-                    <i class="bi bi-key-fill text-primary me-2"></i>Ganti Password Administrator
-                </h5>
-                <p class="text-muted small mb-4">Perbarui password akun administrator Anda secara berkala demi keamanan data evaluasi sekolah.</p>
-
-                <form action="{{ route('admin.pengaturan.password') }}" method="POST">
-                    @csrf
-                    <div class="row g-3">
-                        <div class="col-12">
-                            <label class="form-label small fw-bold">Password Saat Ini <span class="text-danger">*</span></label>
-                            <input type="password" name="current_password" class="form-control" required placeholder="Masukkan password lama Anda">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label small fw-bold">Password Baru <span class="text-danger">*</span></label>
-                            <input type="password" name="password" class="form-control" required placeholder="Minimal 6 karakter">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label small fw-bold">Konfirmasi Password Baru <span class="text-danger">*</span></label>
-                            <input type="password" name="password_confirmation" class="form-control" required placeholder="Ulangi password baru">
-                        </div>
-                        <div class="col-12 mt-3">
-                            <button type="submit" class="btn btn-primary-custom px-4">
-                                <i class="bi bi-check2-circle me-1"></i> Perbarui Password Sekarang
-                            </button>
-                        </div>
-                    </div>
-                </form>
-            </div>
-        </div>
-        
-        <div class="col-lg-4">
-            <div class="card-custom p-4 h-100 d-flex flex-column justify-content-between">
-                <div>
-                    <h5 class="fw-bold mb-1 text-danger">
-                        <i class="bi bi-box-arrow-right me-2"></i>Keluar Sesi Akun
-                    </h5>
-                    <p class="text-muted small mb-3">Akhiri sesi login administrator di perangkat ini.</p>
-                    <div class="alert alert-warning border-0 small py-2">
-                        <i class="bi bi-info-circle me-1"></i> Pastikan seluruh perubahan pengaturan telah Anda simpan sebelum keluar.
+        <section class="settings-panel" id="tabHero" hidden>
+            <div class="settings-card">
+                <div class="d-flex align-items-center justify-content-between mb-4">
+                    <h2 class="settings-heading"><i class="bi bi-image me-2"></i>Banner beranda</h2>
+                    <span class="settings-muted">Preview langsung</span>
+                </div>
+                <div id="heroPreviewBox" class="settings-hero mb-4" style="background-image:linear-gradient(rgba(0,51,102,.82),rgba(0,51,102,.66)),url('{{ $settings['hero_image'] }}');">
+                    <div class="mw-100" style="max-width:680px;">
+                        <h3 class="h4 fw-bold mb-2" id="previewTitle">{{ $settings['hero_title'] }}</h3>
+                        <p class="mb-0 opacity-75 small" id="previewSubtitle">{{ $settings['hero_subtitle'] }}</p>
                     </div>
                 </div>
-                <div class="mt-3">
-                    <form action="{{ route('logout') }}" method="POST">
+                <div class="row g-3">
+                    <div class="col-lg-6">
+                        <label class="form-label" for="heroTitleInput">Judul</label>
+                        <input type="text" name="hero_title" id="heroTitleInput" class="form-control" value="{{ $settings['hero_title'] }}" required>
+                    </div>
+                    <div class="col-lg-6">
+                        <label class="form-label" for="heroCtaInput">Teks tombol</label>
+                        <input type="text" name="hero_cta_text" id="heroCtaInput" class="form-control" value="{{ $settings['hero_cta_text'] }}" required>
+                    </div>
+                    <div class="col-lg-8">
+                        <label class="form-label" for="heroSubtitleInput">Deskripsi</label>
+                        <textarea name="hero_subtitle" id="heroSubtitleInput" rows="3" class="form-control" required>{{ $settings['hero_subtitle'] }}</textarea>
+                    </div>
+                    <div class="col-lg-4">
+                        <label class="form-label" for="heroCtaUrlInput">Link tombol</label>
+                        <input type="text" name="hero_cta_url" id="heroCtaUrlInput" class="form-control" value="{{ $settings['hero_cta_url'] }}">
+                    </div>
+                    <div class="col-lg-6">
+                        <label class="form-label" for="heroImageFileInput">Gambar baru</label>
+                        <input type="file" name="hero_image_file" id="heroImageFileInput" class="form-control" accept="image/png,image/jpeg,image/jpg,image/webp">
+                    </div>
+                    <div class="col-lg-6">
+                        <label class="form-label" for="heroImageUrlInput">atau URL gambar</label>
+                        <input type="url" name="hero_image_url" id="heroImageUrlInput" class="form-control" value="{{ $settings['hero_image'] }}" placeholder="https://...">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="settings-panel" id="tabVisiMisi" hidden>
+            <div class="settings-card">
+                <h2 class="settings-heading mb-4"><i class="bi bi-bullseye me-2"></i>Profil beranda</h2>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label" for="visiTextInput">Visi</label>
+                        <textarea name="visi_text" id="visiTextInput" class="form-control" rows="8" placeholder="Tulis visi...">{{ $settings['visi_text'] }}</textarea>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label" for="misiTextInput">Misi</label>
+                        <textarea name="misi_text" id="misiTextInput" class="form-control" rows="8" placeholder="Satu poin per baris...">{{ $settings['misi_text'] }}</textarea>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="settings-panel" id="tabFooter" hidden>
+            <div class="settings-card">
+                <h2 class="settings-heading mb-4"><i class="bi bi-layout-text-window-reverse me-2"></i>Footer</h2>
+                <div class="row g-3">
+                    <div class="col-md-8">
+                        <label class="form-label" for="footerAboutInput">Deskripsi</label>
+                        <textarea name="footer_about" id="footerAboutInput" class="form-control" rows="4">{{ $settings['footer_about'] }}</textarea>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label" for="footerCopyrightInput">Hak cipta</label>
+                        <input type="text" name="footer_copyright" id="footerCopyrightInput" class="form-control" value="{{ $settings['footer_copyright'] }}">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="settings-panel" id="tabLegal" hidden>
+            <div class="settings-card">
+                <div class="d-flex align-items-center justify-content-between mb-4">
+                    <h2 class="settings-heading"><i class="bi bi-file-earmark-lock me-2"></i>Legal</h2>
+                    <div class="d-flex gap-2">
+                        <a href="{{ route('legal.privacy') }}" target="_blank" class="btn btn-light border btn-sm settings-icon-button" title="Lihat kebijakan privasi" aria-label="Lihat kebijakan privasi"><i class="bi bi-eye"></i></a>
+                        <a href="{{ route('legal.terms') }}" target="_blank" class="btn btn-light border btn-sm settings-icon-button" title="Lihat syarat dan ketentuan" aria-label="Lihat syarat dan ketentuan"><i class="bi bi-box-arrow-up-right"></i></a>
+                    </div>
+                </div>
+                <div class="row g-3">
+                    <div class="col-lg-6">
+                        <label class="form-label" for="privacyInput">Kebijakan privasi</label>
+                        <textarea name="kebijakan_privasi" id="privacyInput" class="form-control font-mono" rows="13">{{ $settings['kebijakan_privasi'] }}</textarea>
+                    </div>
+                    <div class="col-lg-6">
+                        <label class="form-label" for="termsInput">Syarat & ketentuan</label>
+                        <textarea name="syarat_ketentuan" id="termsInput" class="form-control font-mono" rows="13">{{ $settings['syarat_ketentuan'] }}</textarea>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="settings-panel" id="tabModerasi" hidden>
+            <div class="settings-card">
+                <h2 class="settings-heading"><i class="bi bi-shield-exclamation me-2"></i>Kata Filter Moderasi</h2>
+                <p class="settings-muted mt-1">Tambahkan kata atau frasa yang harus diblokir saat siswa mengirim penilaian. Satu kata/frasa per baris. Daftar bawaan tetap aktif.</p>
+                <label class="form-label" for="profanityWordsInput">Kata/frasa tambahan</label>
+                <textarea name="profanity_words" id="profanityWordsInput" class="form-control" rows="10" maxlength="10000" placeholder="contoh kata\ncontoh frasa">{{ $settings['profanity_words'] }}</textarea>
+            </div>
+        </section>
+
+        <div id="landingSaveBar" class="settings-save">
+            <span class="settings-muted"><i class="bi bi-cloud-check me-1"></i>Perubahan diterapkan setelah disimpan.</span>
+            <button type="submit" class="btn btn-primary-custom px-4"><i class="bi bi-check2 me-1"></i>Simpan</button>
+        </div>
+    </form>
+
+    <section class="settings-panel" id="tabPeriode" hidden>
+        <div class="settings-card mb-3">
+            <div class="d-flex align-items-center justify-content-between gap-3 flex-wrap">
+                <div>
+                    <div class="settings-muted mb-1">PERIODE AKTIF</div>
+                    <h2 class="settings-heading">{{ $periodeAktif?->nama_periode ?? 'Belum ada periode aktif' }}</h2>
+                </div>
+                @if($periodeAktif)
+                    <div class="text-md-end small">
+                        <span class="badge bg-success">Aktif</span>
+                        <span class="text-muted ms-1">{{ $periodeAktif->tanggal_mulai?->format('d M Y') }} – {{ $periodeAktif->tanggal_selesai?->format('d M Y') }}</span>
+                    </div>
+                @endif
+            </div>
+        </div>
+
+        <div class="settings-card">
+            <div class="d-flex align-items-center justify-content-between mb-4">
+                <h2 class="settings-heading" id="formPeriodeTitle"><i class="bi bi-calendar-plus me-2"></i>Periode</h2>
+                <button type="button" class="btn btn-light border btn-sm" onclick="resetPeriodeForm()"><i class="bi bi-plus-lg me-1"></i>Baru</button>
+            </div>
+            <form action="{{ route('admin.pengaturan.periode') }}" method="POST" id="formPeriode">
+                @csrf
+                <input type="hidden" name="periode_id" id="periodeIdInput">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label" for="namaPeriodeInput">Nama</label>
+                        <input type="text" name="nama_periode" id="namaPeriodeInput" class="form-control" placeholder="Semester Ganjil 2026/2027" required>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label" for="tahunAjaranInput">Tahun ajaran</label>
+                        <input type="text" name="tahun_ajaran" id="tahunAjaranInput" class="form-control" placeholder="2026/2027" required>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label" for="semesterSelect">Semester</label>
+                        <select name="semester" id="semesterSelect" class="form-select" required><option value="ganjil">Ganjil</option><option value="genap">Genap</option></select>
+                    </div>
+                    <div class="col-md-5">
+                        <label class="form-label" for="tanggalMulaiInput">Mulai</label>
+                        <input type="datetime-local" step="1" name="tanggal_mulai" id="tanggalMulaiInput" class="form-control" required>
+                    </div>
+                    <div class="col-md-5">
+                        <label class="form-label" for="tanggalSelesaiInput">Selesai</label>
+                        <input type="datetime-local" step="1" name="tanggal_selesai" id="tanggalSelesaiInput" class="form-control" required>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label" for="statusSelect">Status</label>
+                        <select name="status" id="statusSelect" class="form-select" required><option value="aktif">Aktif</option><option value="nonaktif">Nonaktif</option></select>
+                    </div>
+                    <div class="col-12 d-flex justify-content-end"><button type="submit" class="btn btn-primary-custom px-4" id="btnSimpanPeriode"><i class="bi bi-check2 me-1"></i>Simpan</button></div>
+                </div>
+            </form>
+        </div>
+
+        <div class="settings-card">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <h2 class="settings-heading"><i class="bi bi-clock-history me-2"></i>Riwayat</h2>
+                <span class="settings-muted">{{ $semuaPeriode->count() }} periode</span>
+            </div>
+            <div class="table-responsive">
+                <table class="table align-middle mb-0">
+                    <thead class="table-light"><tr><th>Periode</th><th>Rentang</th><th>Status</th><th class="text-end">Aksi</th></tr></thead>
+                    <tbody>
+                        @forelse($semuaPeriode as $p)
+                            <tr>
+                                <td><div class="fw-semibold">{{ $p->nama_periode }}</div><small class="text-muted text-capitalize">{{ $p->semester }} · {{ $p->tahun_ajaran }}</small></td>
+                                <td class="small text-muted">{{ $p->tanggal_mulai?->format('d/m/Y H:i') }} – {{ $p->tanggal_selesai?->format('d/m/Y H:i') }}</td>
+                                <td><span class="badge {{ $p->status === 'aktif' ? 'bg-success' : 'bg-secondary' }}">{{ ucfirst($p->status) }}</span></td>
+                                <td class="text-end text-nowrap">
+                                    @if($p->status !== 'aktif')
+                                        <form action="{{ route('admin.pengaturan.periode.aktifkan', $p) }}" method="POST" class="d-inline" data-confirm="Aktifkan periode {{ $p->nama_periode }}?" data-confirm-title="Aktifkan periode" data-confirm-btn="Aktifkan" data-confirm-type="question">
+                                            @csrf
+                                            <button type="submit" class="btn btn-sm btn-success settings-icon-button" title="Aktifkan" aria-label="Aktifkan {{ $p->nama_periode }}"><i class="bi bi-check-lg"></i></button>
+                                        </form>
+                                    @endif
+                                    <button type="button" class="btn btn-sm btn-light border settings-icon-button" onclick='editPeriode(@json($p))' title="Edit" aria-label="Edit {{ $p->nama_periode }}"><i class="bi bi-pencil"></i></button>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr><td colspan="4" class="text-center text-muted py-4">Belum ada periode.</td></tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <section class="settings-panel" id="tabAkun" hidden>
+        <div class="row g-3">
+            <div class="col-lg-8">
+                <div class="settings-card h-100">
+                    <div class="d-flex align-items-center justify-content-between mb-4">
+                        <div>
+                            <h2 class="settings-heading"><i class="bi bi-shield-lock me-2"></i>Keamanan akun</h2>
+                            <div class="settings-muted mt-1">{{ auth()->user()->email }}</div>
+                        </div>
+                        <span class="badge bg-primary">Admin</span>
+                    </div>
+                    <form action="{{ route('admin.pengaturan.password') }}" method="POST">
                         @csrf
-                        <button type="submit" class="btn btn-danger w-100 py-2 fw-semibold">
-                            <i class="bi bi-box-arrow-right me-1"></i> Keluar (Logout)
-                        </button>
+                        <div class="row g-3">
+                            <div class="col-12"><label class="form-label" for="currentPassword">Password saat ini</label><div class="input-group"><input type="password" name="current_password" id="currentPassword" class="form-control" required><button type="button" class="btn btn-outline-secondary toggle-password" data-target="currentPassword" aria-label="Tampilkan password saat ini"><i class="bi bi-eye"></i></button></div></div>
+                            <div class="col-md-6"><label class="form-label" for="newPassword">Password baru</label><div class="input-group"><input type="password" name="password" id="newPassword" class="form-control" minlength="6" required><button type="button" class="btn btn-outline-secondary toggle-password" data-target="newPassword" aria-label="Tampilkan password baru"><i class="bi bi-eye"></i></button></div></div>
+                            <div class="col-md-6"><label class="form-label" for="newPasswordConfirmation">Konfirmasi password</label><div class="input-group"><input type="password" name="password_confirmation" id="newPasswordConfirmation" class="form-control" minlength="6" required><button type="button" class="btn btn-outline-secondary toggle-password" data-target="newPasswordConfirmation" aria-label="Tampilkan konfirmasi password"><i class="bi bi-eye"></i></button></div></div>
+                            <div class="col-12 d-flex justify-content-end"><button type="submit" class="btn btn-primary-custom px-4"><i class="bi bi-check2 me-1"></i>Perbarui</button></div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="settings-card h-100 d-flex flex-column justify-content-between">
+                    <div><h2 class="settings-heading"><i class="bi bi-person-circle me-2"></i>{{ auth()->user()->name }}</h2><p class="settings-muted mt-2 mb-0">Sesi administrator aktif.</p></div>
+                    <form action="{{ route('logout') }}" method="POST" class="mt-4">@csrf <button type="submit" class="btn btn-outline-danger w-100"><i class="bi bi-box-arrow-right me-1"></i>Keluar</button></form>
+                </div>
+            </div>
+            <div class="col-12">
+                <div class="settings-card border-danger border-opacity-25 d-flex align-items-center justify-content-between flex-wrap gap-3">
+                    <div>
+                        <h2 class="settings-heading text-danger"><i class="bi bi-exclamation-triangle me-2 text-danger"></i>Hapus seluruh penilaian</h2>
+                        <div class="settings-muted mt-1">{{ number_format($jumlahPenilaian, 0, ',', '.') }} penilaian akan dihapus permanen. Log pelanggaran tetap disimpan sebagai audit.</div>
+                    </div>
+                    <button type="button" class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#resetPenilaianModal"><i class="bi bi-shield-exclamation me-1"></i>Lanjutkan</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="resetPenilaianModal" tabindex="-1" aria-labelledby="resetPenilaianModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-danger">
+                    <form action="{{ route('admin.pengaturan.reset') }}" method="POST" id="resetPenilaianForm">
+                        @csrf
+                        <div class="modal-header border-danger border-opacity-25">
+                            <div>
+                                <h2 class="modal-title fs-5 text-danger" id="resetPenilaianModalLabel"><i class="bi bi-exclamation-octagon-fill me-2"></i>Konfirmasi penghapusan</h2>
+                                <div class="small text-muted mt-1">Aksi ini tidak dapat dibatalkan.</div>
+                            </div>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="alert alert-danger small py-2">
+                                Data nilai, kritik, saran, dan balasan dari <strong>{{ number_format($jumlahPenilaian, 0, ',', '.') }}</strong> penilaian akan dihapus. Statistik seluruh guru akan kembali ke nol.
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label" for="resetCurrentPassword">Password administrator</label>
+                                <div class="input-group"><input type="password" name="reset_current_password" id="resetCurrentPassword" class="form-control @error('reset_current_password') is-invalid @enderror" autocomplete="current-password" required><button type="button" class="btn btn-outline-secondary toggle-password" data-target="resetCurrentPassword" aria-label="Tampilkan password administrator"><i class="bi bi-eye"></i></button></div>
+                                @error('reset_current_password')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label" for="resetConfirmation">Ketik <code>HAPUS PENILAIAN</code></label>
+                                <input type="text" name="reset_confirmation" id="resetConfirmation" class="form-control @error('reset_confirmation') is-invalid @enderror" autocomplete="off" required>
+                                @error('reset_confirmation')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input @error('reset_acknowledged') is-invalid @enderror" type="checkbox" name="reset_acknowledged" value="1" id="resetAcknowledged" required>
+                                <label class="form-check-label small" for="resetAcknowledged">Saya memahami bahwa data penilaian tidak dapat dipulihkan.</label>
+                                @error('reset_acknowledged')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-light border" data-bs-dismiss="modal">Batal</button>
+                            <button type="submit" class="btn btn-danger" id="resetSubmitButton" disabled><i class="bi bi-trash3 me-1"></i>Hapus permanen</button>
+                        </div>
                     </form>
                 </div>
             </div>
         </div>
-    </div>
-
-    {{-- RESET DATA PENILAIAN --}}
-    <div class="card-custom p-4 border-danger border-opacity-25" style="background: #fff5f5;">
-        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
-            <div>
-                <h6 class="fw-bold text-danger mb-1"><i class="bi bi-exclamation-triangle-fill me-2"></i>Reset Seluruh Data Penilaian Siswa</h6>
-                <p class="text-muted small mb-0">Tindakan ini akan mengosongkan seluruh skor, kritik, saran, dan mereset statistik guru ke 0.</p>
-            </div>
-            <form action="{{ route('admin.pengaturan.reset') }}" method="POST"
-                  data-confirm="PERINGATAN! Seluruh data penilaian, skor, kritik, dan saran siswa akan dihapus permanen dan statistik guru direset ke 0. Lanjutkan?"
-                  data-confirm-title="Reset Seluruh Data Penilaian"
-                  data-confirm-btn="Ya, Reset Semua Data"
-                  data-confirm-type="danger">
-                @csrf
-                <button type="submit" class="btn btn-outline-danger btn-sm">
-                    <i class="bi bi-trash3 me-1"></i> Reset Data Penilaian
-                </button>
-            </form>
-        </div>
-    </div>
+    </section>
 </div>
-</div> {{-- Tutup adminUtilityTabContent --}}
 
 <script>
-function setHeroPreset(url) {
-    document.getElementById('heroImageUrlInput').value = url;
-    document.getElementById('heroPreviewBox').style.backgroundImage = "linear-gradient(rgba(0,51,102,0.85), rgba(0,51,102,0.7)), url('" + url + "')";
-}
+function padZero(number) { return number.toString().padStart(2, '0'); }
+function formatDatetimeLocal(date) { return `${date.getFullYear()}-${padZero(date.getMonth() + 1)}-${padZero(date.getDate())}T${padZero(date.getHours())}:${padZero(date.getMinutes())}:${padZero(date.getSeconds())}`; }
 
-function padZero(num) {
-    return num.toString().padStart(2, '0');
-}
-
-function formatDatetimeLocal(date) {
-    const year = date.getFullYear();
-    const month = padZero(date.getMonth() + 1);
-    const day = padZero(date.getDate());
-    const hours = padZero(date.getHours());
-    const minutes = padZero(date.getMinutes());
-    const seconds = padZero(date.getSeconds());
-    return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
-}
-
-function applyPeriodePreset(type) {
-    const now = new Date();
-    const curYear = now.getFullYear();
-    const namaInp = document.getElementById('namaPeriodeInput');
-    const thInp = document.getElementById('tahunAjaranInput');
-    const smtSelect = document.getElementById('semesterSelect');
-    const startInp = document.getElementById('tanggalMulaiInput');
-    const endInp = document.getElementById('tanggalSelesaiInput');
-    const statusSelect = document.getElementById('statusSelect');
-
-    if (type === 'ganjil') {
-        const nextYear = curYear + 1;
-        namaInp.value = `Semester Ganjil ${curYear}/${nextYear}`;
-        thInp.value = `${curYear}/${nextYear}`;
-        smtSelect.value = 'ganjil';
-        startInp.value = `${curYear}-07-01T00:00:00`;
-        endInp.value = `${curYear}-12-31T23:59:59`;
-        statusSelect.value = 'aktif';
-    } else if (type === 'genap') {
-        const nextYear = curYear + 1;
-        namaInp.value = `Semester Genap ${curYear}/${nextYear}`;
-        thInp.value = `${curYear}/${nextYear}`;
-        smtSelect.value = 'genap';
-        startInp.value = `${nextYear}-01-01T00:00:00`;
-        endInp.value = `${nextYear}-06-30T23:59:59`;
-        statusSelect.value = 'aktif';
-    } else if (type === 'test_1min') {
-        const nextYear = curYear + 1;
-        const endTime = new Date(now.getTime() + 60 * 1000); // 1 minute in the future
-        namaInp.value = `Uji Coba 1 Menit (${padZero(now.getHours())}:${padZero(now.getMinutes())}:${padZero(now.getSeconds())})`;
-        thInp.value = `${curYear}/${nextYear}`;
-        smtSelect.value = 'ganjil';
-        startInp.value = formatDatetimeLocal(now);
-        endInp.value = formatDatetimeLocal(endTime);
-        statusSelect.value = 'aktif';
-    }
-}
-
-function editPeriode(p) {
-    document.getElementById('periodeIdInput').value = p.id;
-    document.getElementById('namaPeriodeInput').value = p.nama_periode || '';
-    document.getElementById('tahunAjaranInput').value = p.tahun_ajaran || '';
-    document.getElementById('semesterSelect').value = p.semester || 'ganjil';
-    
-    // Format datetime string for input
-    if (p.tanggal_mulai) {
-        const dStart = new Date(p.tanggal_mulai);
-        document.getElementById('tanggalMulaiInput').value = !isNaN(dStart) ? formatDatetimeLocal(dStart) : p.tanggal_mulai.substring(0, 19).replace(' ', 'T');
-    }
-    if (p.tanggal_selesai) {
-        const dEnd = new Date(p.tanggal_selesai);
-        document.getElementById('tanggalSelesaiInput').value = !isNaN(dEnd) ? formatDatetimeLocal(dEnd) : p.tanggal_selesai.substring(0, 19).replace(' ', 'T');
-    }
-    document.getElementById('statusSelect').value = p.status || 'aktif';
-
-    const btn = document.getElementById('btnSimpanPeriode');
-    btn.innerHTML = '<i class="bi bi-pencil-square me-1"></i> Perbarui Periode #' + p.id;
-    btn.className = 'btn btn-warning px-4 fw-bold';
-
-    // Scroll to form
+function editPeriode(periode) {
+    document.getElementById('periodeIdInput').value = periode.id;
+    document.getElementById('namaPeriodeInput').value = periode.nama_periode || '';
+    document.getElementById('tahunAjaranInput').value = periode.tahun_ajaran || '';
+    document.getElementById('semesterSelect').value = periode.semester || 'ganjil';
+    document.getElementById('statusSelect').value = periode.status || 'aktif';
+    ['tanggal_mulai', 'tanggal_selesai'].forEach(function(field) {
+        if (!periode[field]) return;
+        const date = new Date(periode[field]);
+        document.getElementById(field === 'tanggal_mulai' ? 'tanggalMulaiInput' : 'tanggalSelesaiInput').value = isNaN(date) ? periode[field].substring(0, 19).replace(' ', 'T') : formatDatetimeLocal(date);
+    });
+    const submit = document.getElementById('btnSimpanPeriode');
+    submit.innerHTML = '<i class="bi bi-check2 me-1"></i>Perbarui';
+    submit.className = 'btn btn-warning px-4';
     document.getElementById('formPeriode').scrollIntoView({ behavior: 'smooth', block: 'center' });
 }
 
 function resetPeriodeForm() {
-    document.getElementById('periodeIdInput').value = '';
     document.getElementById('formPeriode').reset();
-    const btn = document.getElementById('btnSimpanPeriode');
-    btn.innerHTML = '<i class="bi bi-check2-circle me-1"></i> Simpan Periode';
-    btn.className = 'btn btn-primary-custom px-4';
+    document.getElementById('periodeIdInput').value = '';
+    const submit = document.getElementById('btnSimpanPeriode');
+    submit.innerHTML = '<i class="bi bi-check2 me-1"></i>Simpan';
+    submit.className = 'btn btn-primary-custom px-4';
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-    // Tab hash persistence
-    const hash = window.location.hash;
-    if (hash) {
-        const triggerEl = document.querySelector(`button[data-bs-target="${hash}"]`);
-        if (triggerEl) {
-            const tab = new bootstrap.Tab(triggerEl);
-            tab.show();
-        }
-    }
-    document.querySelectorAll('button[data-bs-toggle="pill"]').forEach(tabBtn => {
-        tabBtn.addEventListener('shown.bs.tab', (e) => {
-            const target = e.target.getAttribute('data-bs-target');
-            if (target) history.replaceState(null, null, target);
-        });
-    });
-
-    // Dual-Color Brand live preview
-    const part1Inp = document.getElementById('part1Input');
-    const part2Inp = document.getElementById('part2Input');
-    const color1Inp = document.getElementById('color1Input');
-    const color2Inp = document.getElementById('color2Input');
-    const previewPart1 = document.getElementById('previewPart1');
-    const previewPart2 = document.getElementById('previewPart2');
-
-    function updateBrandPreview() {
-        if (previewPart1 && part1Inp && color1Inp) {
-            previewPart1.innerText = part1Inp.value || 'Guru';
-            previewPart1.style.color = color1Inp.value;
-        }
-        if (previewPart2 && part2Inp && color2Inp) {
-            previewPart2.innerText = part2Inp.value || 'Kuu';
-            previewPart2.style.color = color2Inp.value;
-        }
-    }
-
-    if (part1Inp) part1Inp.addEventListener('input', updateBrandPreview);
-    if (part2Inp) part2Inp.addEventListener('input', updateBrandPreview);
-    if (color1Inp) color1Inp.addEventListener('input', updateBrandPreview);
-    if (color2Inp) color2Inp.addEventListener('input', updateBrandPreview);
-
-    // Site logo file live preview
-    const siteLogoFileInput = document.getElementById('siteLogoFileInput');
-    const brandLogoPreview = document.getElementById('brandLogoPreview');
-    if (siteLogoFileInput && brandLogoPreview) {
-        siteLogoFileInput.addEventListener('change', function() {
-            if (this.files && this.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    brandLogoPreview.src = e.target.result;
-                };
-                reader.readAsDataURL(this.files[0]);
-            }
-        });
-    }
-
-    // Hero Live Previews
-    const titleInp = document.getElementById('heroTitleInput');
-    const subInp = document.getElementById('heroSubtitleInput');
-    const ctaInp = document.getElementById('heroCtaInput');
-    const imgUrlInp = document.getElementById('heroImageUrlInput');
-    const imgFileInput = document.getElementById('heroImageFileInput');
-    const previewBox = document.getElementById('heroPreviewBox');
-
-    if (titleInp) titleInp.addEventListener('input', () => document.getElementById('previewTitle').innerText = titleInp.value);
-    if (subInp) subInp.addEventListener('input', () => document.getElementById('previewSubtitle').innerText = subInp.value);
-    if (ctaInp) ctaInp.addEventListener('input', () => document.getElementById('previewBtn').innerText = ctaInp.value);
-
-    if (imgUrlInp && previewBox) {
-        imgUrlInp.addEventListener('input', () => {
-            if (imgUrlInp.value) {
-                previewBox.style.backgroundImage = "linear-gradient(rgba(0,51,102,0.85), rgba(0,51,102,0.7)), url('" + imgUrlInp.value + "')";
-            }
-        });
-    }
-
-    if (imgFileInput && previewBox) {
-        imgFileInput.addEventListener('change', function() {
-            if (this.files && this.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    previewBox.style.backgroundImage = "linear-gradient(rgba(0,51,102,0.85), rgba(0,51,102,0.7)), url('" + e.target.result + "')";
-                };
-                reader.readAsDataURL(this.files[0]);
-            }
-        });
-    }
-
-    // Tab Switching & Save Bar Visibility Management
-    const tabButtons = document.querySelectorAll('#pengaturanTabs button[data-bs-toggle="pill"]');
+    const tabButtons = document.querySelectorAll('#pengaturanTabs [data-target]');
+    const panels = document.querySelectorAll('.settings-panel');
     const landingSaveBar = document.getElementById('landingSaveBar');
-    const landingTabs = ['#tabBrand', '#tabHero', '#tabVisiMisi', '#tabFooter', '#tabLegal'];
-
-    function activateTabByTarget(target) {
-        // Toggle visibility of landing save bar
-        if (landingSaveBar) {
-            landingSaveBar.style.display = landingTabs.includes(target) ? 'flex' : 'none';
-        }
-
-        // Deactivate all tab panes across all tab containers
-        document.querySelectorAll('.tab-pane').forEach(p => {
-            p.classList.remove('show', 'active');
-        });
-
-        // Activate the target pane
-        const activePane = document.querySelector(target);
-        if (activePane) {
-            activePane.classList.add('show', 'active');
-        }
-
-        // Activate the button
-        tabButtons.forEach(btn => {
-            if (btn.getAttribute('data-bs-target') === target) {
-                btn.classList.add('active');
-            } else {
-                btn.classList.remove('active');
-            }
-        });
+    const landingTargets = ['#tabBrand', '#tabHero', '#tabVisiMisi', '#tabFooter', '#tabLegal', '#tabModerasi'];
+    function showTab(target, updateHash = true) {
+        if (!document.querySelector(target)) return;
+        panels.forEach(panel => panel.hidden = '#' + panel.id !== target);
+        tabButtons.forEach(button => button.classList.toggle('active', button.dataset.target === target));
+        landingSaveBar.hidden = !landingTargets.includes(target);
+        if (updateHash) history.replaceState(null, '', target);
     }
+    tabButtons.forEach(button => button.addEventListener('click', () => showTab(button.dataset.target)));
+    if (window.location.hash && document.querySelector(window.location.hash)) showTab(window.location.hash, false);
 
-    tabButtons.forEach(btn => {
-        btn.addEventListener('click', function(e) {
-            e.preventDefault();
-            const target = this.getAttribute('data-bs-target');
-            activateTabByTarget(target);
-            if (history.pushState) {
-                history.pushState(null, null, target);
-            } else {
-                window.location.hash = target;
-            }
-        });
+    const part1 = document.getElementById('part1Input');
+    const part2 = document.getElementById('part2Input');
+    const color1 = document.getElementById('color1Input');
+    const color2 = document.getElementById('color2Input');
+    function updateBrandPreview() {
+        document.getElementById('previewPart1').textContent = part1.value || 'Guru';
+        document.getElementById('previewPart2').textContent = part2.value || 'Kuu';
+        document.getElementById('previewPart1').style.color = color1.value;
+        document.getElementById('previewPart2').style.color = color2.value;
+    }
+    [part1, part2, color1, color2].forEach(input => input.addEventListener('input', updateBrandPreview));
+
+    document.getElementById('siteLogoFileInput').addEventListener('change', function() {
+        if (!this.files[0]) return;
+        const reader = new FileReader();
+        reader.onload = event => {
+            const image = document.getElementById('brandLogoPreview');
+            image.src = event.target.result;
+            image.classList.remove('d-none');
+            document.getElementById('brandLogoIcon')?.classList.add('d-none');
+        };
+        reader.readAsDataURL(this.files[0]);
     });
 
-    // Handle hash on initial load (e.g. #tabAkun or #tabPeriode)
-    const initialHash = window.location.hash;
-    if (initialHash && document.querySelector(initialHash)) {
-        activateTabByTarget(initialHash);
+    const heroPreview = document.getElementById('heroPreviewBox');
+    const heroTitle = document.getElementById('heroTitleInput');
+    const heroSubtitle = document.getElementById('heroSubtitleInput');
+    const heroUrl = document.getElementById('heroImageUrlInput');
+    heroTitle.addEventListener('input', () => document.getElementById('previewTitle').textContent = heroTitle.value);
+    heroSubtitle.addEventListener('input', () => document.getElementById('previewSubtitle').textContent = heroSubtitle.value);
+    heroUrl.addEventListener('input', () => { if (heroUrl.value) heroPreview.style.backgroundImage = `linear-gradient(rgba(0,51,102,.82),rgba(0,51,102,.66)),url('${heroUrl.value}')`; });
+    document.getElementById('heroImageFileInput').addEventListener('change', function() {
+        if (!this.files[0]) return;
+        const reader = new FileReader();
+        reader.onload = event => heroPreview.style.backgroundImage = `linear-gradient(rgba(0,51,102,.82),rgba(0,51,102,.66)),url('${event.target.result}')`;
+        reader.readAsDataURL(this.files[0]);
+    });
+
+    const resetModalElement = document.getElementById('resetPenilaianModal');
+    const resetPhrase = document.getElementById('resetConfirmation');
+    const resetAcknowledged = document.getElementById('resetAcknowledged');
+    const resetSubmitButton = document.getElementById('resetSubmitButton');
+    function updateResetButton() {
+        resetSubmitButton.disabled = resetPhrase.value !== 'HAPUS PENILAIAN' || !resetAcknowledged.checked;
     }
+    resetPhrase.addEventListener('input', updateResetButton);
+    resetAcknowledged.addEventListener('change', updateResetButton);
+    document.querySelectorAll('.toggle-password').forEach(button => button.addEventListener('click', function() {
+        const input = document.getElementById(this.dataset.target);
+        const icon = this.querySelector('i');
+        const visible = input.type === 'password';
+        input.type = visible ? 'text' : 'password';
+        icon.classList.toggle('bi-eye', !visible);
+        icon.classList.toggle('bi-eye-slash', visible);
+        this.setAttribute('aria-label', visible ? 'Sembunyikan password' : 'Tampilkan password');
+    }));
+
+    @if($errors->has('reset_current_password') || $errors->has('reset_confirmation') || $errors->has('reset_acknowledged'))
+        showTab('#tabAkun', false);
+        bootstrap.Modal.getOrCreateInstance(resetModalElement).show();
+    @endif
 });
 </script>
 @endsection

@@ -381,41 +381,6 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
-        // 🛡️ Client-side filter cek kata kasar / toxic (Bahasa Indonesia & English)
-        const toxicWords = @json(\App\Services\ProfanityFilterService::getBadWords());
-        const kritikVal = (document.getElementById('kritikInput')?.value || '').toLowerCase();
-        const saranVal = (document.getElementById('saranInput')?.value || '').toLowerCase();
-        const combinedText = kritikVal + ' ' + saranVal;
-
-        // Leet replacement map
-        const leetMap = { '0': 'o', '1': 'i', '3': 'e', '4': 'a', '5': 's', '7': 't', '8': 'b', '@': 'a', '$': 's', '!': 'i' };
-        let normalized = combinedText.replace(/[0134578@$!]/g, m => leetMap[m] || m);
-        normalized = normalized.replace(/(.)\1{2,}/g, '$1'); // reduce repetitions
-
-        let detected = [];
-        toxicWords.forEach(word => {
-            const regex = new RegExp('\\b' + word + '\\b', 'i');
-            if (regex.test(combinedText) || regex.test(normalized)) {
-                detected.push(word);
-            }
-        });
-
-        if (detected.length > 0) {
-            e.preventDefault();
-            const uniqueDetected = [...new Set(detected)].map(w => `'${w}'`).join(', ');
-            if (typeof Swal !== 'undefined') {
-                Swal.fire({
-                    title: 'Peringatan Etika & Sopan Santun',
-                    html: `Ulasan Anda terdeteksi mengandung kata yang tidak pantas atau tidak pantas digunakan:<br><strong class="text-danger">${uniqueDetected}</strong><br><br><small class="text-muted">Mohon sampaikan masukan secara santun, objektif, dan membangun demi etika akademik.</small>`,
-                    icon: 'error',
-                    confirmButtonColor: '#003366',
-                    confirmButtonText: 'Perbaiki Kalimat'
-                });
-            } else {
-                alert('Ulasan mengandung kata tidak pantas: ' + uniqueDetected);
-            }
-            return;
-        }
     });
 });
 </script>

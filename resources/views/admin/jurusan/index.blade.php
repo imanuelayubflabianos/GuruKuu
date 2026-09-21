@@ -14,8 +14,12 @@
 </div>
 
 <div class="card-custom">
+    <div class="d-flex justify-content-between align-items-center px-3 px-md-4 py-3 border-bottom">
+        <span class="small text-muted">Menampilkan {{ $jurusans->firstItem() ?? 0 }}–{{ $jurusans->lastItem() ?? 0 }} dari {{ $jurusans->total() }} jurusan</span>
+        <span class="badge bg-light text-dark border">15 per halaman</span>
+    </div>
     <div class="table-responsive">
-        <table class="table table-custom mb-0" id="jurusanTable">
+        <table class="table table-custom mb-0">
             <thead>
                 <tr>
                     <th style="width: 70px;">LOGO</th>
@@ -77,6 +81,9 @@
             </tbody>
         </table>
     </div>
+    @if($jurusans->hasPages())
+        <div class="px-3 px-md-4 py-3 border-top d-flex justify-content-center">{{ $jurusans->links() }}</div>
+    @endif
 </div>
 
 <!-- Modal Tambah Jurusan -->
@@ -120,15 +127,5 @@
 
 @push('scripts')
 <script>
-$(document).ready(function() {
-    if ($.fn.DataTable.isDataTable('#jurusanTable')) {
-        $('#jurusanTable').DataTable().destroy();
-    }
-    $('#jurusanTable').DataTable({
-        language: { url: '//cdn.datatables.net/plug-ins/1.13.8/i18n/id.json' },
-        searching: true,
-        pageLength: 10
-    });
-});
 </script>
 @endpush

@@ -184,26 +184,16 @@ class DashboardController extends Controller
         return back()->with('success', 'Balasan ulasan berhasil dihapus.');
     }
 
-    public function leaderboard()
+    public function leaderboard(Request $request)
     {
         $periodeAktif = Periode::where('status', 'aktif')->first();
-        
-        $leaderboard = Guru::with('jurusan')
-            ->where('total_penilaian', '>', 0)
-            ->orderBy('rata_rata_nilai', 'desc')
-            ->orderBy('total_penilaian', 'desc')
-            ->get();
-
-        // Fallback jika belum ada penilaian
-        if ($leaderboard->isEmpty()) {
-            $leaderboard = Guru::with('jurusan')
-                ->orderBy('nama', 'asc')
-                ->get();
-        }
+        $kelasList = \App\Models\Kelas::with('jurusan')->orderBy('tingkat')->orderBy('nama_kelas')->get();
+        $mode = $request->input('mode', 'rating');
+        $kelasId = $request->integer('kelas_id') ?: null;
+        $leaderboard = Guru::leaderboardFor($mode, $kelasId, $periodeAktif?->id);
 
         return view('guru.leaderboard', compact(
-            'periodeAktif',
-            'leaderboard'
+            'periodeAktif', 'leaderboard', 'kelasList', 'mode', 'kelasId'
         ));
     }
 

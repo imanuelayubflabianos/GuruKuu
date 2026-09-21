@@ -9,6 +9,7 @@ use App\Models\Kelas;
 use App\Models\User;
 use App\Services\SiPintuService;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class SiPintuController extends Controller
 {
@@ -54,7 +55,14 @@ class SiPintuController extends Controller
         }
 
         $result = $this->siPintu->getTeachers($params);
-        $teachers = $result['data'] ?? [];
+        $allTeachers = $result['data'] ?? [];
+        $teachers = new LengthAwarePaginator(
+            array_slice($allTeachers, ($request->integer('page', 1) - 1) * 25, 25),
+            count($allTeachers),
+            25,
+            $request->integer('page', 1),
+            ['path' => $request->url(), 'query' => $request->except('page')]
+        );
 
         // Fetch all local NIPs for quick lookup
         $localNips = Guru::pluck('nip')->filter()->toArray();
@@ -87,7 +95,14 @@ class SiPintuController extends Controller
         $params['only_active'] = $onlyActive;
 
         $result = $this->siPintu->getStudents($params);
-        $students = $result['data'] ?? [];
+        $allStudents = $result['data'] ?? [];
+        $students = new LengthAwarePaginator(
+            array_slice($allStudents, ($request->integer('page', 1) - 1) * 25, 25),
+            count($allStudents),
+            25,
+            $request->integer('page', 1),
+            ['path' => $request->url(), 'query' => $request->except('page')]
+        );
 
         // Fetch all local NISs for quick lookup
         $localNisList = User::where('role', 'siswa')->pluck('nis')->filter()->toArray();

@@ -135,22 +135,6 @@
                                 </form>
                             @endif
                             
-                            <form action="{{ route('admin.manajemen-akun.generate-password', $s) }}" method="POST" class="d-inline" 
-                                  onsubmit="return confirm('Generate password baru untuk {{ $s->name }}? Password lama akan diganti.')">
-                                @csrf
-                                <button type="submit" class="btn btn-sm btn-primary-custom" title="Generate Password">
-                                    <i class="bi bi-key"></i>
-                                </button>
-                            </form>
-
-                            <form action="{{ route('admin.manajemen-akun.reset-password', $s) }}" method="POST" class="d-inline"
-                                  onsubmit="return confirm('Reset password {{ $s->name }}? Siswa akan menerima password baru.')">
-                                @csrf
-                                <button type="submit" class="btn btn-sm btn-outline-custom" title="Reset Password">
-                                    <i class="bi bi-arrow-clockwise"></i>
-                                </button>
-                            </form>
-
                             @if($s->is_active)
                                 <form action="{{ route('admin.manajemen-akun.deactivate', $s) }}" method="POST" class="d-inline"
                                       onsubmit="return confirm('Nonaktifkan akun {{ $s->name }}?')">

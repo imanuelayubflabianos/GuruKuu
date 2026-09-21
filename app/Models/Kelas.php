@@ -18,6 +18,25 @@ class Kelas extends Model
         'jumlah_siswa',
     ];
 
+    public function getLabelSingkatAttribute(): string
+    {
+        $nama = trim((string) $this->nama_kelas);
+        $tingkat = trim((string) $this->tingkat);
+        $kodeJurusan = trim((string) ($this->jurusan?->kode_jurusan ?? ''));
+
+        $nama = preg_replace('/\s*Kelas\s*' . preg_quote($tingkat, '/') . '\s*/i', ' ', $nama);
+        $nama = trim(preg_replace('/\s+/', ' ', $nama));
+
+        if ($kodeJurusan !== '' && !str_contains(strtolower($nama), strtolower($kodeJurusan))) {
+            $nomorKelas = preg_match('/(\d+)\s*$/', $nama, $matches) ? $matches[1] : '';
+            if ($nomorKelas !== '') {
+                $nama = $kodeJurusan . ' ' . $nomorKelas;
+            }
+        }
+
+        return $tingkat !== '' ? 'Kelas ' . $tingkat . ' ' . $nama : $nama;
+    }
+
     public function jurusan()
     {
         return $this->belongsTo(Jurusan::class);

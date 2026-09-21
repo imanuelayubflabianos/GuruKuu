@@ -27,14 +27,11 @@ class ExportController extends Controller
     {
         $periodeAktif = Periode::where('status', 'aktif')->first();
         $leaderboard = Guru::with('jurusan')
-            ->where('total_penilaian', '>', 0)
+            ->withRatings()
             ->orderBy('rata_rata_nilai', 'desc')
             ->orderBy('total_penilaian', 'desc')
             ->get();
 
-        if ($leaderboard->isEmpty()) {
-            $leaderboard = Guru::with('jurusan')->orderBy('nama', 'asc')->get();
-        }
 
         $pdf = Pdf::loadView('exports.leaderboard-pdf', compact('leaderboard', 'periodeAktif'))
             ->setPaper('a4', 'portrait');
@@ -85,13 +82,10 @@ class ExportController extends Controller
 
         $periodeAktif = Periode::where('status', 'aktif')->first();
         $leaderboard = Guru::with('jurusan')
-            ->where('total_penilaian', '>', 0)
+            ->withRatings()
             ->orderBy('rata_rata_nilai', 'desc')
             ->orderBy('total_penilaian', 'desc')
             ->get();
-        if ($leaderboard->isEmpty()) {
-            $leaderboard = Guru::with('jurusan')->orderBy('nama', 'asc')->get();
-        }
         $guru = Guru::with('jurusan')->orderBy('nama', 'asc')->get();
         $siswa = User::where('role', 'siswa')->with(['jurusan', 'kelas'])->orderBy('name', 'asc')->get();
 

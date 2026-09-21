@@ -29,9 +29,6 @@
         <a href="{{ route('admin.sipintu.siswa') }}" class="btn btn-outline-success">
             <i class="bi bi-cloud-arrow-down me-1"></i> Tarik dari SiPintu
         </a>
-        <a href="{{ route('admin.siswa.create') }}" class="btn btn-primary-custom">
-            <i class="bi bi-plus-circle me-1"></i> Tambah Siswa
-        </a>
     </div>
 </div>
 
@@ -56,15 +53,19 @@
         </div>
         <div class="col-md-4 text-end">
             <span class="badge bg-primary px-3 py-2">
-                Total: {{ $siswa->count() }} siswa
+                Total: {{ $siswa->total() }} siswa
             </span>
         </div>
     </form>
 </div>
 
 <div class="card-custom">
+    <div class="d-flex justify-content-between align-items-center px-3 px-md-4 py-3 border-bottom">
+        <span class="small text-muted">Menampilkan {{ $siswa->firstItem() ?? 0 }}–{{ $siswa->lastItem() ?? 0 }} dari {{ $siswa->total() }} siswa</span>
+        <span class="badge bg-light text-dark border">20 per halaman</span>
+    </div>
     <div class="table-responsive">
-        <table class="table table-custom mb-0" id="siswaTable">
+        <table class="table table-custom mb-0">
             <thead>
                 <tr>
                     <th>NIS</th>
@@ -137,6 +138,9 @@
                     </td>
 
                     <td class="text-center">
+                        <a href="{{ route('admin.siswa.show', $s) }}" class="btn btn-sm btn-outline-info mb-1" title="Lihat detail siswa">
+                            <i class="bi bi-eye"></i>
+                        </a>
                         @if($s->is_active)
                             <button type="button" class="btn btn-sm btn-outline-warning mb-1" onclick="openDeactivateModal('{{ $s->id }}', '{{ addslashes($s->name) }}')" title="Nonaktifkan Akun Siswa">
                                 <i class="bi bi-lock"></i>
@@ -154,13 +158,6 @@
                             </form>
                         @endif
 
-                        <button type="button" class="btn btn-sm btn-outline-secondary mb-1" onclick="openResetPasswordModal('{{ $s->id }}', '{{ addslashes($s->name) }}', '{{ $s->nis }}')" title="Reset Password Akun">
-                            <i class="bi bi-key"></i>
-                        </button>
-                        
-                        <a href="{{ route('admin.siswa.edit', $s) }}" class="btn btn-sm btn-outline-primary mb-1" title="Edit">
-                            <i class="bi bi-pencil"></i>
-                        </a>
                         <form action="{{ route('admin.siswa.destroy', $s) }}" method="POST" class="d-inline"
                               data-confirm="Yakin ingin menghapus siswa {{ addslashes($s->name) }} (NIS: {{ $s->nis }})? Data yang dihapus tidak dapat dipulihkan."
                               data-confirm-title="Hapus Data Siswa"
@@ -184,6 +181,9 @@
             </tbody>
         </table>
     </div>
+    @if($siswa->hasPages())
+        <div class="px-3 px-md-4 py-3 border-top d-flex justify-content-center">{{ $siswa->links() }}</div>
+    @endif
 </div>
 
 {{-- MODAL NONAKTIFKAN SISWA DENGAN PILIHAN PERMANEN / BERKALA --}}
@@ -271,40 +271,6 @@
 </script>
 
 
-{{-- MODAL RESET PASSWORD SISWA --}}
-<div class="modal fade" id="modalResetPasswordSiswa" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <form id="formResetPasswordSiswa" method="POST">
-                @csrf
-                <div class="modal-header bg-primary text-white">
-                    <h5 class="modal-title fs-6 fw-bold"><i class="bi bi-key-fill me-2"></i>Reset Password Akun Siswa</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="p-2 rounded bg-light border mb-3">
-                        <span class="small text-muted">Siswa: </span><strong class="small text-dark" id="resetPasswordSiswaName">Nama Siswa</strong>
-                        <br><span class="small text-muted">NIS: </span><span class="small font-mono fw-bold" id="resetPasswordSiswaNis">NIS</span>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label small fw-bold">Password Baru</label>
-                        <input type="password" name="password" class="form-control" required placeholder="Minimal 6 karakter">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label small fw-bold">Konfirmasi Password Baru</label>
-                        <input type="password" name="password_confirmation" class="form-control" required placeholder="Ulangi password baru">
-                    </div>
-                </div>
-                <div class="modal-footer bg-light">
-                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-primary-custom btn-sm px-3 fw-semibold">
-                        <i class="bi bi-check2-circle me-1"></i> Simpan Password
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
 @endsection
 
 @push('scripts')
@@ -315,19 +281,5 @@ function openDeactivateModal(id, name) {
     new bootstrap.Modal(document.getElementById('modalDeactivateSiswa')).show();
 }
 
-function openResetPasswordModal(id, name, nis) {
-    document.getElementById('formResetPasswordSiswa').action = '/admin/siswa/' + id + '/reset-password';
-    document.getElementById('resetPasswordSiswaName').innerText = name;
-    document.getElementById('resetPasswordSiswaNis').innerText = nis;
-    new bootstrap.Modal(document.getElementById('modalResetPasswordSiswa')).show();
-}
-
-$(document).ready(function() {
-    $('#siswaTable').DataTable({
-        language: { url: '//cdn.datatables.net/plug-ins/1.13.8/i18n/id.json' },
-        searching: true,
-        pageLength: 10
-    });
-});
 </script>
 @endpush

@@ -66,13 +66,17 @@ class PenilaianController extends Controller
                     'ip_address' => $request->ip(),
                     'user_agent' => $request->userAgent(),
                     'is_read' => false,
+                    'siswa_is_read' => false,
+                    'notifikasi_siswa' => 'Anda terkena pelanggaran karena mengirim ulasan yang mengandung kata tidak pantas. Ulasan belum dikirim dan Anda dapat memperbaikinya lalu menilai kembali.',
                     'tindakan' => 'diblokir_otomatis',
                 ]);
             } catch (\Throwable $e) {
                 \Illuminate\Support\Facades\Log::error('Gagal mencatat log pelanggaran: ' . $e->getMessage());
             }
 
-            return back()->withInput()->with('error', $profanityResult['message']);
+            return redirect()
+                ->route('siswa.penilaian.create', $guru)
+                ->with('violation_popup', 'Anda melakukan pelanggaran etika. Penilaian dibatalkan dan belum disimpan. Silakan isi ulang rating serta tulis kritik dan saran dengan bahasa yang sopan.');
         }
 
         $periodeAktif = Periode::where('status', 'aktif')->first();

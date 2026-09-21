@@ -77,6 +77,15 @@ class PelanggaranController extends Controller
         return back()->with('success', 'Semua notifikasi pelanggaran telah ditandai dibaca.');
     }
 
+    public function markAsReadBySiswa(Pelanggaran $pelanggaran)
+    {
+        abort_unless($pelanggaran->user_id === auth()->id(), 403);
+
+        $pelanggaran->update(['siswa_is_read' => true]);
+
+        return back()->with('success', 'Notifikasi pelanggaran ditandai telah dibaca.');
+    }
+
     public function destroy(Pelanggaran $pelanggaran)
     {
         $pelanggaran->delete();
@@ -136,6 +145,10 @@ class PelanggaranController extends Controller
         $pelanggaran->update([
             'is_read' => true,
             'read_at' => now(),
+            'siswa_is_read' => false,
+            'notifikasi_siswa' => $pelanggaran->user_id
+                ? 'Admin telah meninjau pelanggaran Anda. Anda mendapat peringatan dan akun tidak diblokir otomatis.'
+                : $pelanggaran->notifikasi_siswa,
             'tindakan' => match ($actionType) {
                 'nonaktif_permanen' => 'dinonaktifkan_permanen',
                 'nonaktif_berkala' => 'dinonaktifkan_berkala',

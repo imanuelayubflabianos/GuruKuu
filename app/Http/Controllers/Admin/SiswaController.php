@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\Kelas;
+use App\Models\Penilaian;
+use App\Models\Pelanggaran;
 use Illuminate\Http\Request;
 
 class SiswaController extends Controller
@@ -20,10 +22,27 @@ class SiswaController extends Controller
             });
         }
         
-        $siswa = $query->latest()->get();
+        $siswa = $query->latest()->paginate(20)->withQueryString();
         $kelasList = Kelas::orderBy('tingkat')->orderBy('nama_kelas')->get();
         
         return view('admin.siswa.index', compact('siswa', 'kelasList'));
+    }
+
+    public function show(User $siswa)
+    {
+        abort_unless($siswa->role === 'siswa', 404);
+
+        $siswa->load(['jurusan', 'kelas.jurusan']);
+        $penilaian = Penilaian::with(['guru', 'periode', 'kelas'])
+            ->where('siswa_id', $siswa->id)
+            ->latest()
+            ->get();
+        $pelanggaran = Pelanggaran::with('guru')
+            ->where('user_id', $siswa->id)
+            ->latest()
+            ->get();
+
+        return view('admin.siswa.show', compact('siswa', 'penilaian', 'pelanggaran'));
     }
 
     public function create()

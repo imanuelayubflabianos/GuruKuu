@@ -11,6 +11,10 @@
 </div>
 
 <div class="card-custom p-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <span class="small text-muted">Menampilkan {{ $feedbacks->firstItem() ?? 0 }}–{{ $feedbacks->lastItem() ?? 0 }} dari {{ $feedbacks->total() }} ulasan</span>
+        <span class="badge bg-light text-dark border">15 per halaman</span>
+    </div>
     <div class="table-responsive">
         <table class="table table-custom mb-0" id="feedbackTable">
             <thead>
@@ -26,7 +30,7 @@
             <tbody>
                 @forelse($feedbacks as $index => $f)
                 <tr>
-                    <td>{{ $index + 1 }}</td>
+                    <td>{{ $feedbacks->firstItem() + $index }}</td>
                     <td>
                         <div class="d-flex align-items-center gap-2">
                             <img src="{{ $f->guru->photo_url }}" class="rounded-circle border" style="width: 36px; height: 36px; object-fit: cover;">
@@ -51,7 +55,7 @@
                         @endif
                     </td>
                     <td>
-                        <span class="badge bg-light text-dark border">{{ $f->kelas ? $f->kelas->nama_kelas . ' Kelas ' . $f->kelas->tingkat : '-' }}</span>
+                        <span class="badge bg-light text-dark border">{{ $f->kelas?->label_singkat ?? '-' }}</span>
                     </td>
                     <td>
                         @php
@@ -70,14 +74,14 @@
                             
                             <details class="mt-1">
                                 <summary class="text-muted small" style="cursor: pointer; font-size: 0.78rem;">
-                                    <i class="bi bi-eye me-1"></i>Lihat ulasan asli (Khusus Admin)
+                                    <i class="bi bi-eye-slash me-1"></i>Lihat teks tersamar
                                 </summary>
                                 <div class="p-2 mt-1 rounded bg-light border small">
                                     @if($f->kritik)
-                                        <div class="mb-1"><strong class="text-danger small">Kritik:</strong> <span class="text-dark">{{ $f->kritik }}</span></div>
+                                        <div class="mb-1"><strong class="text-danger small">Kritik:</strong> <span class="text-dark">{{ \App\Services\ProfanityFilterService::mask($f->kritik) }}</span></div>
                                     @endif
                                     @if($f->saran)
-                                        <div><strong class="text-success small">Saran:</strong> <span class="text-dark">{{ $f->saran }}</span></div>
+                                        <div><strong class="text-success small">Saran:</strong> <span class="text-dark">{{ \App\Services\ProfanityFilterService::mask($f->saran) }}</span></div>
                                     @endif
                                 </div>
                             </details>
@@ -126,7 +130,7 @@
                             @endif
 
                             <form action="{{ route('admin.kritik-saran.destroy', $f->id) }}" method="POST" class="d-inline"
-                                  data-confirm="Apakah Anda yakin ingin menghapus permanen ulasan ini? Data yang dihapus tidak dapat dipulihkan."
+                                  data-confirm="Apakah Anda yakin ingin menghapus permanen penilaian dan ulasan siswa ini? Rating guru akan dihitung ulang dan siswa dapat menilai kembali."
                                   data-confirm-title="Hapus Ulasan Permanen"
                                   data-confirm-btn="Hapus Permanen"
                                   data-confirm-type="danger">
@@ -150,16 +154,8 @@
             </tbody>
         </table>
     </div>
+    @if($feedbacks->hasPages())
+        <div class="pt-3 mt-3 border-top d-flex justify-content-center">{{ $feedbacks->links() }}</div>
+    @endif
 </div>
 @endsection
-
-@push('scripts')
-<script>
-$(document).ready(function() {
-    $('#feedbackTable').DataTable({
-        language: { url: '//cdn.datatables.net/plug-ins/1.13.8/i18n/id.json' },
-        pageLength: 10
-    });
-});
-</script>
-@endpush

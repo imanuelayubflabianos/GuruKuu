@@ -37,22 +37,13 @@
                                  onerror="this.src='https://ui-avatars.com/api/?name={{ urlencode($g->nama) }}&background=003366&color=fff'">
                         </div>
 
-                        <h5 class="fw-bold text-center mb-1" style="color: var(--text-dark);">{{ $g->nama }}</h5>
-                        <div class="text-muted small text-center mb-2 font-mono">NIP: {{ $g->nip }}</div>
-
-                        @if($g->bio)
-                            <p class="small text-muted text-center mb-3" style="min-height: 38px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
-                                {{ $g->bio }}
-                            </p>
-                        @else
-                            <div class="mb-3" style="min-height: 20px;"></div>
-                        @endif
+                        <h5 class="fw-bold text-center mb-3" style="color: var(--text-dark);">{{ $g->nama }}</h5>
 
                         {{-- Rating Summary Bar Persen --}}
                         <div class="p-3 rounded mb-3" style="background: var(--bg-light); border: 1px solid var(--border);">
                             <div class="d-flex justify-content-between align-items-center mb-1">
                                 <small class="text-muted font-mono fw-semibold" style="font-size: 0.72rem;">RATING KEPUASAN</small>
-                                <span class="fw-bold text-primary font-mono" style="font-size: 0.9rem;">{{ $persen }}%</span>
+                                <span class="fw-bold text-primary font-mono" style="font-size: 0.9rem;">{{ $persen }}% <span class="text-warning" aria-label="{{ round($persen / 20) }} dari 5 bintang">@for($star = 1; $star <= 5; $star++){{ $star <= round($persen / 20) ? '★' : '☆' }}@endfor</span></span>
                             </div>
                             <div class="progress" style="height: 7px; background-color: #e2e8f0; border-radius: 10px;">
                                 <div class="progress-bar bg-primary rounded-pill" role="progressbar" style="width: {{ $persen }}%;" aria-valuenow="{{ $persen }}" aria-valuemin="0" aria-valuemax="100"></div>

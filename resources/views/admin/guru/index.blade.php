@@ -29,33 +29,33 @@
         <a href="{{ route('admin.sipintu.guru') }}" class="btn btn-outline-primary">
             <i class="bi bi-cloud-arrow-down me-1"></i> Tarik dari SiPintu
         </a>
-        <a href="{{ route('admin.guru.create') }}" class="btn btn-primary-custom">
-            <i class="bi bi-plus-circle me-1"></i> Tambah Guru
-        </a>
     </div>
 </div>
 
 <div class="card-custom p-3 mb-4">
     <form method="GET" action="{{ route('admin.guru.index') }}" class="row g-3 align-items-end">
-        <div class="col-md-8">
-            <label class="form-label small fw-bold text-muted">Filter Jurusan</label>
-            <select name="jurusan_id" class="form-select" style="border-radius: 8px;">
-                <option value="">Semua Jurusan</option>
-                @foreach($jurusans as $j)
-                    <option value="{{ $j->id }}" {{ request('jurusan_id') == $j->id ? 'selected' : '' }}>{{ $j->nama_jurusan }}</option>
+        <div class="col-md-10">
+            <label class="form-label small fw-bold text-muted">Filter Kelas yang Diajar</label>
+            <select name="kelas_id" class="form-select" style="border-radius: 8px;" onchange="this.form.submit()">
+                <option value="">Semua Kelas</option>
+                @foreach($kelasList as $kelas)
+                    <option value="{{ $kelas->id }}" {{ request('kelas_id') == $kelas->id ? 'selected' : '' }}>{{ $kelas->label_singkat }}</option>
                 @endforeach
             </select>
         </div>
-        <div class="col-md-4 d-flex gap-2">
-            <button type="submit" class="btn btn-primary-custom flex-grow-1"><i class="bi bi-funnel me-1"></i> Filter</button>
-            <a href="{{ route('admin.guru.index') }}" class="btn btn-outline-custom"><i class="bi bi-arrow-counterclockwise"></i></a>
+        <div class="col-md-2 d-flex gap-2">
+            <a href="{{ route('admin.guru.index') }}" class="btn btn-outline-custom w-100" title="Reset filter" aria-label="Reset filter"><i class="bi bi-arrow-counterclockwise"></i></a>
         </div>
     </form>
 </div>
 
 <div class="card-custom">
+    <div class="d-flex justify-content-between align-items-center px-3 px-md-4 py-3 border-bottom">
+        <span class="small text-muted">Menampilkan {{ $guru->firstItem() ?? 0 }}–{{ $guru->lastItem() ?? 0 }} dari {{ $guru->total() }} guru</span>
+        <span class="badge bg-light text-dark border">15 per halaman</span>
+    </div>
     <div class="table-responsive">
-        <table class="table table-custom mb-0" id="guruTable">
+        <table class="table table-custom mb-0">
             <thead>
                 <tr>
                     <th>NIP</th>
@@ -63,6 +63,7 @@
                     <th>EMAIL</th>
                     <th>KONTAK / HP</th>
                     <th>JURUSAN</th>
+                    <th>KELAS DIAJAR</th>
                     <th>KEPUASAN (RATING)</th>
                     <th>STATUS AKUN</th>
                     <th class="text-center">AKSI</th>
@@ -99,6 +100,13 @@
                         @endif
                     </td>
                     <td>{{ $g->jurusan->nama_jurusan ?? '-' }}</td>
+                    <td>
+                        @forelse($g->kelas as $kelas)
+                            <span class="badge bg-light text-dark border mb-1">{{ $kelas->label_singkat }}</span>
+                        @empty
+                            <span class="text-muted small">Belum diatur</span>
+                        @endforelse
+                    </td>
                     <td>
                         @php $pct = round(($g->rata_rata_nilai / 5) * 100); @endphp
                         <div class="fw-bold font-mono text-primary" style="font-size: 0.85rem;">{{ $pct }}%</div>
@@ -148,7 +156,6 @@
                             @endif
                         @endif
 
-                        <button type="button" class="btn btn-sm btn-outline-secondary me-1" onclick="openResetPasswordGuruModal('{{ $g->id }}', '{{ addslashes($g->nama) }}', '{{ $g->nip }}')" title="Reset Password Akun"><i class="bi bi-key"></i></button>
                         <a href="{{ route('admin.guru.edit', $g) }}" class="btn btn-sm btn-outline-primary me-1" title="Edit Guru"><i class="bi bi-pencil"></i></a>
                         <form action="{{ route('admin.guru.destroy', $g) }}" method="POST" class="d-inline"
                               data-confirm="Yakin ingin menghapus data guru {{ addslashes($g->nama) }}? Tindakan ini akan menghapus data evaluasi guru terkait."
@@ -162,12 +169,15 @@
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="8" class="text-center py-5 text-muted">Belum ada data guru.</td>
+                    <td colspan="9" class="text-center py-5 text-muted">Belum ada data guru.</td>
                 </tr>
                 @endforelse
             </tbody>
         </table>
     </div>
+    @if($guru->hasPages())
+        <div class="px-3 px-md-4 py-3 border-top d-flex justify-content-center">{{ $guru->links() }}</div>
+    @endif
 </div>
 
 {{-- MODAL NONAKTIFKAN GURU DENGAN PILIHAN PERMANEN / BERKALA --}}
@@ -242,40 +252,6 @@
     </div>
 </div>
 
-{{-- MODAL RESET PASSWORD GURU --}}
-<div class="modal fade" id="modalResetPasswordGuru" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <form id="formResetPasswordGuru" method="POST">
-                @csrf
-                <div class="modal-header bg-primary text-white">
-                    <h5 class="modal-title fs-6 fw-bold"><i class="bi bi-key-fill me-2"></i>Reset Password Akun Guru</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="p-2 rounded bg-light border mb-3">
-                        <span class="small text-muted">Guru: </span><strong class="small text-dark" id="resetPasswordGuruName">Nama Guru</strong>
-                        <br><span class="small text-muted">NIP: </span><span class="small font-mono fw-bold" id="resetPasswordGuruNip">NIP</span>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label small fw-bold">Password Baru</label>
-                        <input type="password" name="password" class="form-control" required placeholder="Minimal 6 karakter">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label small fw-bold">Konfirmasi Password Baru</label>
-                        <input type="password" name="password_confirmation" class="form-control" required placeholder="Ulangi password baru">
-                    </div>
-                </div>
-                <div class="modal-footer bg-light">
-                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-primary-custom btn-sm px-3 fw-semibold">
-                        <i class="bi bi-check2-circle me-1"></i> Simpan Password
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
 @endsection
 
 @push('scripts')
@@ -296,19 +272,5 @@ function toggleGuruDeactDuration() {
     }
 }
 
-function openResetPasswordGuruModal(id, name, nip) {
-    document.getElementById('formResetPasswordGuru').action = '/admin/guru/' + id + '/reset-password';
-    document.getElementById('resetPasswordGuruName').innerText = name;
-    document.getElementById('resetPasswordGuruNip').innerText = nip;
-    new bootstrap.Modal(document.getElementById('modalResetPasswordGuru')).show();
-}
-
-$(document).ready(function() {
-    $('#guruTable').DataTable({
-        language: { url: '//cdn.datatables.net/plug-ins/1.13.8/i18n/id.json' },
-        ordering: false,
-        pageLength: 10
-    });
-});
 </script>
 @endpush

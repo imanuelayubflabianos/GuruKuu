@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Guru;
+use App\Models\Kelas;
 use App\Models\Jurusan;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -18,14 +20,52 @@ class GuruController extends Controller
             $query->where('kategori', $request->kategori);
         }
         
-        if ($request->filled('jurusan_id')) {
-            $query->where('jurusan_id', $request->jurusan_id);
+        if ($request->filled('kelas_id')) {
+            $query->whereHas('kelas', function ($kelas) use ($request) {
+                $kelas->whereKey($request->kelas_id);
+            });
         }
         
-        $guru = $query->latest()->get();
-        $jurusans = Jurusan::orderBy('nama_jurusan')->get();
+        $guru = $query->with('kelas.jurusan')->latest()->paginate(15)->withQueryString();
+        $this->loadLinkedUsers($guru->getCollection());
+        $kelasList = Kelas::with('jurusan')->orderBy('tingkat')->orderBy('nama_kelas')->get();
         
-        return view('admin.guru.index', compact('guru', 'jurusans'));
+        return view('admin.guru.index', compact('guru', 'kelasList'));
+    }
+
+    /**
+     * Memuat akun guru dalam satu query untuk menghindari query tambahan per baris tabel.
+     */
+    private function loadLinkedUsers($gurus): void
+    {
+        $nips = $gurus->pluck('nip')->filter()->values();
+        $emails = $gurus->pluck('email')->filter()->values();
+
+        if ($nips->isEmpty() && $emails->isEmpty()) {
+            return;
+        }
+
+        $users = User::where('role', 'guru')
+            ->where(function ($query) use ($nips, $emails) {
+                if ($nips->isNotEmpty()) {
+                    $query->whereIn('nis', $nips);
+                }
+
+                if ($emails->isNotEmpty()) {
+                    $query->orWhereIn('email', $emails);
+                }
+            })
+            ->get();
+
+        $usersByNip = $users->keyBy('nis');
+        $usersByEmail = $users->filter(fn ($user) => filled($user->email))->keyBy('email');
+
+        $gurus->each(function ($guru) use ($usersByNip, $usersByEmail) {
+            $guru->setRelation(
+                'linkedUser',
+                $usersByNip->get($guru->nip) ?? $usersByEmail->get($guru->email)
+            );
+        });
     }
 
     public function create()
@@ -94,13 +134,15 @@ class GuruController extends Controller
             ->latest('tanggal_mulai')
             ->get();
 
+        $guru->load('kelas.jurusan');
         return view('admin.guru.show', compact('guru', 'periodeAktif', 'stats', 'semuaFeedback', 'arsipPeriode'));
     }
 
     public function edit(Guru $guru)
     {
-        $jurusans = Jurusan::orderBy('nama_jurusan')->get();
-        return view('admin.guru.edit', compact('guru', 'jurusans'));
+        $kelasList = Kelas::with('jurusan')->orderBy('tingkat')->orderBy('nama_kelas')->get();
+        $guru->load('kelas');
+        return view('admin.guru.edit', compact('guru', 'kelasList'));
     }
 
     public function update(Request $request, Guru $guru)
@@ -111,12 +153,13 @@ class GuruController extends Controller
             'email'      => 'nullable|email|max:255|unique:guru,email,' . $guru->id,
             'phone'      => 'nullable|string|max:50',
             'kategori'   => 'nullable|in:normada,produktif',
-            'jurusan_id' => 'nullable|exists:jurusan,id',
+            'kelas_ids'  => 'nullable|array',
+            'kelas_ids.*' => 'exists:kelas,id',
             'bio'        => 'nullable|string',
             'photo'      => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        $data = $request->except(['photo']);
+        $data = $request->except(['photo', 'kelas_ids']);
         $data['kategori'] = $request->input('kategori') ?: ($guru->kategori ?: 'normada');
 
         if ($request->hasFile('photo')) {
@@ -128,6 +171,7 @@ class GuruController extends Controller
         }
 
         $guru->update($data);
+        $guru->kelas()->sync($request->input('kelas_ids', []));
 
         // Sinkronkan ke akun User jika guru ini memiliki akun login sistem
         $linkedUser = \App\Models\User::where('nis', $guru->nip)

@@ -54,9 +54,20 @@
                     <i class="bi bi-telephone text-success"></i>
                     <span class="font-mono text-dark">{{ $guru->phone ?: '-' }}</span>
                 </div>
-                <div class="d-flex align-items-center gap-2">
+                <div class="d-flex align-items-center gap-2 mb-2">
                     <i class="bi bi-mortarboard text-info"></i>
                     <span class="text-dark">{{ $guru->jurusan ? $guru->jurusan->nama_jurusan : 'Semua Jurusan / Umum' }}</span>
+                </div>
+                <div class="d-flex align-items-start gap-2">
+                    <i class="bi bi-easel text-info"></i>
+                    <div class="text-dark">
+                        <div class="fw-semibold mb-1">Kelas yang diajar</div>
+                        @forelse($guru->kelas as $kelas)
+                            <span class="badge bg-light text-dark border me-1 mb-1">{{ $kelas->label_singkat }}</span>
+                        @empty
+                            <span class="text-muted">Belum diatur</span>
+                        @endforelse
+                    </div>
                 </div>
             </div>
         </div>

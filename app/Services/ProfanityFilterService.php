@@ -7,7 +7,7 @@ class ProfanityFilterService
     /**
      * Daftar kata kasar, kotor, dan ejekan/toxic (Bahasa Indonesia & English).
      */
-    protected static array $badWords = [
+    protected static array $defaultBadWords = [
         // ==========================================
         // 🇮🇩 BAHASA INDONESIA - KATA KASAR / VULGAR
         // ==========================================
@@ -102,7 +102,7 @@ class ProfanityFilterService
 
         $detected = [];
 
-        foreach (self::$badWords as $word) {
+        foreach (self::getBadWords() as $word) {
             $pattern = '/\\b' . preg_quote($word, '/') . '\\b/iu';
 
             // 1. Cek pada teks asli
@@ -159,7 +159,7 @@ class ProfanityFilterService
         }
 
         $result = $text;
-        foreach (self::$badWords as $word) {
+        foreach (self::getBadWords() as $word) {
             $pattern = '/\\b' . preg_quote($word, '/') . '\\b/iu';
             $result = preg_replace_callback($pattern, function ($matches) use ($replacement) {
                 $len = mb_strlen($matches[0]);
@@ -179,6 +179,11 @@ class ProfanityFilterService
      */
     public static function getBadWords(): array
     {
-        return self::$badWords;
+        $custom = \App\Models\Setting::get('profanity_words', '');
+        $customWords = preg_split('/[\r\n,]+/', (string) $custom, -1, PREG_SPLIT_NO_EMPTY);
+        $customWords = array_map(fn ($word) => mb_strtolower(trim($word), 'UTF-8'), $customWords);
+        $customWords = array_filter($customWords, fn ($word) => mb_strlen($word) >= 2);
+
+        return array_values(array_unique(array_merge(self::$defaultBadWords, $customWords)));
     }
 }

@@ -71,14 +71,13 @@ Route::middleware('auth')->group(function () {
 // ==================== 4. ADMIN ROUTES ====================
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
+    Route::post('/dashboard/clear-cache', [AdminDashboardController::class, 'clearCache'])->name('dashboard.clear-cache');
     Route::get('/profil', [AdminProfilController::class, 'index'])->name('profil.index');
     Route::put('/profil', [AdminProfilController::class, 'update'])->name('profil.update');
-    Route::resource('guru', AdminGuruController::class);
+    Route::resource('guru', AdminGuruController::class)->except(['create', 'store']);
     Route::patch('/guru/{guru}/toggle', [AdminGuruController::class, 'toggleStatus'])->name('guru.toggle');
-    Route::post('/guru/{guru}/reset-password', [AdminGuruController::class, 'resetPassword'])->name('guru.reset-password');
-    Route::resource('siswa', AdminSiswaController::class);
+    Route::resource('siswa', AdminSiswaController::class)->except(['create', 'store', 'edit', 'update']);
     Route::patch('/siswa/{siswa}/toggle', [AdminSiswaController::class, 'toggleStatus'])->name('siswa.toggle');
-    Route::post('/siswa/{siswa}/reset-password', [AdminSiswaController::class, 'resetPassword'])->name('siswa.reset-password');
     Route::get('/jurusan', [AdminJurusanController::class, 'index'])->name('jurusan.index');
     Route::post('/jurusan', [AdminJurusanController::class, 'store'])->name('jurusan.store');
     Route::get('/jurusan/{jurusan}', [AdminJurusanController::class, 'show'])->name('jurusan.show');
@@ -103,6 +102,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/leaderboard', [AdminLeaderboardController::class, 'index'])->name('leaderboard.index');
     Route::get('/pengaturan', [PengaturanController::class, 'index'])->name('pengaturan.index');
     Route::post('/pengaturan/landing', [PengaturanController::class, 'updateLanding'])->name('pengaturan.landing');
+    Route::post('/pelanggaran/kata-toxic', [PengaturanController::class, 'updateProfanityWords'])->name('pelanggaran.words.update');
     Route::post('/pengaturan/landing/reset', [PengaturanController::class, 'resetLandingHero'])->name('pengaturan.landing.reset');
     Route::post('/pengaturan/reset', [PengaturanController::class, 'reset'])->name('pengaturan.reset');
     Route::post('/pengaturan/ganti-password', [PengaturanController::class, 'gantiPassword'])->name('pengaturan.password');
@@ -152,6 +152,7 @@ Route::middleware(['auth', 'role:siswa'])->prefix('siswa')->name('siswa.')->grou
     });
     Route::get('/riwayat', [PenilaianController::class, 'riwayat'])->name('riwayat');
     Route::delete('/riwayat/{penilaian}', [PenilaianController::class, 'destroy'])->name('riwayat.destroy');
+    Route::patch('/notifikasi/{pelanggaran}/read', [\App\Http\Controllers\Admin\PelanggaranController::class, 'markAsReadBySiswa'])->name('notifikasi.read');
     Route::get('/leaderboard', [SiswaLeaderboardController::class, 'index'])->name('leaderboard.index');
     Route::get('/pengaturan', [\App\Http\Controllers\Siswa\PengaturanController::class, 'index'])->name('pengaturan');
     Route::post('/pengaturan/chat', [\App\Http\Controllers\Siswa\PengaturanController::class, 'kirimPesanAdmin'])->name('pengaturan.chat');

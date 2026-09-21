@@ -13,6 +13,9 @@
             <p class="page-subtitle mb-0">Catatan otomatis siswa atau pengguna yang melanggar aturan kebijakan & etika (kata kotor, ujaran kebencian, atau toxic).</p>
         </div>
         <div class="d-flex align-items-center gap-2">
+            <button type="button" class="btn btn-outline-warning btn-sm rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#toxicWordsModal">
+                <i class="bi bi-plus-circle me-1"></i> Kata Toxic
+            </button>
             @if(($stats['unread'] ?? 0) > 0)
                 <form action="{{ route('admin.pelanggaran.read-all') }}" method="POST">
                     @csrf
@@ -279,6 +282,28 @@
                 {{ $pelanggarans->links() }}
             </div>
         @endif
+    </div>
+</div>
+
+<div class="modal fade" id="toxicWordsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <form action="{{ route('admin.pelanggaran.words.update') }}" method="POST">
+                @csrf
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="bi bi-shield-exclamation text-warning me-2"></i>Kata Toxic Tambahan</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="small text-muted">Satu kata atau frasa per baris. Daftar bawaan tetap digunakan.</p>
+                    <textarea name="profanity_words" class="form-control" rows="10" maxlength="10000" placeholder="contoh kata\ncontoh frasa">{{ \App\Models\Setting::get('profanity_words', '') }}</textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light border" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-warning"><i class="bi bi-save me-1"></i>Simpan</button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 @endsection

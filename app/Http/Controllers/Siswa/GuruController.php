@@ -20,14 +20,17 @@ class GuruController extends Controller
             ->wherePivot('tahun_ajaran', $periodeAktif?->tahun_ajaran)
             ->first();
 
+        $mode = $request->input('mode', 'kelas');
         $query = Guru::with('jurusan')->orderBy('nama');
+
+        if ($mode === 'kelas' && $kelasAktif) {
+            $query->whereHas('kelas', fn ($kelas) => $kelas->whereKey($kelasAktif->id));
+        }
 
         if ($request->filled('search')) {
             $search = trim($request->search);
             $query->where(function($q) use ($search) {
-                $q->where('nama', 'LIKE', "%{$search}%")
-                  ->orWhere('nip', 'LIKE', "%{$search}%")
-                  ->orWhere('bio', 'LIKE', "%{$search}%");
+                                $q->where('nama', 'LIKE', "%{$search}%");
             });
         }
 
@@ -41,7 +44,7 @@ class GuruController extends Controller
             ? Penilaian::where('siswa_id', $user->id)->where('periode_id', $periodeId)->pluck('guru_id')->toArray()
             : [];
 
-        return view('siswa.guru.index', compact('guru', 'kelasAktif', 'periodeId', 'sudahMenilaiIds'));
+        return view('siswa.guru.index', compact('guru', 'kelasAktif', 'periodeId', 'sudahMenilaiIds', 'mode'));
     }
 
     public function show(Guru $guru)

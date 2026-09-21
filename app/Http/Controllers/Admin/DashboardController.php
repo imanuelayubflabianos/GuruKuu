@@ -8,13 +8,12 @@ use App\Models\Jurusan;
 use App\Models\Kelas;
 use App\Models\Penilaian;
 use App\Models\Periode;
-use App\Models\Setting;
 use App\Models\User;
-use App\Services\SiPintuService;
+use Illuminate\Support\Facades\Artisan;
 
 class DashboardController extends Controller
 {
-    public function index(SiPintuService $siPintu)
+    public function index()
     {
         $totalGuru = Guru::count();
         $totalSiswa = User::where('role', 'siswa')->count();
@@ -23,16 +22,8 @@ class DashboardController extends Controller
         $totalKelas = Kelas::count();
         
         $periodeAktif = Periode::where('status', 'aktif')->first();
-        $heroThumbnail = Setting::get('hero_image', 'https://images.unsplash.com/photo-1562774053-701939374585?w=1920');
-        $heroTitle = Setting::get('hero_title', 'Bangun Sekolah yang Lebih Baik Melalui Penilaian Guru yang Objektif');
-
-        // Cache status ping selama 60 detik agar tidak membebani loading admin dashboard (0ms latency)
-        $ping = \Illuminate\Support\Facades\Cache::remember('sipintu_gateway_ping', 60, function () use ($siPintu) {
-            return $siPintu->ping();
-        });
-
         $topGuru = Guru::with('jurusan')
-            ->where('total_penilaian', '>', 0)
+            ->withRatings()
             ->orderBy('rata_rata_nilai', 'desc')
             ->limit(3)
             ->get();
@@ -57,11 +48,15 @@ class DashboardController extends Controller
             'totalJurusan',
             'totalKelas',
             'periodeAktif',
-            'heroThumbnail',
-            'heroTitle',
-            'ping',
             'topGuru', 
             'feedbacks'
         ));
+    }
+
+    public function clearCache()
+    {
+        Artisan::call('optimize:clear');
+
+        return back()->with('success', 'Cache aplikasi, konfigurasi, route, dan view berhasil dibersihkan.');
     }
 }

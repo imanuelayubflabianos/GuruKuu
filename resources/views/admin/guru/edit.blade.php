@@ -48,13 +48,22 @@
                         @error('phone')<div class="text-danger small">{{ $message }}</div>@enderror
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label font-mono small fw-bold text-muted">JURUSAN</label>
-                        <select name="jurusan_id" class="form-select" style="border-radius: 8px;">
-                            <option value="">Pilih Jurusan (Opsional)</option>
-                            @foreach($jurusans as $j)
-                                <option value="{{ $j->id }}" {{ old('jurusan_id', $guru->jurusan_id) == $j->id ? 'selected' : '' }}>{{ $j->nama_jurusan }} ({{ $j->kode_jurusan }})</option>
+                        <label class="form-label font-mono small fw-bold text-muted">KATEGORI PENGAJAR</label>
+                        <select name="kategori" class="form-select" style="border-radius: 8px;">
+                            <option value="normada" {{ old('kategori', $guru->kategori) === 'normada' ? 'selected' : '' }}>Normada</option>
+                            <option value="produktif" {{ old('kategori', $guru->kategori) === 'produktif' ? 'selected' : '' }}>Produktif</option>
+                        </select>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label font-mono small fw-bold text-muted">KELAS YANG DIAJAR</label>
+                        <select name="kelas_ids[]" class="form-select" multiple size="6" style="border-radius: 8px;">
+                            @foreach($kelasList as $kelas)
+                                <option value="{{ $kelas->id }}" {{ $guru->kelas->contains($kelas->id) ? 'selected' : '' }}>
+                                    {{ $kelas->label_singkat }}
+                                </option>
                             @endforeach
                         </select>
+                        <small class="text-muted">Pilih satu atau beberapa kelas. Tahan Ctrl untuk memilih lebih dari satu.</small>
                     </div>
                     <div class="col-12">
                         <label class="form-label font-mono small fw-bold text-muted">BIO / ALAMAT / KETERANGAN</label>

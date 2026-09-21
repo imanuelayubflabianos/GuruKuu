@@ -18,14 +18,10 @@ class LeaderboardExport implements FromCollection, WithHeadings, WithMapping, Wi
         $periodeAktif = Periode::where('status', 'aktif')->first();
         
         $query = Guru::with('jurusan')
-            ->where('total_penilaian', '>', 0)
+            ->withRatings()
             ->orderBy('rata_rata_nilai', 'desc')
             ->orderBy('total_penilaian', 'desc')
             ->get();
-
-        if ($query->isEmpty()) {
-            $query = Guru::with('jurusan')->orderBy('nama', 'asc')->get();
-        }
 
         return $query;
     }

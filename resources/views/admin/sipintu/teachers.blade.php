@@ -1,6 +1,10 @@
 @extends('layouts.admin')
 @section('title', 'Data Guru SiPintu')
 
+@push('styles')
+<link href="https://cdn.datatables.net/1.13.8/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+@endpush
+
 @section('content')
 <div class="page-header d-flex justify-content-between align-items-center">
     <div>
@@ -15,7 +19,7 @@
         <a href="{{ route('admin.guru.index') }}" class="btn btn-outline-secondary">
             <i class="bi bi-person-check me-1"></i> Data Guru Lokal
         </a>
-        @if($result['success'] && !empty($teachers))
+        @if($result['success'] && $teachers->isNotEmpty())
         <form action="{{ route('admin.sipintu.guru.sync-all') }}" method="POST" onsubmit="return confirm('Sinkronkan seluruh data guru dari SiPintu ke database GuruKuu?')">
             @csrf
             <button type="submit" class="btn btn-success">
@@ -65,7 +69,7 @@
                 <i class="bi bi-arrow-counterclockwise"></i>
             </a>
             <span class="badge bg-light text-dark border align-self-center px-3 py-2">
-                Total: <strong>{{ count($teachers) }}</strong> guru
+                Total: <strong>{{ $teachers->total() }}</strong> guru
             </span>
         </div>
     </form>
@@ -157,7 +161,7 @@
             </tbody>
         </table>
 
-        @if(empty($teachers))
+        @if($teachers->isEmpty())
         <div class="text-center py-5 text-muted">
             <i class="bi bi-person-x fs-1 d-block mb-3 text-secondary"></i>
             @if(!$result['success'])
@@ -169,6 +173,9 @@
         </div>
         @endif
     </div>
+    @if($teachers->hasPages())
+        <div class="px-3 py-3 border-top d-flex justify-content-center">{{ $teachers->withQueryString()->links() }}</div>
+    @endif
 </div>
 
 {{-- MODAL DETAIL GURU --}}
@@ -304,6 +311,9 @@
 @endsection
 
 @push('scripts')
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.8/js/dataTables.bootstrap5.min.js"></script>
 <script>
 let currentTeacher = null;
 

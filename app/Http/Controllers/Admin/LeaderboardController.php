@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Guru;
 use App\Models\Kelas;
+use App\Models\Jurusan;
 use App\Models\Penilaian;
 use App\Models\Periode;
 use Illuminate\Http\Request;
@@ -14,23 +15,13 @@ class LeaderboardController extends Controller
     public function index(Request $request)
     {
         $periodeAktif = Periode::where('status', 'aktif')->first();
-        
-        $leaderboard = Guru::with('jurusan')
-            ->where('total_penilaian', '>', 0)
-            ->orderBy('rata_rata_nilai', 'desc')
-            ->orderBy('total_penilaian', 'desc')
-            ->get();
-
-        // Fallback jika belum ada penilaian
-        if ($leaderboard->isEmpty()) {
-            $leaderboard = Guru::with('jurusan')
-                ->orderBy('nama', 'asc')
-                ->get();
-        }
+        $kelasList = Kelas::with('jurusan')->orderBy('tingkat')->orderBy('nama_kelas')->get();
+        $mode = $request->input('mode', 'rating');
+        $kelasId = $request->integer('kelas_id') ?: null;
+        $leaderboard = Guru::leaderboardFor($mode, $kelasId, $periodeAktif?->id);
 
         return view('admin.leaderboard.index', compact(
-            'periodeAktif',
-            'leaderboard'
+            'periodeAktif', 'leaderboard', 'kelasList', 'mode', 'kelasId'
         ));
     }
 }

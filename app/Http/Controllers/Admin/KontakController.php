@@ -8,9 +8,9 @@ use Illuminate\Http\Request;
 
 class KontakController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $kontak = Kontak::latest()->get();
+        $kontak = Kontak::latest()->paginate(15)->withQueryString();
         return view('admin.kontak.index', compact('kontak'));
     }
 

@@ -67,12 +67,68 @@ class Guru extends Model
         return $query->where('kategori', 'produktif');
     }
 
+    public function scopeWithRatings($query)
+    {
+        return $query->whereHas('penilaian');
+    }
+
+    public function scopeTeachingInJurusan($query, int $jurusanId)
+    {
+        return $query->where(function ($query) use ($jurusanId) {
+            $query->where('jurusan_id', $jurusanId)
+                ->orWhereHas('kelas', function ($kelasQuery) use ($jurusanId) {
+                    $kelasQuery->where('jurusan_id', $jurusanId);
+                });
+        });
+    }
+
+    public static function leaderboardFor(string $mode = 'rating', ?int $kelasId = null, ?int $periodeId = null)
+    {
+        $query = self::with('jurusan');
+
+        if ($mode === 'partisipasi') {
+            if (!$kelasId) return collect();
+            $query->whereHas('kelas', fn ($kelas) => $kelas->whereKey($kelasId));
+        } else {
+            $query->withRatings();
+            if ($kelasId) {
+                $query->whereHas('kelas', fn ($kelas) => $kelas->whereKey($kelasId));
+            }
+            return $query->orderByDesc('rata_rata_nilai')->orderByDesc('total_penilaian')->get();
+        }
+
+        $kelas = Kelas::find($kelasId);
+        $totalSiswa = $kelas?->jumlah_siswa ?: $kelas?->siswa()->count();
+        $counts = Penilaian::where('class_id', $kelasId)
+            ->when($periodeId, fn ($penilaian) => $penilaian->where('periode_id', $periodeId))
+            ->selectRaw('guru_id, COUNT(DISTINCT siswa_id) as jumlah_memilih')
+            ->groupBy('guru_id')
+            ->pluck('jumlah_memilih', 'guru_id');
+
+        return $query->get()->map(function ($guru) use ($counts, $totalSiswa) {
+            $jumlahMemilih = (int) ($counts[$guru->id] ?? 0);
+            $persentase = $totalSiswa > 0 ? round(($jumlahMemilih / $totalSiswa) * 100, 1) : 0;
+            $guru->setAttribute('total_penilaian', $jumlahMemilih);
+            $guru->setAttribute('rata_rata_nilai', $persentase / 20);
+            $guru->setAttribute('partisipasi_persen', $persentase);
+            return $guru;
+        })->sortByDesc('partisipasi_persen')->values();
+    }
+
     // ==================== ACCESSOR & HELPER ====================
 
     public function getLinkedUserAttribute()
     {
+        if ($this->relationLoaded('linkedUser')) {
+            return $this->getRelation('linkedUser');
+        }
+
         return User::where(function($q) {
-            $q->where('nis', $this->nip)->orWhere('email', $this->email);
+            $q->where('nis', $this->nip);
+
+            if (!empty($this->email)) {
+                $q->orWhere('email', $this->email);
+            }
         })->where('role', 'guru')->first();
     }
 

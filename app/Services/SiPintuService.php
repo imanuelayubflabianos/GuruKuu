@@ -69,7 +69,7 @@ class SiPintuService
             'X-Client-ID'     => $this->clientId,
             'X-Client-Secret' => $this->clientSecret,
             'Accept'          => 'application/json',
-        ])->timeout($this->timeout);
+        ])->connectTimeout(5)->timeout(min($this->timeout, 15));
 
         if (!$this->verifySsl) {
             $http = $http->withoutVerifying();
@@ -148,7 +148,7 @@ class SiPintuService
         }
 
         try {
-            $http = Http::timeout($this->timeout)->acceptJson();
+            $http = Http::connectTimeout(5)->timeout(min($this->timeout, 15))->acceptJson();
             if (!$this->verifySsl) {
                 $http = $http->withoutVerifying();
             }

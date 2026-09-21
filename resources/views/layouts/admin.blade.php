@@ -15,7 +15,6 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
-    <link href="https://cdn.datatables.net/1.13.8/css/dataTables.bootstrap5.min.css" rel="stylesheet">
     <style>
         :root { --primary:#003366; --primary-light:#004080; --secondary:#FFC107; --accent:#00A86B; --bg-light:#f5f7fa; --text-dark:#1a1a2e; --text-muted:#64748b; --border:#e2e8f0; }
         body { background-color:var(--bg-light); color:var(--text-dark); font-family:'Inter',sans-serif; }
@@ -47,9 +46,10 @@
         .stat-card-value { font-size:2rem; font-weight:800; color:var(--text-dark); }
     </style>
     <link href="{{ asset('css/gurukuu-theme.css') }}" rel="stylesheet">
+    @stack('styles')
     <script src="{{ asset('js/gurukuu-theme.js') }}"></script>
 </head>
-<body>
+<body data-admin-cache-user="{{ auth()->id() }}">
     {{-- MOBILE TOPBAR HEADER (KHUSUS TAMPILAN HP) --}}
     <header class="gk-mobile-header shadow-sm">
         <div class="d-flex align-items-center gap-2">
@@ -117,9 +117,9 @@
             </div>
             <div class="collapse {{ request()->routeIs('admin.guru.*', 'admin.siswa.*', 'admin.jurusan.*') ? 'show' : '' }}" id="menuData">
                 <div class="sidebar-submenu">
-                    <a href="{{ route('admin.guru.index') }}" class="sidebar-link {{ request()->routeIs('admin.guru.*') ? 'active' : '' }}">Data Guru</a>
-                    <a href="{{ route('admin.siswa.index') }}" class="sidebar-link {{ request()->routeIs('admin.siswa.*') ? 'active' : '' }}">Data Siswa</a>
-                    <a href="{{ route('admin.jurusan.index') }}" class="sidebar-link {{ request()->routeIs('admin.jurusan.*') ? 'active' : '' }}">Data Jurusan</a>
+                    <a href="{{ route('admin.guru.index') }}" class="sidebar-link {{ request()->routeIs('admin.guru.*') ? 'active' : '' }}" data-admin-page-link>Data Guru</a>
+                    <a href="{{ route('admin.siswa.index') }}" class="sidebar-link {{ request()->routeIs('admin.siswa.*') ? 'active' : '' }}" data-admin-page-link>Data Siswa</a>
+                    <a href="{{ route('admin.jurusan.index') }}" class="sidebar-link {{ request()->routeIs('admin.jurusan.*') ? 'active' : '' }}" data-admin-page-link>Data Jurusan</a>
                 </div>
             </div>
 
@@ -320,12 +320,10 @@
         @yield('content')
     </div>
 
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.13.8/js/dataTables.bootstrap5.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="{{ asset('js/gurukuu-modal.js') }}"></script>
+    <script src="{{ asset('js/admin-page-cache.js') }}"></script>
     @stack('scripts')
 </body>
 </html>
