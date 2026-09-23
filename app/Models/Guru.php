@@ -203,7 +203,7 @@ class Guru extends Model
         $penilaian = $query->get();
         if ($penilaian->isEmpty()) return 0.0;
 
-        return round($penilaian->avg('total_nilai') / 6, 2);
+        return round($penilaian->avg('total_nilai') / 5, 2);
     }
 
     public function updateRataRata(?int $periodeId = null)
@@ -225,7 +225,7 @@ class Guru extends Model
         }
 
         $this->update([
-            'rata_rata_nilai' => round($penilaian->avg('total_nilai') / 6, 2),
+            'rata_rata_nilai' => round($penilaian->avg('total_nilai') / 5, 2),
             'total_penilaian' => $penilaian->count(),
         ]);
     }

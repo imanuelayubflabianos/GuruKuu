@@ -26,9 +26,6 @@
                 </li>
             </ul>
         </div>
-        <a href="{{ url('/') }}" class="btn btn-outline-custom">
-            <i class="bi bi-house-door me-1"></i> Ke Beranda Publik
-        </a>
     </div>
 </div>
 

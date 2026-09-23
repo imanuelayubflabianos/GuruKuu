@@ -225,7 +225,7 @@
                 <div class="d-flex flex-column gap-2.5">
                     @foreach($riwayatTerakhir as $riwayat)
                         @php
-                            $rwScore = round(($riwayat->total_nilai / 30) * 100);
+                            $rwScore = round(($riwayat->rata_rata_evaluasi / 5) * 100);
                             $rwBadge = $rwScore >= 80 ? 'bg-success' : ($rwScore >= 60 ? 'bg-info' : 'bg-warning');
                         @endphp
                         <div class="d-flex align-items-center gap-3 p-2.5 rounded-3 border" style="background: var(--bg-card); border-color: var(--border) !important;">

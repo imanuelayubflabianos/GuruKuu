@@ -43,10 +43,10 @@
         {{-- BREADCRUMB & HEADER --}}
         <div class="page-header mb-4">
             <div>
-                <a href="{{ url()->previous() != url()->current() ? url()->previous() : route('landing.index') . '#guru' }}" class="text-decoration-none text-muted small">
+                <a href="{{ url()->previous() != url()->current() ? url()->previous() : route('landing.index') . '#guru' }}" class="btn btn-outline-secondary btn-sm mb-2.5">
                     <i class="bi bi-arrow-left me-1"></i> Kembali
                 </a>
-                <h1 class="page-title mt-2">{{ $guru->nama }}</h1>
+                <h1 class="page-title mt-1">{{ $guru->nama }}</h1>
                 <p class="page-subtitle mb-0 mt-1">
                     @if($guru->jurusan)
                         <span class="badge bg-primary text-white">{{ $guru->jurusan->nama_jurusan }}</span>
@@ -104,7 +104,6 @@
                             @php
                                 $aspects = [
                                     'Kedisiplinan' => $stats['rata_kedisiplinan'],
-                                    'Cara Mengajar' => $stats['rata_cara_mengajar'],
                                     'Komunikasi' => $stats['rata_komunikasi'],
                                     'Tanggung Jawab' => $stats['rata_tanggung_jawab'],
                                     'Kreativitas' => $stats['rata_kreativitas'],
@@ -198,7 +197,7 @@
             @if($semuaFeedback->count() > 0)
                 @foreach($semuaFeedback as $fb)
                 @php
-                    $fbScore = round(($fb->total_nilai / 30) * 100);
+                    $fbScore = round(($fb->rata_rata_evaluasi / 5) * 100);
                     $fbColor = $fbScore >= 80 ? 'bg-success' : ($fbScore >= 60 ? 'bg-info' : ($fbScore >= 40 ? 'bg-warning' : 'bg-danger'));
                 @endphp
                 <div class="border rounded p-3 mb-3" style="background: #fdfdfd;">
@@ -220,11 +219,40 @@
                         <div style="min-width: 140px;">
                             <div class="d-flex justify-content-between mb-1">
                                 <small class="text-muted" style="font-size: 0.7rem;">Nilai Diberikan:</small>
-                                <small class="fw-bold font-mono text-dark" style="font-size: 0.7rem;">{{ $fbScore }}% ({{ $fb->total_nilai }}/30)</small>
+                                <small class="fw-bold font-mono text-dark" style="font-size: 0.7rem;">{{ $fbScore }}% ({{ $fb->total_nilai }}/25)</small>
                             </div>
                             <div class="progress" style="height: 6px; background-color: #dee2e6; border-radius: 3px;">
                                 <div class="progress-bar {{ $fbColor }}" style="width: {{ $fbScore }}%;"></div>
                             </div>
+                        </div>
+                    </div>
+
+                    {{-- RINCIAN BINTANG PER KRITERIA --}}
+                    <div class="p-2 rounded mb-2" style="background: var(--bg-light, #f8fafc); border: 1px solid var(--border, #e2e8f0);">
+                        <div class="small fw-bold text-muted mb-1" style="font-size: 0.7rem; letter-spacing: 0.5px;">
+                            <i class="bi bi-star-fill text-warning me-1"></i> RINCIAN NILAI PER ASPEK:
+                        </div>
+                        <div class="row g-1 text-center">
+                            @php
+                                $aspectsFb = [
+                                    'Kedisiplinan' => $fb->kedisiplinan,
+                                    'Komunikasi' => $fb->komunikasi,
+                                    'Tanggung Jawab' => $fb->tanggung_jawab,
+                                    'Kreativitas' => $fb->kreativitas,
+                                    'Keramahan' => $fb->keramahan,
+                                ];
+                            @endphp
+                            @foreach($aspectsFb as $aspLabel => $aspVal)
+                                <div class="col-6 col-sm">
+                                    <div class="bg-white p-1.5 rounded border" style="font-size: 0.7rem;">
+                                        <div class="text-truncate text-muted fw-semibold" title="{{ $aspLabel }}">{{ $aspLabel }}</div>
+                                        <div class="text-warning mt-0.5 d-flex align-items-center justify-content-center gap-0.5">
+                                            <i class="bi bi-star-fill" style="font-size: 0.7rem;"></i>
+                                            <span class="fw-bold font-mono text-dark" style="font-size: 0.75rem;">{{ $aspVal ?? '-' }}<span class="text-muted fw-normal" style="font-size: 0.65rem;">/5</span></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
                         </div>
                     </div>
 
@@ -286,7 +314,7 @@
                                 <div class="accordion-body bg-light">
                                     @forelse($periodeLalu->penilaian as $fbLalu)
                                         @php
-                                            $scoreLalu = round(($fbLalu->total_nilai / 30) * 100);
+                                            $scoreLalu = round(($fbLalu->rata_rata_evaluasi / 5) * 100);
                                         @endphp
                                         <div class="p-3 bg-white rounded border mb-2">
                                             <div class="d-flex justify-content-between align-items-center mb-2">

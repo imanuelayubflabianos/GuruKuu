@@ -113,7 +113,7 @@
             {{-- DETAIL SKOR 6 ASPEK --}}
             <div class="mb-3 p-3 rounded bg-light border">
                 <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
-                    @php $revPct = round(($review->total_nilai / 30) * 100); @endphp
+                    @php $revPct = round(($review->rata_rata_evaluasi / 5) * 100); @endphp
                     <div class="d-flex align-items-center gap-3">
                         <span class="fw-bold text-primary font-mono" style="font-size: 1.2rem;">
                             {{ $revPct }}%
@@ -123,41 +123,35 @@
                         </div>
                     </div>
                     <span class="badge bg-white text-dark border font-mono">
-                        Skor Total: {{ $review->total_nilai }} / 30 ({{ round(($review->total_nilai / 30) * 100) }}%)
+                        Skor Total: {{ $review->total_nilai }} / 25 ({{ $revPct }}%)
                     </span>
                 </div>
                 <div class="row g-2 text-center" style="font-size: 0.78rem;">
-                    <div class="col-4 col-md-2">
+                    <div class="col-4 col-md">
                         <div class="p-1 bg-white rounded border">
                             <span class="text-muted d-block">Disiplin</span>
                             <strong class="text-primary">{{ $review->kedisiplinan }}/5</strong>
                         </div>
                     </div>
-                    <div class="col-4 col-md-2">
-                        <div class="p-1 bg-white rounded border">
-                            <span class="text-muted d-block">Mengajar</span>
-                            <strong class="text-primary">{{ $review->cara_mengajar }}/5</strong>
-                        </div>
-                    </div>
-                    <div class="col-4 col-md-2">
+                    <div class="col-4 col-md">
                         <div class="p-1 bg-white rounded border">
                             <span class="text-muted d-block">Komunikasi</span>
                             <strong class="text-primary">{{ $review->komunikasi }}/5</strong>
                         </div>
                     </div>
-                    <div class="col-4 col-md-2">
+                    <div class="col-4 col-md">
                         <div class="p-1 bg-white rounded border">
                             <span class="text-muted d-block">Tanggung Jwb</span>
                             <strong class="text-primary">{{ $review->tanggung_jawab }}/5</strong>
                         </div>
                     </div>
-                    <div class="col-4 col-md-2">
+                    <div class="col-4 col-md">
                         <div class="p-1 bg-white rounded border">
                             <span class="text-muted d-block">Kreativitas</span>
                             <strong class="text-primary">{{ $review->kreativitas }}/5</strong>
                         </div>
                     </div>
-                    <div class="col-4 col-md-2">
+                    <div class="col-4 col-md">
                         <div class="p-1 bg-white rounded border">
                             <span class="text-muted d-block">Keramahan</span>
                             <strong class="text-primary">{{ $review->keramahan }}/5</strong>

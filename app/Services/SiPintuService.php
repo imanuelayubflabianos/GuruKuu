@@ -220,14 +220,18 @@ class SiPintuService
                 $nama = $t['nama'] ?? $t['name'] ?? $t['nama_guru'] ?? 'Tanpa Nama';
                 $email = $t['user']['email'] ?? $t['email'] ?? null;
                 $phone = $t['hp'] ?? $t['phone'] ?? $t['telepon'] ?? $t['no_hp'] ?? null;
-                $bio = $t['bio'] ?? $t['alamat'] ?? $t['mapel'] ?? null;
+                $bio = $t['bio'] ?? null;
+                if (empty($bio)) {
+                    $bio = 'Guru pengajar di SMK Negeri 1 Bangsri yang berdedikasi membimbing dan mendidik generasi muda berprestasi.';
+                }
+                $alamat = $t['alamat'] ?? null;
                 $kategori = strtolower($t['kategori'] ?? $t['category'] ?? 'normada');
                 $photo = $t['photo'] ?? $t['foto'] ?? "https://ui-avatars.com/api/?name=" . urlencode($nama) . "&background=003366&color=fff";
                 $status = (int) ($t['status'] ?? 1);
 
                 return array_merge($t, [
                     'nip' => $nip, 'nama' => $nama, 'name' => $nama, 'email' => $email,
-                    'phone' => $phone, 'hp' => $phone, 'bio' => $bio, 'alamat' => $bio,
+                    'phone' => $phone, 'hp' => $phone, 'bio' => $bio, 'alamat' => $alamat,
                     'kategori' => $kategori, 'photo' => $photo, 'status' => $status,
                 ]);
             }, $rawTeachers);
@@ -453,9 +457,11 @@ class SiPintuService
 
             if (!$nip || !$nama) return ['success' => false, 'message' => 'Data guru tidak lengkap (NIP/Nama kosong).'];
 
-            $email = $teacherData['user']['email'] ?? $teacherData['email'] ?? null;
-            $phone = $teacherData['hp'] ?? $teacherData['phone'] ?? $teacherData['telepon'] ?? null;
-            $bio = $teacherData['bio'] ?? $teacherData['alamat'] ?? $teacherData['mapel'] ?? null;
+            $bio = $teacherData['bio'] ?? null;
+            if (empty($bio)) {
+                $bio = 'Guru pengajar di SMK Negeri 1 Bangsri yang berdedikasi membimbing dan mendidik generasi muda berprestasi.';
+            }
+            $alamat = $teacherData['alamat'] ?? null;
             $photo = $teacherData['photo'] ?? $teacherData['foto'] ?? null;
             $kategori = strtolower($teacherData['kategori'] ?? $teacherData['category'] ?? 'normada');
             if (!in_array($kategori, ['normada', 'produktif'])) $kategori = 'normada';

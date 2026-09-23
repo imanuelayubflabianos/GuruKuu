@@ -144,11 +144,11 @@
                         </div>
 
                         {{-- Rating Persen & Bar --}}
-                        @php $revPct = round(($review->total_nilai / 30) * 100); @endphp
+                        @php $revPct = round(($review->rata_rata_evaluasi / 5) * 100); @endphp
                         <div class="mb-2" style="max-width: 220px;">
                             <div class="d-flex justify-content-between align-items-center mb-1 font-mono" style="font-size: 0.75rem;">
                                 <span class="fw-bold text-primary">{{ $revPct }}%</span>
-                                <span class="text-muted">({{ $review->total_nilai }}/30)</span>
+                                <span class="text-muted">({{ $review->total_nilai }}/25)</span>
                             </div>
                             <div class="progress" style="height: 5px; border-radius: 10px;">
                                 <div class="progress-bar bg-primary rounded-pill" style="width: {{ $revPct }}%;"></div>

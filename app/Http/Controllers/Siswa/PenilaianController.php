@@ -40,7 +40,6 @@ class PenilaianController extends Controller
     {
         $request->validate([
             'kedisiplinan' => 'required|integer|min:1|max:5',
-            'cara_mengajar' => 'required|integer|min:1|max:5',
             'komunikasi' => 'required|integer|min:1|max:5',
             'tanggung_jawab' => 'required|integer|min:1|max:5',
             'kreativitas' => 'required|integer|min:1|max:5',
@@ -107,7 +106,6 @@ class PenilaianController extends Controller
             'periode_id' => $periodeAktif->id,
             'class_id' => $kelasAktif?->id, // ✅ Simpan class_id jika ada, null jika belum dipetakan
             'kedisiplinan' => $request->kedisiplinan,
-            'cara_mengajar' => $request->cara_mengajar,
             'komunikasi' => $request->komunikasi,
             'tanggung_jawab' => $request->tanggung_jawab,
             'kreativitas' => $request->kreativitas,

@@ -26,7 +26,7 @@ class PenilaianExport implements FromCollection, WithHeadings, WithMapping, With
         return [
             'No', 'Tanggal', 'NIS Siswa', 'Nama Siswa', 'Kelas',
             'NIP Guru', 'Nama Guru', 'Kategori', 'Jurusan',
-            'Kedisiplinan', 'Cara Mengajar', 'Komunikasi',
+            'Kedisiplinan', 'Komunikasi',
             'Tanggung Jawab', 'Kreativitas', 'Keramahan',
             'Total Nilai', 'Kritik', 'Saran', 'Periode'
         ];
@@ -47,7 +47,6 @@ class PenilaianExport implements FromCollection, WithHeadings, WithMapping, With
             $row->guru->kategori_label,
             $row->guru->jurusan?->nama_jurusan,
             $row->kedisiplinan,
-            $row->cara_mengajar,
             $row->komunikasi,
             $row->tanggung_jawab,
             $row->kreativitas,

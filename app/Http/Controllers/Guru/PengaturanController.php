@@ -85,7 +85,7 @@ class PengaturanController extends Controller
     public function kirimPesanAdmin(Request $request)
     {
         $request->validate([
-            'pesan'   => 'required|string|min:3|max:2000',
+            'pesan'   => 'required|string|min:3|max:1000',
             'captcha' => 'required|numeric',
         ], [
             'pesan.required'   => 'Pesan tidak boleh kosong.',
@@ -120,7 +120,7 @@ class PengaturanController extends Controller
             return back()->with('error', 'Akses ditolak.');
         }
 
-        $request->validate(['pesan' => 'required|string|min:3']);
+        $request->validate(['pesan' => 'required|string|min:3|max:1000']);
         $kontak->update(['pesan' => trim($request->pesan)]);
 
         return redirect()->to(route('guru.pengaturan') . '#tabChat')->with('success', 'Pesan Anda berhasil diperbarui!');

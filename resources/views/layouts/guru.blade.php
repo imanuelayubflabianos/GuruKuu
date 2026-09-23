@@ -93,7 +93,7 @@
                 <span>SMKN 1 Bangsri</span>
             </a>
         </div>
-        <div class="d-flex align-items-center gap-1.5">
+        <div class="d-flex align-items-center gap-2">
             {{-- BERANDA PUBLIK MOBILE --}}
             <a href="{{ url('/') }}" target="_blank" class="btn btn-light border p-1.5 rounded-circle shadow-sm" title="Buka Beranda Publik">
                 <i class="bi bi-globe2 text-primary" style="font-size: 1rem;"></i>
@@ -101,22 +101,19 @@
             <button class="btn btn-light border p-1.5 rounded-circle shadow-sm" type="button" onclick="GuruKuuTheme.toggleTheme()" title="Mode Gelap/Terang">
                 <i class="bi bi-moon-stars-fill gk-theme-icon" style="font-size: 1rem;"></i>
             </button>
-            <button class="btn btn-light border p-1.5 rounded-circle shadow-sm" type="button" onclick="GuruKuuTheme.openDisplayModal()" title="Pengaturan Grafis & Performa">
-                <i class="bi bi-sliders2-vertical text-primary" style="font-size: 1rem;"></i>
-            </button>
         </div>
     </header>
 
     <aside class="sidebar">
         <div class="sidebar-brand">
-            <a href="{{ route('guru.dashboard') }}" class="d-flex align-items-center gap-2 text-decoration-none text-dark">
+            <a href="{{ route('guru.dashboard') }}" class="d-flex align-items-center gap-2 text-decoration-none">
                 @if(!empty($siteLogo))
                     <img src="{{ $siteLogo }}" alt="{{ $siteTitle ?? 'GuruKuu' }}" style="height: 32px; max-width: 45px; object-fit: contain;">
                 @else
-                    <i class="bi bi-mortarboard-fill fs-4 text-primary"></i>
+                    <i class="bi bi-mortarboard-fill fs-4" style="color: {{ $siteTitleColor1 ?? '#003366' }} !important;"></i>
                 @endif
-                <span class="fs-5 fw-bold">
-                    <span>{{ $siteTitlePart1 ?? 'Guru' }}</span><span class="text-warning">{{ $siteTitlePart2 ?? 'Kuu' }}</span>
+                <span class="fs-5 fw-bold brand-logo-text">
+                    <span style="color: {{ $siteTitleColor1 ?? '#003366' }} !important;">{{ $siteTitlePart1 ?? 'Guru' }}</span><span style="color: {{ $siteTitleColor2 ?? '#F59E0B' }} !important;">{{ $siteTitlePart2 ?? 'Kuu' }}</span>
                 </span>
             </a>
             <button type="button" class="btn btn-sm btn-light border d-lg-none rounded-circle" onclick="GuruKuuTheme.closeSidebar()" aria-label="Tutup">
@@ -149,20 +146,16 @@
                 <span class="text-muted small">| Evaluasi & Refleksi Pembelajaran Siswa SMKN 1 Bangsri</span>
             </div>
             <div class="d-flex align-items-center gap-2">
-                {{-- BERANDA PUBLIK LINK (TOPBAR) --}}
-                <a href="{{ url('/') }}" target="_blank" class="btn btn-outline-secondary btn-sm rounded-pill px-3 py-1.5 d-inline-flex align-items-center gap-1.5 text-decoration-none shadow-sm" title="Buka Beranda Publik">
-                    <i class="bi bi-globe2 text-primary"></i>
-                    <span class="d-none d-md-inline small fw-semibold">Beranda Publik</span>
+                {{-- BERANDA PUBLIK ICON BUTTON (TOPBAR) --}}
+                <a href="{{ url('/') }}" target="_blank" class="btn btn-light border p-2 rounded-circle shadow-sm" title="Buka Beranda Publik">
+                    <i class="bi bi-globe2 text-primary fs-5"></i>
                 </a>
                 <button class="btn btn-light border p-2 rounded-circle shadow-sm" type="button" onclick="GuruKuuTheme.toggleTheme()" title="Ganti Mode Gelap / Terang">
                     <i class="bi bi-moon-stars-fill gk-theme-icon fs-5"></i>
                 </button>
-                <button class="btn btn-light border p-2 rounded-circle shadow-sm" type="button" onclick="GuruKuuTheme.openDisplayModal()" title="Pengaturan Grafis & Performa">
-                    <i class="bi bi-sliders2-vertical text-primary fs-5"></i>
-                </button>
 
                 {{-- USER BADGE DROPDOWN (PERSIS SEPERTI ADMIN) --}}
-                <div class="dropdown border-start ps-3 ms-1">
+                <div class="dropdown border-start ps-3 ms-2">
                     <button class="btn btn-light d-flex align-items-center gap-2 p-1.5 px-2.5 rounded-pill border shadow-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                         <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center fw-bold" style="width: 28px; height: 28px; font-size: 0.8rem;">
                             {{ strtoupper(substr(auth()->user()->name ?? 'G', 0, 1)) }}
@@ -185,7 +178,7 @@
                             <form action="{{ route('logout') }}" method="POST">
                                 @csrf
                                 <button type="submit" class="dropdown-item rounded py-1.5 small text-danger fw-semibold">
-                                    <i class="bi bi-box-arrow-right me-2"></i> Keluar
+                                    <i class="bi bi-box-arrow-right me-2"></i> Logout
                                 </button>
                             </form>
                         </li>

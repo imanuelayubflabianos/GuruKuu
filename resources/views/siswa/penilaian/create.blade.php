@@ -64,7 +64,7 @@
                     <div>
                         <span class="text-muted small text-uppercase font-mono fw-bold">Akumulasi Nilai Sementara</span>
                         <div class="d-flex align-items-baseline gap-2">
-                            <h2 class="fw-bold mb-0 text-primary font-mono" id="liveScoreText">0 <span class="text-muted fs-6 fw-normal">/ 30</span></h2>
+                            <h2 class="fw-bold mb-0 text-primary font-mono" id="liveScoreText">0 <span class="text-muted fs-6 fw-normal">/ 25</span></h2>
                             <span class="badge bg-secondary font-mono" id="liveScorePct">0%</span>
                         </div>
                     </div>
@@ -78,11 +78,11 @@
                     <div class="progress-bar progress-bar-striped progress-bar-animated bg-primary" id="liveProgressBar" style="width: 0%; transition: width 0.4s ease;"></div>
                 </div>
                 <small class="text-muted mt-2 d-block text-end" style="font-size: 0.75rem;">
-                    *Pilih rating bintang pada keenam kriteria di bawah ini untuk mengaktifkan pengiriman.
+                    *Pilih rating bintang pada kelima kriteria di bawah ini untuk mengaktifkan pengiriman.
                 </small>
             </div>
 
-            {{-- 6 KRITERIA CARD TILES --}}
+            {{-- 5 KRITERIA CARD TILES --}}
             <div class="card-custom p-4 mb-4">
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <div>
@@ -96,7 +96,6 @@
                 @php
                     $kriteriaList = [
                         'kedisiplinan'   => ['label' => 'Kedisiplinan', 'desc' => 'Ketepatan waktu masuk kelas, keteraturan jam pelajaran, dan komitmen kehadiran.', 'icon' => 'bi-clock-history', 'color' => '#0284c7', 'bg' => '#e0f2fe'],
-                        'cara_mengajar'  => ['label' => 'Cara Mengajar', 'desc' => 'Kemampuan menyampaikan materi dengan jelas, mudah dipahami, dan terstruktur.', 'icon' => 'bi-mortarboard-fill', 'color' => '#6366f1', 'bg' => '#e0e7ff'],
                         'komunikasi'     => ['label' => 'Komunikasi', 'desc' => 'Kejelasan instruksi, interaksi dua arah, dan keterbukaan dalam mendengarkan siswa.', 'icon' => 'bi-chat-dots-fill', 'color' => '#0d9488', 'bg' => '#ccfbf1'],
                         'tanggung_jawab' => ['label' => 'Tanggung Jawab', 'desc' => 'Tanggung jawab terhadap penugasan, keadilan penilaian, dan bimbingan tugas.', 'icon' => 'bi-shield-check', 'color' => '#16a34a', 'bg' => '#dcfce7'],
                         'kreativitas'    => ['label' => 'Kreativitas', 'desc' => 'Penggunaan metode belajar yang variatif, media digital, dan tidak monoton.', 'icon' => 'bi-lightbulb-fill', 'color' => '#d97706', 'bg' => '#fef3c7'],
@@ -151,42 +150,64 @@
 
                 {{-- QUICK CHIPS INSPIRATION --}}
                 <div class="mb-3 p-3 rounded bg-light border">
-                    <small class="fw-bold text-muted d-block mb-2 font-mono" style="font-size: 0.75rem;">
-                        <i class="bi bi-magic me-1"></i> CONTOH INSPIRASI (Klik untuk menambahkan ke teks):
-                    </small>
-                    <div class="d-flex flex-wrap gap-1">
-                        <button type="button" class="btn btn-sm btn-outline-secondary quick-chip py-1 px-2" data-target="saran" data-text="Penjelasan materi sangat jelas, terstruktur, dan mudah dipahami." style="font-size: 0.78rem;">
-                            ✨ Penjelasan Sangat Jelas
-                        </button>
-                        <button type="button" class="btn btn-sm btn-outline-secondary quick-chip py-1 px-2" data-target="saran" data-text="Guru sangat sabar, ramah, dan selalu siap membimbing siswa yang kesulitan." style="font-size: 0.78rem;">
-                            😊 Sabar & Ramah
-                        </button>
-                        <button type="button" class="btn btn-sm btn-outline-secondary quick-chip py-1 px-2" data-target="saran" data-text="Suasana belajar di kelas sangat seru, interaktif, dan tidak membosankan." style="font-size: 0.78rem;">
-                            🎯 Kelas Seru & Interaktif
-                        </button>
-                        <button type="button" class="btn btn-sm btn-outline-secondary quick-chip py-1 px-2" data-target="saran" data-text="Akan lebih menarik jika ada lebih banyak latihan praktik atau studi kasus nyata." style="font-size: 0.78rem;">
-                            💡 Perbanyak Contoh Praktik
-                        </button>
-                        <button type="button" class="btn btn-sm btn-outline-secondary quick-chip py-1 px-2" data-target="kritik" data-text="Terkadang tempo penjelasan materi terasa agak cepat sehingga perlu sedikit diperlambat." style="font-size: 0.78rem;">
-                            ⏳ Tempo Kadang Terlalu Cepat
-                        </button>
+                    <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
+                        <small class="fw-bold text-muted font-mono" style="font-size: 0.75rem;">
+                            <i class="bi bi-lightbulb-fill text-warning me-1"></i> CONTOH INSPIRASI SANTUN (Klik untuk menambahkan/hapus dari teks):
+                        </small>
+                        <small class="text-muted" style="font-size: 0.72rem;">*Klik untuk menyisipkan, klik lagi untuk membatalkan</small>
+                    </div>
+
+                    <div class="mb-2">
+                        <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 mb-1.5" style="font-size: 0.7rem;">Saran & Pujian:</span>
+                        <div class="d-flex flex-wrap gap-1.5">
+                            <button type="button" class="btn btn-sm btn-outline-secondary quick-chip py-1 px-2.5 rounded-pill" data-target="saran" data-text="Penyampaian materi sangat terstruktur, jelas, dan mudah dipahami." style="font-size: 0.75rem;">
+                                ✨ Penjelasan Sangat Jelas
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-secondary quick-chip py-1 px-2.5 rounded-pill" data-target="saran" data-text="Bapak/Ibu guru sangat sabar, ramah, dan memotivasi siswa saat belajar." style="font-size: 0.75rem;">
+                                😊 Ramah & Memotivasi
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-secondary quick-chip py-1 px-2.5 rounded-pill" data-target="saran" data-text="Suasana belajar di kelas interaktif, menyenangkan, dan komunikatif." style="font-size: 0.75rem;">
+                                🎯 Kelas Interaktif & Seru
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-secondary quick-chip py-1 px-2.5 rounded-pill" data-target="saran" data-text="Akan lebih baik dan aplikatif jika ditambah lebih banyak contoh praktik nyata." style="font-size: 0.75rem;">
+                                💡 Perbanyak Contoh Praktik
+                            </button>
+                        </div>
+                    </div>
+
+                    <div>
+                        <span class="badge bg-warning bg-opacity-10 text-warning-emphasis border border-warning border-opacity-25 mb-1.5" style="font-size: 0.7rem;">Masukan Santun:</span>
+                        <div class="d-flex flex-wrap gap-1.5">
+                            <button type="button" class="btn btn-sm btn-outline-secondary quick-chip py-1 px-2.5 rounded-pill" data-target="kritik" data-text="Mohon izin, alangkah baiknya jika tempo penyampaian materi tertentu dapat sedikit diperlambat agar siswa lebih memahami." style="font-size: 0.75rem;">
+                                ⏳ Tempo Sedikit Diperlambat
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-secondary quick-chip py-1 px-2.5 rounded-pill" data-target="kritik" data-text="Semoga bisa diberikan lebih banyak sesi tanya jawab dan diskusi sebelum pergantian materi." style="font-size: 0.75rem;">
+                                💬 Perbanyak Sesi Tanya Jawab
+                            </button>
+                        </div>
                     </div>
                 </div>
 
                 <div class="row g-3">
                     <div class="col-md-6">
-                        <label class="form-label font-mono small fw-bold text-danger">
-                            <i class="bi bi-chat-dots me-1"></i>KRITIK / EVALUASI KEKURANGAN
-                        </label>
-                        <textarea name="kritik" id="kritikInput" class="form-control" rows="3" placeholder="Sampaikan hal-hal yang perlu diperbaiki secara sopan dan konstruktif..." style="border-radius: 8px;">{{ old('kritik') }}</textarea>
-                        <div class="form-text small text-muted">Gunakan bahasa yang santun tanpa merendahkan.</div>
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <label class="form-label font-mono small fw-bold text-danger mb-0">
+                                <i class="bi bi-chat-dots me-1"></i>KRITIK / MASUKAN SANTUN
+                            </label>
+                            <span class="font-mono text-muted small" id="kritikCounter" style="font-size: 0.72rem;">0 / 500</span>
+                        </div>
+                        <textarea name="kritik" id="kritikInput" class="form-control" rows="3" maxlength="500" placeholder="Sampaikan masukan perbaikan secara sopan, objektif, dan konstruktif..." style="border-radius: 8px;">{{ old('kritik') }}</textarea>
+                        <div class="form-text small text-muted">Maksimal 500 karakter. Gunakan tata krama yang baik.</div>
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label font-mono small fw-bold text-success">
-                            <i class="bi bi-lightbulb me-1"></i>SARAN & HARAPAN PERBAIKAN
-                        </label>
-                        <textarea name="saran" id="saranInput" class="form-control" rows="3" placeholder="Sampaikan ide, harapan, atau pujian Anda untuk guru tercinta..." style="border-radius: 8px;">{{ old('saran') }}</textarea>
-                        <div class="form-text small text-muted">Saran yang baik membantu guru berinovasi.</div>
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <label class="form-label font-mono small fw-bold text-success mb-0">
+                                <i class="bi bi-lightbulb me-1"></i>SARAN & HARAPAN PERBAIKAN
+                            </label>
+                            <span class="font-mono text-muted small" id="saranCounter" style="font-size: 0.72rem;">0 / 500</span>
+                        </div>
+                        <textarea name="saran" id="saranInput" class="form-control" rows="3" maxlength="500" placeholder="Sampaikan ide, harapan, atau apresiasi Anda untuk guru tercinta..." style="border-radius: 8px;">{{ old('saran') }}</textarea>
+                        <div class="form-text small text-muted">Maksimal 500 karakter. Saran yang baik membantu guru berinovasi.</div>
                     </div>
                 </div>
             </div>
@@ -297,34 +318,34 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
 
-        const pct = Math.round((total / 30) * 100);
-        document.getElementById('liveScoreText').innerHTML = `${total} <span class="text-muted fs-6 fw-normal">/ 30</span>`;
+        const pct = Math.round((total / 25) * 100);
+        document.getElementById('liveScoreText').innerHTML = `${total} <span class="text-muted fs-6 fw-normal">/ 25</span>`;
         document.getElementById('liveScorePct').innerText = `${pct}%`;
         document.getElementById('liveProgressBar').style.width = `${pct}%`;
 
         const badge = document.getElementById('liveScoreBadge');
-        if (countFilled < 6) {
-            badge.innerText = `${countFilled} dari 6 Kriteria`;
+        if (countFilled < 5) {
+            badge.innerText = `${countFilled} dari 5 Kriteria`;
             badge.style.background = '#f1f5f9';
             badge.style.color = '#475569';
             document.getElementById('liveProgressBar').className = 'progress-bar progress-bar-striped progress-bar-animated bg-secondary';
         } else {
-            if (total >= 26) {
+            if (total >= 22) {
                 badge.innerText = '🤩 Luar Biasa';
                 badge.style.background = '#d1fae5';
                 badge.style.color = '#065f46';
                 document.getElementById('liveProgressBar').className = 'progress-bar bg-success';
-            } else if (total >= 21) {
+            } else if (total >= 18) {
                 badge.innerText = '😊 Sangat Baik';
                 badge.style.background = '#e0e7ff';
                 badge.style.color = '#3730a3';
                 document.getElementById('liveProgressBar').className = 'progress-bar bg-primary';
-            } else if (total >= 16) {
+            } else if (total >= 14) {
                 badge.innerText = '🙂 Baik';
                 badge.style.background = '#dbeafe';
                 badge.style.color = '#1e40af';
                 document.getElementById('liveProgressBar').className = 'progress-bar bg-info';
-            } else if (total >= 11) {
+            } else if (total >= 10) {
                 badge.innerText = '😐 Cukup';
                 badge.style.background = '#fef3c7';
                 badge.style.color = '#92400e';
@@ -338,21 +359,85 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Quick chip appender
-    document.querySelectorAll('.quick-chip').forEach(chip => {
-        chip.addEventListener('click', function() {
-            const target = this.dataset.target === 'kritik' ? document.getElementById('kritikInput') : document.getElementById('saranInput');
-            const textToAdd = this.dataset.text;
-            if (target) {
-                if (target.value.trim() === '') {
-                    target.value = textToAdd;
-                } else {
-                    target.value += ' ' + textToAdd;
-                }
-                target.focus();
+    // Quick chip toggle & Anti-spam logic
+    const chips = document.querySelectorAll('.quick-chip');
+    const kritikInput = document.getElementById('kritikInput');
+    const saranInput = document.getElementById('saranInput');
+    const kritikCounter = document.getElementById('kritikCounter');
+    const saranCounter = document.getElementById('saranCounter');
+
+    function updateCounters() {
+        if (kritikInput && kritikCounter) {
+            kritikCounter.innerText = `${kritikInput.value.length} / 500`;
+            if (kritikInput.value.length >= 480) {
+                kritikCounter.classList.add('text-danger', 'fw-bold');
+            } else {
+                kritikCounter.classList.remove('text-danger', 'fw-bold');
+            }
+        }
+        if (saranInput && saranCounter) {
+            saranCounter.innerText = `${saranInput.value.length} / 500`;
+            if (saranInput.value.length >= 480) {
+                saranCounter.classList.add('text-danger', 'fw-bold');
+            } else {
+                saranCounter.classList.remove('text-danger', 'fw-bold');
+            }
+        }
+        // Update chip active visual
+        chips.forEach(chip => {
+            const target = chip.dataset.target === 'kritik' ? kritikInput : saranInput;
+            const text = chip.dataset.text;
+            if (target && target.value.includes(text)) {
+                chip.classList.remove('btn-outline-secondary');
+                chip.classList.add('btn-primary', 'text-white');
+            } else {
+                chip.classList.remove('btn-primary', 'text-white');
+                chip.classList.add('btn-outline-secondary');
             }
         });
+    }
+
+    if (kritikInput) {
+        kritikInput.addEventListener('input', updateCounters);
+    }
+    if (saranInput) {
+        saranInput.addEventListener('input', updateCounters);
+    }
+
+    chips.forEach(chip => {
+        chip.addEventListener('click', function() {
+            const target = this.dataset.target === 'kritik' ? kritikInput : saranInput;
+            const textToAdd = this.dataset.text;
+            if (!target) return;
+
+            let curVal = target.value.trim();
+            // Anti-spam toggle: If already present, remove it cleanly
+            if (curVal.includes(textToAdd)) {
+                curVal = curVal.replace(textToAdd, '').replace(/\s+/g, ' ').trim();
+                target.value = curVal;
+            } else {
+                // Check 500 limit
+                const newLength = curVal ? (curVal.length + 1 + textToAdd.length) : textToAdd.length;
+                if (newLength > 500) {
+                    if (typeof Swal !== 'undefined') {
+                        Swal.fire({
+                            title: 'Batas Karakter Tercapai',
+                            text: 'Pesan masukan/saran maksimal 500 karakter.',
+                            icon: 'info'
+                        });
+                    } else {
+                        alert('Pesan masukan/saran maksimal 500 karakter.');
+                    }
+                    return;
+                }
+                target.value = curVal ? (curVal + ' ' + textToAdd) : textToAdd;
+            }
+            updateCounters();
+            target.focus();
+        });
     });
+
+    updateCounters();
 
     // Form submit validation
     document.getElementById('penilaianForm').addEventListener('submit', function(e) {

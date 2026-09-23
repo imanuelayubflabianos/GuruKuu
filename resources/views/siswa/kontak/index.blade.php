@@ -36,7 +36,7 @@
         <div class="card-custom" style="overflow: hidden; display: flex; flex-direction: column; height: 65vh; border: 1px solid var(--border);">
             
             {{-- Area Pesan Chat (Scrollable) --}}
-            <div class="flex-grow-1 p-4" style="overflow-y: auto; background: linear-gradient(to bottom, #f8f9fa 0%, #ffffff 100%);" id="chatContainer">
+            <div class="flex-grow-1 p-4" style="overflow-y: auto; background: var(--bg-card);" id="chatContainer">
                 @if($pesan->isEmpty())
                     <div class="text-center py-5">
                         <div class="d-inline-flex align-items-center justify-content-center rounded-circle mb-3" style="width: 80px; height: 80px; background: rgba(0,51,102,0.1);">
@@ -115,7 +115,7 @@
                     @csrf
                     <div class="p-3">
                         <div class="d-flex gap-2 align-items-end mb-3">
-                            <textarea name="pesan" class="form-control" rows="2" placeholder="Ketik pesan Anda di sini..." required style="border-radius: 12px; resize: none; border: 2px solid var(--border); transition: all 0.3s;" onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='var(--border)'">{{ old('pesan') }}</textarea>
+                            <textarea name="pesan" maxlength="1000" class="form-control" rows="2" placeholder="Ketik pesan Anda di sini (maks. 1000 karakter)..." required style="border-radius: 12px; resize: none; border: 2px solid var(--border); transition: all 0.3s;" onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='var(--border)'">{{ old('pesan') }}</textarea>
                             <button type="submit" class="btn btn-primary-custom d-flex align-items-center justify-content-center" style="height: 46px; width: 46px; border-radius: 12px; padding: 0;">
                                 <i class="bi bi-send-fill fs-5"></i>
                             </button>
@@ -157,7 +157,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <textarea name="pesan" id="editTextarea" class="form-control" rows="4" required style="border-radius: 12px; border: 2px solid var(--border);"></textarea>
+                    <textarea name="pesan" id="editTextarea" maxlength="1000" class="form-control" rows="4" required style="border-radius: 12px; border: 2px solid var(--border);"></textarea>
                 </div>
                 <div class="modal-footer border-0 pt-0">
                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" style="border-radius: 8px;">Batal</button>

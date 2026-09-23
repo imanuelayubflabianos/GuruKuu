@@ -32,13 +32,13 @@
             </div>
 
             @php
-                $pct = round(($item->total_nilai / 30) * 100);
+                $pct = round(($item->rata_rata_evaluasi / 5) * 100);
                 $pctBadge = $pct >= 80 ? 'bg-success' : ($pct >= 60 ? 'bg-info' : ($pct >= 40 ? 'bg-warning' : 'bg-danger'));
             @endphp
             <div class="mb-3">
                 <div class="d-flex justify-content-between align-items-center mb-1">
                     <small class="text-muted fw-semibold">Tingkat Kepuasan</small>
-                    <span class="badge {{ $pctBadge }} font-mono">{{ $pct }}% ({{ $item->total_nilai }}/30)</span>
+                    <span class="badge {{ $pctBadge }} font-mono">{{ $pct }}% ({{ $item->total_nilai }}/25)</span>
                 </div>
                 <div class="progress mb-2" style="height: 6px; border-radius: 4px; background-color: #e9ecef;">
                     <div class="progress-bar {{ $pctBadge }} rounded-pill" style="width: {{ $pct }}%;"></div>

@@ -337,7 +337,7 @@
             <div class="col-lg-4">
                 <div class="settings-card h-100 d-flex flex-column justify-content-between">
                     <div><h2 class="settings-heading"><i class="bi bi-person-circle me-2"></i>{{ auth()->user()->name }}</h2><p class="settings-muted mt-2 mb-0">Sesi administrator aktif.</p></div>
-                    <form action="{{ route('logout') }}" method="POST" class="mt-4">@csrf <button type="submit" class="btn btn-outline-danger w-100"><i class="bi bi-box-arrow-right me-1"></i>Keluar</button></form>
+                    <form action="{{ route('logout') }}" method="POST" class="mt-4">@csrf <button type="submit" class="btn btn-outline-danger w-100"><i class="bi bi-box-arrow-right me-1"></i>Logout</button></form>
                 </div>
             </div>
             <div class="col-12">

@@ -712,3 +712,57 @@ html.compact-mode .card-custom {
     background: rgba(255, 255, 255, 0.08);
     border-color: rgba(255, 255, 255, 0.12);
 }
+
+/* ===================================================
+   7. BRAND LOGO COLOR INTEGRITY IN DARK MODE
+   =================================================== */
+[data-theme="dark"] .brand-logo-text span,
+[data-theme="dark"] .sidebar-brand .brand-logo-text span,
+[data-theme="dark"] .navbar-brand .brand-logo-text span {
+    color: inherit;
+}
+
+/* ===================================================
+   8. DARK MODE CHAT & CONTAINER UNIFIED FIXES
+   =================================================== */
+[data-theme="dark"] #siswaChatContainer,
+[data-theme="dark"] #guruChatContainer,
+[data-theme="dark"] #chatContainer,
+[data-theme="dark"] .chat-box {
+    background: var(--bg-card) !important;
+    border-color: var(--border) !important;
+}
+
+[data-theme="dark"] .admin-chat-card,
+[data-theme="dark"] .chat-container {
+    background-color: var(--bg-card) !important;
+}
+
+/* ===================================================
+   9. SUBTLE DASHBOARD MICRO-ANIMATIONS (NON-ADMIN)
+   =================================================== */
+body:not(.role-admin) .card-custom {
+    transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+body:not(.role-admin) .card-custom:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+body:not(.role-admin) .stat-card,
+body:not(.role-admin) .stat-card-modern,
+body:not(.role-admin) .btn-podium {
+    transition: transform 0.22s ease, box-shadow 0.22s ease;
+}
+body:not(.role-admin) .stat-card:hover,
+body:not(.role-admin) .stat-card-modern:hover {
+    transform: translateY(-3px);
+}
+@keyframes gentleEntrance {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+body:not(.role-admin) .content,
+body:not(.role-admin) .main-content {
+    animation: gentleEntrance 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+}
+

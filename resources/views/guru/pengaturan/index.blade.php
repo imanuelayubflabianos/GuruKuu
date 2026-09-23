@@ -137,7 +137,7 @@
                 {{-- AREA CHAT MESSENGER --}}
                 <div class="card-custom mb-4" style="overflow: hidden; display: flex; flex-direction: column; height: 60vh; border: 1px solid var(--border);">
                     {{-- Area Pesan Chat (Scrollable) --}}
-                    <div class="flex-grow-1 p-4" style="overflow-y: auto; background: linear-gradient(to bottom, #f8f9fa 0%, #ffffff 100%);" id="guruChatContainer">
+                    <div class="flex-grow-1 p-4" style="overflow-y: auto; background: var(--bg-card);" id="guruChatContainer">
                         @if($pesan->isEmpty())
                             <div class="text-center py-5">
                                 <div class="d-inline-flex align-items-center justify-content-center rounded-circle mb-3" style="width: 70px; height: 70px; background: rgba(0,51,102,0.08);">
@@ -206,7 +206,7 @@
                         <form action="{{ route('guru.pengaturan.chat') }}" method="POST">
                             @csrf
                             <div class="d-flex gap-2 align-items-end mb-2">
-                                <textarea name="pesan" class="form-control" rows="2" placeholder="Tulis pesan atau pertanyaan Anda di sini..." required style="border-radius: 12px; resize: none; border: 2px solid var(--border);" onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='var(--border)'">{{ old('pesan') }}</textarea>
+                                <textarea name="pesan" maxlength="1000" class="form-control" rows="2" placeholder="Tulis pesan atau pertanyaan Anda di sini (maks. 1000 karakter)..." required style="border-radius: 12px; resize: none; border: 2px solid var(--border);" onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='var(--border)'">{{ old('pesan') }}</textarea>
                                 <button type="submit" class="btn btn-primary-custom d-flex align-items-center justify-content-center" style="height: 48px; width: 48px; border-radius: 12px; padding: 0;" title="Kirim Pesan">
                                     <i class="bi bi-send-fill fs-5"></i>
                                 </button>
@@ -300,7 +300,7 @@
         <form action="{{ route('logout') }}" method="POST">
             @csrf
             <button type="submit" class="btn btn-outline-danger px-4 py-2 fw-semibold">
-                <i class="bi bi-box-arrow-right me-1"></i> Keluar (Logout)
+                <i class="bi bi-box-arrow-right me-1"></i> Logout
             </button>
         </form>
     </div>

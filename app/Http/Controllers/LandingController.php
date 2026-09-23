@@ -82,7 +82,6 @@ class LandingController extends Controller
         $stats = [
             'total_penilaian' => $allPenilaian->count(),
             'rata_kedisiplinan' => $allPenilaian->avg('kedisiplinan') ?? 0,
-            'rata_cara_mengajar' => $allPenilaian->avg('cara_mengajar') ?? 0,
             'rata_komunikasi' => $allPenilaian->avg('komunikasi') ?? 0,
             'rata_tanggung_jawab' => $allPenilaian->avg('tanggung_jawab') ?? 0,
             'rata_kreativitas' => $allPenilaian->avg('kreativitas') ?? 0,

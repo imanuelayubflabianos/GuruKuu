@@ -26,13 +26,16 @@
         }
         * { font-family: 'Inter', sans-serif; box-sizing: border-box; }
         body.auth-page { 
+            min-height: 100dvh;
             min-height: 100vh;
             display: flex;
-            flex-direction: column;
+            align-items: center;
             justify-content: center;
             background: linear-gradient(135deg, rgba(15, 23, 42, 0.72), rgba(0, 51, 102, 0.82)), url('{{ $heroImage }}') center/cover no-repeat fixed;
             position: relative;
-            padding: 2rem 1rem;
+            padding: 1rem;
+            margin: 0;
+            overflow-x: hidden;
         }
         body.auth-page::before {
             content: '';
@@ -47,14 +50,15 @@
         .auth-container-wrapper {
             position: relative;
             z-index: 2;
+            width: 100%;
         }
         .font-mono {
             font-family: 'JetBrains Mono', monospace;
         }
         .auth-controls-floating {
             position: fixed;
-            top: 1.25rem;
-            right: 1.25rem;
+            top: 1rem;
+            right: 1rem;
             z-index: 1050;
             display: flex;
             align-items: center;
@@ -83,13 +87,10 @@
     <script src="{{ asset('js/gurukuu-theme.js') }}"></script>
 </head>
 <body class="auth-page">
-    {{-- FLOATING THEME & PERFORMANCE CONTROLS --}}
+    {{-- FLOATING THEME CONTROL --}}
     <div class="auth-controls-floating">
         <button class="btn btn-glass-nav p-2 rounded-circle shadow-sm" type="button" onclick="GuruKuuTheme.toggleTheme()" title="Mode Gelap / Terang">
             <i class="bi bi-moon-stars-fill gk-theme-icon fs-5"></i>
-        </button>
-        <button class="btn btn-glass-nav p-2 rounded-circle shadow-sm" type="button" onclick="GuruKuuTheme.openDisplayModal()" title="Pengaturan Grafis & Performa">
-            <i class="bi bi-sliders2-vertical fs-5"></i>
         </button>
     </div>
 

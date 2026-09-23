@@ -13,7 +13,7 @@ class Penilaian extends Model
 
     protected $fillable = [
         'siswa_id', 'guru_id', 'periode_id', 'class_id',
-        'kedisiplinan', 'cara_mengajar', 'komunikasi',
+        'kedisiplinan', 'komunikasi',
         'tanggung_jawab', 'kreativitas', 'keramahan',
         'total_nilai', 'kritik', 'saran',
         'is_censored', 'censored_reason',
@@ -23,6 +23,10 @@ class Penilaian extends Model
     protected $casts = [
         'is_censored' => 'boolean',
         'balasan_guru_at' => 'datetime',
+    ];
+
+    protected $attributes = [
+        'cara_mengajar' => 0,
     ];
 
     // ==================== RELASI ====================
@@ -56,7 +60,7 @@ class Penilaian extends Model
 
     public static function hitungTotal(array $data): int
     {
-        return ($data['kedisiplinan'] ?? 0) + ($data['cara_mengajar'] ?? 0) +
+        return ($data['kedisiplinan'] ?? 0) +
                ($data['komunikasi'] ?? 0) + ($data['tanggung_jawab'] ?? 0) +
                ($data['kreativitas'] ?? 0) + ($data['keramahan'] ?? 0);
     }
@@ -64,7 +68,7 @@ class Penilaian extends Model
     // Rata-rata dari 6 aspek evaluasi (skala 1-5)
     public function getRataRataEvaluasiAttribute(): float
     {
-        return round($this->total_nilai / 6, 2);
+        return round($this->total_nilai / 5, 2);
     }
 
     // ==================== DETEKSI TOXIC ====================

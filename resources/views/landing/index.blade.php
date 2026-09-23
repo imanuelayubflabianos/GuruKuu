@@ -224,24 +224,24 @@
         </div>
         <div class="row g-2 g-md-4">
             <div class="col-4 col-md-4" data-aos="fade-up" data-aos-delay="100">
-                <div class="tutorial-card p-2 p-md-4 text-center h-100">
-                    <div class="tutorial-number" style="background: var(--primary); color: white;">1</div>
-                    <h5 class="fw-bold mb-1 mb-md-2 mt-2 mt-md-3">Login NIS</h5>
-                    <p class="text-muted mb-0 small">Masuk dengan akun NIS & tanggal lahir resmi terverifikasi.</p>
+                <div class="tutorial-card p-2 p-sm-3 p-md-4 text-center h-100">
+                    <div class="tutorial-number" style="background: var(--primary); color: white; width: clamp(34px, 8vw, 52px); height: clamp(34px, 8vw, 52px); font-size: clamp(0.85rem, 2.2vw, 1.4rem);">1</div>
+                    <h5 class="fw-bold mb-1 mb-md-2 mt-2 mt-md-3" style="font-size: clamp(0.78rem, 2.2vw, 1.15rem);">Login NIS</h5>
+                    <p class="text-muted mb-0 small" style="font-size: clamp(0.65rem, 1.8vw, 0.85rem); line-height: 1.35;">Masuk dengan akun NIS & tanggal lahir resmi terverifikasi.</p>
                 </div>
             </div>
             <div class="col-4 col-md-4" data-aos="fade-up" data-aos-delay="200">
-                <div class="tutorial-card p-2 p-md-4 text-center h-100">
-                    <div class="tutorial-number" style="background: var(--accent); color: white;">2</div>
-                    <h5 class="fw-bold mb-1 mb-md-2 mt-2 mt-md-3">Beri Nilai</h5>
-                    <p class="text-muted mb-0 small">Pilih guru Normada/Produktif, beri nilai (1-5) pada 6 kriteria.</p>
+                <div class="tutorial-card p-2 p-sm-3 p-md-4 text-center h-100">
+                    <div class="tutorial-number" style="background: var(--accent); color: white; width: clamp(34px, 8vw, 52px); height: clamp(34px, 8vw, 52px); font-size: clamp(0.85rem, 2.2vw, 1.4rem);">2</div>
+                    <h5 class="fw-bold mb-1 mb-md-2 mt-2 mt-md-3" style="font-size: clamp(0.78rem, 2.2vw, 1.15rem);">Beri Nilai</h5>
+                    <p class="text-muted mb-0 small" style="font-size: clamp(0.65rem, 1.8vw, 0.85rem); line-height: 1.35;">Pilih guru Normada/Produktif, beri nilai (1-5) pada 5 kriteria.</p>
                 </div>
             </div>
             <div class="col-4 col-md-4" data-aos="fade-up" data-aos-delay="300">
-                <div class="tutorial-card p-2 p-md-4 text-center h-100">
-                    <div class="tutorial-number" style="background: var(--secondary); color: var(--text-dark);">3</div>
-                    <h5 class="fw-bold mb-1 mb-md-2 mt-2 mt-md-3">Kirim Anonim</h5>
-                    <p class="text-muted mb-0 small">Data tersimpan aman & anonim untuk perbaikan pengajaran.</p>
+                <div class="tutorial-card p-2 p-sm-3 p-md-4 text-center h-100">
+                    <div class="tutorial-number" style="background: var(--secondary); color: var(--text-dark); width: clamp(34px, 8vw, 52px); height: clamp(34px, 8vw, 52px); font-size: clamp(0.85rem, 2.2vw, 1.4rem);">3</div>
+                    <h5 class="fw-bold mb-1 mb-md-2 mt-2 mt-md-3" style="font-size: clamp(0.78rem, 2.2vw, 1.15rem);">Kirim Anonim</h5>
+                    <p class="text-muted mb-0 small" style="font-size: clamp(0.65rem, 1.8vw, 0.85rem); line-height: 1.35;">Data tersimpan aman & anonim untuk perbaikan pengajaran.</p>
                 </div>
             </div>
         </div>
@@ -254,38 +254,38 @@
         <div class="text-center mb-4 mb-md-5" data-aos="fade-up">
             <div class="section-label">TENTANG KAMI</div>
             <h2 class="section-title">Mengapa {{ \App\Models\Setting::get('site_title', 'GuruKuu') }} Ada?</h2>
-            <p class="text-muted" style="max-width: 700px; margin: 0 auto; font-size: 0.9rem;">
+            <p class="text-muted" style="max-width: 650px; margin: 0 auto; font-size: 0.92rem; text-wrap: balance;">
                 Platform evaluasi terintegrasi untuk SMK yang membangun jembatan komunikasi positif antara siswa, guru, dan manajemen sekolah.
             </p>
         </div>
 
         <div class="row g-2 g-md-4 mb-3 mb-md-4">
-            <div class="col-12 col-md-6" data-aos="fade-right">
-                <div class="card-custom gk-vm-card p-3 p-md-4 h-100" style="border-top: 4px solid var(--primary);">
+            <div class="col-6 col-md-6" data-aos="fade-right">
+                <div class="card-custom gk-vm-card p-2.5 p-sm-3 p-md-4 h-100" style="border: 1px solid var(--border);">
                     <div class="d-flex align-items-center mb-2 mb-md-3">
-                        <div class="rounded-circle d-flex align-items-center justify-content-center me-2.5 me-md-3 gk-vm-icon" style="width: 40px; height: 40px; background: var(--primary); color: white; flex-shrink: 0;">
-                            <i class="bi bi-bullseye fs-5"></i>
+                        <div class="rounded-circle d-flex align-items-center justify-content-center me-2 me-md-3 gk-vm-icon" style="width: clamp(30px, 7vw, 40px); height: clamp(30px, 7vw, 40px); background: var(--primary); color: white; flex-shrink: 0; font-size: clamp(0.85rem, 2vw, 1.1rem);">
+                            <i class="bi bi-bullseye"></i>
                         </div>
-                        <h5 class="fw-bold mb-0">Visi Kami</h5>
+                        <h5 class="fw-bold mb-0" style="font-size: clamp(0.85rem, 2.4vw, 1.25rem);">Visi Kami</h5>
                     </div>
-                    <p class="text-muted mb-0" style="line-height: 1.6; font-size: 0.88rem;">
+                    <p class="text-muted mb-0" style="line-height: 1.5; font-size: clamp(0.72rem, 1.9vw, 0.88rem);">
                         {{ \App\Models\Setting::get('visi_text', 'Menjadi standar nasional dalam evaluasi pengajaran berbasis data untuk menciptakan ekosistem pendidikan yang responsif, transparan, dan berkelanjutan di seluruh SMK Indonesia.') }}
                     </p>
                 </div>
             </div>
-            <div class="col-12 col-md-6" data-aos="fade-left">
-                <div class="card-custom gk-vm-card p-3 p-md-4 h-100" style="border-top: 4px solid var(--accent);">
+            <div class="col-6 col-md-6" data-aos="fade-left">
+                <div class="card-custom gk-vm-card p-2.5 p-sm-3 p-md-4 h-100" style="border: 1px solid var(--border);">
                     <div class="d-flex align-items-center mb-2 mb-md-3">
-                        <div class="rounded-circle d-flex align-items-center justify-content-center me-2.5 me-md-3 gk-vm-icon" style="width: 40px; height: 40px; background: var(--accent); color: white; flex-shrink: 0;">
-                            <i class="bi bi-rocket-takeoff fs-5"></i>
+                        <div class="rounded-circle d-flex align-items-center justify-content-center me-2 me-md-3 gk-vm-icon" style="width: clamp(30px, 7vw, 40px); height: clamp(30px, 7vw, 40px); background: var(--accent); color: white; flex-shrink: 0; font-size: clamp(0.85rem, 2vw, 1.1rem);">
+                            <i class="bi bi-rocket-takeoff"></i>
                         </div>
-                        <h5 class="fw-bold mb-0">Misi Kami</h5>
+                        <h5 class="fw-bold mb-0" style="font-size: clamp(0.85rem, 2.4vw, 1.25rem);">Misi Kami</h5>
                     </div>
                     @php
                         $misiRaw = \App\Models\Setting::get('misi_text', "Memberikan saluran aspirasi yang aman dan anonim bagi siswa.\nMenyediakan data analitik yang dapat ditindaklanjuti oleh manajemen sekolah.\nMendorong pengembangan profesional guru secara berkelanjutan.");
                         $misiList = array_filter(array_map('trim', explode("\n", $misiRaw)));
                     @endphp
-                    <ul class="text-muted mb-0 ps-3" style="line-height: 1.7; font-size: 0.88rem;">
+                    <ul class="text-muted mb-0 ps-2.5 ps-md-3" style="line-height: 1.5; font-size: clamp(0.72rem, 1.9vw, 0.88rem);">
                         @foreach($misiList as $misiItem)
                             <li>{{ ltrim($misiItem, '-*• ') }}</li>
                         @endforeach
@@ -296,24 +296,24 @@
 
         <div class="row g-2 g-md-4">
             <div class="col-4 col-md-4" data-aos="fade-up" data-aos-delay="100">
-                <div class="card-custom gk-feature-card p-2.5 p-md-4 text-center h-100">
-                    <i class="bi bi-shield-check fs-2 mb-2" style="color: var(--primary);"></i>
-                    <h5 class="fw-bold mb-1">Anonimitas</h5>
-                    <p class="text-muted mb-0 small">Identitas siswa aman dengan enkripsi tanpa tekanan.</p>
+                <div class="card-custom gk-feature-card p-2 p-sm-3 p-md-4 text-center h-100">
+                    <i class="bi bi-shield-check mb-1 mb-md-2" style="color: var(--primary); font-size: clamp(1.3rem, 3.5vw, 2rem);"></i>
+                    <h5 class="fw-bold mb-1" style="font-size: clamp(0.75rem, 2.2vw, 1.1rem);">Anonimitas</h5>
+                    <p class="text-muted mb-0 small" style="font-size: clamp(0.65rem, 1.8vw, 0.85rem); line-height: 1.35;">Identitas siswa aman dengan enkripsi tanpa tekanan.</p>
                 </div>
             </div>
             <div class="col-4 col-md-4" data-aos="fade-up" data-aos-delay="200">
-                <div class="card-custom gk-feature-card p-2.5 p-md-4 text-center h-100">
-                    <i class="bi bi-graph-up-arrow fs-2 mb-2" style="color: var(--accent);"></i>
-                    <h5 class="fw-bold mb-1">Berbasis Data</h5>
-                    <p class="text-muted mb-0 small">Data statistik valid & terukur untuk setiap apresiasi.</p>
+                <div class="card-custom gk-feature-card p-2 p-sm-3 p-md-4 text-center h-100">
+                    <i class="bi bi-graph-up-arrow mb-1 mb-md-2" style="color: var(--accent); font-size: clamp(1.3rem, 3.5vw, 2rem);"></i>
+                    <h5 class="fw-bold mb-1" style="font-size: clamp(0.75rem, 2.2vw, 1.1rem);">Berbasis Data</h5>
+                    <p class="text-muted mb-0 small" style="font-size: clamp(0.65rem, 1.8vw, 0.85rem); line-height: 1.35;">Data statistik valid & terukur untuk setiap apresiasi.</p>
                 </div>
             </div>
             <div class="col-4 col-md-4" data-aos="fade-up" data-aos-delay="300">
-                <div class="card-custom gk-feature-card p-2.5 p-md-4 text-center h-100">
-                    <i class="bi bi-people-fill fs-2 mb-2" style="color: var(--secondary);"></i>
-                    <h5 class="fw-bold mb-1">Kolaboratif</h5>
-                    <p class="text-muted mb-0 small">Membangun komunikasi positif siswa, guru, & sekolah.</p>
+                <div class="card-custom gk-feature-card p-2 p-sm-3 p-md-4 text-center h-100">
+                    <i class="bi bi-people-fill mb-1 mb-md-2" style="color: var(--secondary); font-size: clamp(1.3rem, 3.5vw, 2rem);"></i>
+                    <h5 class="fw-bold mb-1" style="font-size: clamp(0.75rem, 2.2vw, 1.1rem);">Kolaboratif</h5>
+                    <p class="text-muted mb-0 small" style="font-size: clamp(0.65rem, 1.8vw, 0.85rem); line-height: 1.35;">Membangun komunikasi positif siswa, guru, & sekolah.</p>
                 </div>
             </div>
         </div>

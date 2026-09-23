@@ -50,12 +50,12 @@
                         </small>
                     </td>
                     <td class="text-center">
-                        @php $pct = round(($r->total_nilai / 30) * 100); @endphp
+                        @php $pct = round(($r->rata_rata_evaluasi / 5) * 100); @endphp
                         <div class="fw-bold font-mono text-primary mb-1">{{ $pct }}%</div>
                         <div class="progress mx-auto" style="height: 6px; width: 80px; border-radius: 10px;">
                             <div class="progress-bar bg-primary rounded-pill" style="width: {{ $pct }}%;"></div>
                         </div>
-                        <small class="text-muted font-mono" style="font-size: 0.7rem;">({{ $r->total_nilai }}/30)</small>
+                        <small class="text-muted font-mono" style="font-size: 0.7rem;">({{ $r->total_nilai }}/25)</small>
                     </td>
                     <td class="text-center">
                         <div class="font-mono" style="font-size: 0.8rem;">

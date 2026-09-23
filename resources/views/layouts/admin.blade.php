@@ -49,7 +49,7 @@
     @stack('styles')
     <script src="{{ asset('js/gurukuu-theme.js') }}"></script>
 </head>
-<body data-admin-cache-user="{{ auth()->id() }}">
+<body class="role-admin" data-admin-cache-user="{{ auth()->id() }}">
     {{-- MOBILE TOPBAR HEADER (KHUSUS TAMPILAN HP) --}}
     <header class="gk-mobile-header shadow-sm">
         <div class="d-flex align-items-center gap-2">
@@ -61,7 +61,7 @@
                 <span>{{ $siteTitlePart2 ?? 'Bangsri' }}</span>
             </a>
         </div>
-        <div class="d-flex align-items-center gap-1.5">
+        <div class="d-flex align-items-center gap-2">
             {{-- BERANDA PUBLIK MOBILE --}}
             <a href="{{ url('/') }}" target="_blank" class="btn btn-light border p-1.5 rounded-circle shadow-sm" title="Buka Beranda Publik">
                 <i class="bi bi-globe2 text-primary" style="font-size: 1rem;"></i>
@@ -69,10 +69,6 @@
             {{-- THEME TOGGLE MOBILE --}}
             <button class="btn btn-light border p-1.5 rounded-circle shadow-sm" type="button" onclick="GuruKuuTheme.toggleTheme()" title="Ganti Mode Gelap / Terang">
                 <i class="bi bi-moon-stars-fill gk-theme-icon" style="font-size: 1rem;"></i>
-            </button>
-            {{-- DISPLAY PERF SETTINGS MOBILE --}}
-            <button class="btn btn-light border p-1.5 rounded-circle shadow-sm" type="button" onclick="GuruKuuTheme.openDisplayModal()" title="Pengaturan Grafis & Performa">
-                <i class="bi bi-sliders2-vertical text-primary" style="font-size: 1rem;"></i>
             </button>
             {{-- NOTIF DROPDOWN MOBILE --}}
             <a href="{{ route('admin.pelanggaran.index') }}" class="btn btn-light border position-relative p-1.5 rounded-circle shadow-sm" title="Notifikasi Pelanggaran">
@@ -86,14 +82,14 @@
 
     <div class="sidebar">
         <div class="sidebar-brand">
-            <a href="{{ route('admin.dashboard') }}" class="d-flex align-items-center gap-2 text-decoration-none text-dark">
+            <a href="{{ route('admin.dashboard') }}" class="d-flex align-items-center gap-2 text-decoration-none">
                 @if(!empty($siteLogo))
                     <img src="{{ $siteLogo }}" alt="{{ $siteTitle ?? 'GuruKuu' }}" style="height: 32px; max-width: 45px; object-fit: contain;">
                 @else
-                    <i class="bi bi-mortarboard-fill fs-4 text-primary"></i>
+                    <i class="bi bi-mortarboard-fill fs-4" style="color: {{ $siteTitleColor1 ?? '#003366' }} !important;"></i>
                 @endif
-                <span class="fs-5 fw-bold">
-                    <span>{{ $siteTitlePart1 ?? 'Guru' }}</span><span class="text-warning">{{ $siteTitlePart2 ?? 'Kuu' }}</span>
+                <span class="fs-5 fw-bold brand-logo-text">
+                    <span style="color: {{ $siteTitleColor1 ?? '#003366' }} !important;">{{ $siteTitlePart1 ?? 'Guru' }}</span><span style="color: {{ $siteTitleColor2 ?? '#F59E0B' }} !important;">{{ $siteTitlePart2 ?? 'Kuu' }}</span>
                 </span>
             </a>
             {{-- CLOSE BUTTON MOBILE --}}
@@ -173,20 +169,14 @@
                 <span class="text-muted small d-none d-md-inline">| Sistem Evaluasi & Akuntabilitas Pendidik</span>
             </div>
             <div class="d-flex align-items-center gap-2">
-                {{-- BERANDA PUBLIK LINK (TOPBAR) --}}
-                <a href="{{ url('/') }}" target="_blank" class="btn btn-outline-secondary btn-sm rounded-pill px-3 py-1.5 d-inline-flex align-items-center gap-1.5 text-decoration-none shadow-sm" title="Buka Beranda Publik">
-                    <i class="bi bi-globe2 text-primary"></i>
-                    <span class="d-none d-md-inline small fw-semibold">Beranda Publik</span>
+                {{-- BERANDA PUBLIK ICON BUTTON (TOPBAR) --}}
+                <a href="{{ url('/') }}" target="_blank" class="btn btn-light border p-2 rounded-circle shadow-sm" title="Buka Beranda Publik">
+                    <i class="bi bi-globe2 text-primary fs-5"></i>
                 </a>
 
                 {{-- THEME TOGGLE DESKTOP --}}
                 <button class="btn btn-light border p-2 rounded-circle shadow-sm" type="button" onclick="GuruKuuTheme.toggleTheme()" title="Ganti Mode Gelap / Terang">
                     <i class="bi bi-moon-stars-fill gk-theme-icon fs-5"></i>
-                </button>
-
-                {{-- DISPLAY SETTINGS DESKTOP --}}
-                <button class="btn btn-light border p-2 rounded-circle shadow-sm" type="button" onclick="GuruKuuTheme.openDisplayModal()" title="Pengaturan Grafis & Performa Layar">
-                    <i class="bi bi-sliders2-vertical text-primary fs-5"></i>
                 </button>
 
                 {{-- NOTIFIKASI BELL DROPDOWN --}}
@@ -302,7 +292,7 @@
                             <form action="{{ route('logout') }}" method="POST">
                                 @csrf
                                 <button type="submit" class="dropdown-item rounded py-1.5 small text-danger fw-semibold">
-                                    <i class="bi bi-box-arrow-right me-2"></i> Keluar
+                                    <i class="bi bi-box-arrow-right me-2"></i> Logout
                                 </button>
                             </form>
                         </li>

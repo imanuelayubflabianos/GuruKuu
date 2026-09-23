@@ -44,7 +44,9 @@ class GuruController extends Controller
             ? Penilaian::where('siswa_id', $user->id)->where('periode_id', $periodeId)->pluck('guru_id')->toArray()
             : [];
 
-        return view('siswa.guru.index', compact('guru', 'kelasAktif', 'periodeId', 'sudahMenilaiIds', 'mode'));
+        $allTeacherNames = Guru::orderBy('nama')->pluck('nama')->toArray();
+
+        return view('siswa.guru.index', compact('guru', 'kelasAktif', 'periodeId', 'sudahMenilaiIds', 'mode', 'allTeacherNames'));
     }
 
     public function show(Guru $guru)
@@ -84,7 +86,6 @@ class GuruController extends Controller
         $stats = [
             'total_penilaian' => $allPenilaian->count(),
             'rata_kedisiplinan' => $allPenilaian->avg('kedisiplinan') ?? 0,
-            'rata_cara_mengajar' => $allPenilaian->avg('cara_mengajar') ?? 0,
             'rata_komunikasi' => $allPenilaian->avg('komunikasi') ?? 0,
             'rata_tanggung_jawab' => $allPenilaian->avg('tanggung_jawab') ?? 0,
             'rata_kreativitas' => $allPenilaian->avg('kreativitas') ?? 0,

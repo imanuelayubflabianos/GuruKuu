@@ -225,9 +225,6 @@
                 <button class="btn btn-light border p-1.5 rounded-circle shadow-sm" type="button" onclick="GuruKuuTheme.toggleTheme()" title="Mode Gelap / Terang">
                     <i class="bi bi-moon-stars-fill gk-theme-icon" style="font-size: 0.95rem;"></i>
                 </button>
-                <button class="btn btn-light border p-1.5 rounded-circle shadow-sm" type="button" onclick="GuruKuuTheme.openDisplayModal()" title="Pengaturan Grafis & Performa">
-                    <i class="bi bi-sliders2-vertical text-primary" style="font-size: 0.95rem;"></i>
-                </button>
             </div>
             <button class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navMenu"><span class="navbar-toggler-icon"></span></button>
             <div class="collapse navbar-collapse" id="navMenu">
@@ -237,49 +234,46 @@
                     <a class="nav-link nav-link-custom" data-nav-target="panduan" href="{{ route('landing.index') }}#panduan">Panduan</a>
                     <a class="nav-link nav-link-custom" data-nav-target="tentang" href="{{ route('landing.index') }}#tentang">Tentang</a>
                 </div>
-                                <div class="nav-actions">
-                 @auth
-    @php
-        $userRole = Auth::user()->role;
-        $dashboardUrl = match($userRole) {
-            'admin' => route('admin.dashboard'),
-            'guru' => route('guru.dashboard'),
-            'siswa' => route('siswa.dashboard'),
-            default => route('landing.index')
-        };
-        $dashboardLabel = match($userRole) {
-            'admin' => 'Dashboard Admin',
-            'guru' => 'Dashboard Guru',
-            'siswa' => 'Dashboard Siswa',
-            default => 'Dashboard'
-        };
-    @endphp
-    
-    <a href="{{ $dashboardUrl }}" class="btn btn-dashboard">
-        <i class="bi bi-speedometer2 me-1"></i> {{ $dashboardLabel }}
-    </a>
-    
-    <form action="{{ route('logout') }}" method="POST" class="d-inline">
-        @csrf
-        <button type="submit" class="btn btn-danger btn-sm">
-            <i class="bi bi-box-arrow-right me-1"></i> Keluar
-        </button>
-    </form>
-@else
-    <a href="{{ route('login') }}" class="btn btn-primary">
-        <i class="bi bi-box-arrow-in-right me-1"></i> Masuk
-    </a>
-@endauth
+                <div class="nav-actions">
+                    @auth
+                        @php
+                            $userRole = Auth::user()->role;
+                            $dashboardUrl = match($userRole) {
+                                'admin' => route('admin.dashboard'),
+                                'guru' => route('guru.dashboard'),
+                                'siswa' => route('siswa.dashboard'),
+                                default => route('landing.index')
+                            };
+                            $dashboardLabel = match($userRole) {
+                                'admin' => 'Dashboard Admin',
+                                'guru' => 'Dashboard Guru',
+                                'siswa' => 'Dashboard Siswa',
+                                default => 'Dashboard'
+                            };
+                        @endphp
+                        
+                        <a href="{{ $dashboardUrl }}" class="btn btn-dashboard">
+                            <i class="bi bi-speedometer2 me-1"></i> {{ $dashboardLabel }}
+                        </a>
+                        
+                        <form action="{{ route('logout') }}" method="POST" class="d-inline">
+                            @csrf
+                            <button type="submit" class="btn btn-danger btn-sm">
+                                <i class="bi bi-box-arrow-right me-1"></i> Logout
+                            </button>
+                        </form>
+                    @else
+                        <a href="{{ route('login') }}" class="btn btn-primary">
+                            <i class="bi bi-box-arrow-in-right me-1"></i> Masuk
+                        </a>
+                    @endauth
 
-    {{-- THEME & DISPLAY CONTROLS --}}
-    <div class="d-flex align-items-center gap-1.5 ms-2 ps-2 border-start">
-        <button class="btn btn-light border p-1.5 rounded-circle shadow-sm" type="button" onclick="GuruKuuTheme.toggleTheme()" title="Mode Gelap / Terang">
-            <i class="bi bi-moon-stars-fill gk-theme-icon" style="font-size: 0.95rem;"></i>
-        </button>
-        <button class="btn btn-light border p-1.5 rounded-circle shadow-sm" type="button" onclick="GuruKuuTheme.openDisplayModal()" title="Pengaturan Grafis & Performa">
-            <i class="bi bi-sliders2-vertical text-primary" style="font-size: 0.95rem;"></i>
-        </button>
-    </div>
+                    {{-- THEME CONTROLS --}}
+                    <div class="d-flex align-items-center gap-1.5 ms-2 ps-2 border-start">
+                        <button class="btn btn-light border p-1.5 rounded-circle shadow-sm" type="button" onclick="GuruKuuTheme.toggleTheme()" title="Mode Gelap / Terang">
+                            <i class="bi bi-moon-stars-fill gk-theme-icon" style="font-size: 0.95rem;"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -301,19 +295,30 @@
                         {{ \App\Models\Setting::get('footer_about', 'Sistem Manajemen Penilaian Guru Berbasis Siswa untuk SMK N 1 Bangsri.') }}
                     </p>
                 </div>
-                <div class="col-lg-5 mb-4 text-lg-end">
+                <div class="col-lg-5 mb-4 text-start text-lg-end">
                     <div class="footer-label">LEGAL & BANTUAN</div>
-                    <a href="{{ route('legal.privacy') }}" class="footer-link me-3">Kebijakan Privasi</a>
-                    <a href="{{ route('legal.terms') }}" class="footer-link me-3">Syarat & Ketentuan</a>
-                    <a href="{{ route('kontak.guest.page') }}" class="footer-link">Hubungi Admin Operator Sekolah</a>
-
+                    <div class="d-flex flex-column flex-sm-row gap-2 gap-sm-3 justify-content-start justify-content-lg-end align-items-start align-items-sm-center">
+                        <a href="{{ route('legal.privacy') }}" class="footer-link mb-0">Kebijakan Privasi</a>
+                        <span class="text-muted d-none d-sm-inline">•</span>
+                        <a href="{{ route('legal.terms') }}" class="footer-link mb-0">Syarat & Ketentuan</a>
+                        <span class="text-muted d-none d-sm-inline">•</span>
+                        <a href="{{ route('kontak.guest.page') }}" class="footer-link mb-0">Hubungi Admin Operator Sekolah</a>
+                    </div>
                 </div>
             </div>
             <hr class="border-secondary my-4">
             <div class="row">
                 <div class="col-12 text-center">
+                    @php
+                        $rawCopyright = \App\Models\Setting::get('footer_copyright', 'Hak Cipta Dilindungi.');
+                        if (str_contains($rawCopyright, '©') || str_contains($rawCopyright, '&copy;')) {
+                            $finalCopyright = $rawCopyright;
+                        } else {
+                            $finalCopyright = '&copy; ' . date('Y') . ' ' . \App\Models\Setting::get('site_title', 'GuruKuu') . '. ' . $rawCopyright;
+                        }
+                    @endphp
                     <p class="text-muted mb-0" style="font-size: 0.85rem;">
-                        &copy; {{ date('Y') }} {{ \App\Models\Setting::get('site_title', 'GuruKuu') }}. {{ \App\Models\Setting::get('footer_copyright', 'All rights reserved.') }}
+                        {!! $finalCopyright !!}
                     </p>
                 </div>
             </div>

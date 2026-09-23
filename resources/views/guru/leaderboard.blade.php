@@ -2,17 +2,10 @@
 @section('title', 'Leaderboard Guru')
 
 @section('content')
-<div class="page-header d-flex justify-content-between align-items-center flex-wrap gap-3">
-    <div>
-        <div class="page-label">PENCAPAIAN TERTINGGI</div>
-        <h1 class="page-title">Leaderboard Guru</h1>
-        <p class="page-subtitle">Peringkat guru terbaik berdasarkan penilaian dan ulasan objektif siswa.</p>
-    </div>
-    <div>
-        <a href="{{ url('/') }}" class="btn btn-outline-custom">
-            <i class="bi bi-house-door me-1"></i> Ke Beranda Publik
-        </a>
-    </div>
+<div class="page-header">
+    <div class="page-label">PENCAPAIAN TERTINGGI</div>
+    <h1 class="page-title">Leaderboard Guru</h1>
+    <p class="page-subtitle">Peringkat guru terbaik berdasarkan penilaian dan ulasan objektif siswa.</p>
 </div>
 
 @include('components.leaderboard-filter')

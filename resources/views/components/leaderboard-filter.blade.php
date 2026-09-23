@@ -44,7 +44,22 @@ document.querySelectorAll('input[name="mode"]').forEach(function (radio) {
         const select = document.getElementById('leaderboardKelas');
         if (!select) return;
         select.disabled = this.value === 'rating';
+        if (this.value === 'rating') {
+            this.form.submit();
+        } else {
+            select.focus();
+            if (select.value) {
+                this.form.submit();
+            }
+        }
     });
 });
+
+const selectKelas = document.getElementById('leaderboardKelas');
+if (selectKelas) {
+    selectKelas.addEventListener('change', function () {
+        this.form.submit();
+    });
+}
 </script>
 @endpush

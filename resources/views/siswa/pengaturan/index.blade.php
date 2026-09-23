@@ -76,7 +76,7 @@
                         </h5>
                         <p class="text-muted small mb-4">Keamanan data dan privasi Anda dalam memberikan evaluasi guru.</p>
 
-                        <div class="p-3 rounded mb-3" style="background: #f0fdf4; border: 1px solid #bbf7d0;">
+                        <div class="p-3 rounded mb-3 border border-success border-opacity-25" style="background: rgba(16, 185, 129, 0.08);">
                             <div class="d-flex align-items-center gap-2 mb-1">
                                 <i class="bi bi-check-circle-fill text-success fs-5"></i>
                                 <strong class="text-success">Akun Siswa Aktif Terverifikasi</strong>
@@ -84,7 +84,7 @@
                             <small class="text-muted">Akun Anda memiliki hak akses penuh untuk memberikan penilaian pada periode aktif saat ini.</small>
                         </div>
 
-                        <div class="p-3 rounded" style="background: #eff6ff; border: 1px solid #bfdbfe;">
+                        <div class="p-3 rounded border border-primary border-opacity-25" style="background: rgba(0, 51, 102, 0.08);">
                             <div class="d-flex align-items-center gap-2 mb-1">
                                 <i class="bi bi-incognito text-primary fs-5"></i>
                                 <strong class="text-primary">100% Anonim Bagi Guru</strong>
@@ -126,7 +126,7 @@
                 {{-- AREA CHAT MESSENGER --}}
                 <div class="card-custom mb-4" style="overflow: hidden; display: flex; flex-direction: column; height: 60vh; border: 1px solid var(--border);">
                     {{-- Area Pesan Chat (Scrollable) --}}
-                    <div class="flex-grow-1 p-4" style="overflow-y: auto; background: linear-gradient(to bottom, #f8f9fa 0%, #ffffff 100%);" id="siswaChatContainer">
+                    <div class="flex-grow-1 p-4" style="overflow-y: auto; background: var(--bg-card);" id="siswaChatContainer">
                         @if($pesan->isEmpty())
                             <div class="text-center py-5">
                                 <div class="d-inline-flex align-items-center justify-content-center rounded-circle mb-3" style="width: 70px; height: 70px; background: rgba(0,51,102,0.08);">
@@ -196,7 +196,7 @@
                         <form action="{{ route('siswa.pengaturan.chat') }}" method="POST">
                             @csrf
                             <div class="d-flex gap-2 align-items-end mb-2">
-                                <textarea name="pesan" class="form-control" rows="2" placeholder="Tulis pesan atau kendala Anda di sini..." required style="border-radius: 12px; resize: none; border: 2px solid var(--border);" onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='var(--border)'">{{ old('pesan') }}</textarea>
+                                <textarea name="pesan" maxlength="1000" class="form-control" rows="2" placeholder="Tulis pesan atau kendala Anda di sini (maks. 1000 karakter)..." required style="border-radius: 12px; resize: none; border: 2px solid var(--border);" onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='var(--border)'">{{ old('pesan') }}</textarea>
                                 <button type="submit" class="btn btn-primary-custom d-flex align-items-center justify-content-center" style="height: 48px; width: 48px; border-radius: 12px; padding: 0;" title="Kirim Pesan">
                                     <i class="bi bi-send-fill fs-5"></i>
                                 </button>
@@ -290,7 +290,7 @@
         <form action="{{ route('logout') }}" method="POST">
             @csrf
             <button type="submit" class="btn btn-outline-danger px-4 py-2 fw-semibold">
-                <i class="bi bi-box-arrow-right me-1"></i> Keluar (Logout)
+                <i class="bi bi-box-arrow-right me-1"></i> Logout
             </button>
         </form>
     </div>

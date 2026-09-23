@@ -32,7 +32,7 @@ class PengaturanController extends Controller
     public function kirimPesanAdmin(Request $request)
     {
         $request->validate([
-            'pesan'   => 'required|string|min:3|max:2000',
+            'pesan'   => 'required|string|min:3|max:1000',
             'captcha' => 'required|numeric',
         ], [
             'pesan.required'   => 'Pesan tidak boleh kosong.',
