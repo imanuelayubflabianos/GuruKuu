@@ -32,11 +32,18 @@
         <div class="card-custom p-4 h-100">
             <h5 class="fw-bold mb-3"><i class="bi bi-door-open text-primary me-2"></i>Kelas Terhubung</h5>
             <div class="d-flex flex-wrap gap-2">
-                @forelse($siswa->kelas as $kelas)
-                    <span class="badge bg-light text-dark border px-3 py-2">{{ $kelas->label_singkat }}</span>
-                @empty
+                @php
+                    $kelasList = $siswa->kelasList ?? collect();
+                @endphp
+                @if($kelasList->isNotEmpty())
+                    @foreach($kelasList as $kelas)
+                        <span class="badge bg-light text-dark border px-3 py-2">{{ $kelas->label_singkat ?? ($kelas->nama_kelas . ' Kelas ' . $kelas->tingkat) }}</span>
+                    @endforeach
+                @elseif(is_string($siswa->kelas) && !empty($siswa->kelas))
+                    <span class="badge bg-light text-dark border px-3 py-2">{{ $siswa->kelas }}</span>
+                @else
                     <span class="text-muted">Belum ada kelas terhubung.</span>
-                @endforelse
+                @endif
             </div>
             @if($siswa->deactivated_reason)
                 <div class="alert alert-warning small mt-4 mb-0"><strong>Catatan status:</strong> {{ $siswa->deactivated_reason }}</div>

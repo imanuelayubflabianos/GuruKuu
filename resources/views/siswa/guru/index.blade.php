@@ -21,35 +21,32 @@
 </div>
 
 {{-- SEARCH BAR --}}
-<div class="card-custom p-3 mb-4">
+<div class="card-custom p-3 mb-4 position-relative" style="z-index: 50; overflow: visible;">
     <form method="GET" action="{{ route('siswa.guru.index') }}" class="row g-3 align-items-end mb-3">
         <div class="col-md-8">
-            <label class="form-label small fw-bold text-muted">Cakupan daftar guru</label>
-            <div class="d-flex flex-wrap gap-3">
-                <label class="form-check d-flex align-items-center gap-2 mb-0">
-                    <input class="form-check-input" type="radio" name="mode" value="kelas" {{ $mode === 'kelas' ? 'checked' : '' }} onchange="this.form.submit()">
-                    <span class="small">Guru yang mengajar kelas saya</span>
+            <label class="form-label small fw-bold text-muted mb-2"><i class="bi bi-funnel text-primary me-1"></i>Cakupan Daftar Guru</label>
+            <div class="d-flex flex-wrap gap-2">
+                <label class="btn {{ $mode === 'kelas' ? 'btn-primary-custom' : 'btn-outline-custom' }} d-inline-flex align-items-center gap-2 py-2 px-3 rounded-3 shadow-sm border" style="cursor: pointer; font-size: 0.85rem; font-weight: 600;">
+                    <input class="d-none" type="radio" name="mode" value="kelas" {{ $mode === 'kelas' ? 'checked' : '' }} onchange="this.form.submit()">
+                    <i class="bi bi-door-open-fill {{ $mode === 'kelas' ? 'text-white' : 'text-primary' }}"></i>
+                    <span>Guru yang Mengajar Kelas Saya</span>
                 </label>
-                <label class="form-check d-flex align-items-center gap-2 mb-0">
-                    <input class="form-check-input" type="radio" name="mode" value="semua" {{ $mode === 'semua' ? 'checked' : '' }} onchange="this.form.submit()">
-                    <span class="small">Semua guru</span>
+                <label class="btn {{ $mode === 'semua' ? 'btn-primary-custom' : 'btn-outline-custom' }} d-inline-flex align-items-center gap-2 py-2 px-3 rounded-3 shadow-sm border" style="cursor: pointer; font-size: 0.85rem; font-weight: 600;">
+                    <input class="d-none" type="radio" name="mode" value="semua" {{ $mode === 'semua' ? 'checked' : '' }} onchange="this.form.submit()">
+                    <i class="bi bi-people-fill {{ $mode === 'semua' ? 'text-white' : 'text-primary' }}"></i>
+                    <span>Semua Guru Sekolah</span>
                 </label>
             </div>
         </div>
     </form>
     <form method="GET" action="{{ route('siswa.guru.index') }}" class="row g-2 align-items-center" id="searchTeacherForm">
         <input type="hidden" name="mode" value="{{ $mode }}">
-        <div class="col-md-10 position-relative">
+        <div class="col-md-10 position-relative" style="z-index: 55;">
             <div class="input-group">
                 <span class="input-group-text bg-white border-end-0"><i class="bi bi-search text-muted"></i></span>
-                <input type="text" name="search" id="guruSearchInput" class="form-control border-start-0" placeholder="Cari nama guru..." value="{{ request('search') }}" autocomplete="off" list="guruDatalist">
+                <input type="text" name="search" id="guruSearchInput" class="form-control border-start-0" placeholder="Cari nama guru..." value="{{ request('search') }}" autocomplete="off">
             </div>
-            <datalist id="guruDatalist">
-                @foreach(($allTeacherNames ?? []) as $name)
-                    <option value="{{ $name }}"></option>
-                @endforeach
-            </datalist>
-            <div id="guruSearchSuggestions" class="list-group position-absolute w-100 shadow border mt-1" style="display: none; z-index: 1050; max-height: 250px; overflow-y: auto; border-radius: 10px; background: var(--bg-card, #ffffff);"></div>
+            <div id="guruSearchSuggestions" class="list-group position-absolute w-100 shadow-lg border mt-1" style="display: none; z-index: 1060; max-height: 250px; overflow-y: auto; border-radius: 10px; background: var(--bg-card, #ffffff);"></div>
         </div>
         <div class="col-md-2 d-flex gap-2">
             <button type="submit" class="btn btn-primary-custom flex-grow-1"><i class="bi bi-search me-1"></i> Cari</button>

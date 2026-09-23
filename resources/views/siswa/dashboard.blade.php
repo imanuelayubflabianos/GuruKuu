@@ -112,95 +112,187 @@
                     <i class="bi bi-inbox fs-2 d-block mb-2"></i>
                     <p class="mb-0 small">Belum ada data evaluasi guru untuk periode ini.</p>
                 </div>
+            @elseif($topGuru->count() === 1)
+                @php $g1 = $topGuru->first(); @endphp
+                {{-- TAMPILAN ELEGAN JIKA HANYA 1 TOP GURU (FULL GOLD CONTAINER) --}}
+                <div class="row justify-content-center pt-2 pb-1">
+                    <div class="col-12 col-sm-10 col-md-9 col-lg-8">
+                        <div class="card-custom gk-podium-card gk-podium-gold p-3.5 p-md-4 text-center position-relative shadow" style="border-radius: 16px;">
+                            <div class="mb-2">
+                                <span class="badge rounded-pill px-3 py-1 fw-bold shadow-sm" style="background: linear-gradient(135deg, #d97706, #b45309); color: #ffffff; font-size: 0.78rem;">
+                                    <i class="bi bi-trophy-fill me-1"></i> #1 EMAS
+                                </span>
+                            </div>
+                            <div class="position-relative d-inline-block mb-2 mt-1">
+                                <img src="{{ $g1->photo_url }}" class="rounded-circle shadow gk-podium-avatar-1" style="width: 72px; height: 72px; object-fit: cover;">
+                            </div>
+                            <h5 class="fw-bold mb-1 gk-podium-nama" title="{{ $g1->nama }}">{{ $g1->nama }}</h5>
+                            <small class="d-block mb-2.5 gk-podium-jurusan font-mono fw-semibold" style="font-size: 0.75rem;">{{ strtoupper($g1->jurusan?->nama_jurusan ?? 'UMUM') }}</small>
+                            <div class="p-2.5 rounded-3 mb-3 gk-podium-statbox">
+                                <div class="d-flex justify-content-between align-items-center font-mono mb-1.5" style="font-size: 0.75rem;">
+                                    <span class="fw-bold text-dark">Skor Evaluasi Siswa</span>
+                                    <span class="fw-bold gk-podium-score fs-6">{{ round(($g1->rata_rata_nilai / 5) * 100) }}%</span>
+                                </div>
+                                <div class="progress" style="height: 6px; border-radius: 4px; background: rgba(217, 119, 6, 0.2);">
+                                    <div class="progress-bar rounded-pill" style="width: {{ round(($g1->rata_rata_nilai / 5) * 100) }}%; background: #d97706;"></div>
+                                </div>
+                            </div>
+                            <a href="{{ route('siswa.guru.show', $g1) }}" class="btn btn-primary-custom w-100 rounded-pill py-2 fw-semibold" style="font-size: 0.82rem; background: #003366;">
+                                <i class="bi bi-eye me-1"></i> Detail Guru
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            @elseif($topGuru->count() === 2)
+                @php
+                    $g1 = $topGuru->get(0);
+                    $g2 = $topGuru->get(1);
+                @endphp
+                {{-- TAMPILAN 2 GURU (FULL CONTAINER SILVER & GOLD) --}}
+                <div class="row g-3 justify-content-center align-items-end pt-1 pb-1">
+                    <div class="col-6 col-md-6">
+                        <div class="card-custom gk-podium-card gk-podium-silver p-2.5 p-md-3 text-center h-100 shadow-sm" style="border-radius: 16px;">
+                            <div class="mb-1 mb-md-2">
+                                <span class="badge rounded-pill px-2.5 py-0.5" style="background: #64748b; color: #fff; font-size: 0.7rem;">
+                                    <i class="bi bi-award-fill me-1"></i> #2 PERAK
+                                </span>
+                            </div>
+                            <div class="position-relative d-inline-block mb-1 mb-md-2">
+                                <img src="{{ $g2->photo_url }}" class="rounded-circle shadow-sm gk-podium-avatar-2" style="width: 58px; height: 58px; object-fit: cover;">
+                            </div>
+                            <h6 class="fw-bold mb-0.5 text-truncate gk-podium-nama" title="{{ $g2->nama }}" style="font-size: 0.85rem;">{{ $g2->nama }}</h6>
+                            <small class="d-block mb-2 text-truncate font-mono gk-podium-jurusan" style="font-size: 0.68rem;">{{ strtoupper($g2->jurusan?->nama_jurusan ?? 'UMUM') }}</small>
+                            <div class="gk-podium-statbox p-2 rounded-2 mb-2">
+                                <div class="d-flex justify-content-between font-mono mb-1" style="font-size: 0.72rem;">
+                                    <span class="text-muted">Skor</span>
+                                    <span class="fw-bold gk-podium-score">{{ round(($g2->rata_rata_nilai / 5) * 100) }}%</span>
+                                </div>
+                                <div class="progress" style="height: 5px; border-radius: 4px; background: rgba(100, 116, 139, 0.2);">
+                                    <div class="progress-bar rounded-pill" style="width: {{ round(($g2->rata_rata_nilai / 5) * 100) }}%; background: #64748b;"></div>
+                                </div>
+                            </div>
+                            <a href="{{ route('siswa.guru.show', $g2) }}" class="btn btn-sm btn-outline-custom w-100 rounded-pill py-1.5" style="font-size: 0.75rem;">
+                                Detail
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-6">
+                        <div class="card-custom gk-podium-card gk-podium-gold p-2.5 p-md-3 text-center h-100 position-relative shadow" style="border-radius: 16px;">
+                            <div class="mb-1 mb-md-2">
+                                <span class="badge rounded-pill px-2.5 py-0.5 fw-bold shadow-sm" style="background: linear-gradient(135deg, #d97706, #b45309); color: #ffffff; font-size: 0.72rem;">
+                                    <i class="bi bi-trophy-fill me-1"></i> #1 EMAS
+                                </span>
+                            </div>
+                            <div class="position-relative d-inline-block mb-1 mb-md-2">
+                                <img src="{{ $g1->photo_url }}" class="rounded-circle shadow gk-podium-avatar-1" style="width: 66px; height: 66px; object-fit: cover;">
+                            </div>
+                            <h6 class="fw-bold mb-0.5 text-truncate gk-podium-nama" title="{{ $g1->nama }}" style="font-size: 0.88rem;">{{ $g1->nama }}</h6>
+                            <small class="d-block mb-2 text-truncate font-mono gk-podium-jurusan" style="font-size: 0.68rem;">{{ strtoupper($g1->jurusan?->nama_jurusan ?? 'UMUM') }}</small>
+                            <div class="gk-podium-statbox p-2 rounded-2 mb-2">
+                                <div class="d-flex justify-content-between font-mono mb-1" style="font-size: 0.72rem;">
+                                    <span class="text-dark fw-bold">Skor</span>
+                                    <span class="fw-bold gk-podium-score">{{ round(($g1->rata_rata_nilai / 5) * 100) }}%</span>
+                                </div>
+                                <div class="progress" style="height: 5px; border-radius: 4px; background: rgba(217, 119, 6, 0.2);">
+                                    <div class="progress-bar rounded-pill" style="width: {{ round(($g1->rata_rata_nilai / 5) * 100) }}%; background: #d97706;"></div>
+                                </div>
+                            </div>
+                            <a href="{{ route('siswa.guru.show', $g1) }}" class="btn btn-sm btn-primary-custom w-100 rounded-pill py-1.5 fw-bold" style="font-size: 0.75rem; background: #003366;">
+                                Detail
+                            </a>
+                        </div>
+                    </div>
+                </div>
             @else
                 @php
                     $g1 = $topGuru->get(0);
                     $g2 = $topGuru->get(1);
                     $g3 = $topGuru->get(2);
                 @endphp
+                {{-- TAMPILAN 3 PODIUM PENUH (2-1-3 FULL CONTAINER) --}}
                 <div class="row g-2 g-md-3 align-items-end pt-1 pb-1 gk-podium-row">
                     {{-- #2 PERAK (KIRI) --}}
                     <div class="col-4 order-1 order-md-1 gk-podium-col gk-podium-2">
-                        @if($g2)
-                        <div class="card-custom gk-podium-card p-2 p-md-3 text-center h-100" style="border: 1px solid rgba(148, 163, 184, 0.4); box-shadow: 0 4px 16px rgba(0,0,0,0.03);">
+                        <div class="card-custom gk-podium-card gk-podium-silver p-2 p-md-3 text-center h-100" style="border-radius: 14px;">
                             <div class="mb-1 mb-md-2">
-                                <span class="badge rounded-pill px-2 py-0.5" style="background: #94a3b8; color: #fff; font-size: 0.68rem;">
+                                <span class="badge rounded-pill px-2 py-0.5" style="background: #64748b; color: #fff; font-size: 0.68rem;">
                                     <i class="bi bi-award-fill me-1"></i> #2 PERAK
                                 </span>
                             </div>
                             <div class="position-relative d-inline-block mb-1 mb-md-2">
-                                <img src="{{ $g2->photo_url }}" class="rounded-circle shadow-sm gk-podium-avatar-2" style="width: 54px; height: 54px; object-fit: cover; border: 2.5px solid #94a3b8;">
+                                <img src="{{ $g2->photo_url }}" class="rounded-circle shadow-sm gk-podium-avatar-2" style="width: 54px; height: 54px; object-fit: cover;">
                             </div>
                             <h6 class="fw-bold mb-0.5 text-truncate gk-podium-nama" title="{{ $g2->nama }}" style="font-size: 0.82rem;">{{ $g2->nama }}</h6>
-                            <small class="text-muted d-block mb-1.5 text-truncate font-mono gk-podium-jurusan" style="font-size: 0.65rem;">{{ strtoupper($g2->jurusan?->nama_jurusan ?? 'UMUM') }}</small>
-                            <div class="d-flex justify-content-between font-mono mb-1 gk-podium-statbox" style="font-size: 0.7rem;">
-                                <span class="text-muted">Skor</span>
-                                <span class="fw-bold text-primary gk-podium-score">{{ round(($g2->rata_rata_nilai / 5) * 100) }}%</span>
-                            </div>
-                            <div class="progress mb-1.5" style="height: 4px; border-radius: 4px;">
-                                <div class="progress-bar bg-primary rounded-pill" style="width: {{ round(($g2->rata_rata_nilai / 5) * 100) }}%;"></div>
+                            <small class="d-block mb-1.5 text-truncate font-mono gk-podium-jurusan" style="font-size: 0.65rem;">{{ strtoupper($g2->jurusan?->nama_jurusan ?? 'UMUM') }}</small>
+                            <div class="gk-podium-statbox p-1.5 rounded-2 mb-1.5">
+                                <div class="d-flex justify-content-between font-mono mb-1" style="font-size: 0.7rem;">
+                                    <span class="text-muted">Skor</span>
+                                    <span class="fw-bold gk-podium-score">{{ round(($g2->rata_rata_nilai / 5) * 100) }}%</span>
+                                </div>
+                                <div class="progress" style="height: 4px; border-radius: 4px; background: rgba(100, 116, 139, 0.2);">
+                                    <div class="progress-bar rounded-pill" style="width: {{ round(($g2->rata_rata_nilai / 5) * 100) }}%; background: #64748b;"></div>
+                                </div>
                             </div>
                             <a href="{{ route('siswa.guru.show', $g2) }}" class="btn btn-sm btn-outline-custom btn-podium w-100 rounded-pill py-1" style="font-size: 0.72rem;">
                                 Detail
                             </a>
                         </div>
-                        @endif
                     </div>
 
                     {{-- #1 EMAS (TENGAH - ELEVATED PODIUM) --}}
                     <div class="col-4 order-2 order-md-2 mb-0 gk-podium-col gk-podium-1">
-                        @if($g1)
-                        <div class="card-custom gk-podium-card p-2 p-md-3 text-center h-100 position-relative" style="border: 2px solid #f59e0b; box-shadow: 0 12px 32px rgba(245, 158, 11, 0.18); background: var(--bg-card);">
+                        <div class="card-custom gk-podium-card gk-podium-gold p-2 p-md-3 text-center h-100 position-relative shadow" style="border-radius: 16px;">
                             <div class="mb-1 mb-md-2">
-                                <span class="badge rounded-pill px-2 px-md-3 py-0.5 py-md-1 fw-bold shadow-sm" style="background: linear-gradient(135deg, #f59e0b, #d97706); color: #ffffff; font-size: 0.72rem;">
+                                <span class="badge rounded-pill px-2 px-md-3 py-0.5 py-md-1 fw-bold shadow-sm" style="background: linear-gradient(135deg, #d97706, #b45309); color: #ffffff; font-size: 0.72rem;">
                                     <i class="bi bi-trophy-fill me-1"></i> #1 EMAS
                                 </span>
                             </div>
                             <div class="position-relative d-inline-block mb-1 mb-md-2">
-                                <img src="{{ $g1->photo_url }}" class="rounded-circle shadow gk-podium-avatar-1" style="width: 64px; height: 64px; object-fit: cover; border: 3px solid #f59e0b;">
+                                <img src="{{ $g1->photo_url }}" class="rounded-circle shadow gk-podium-avatar-1" style="width: 64px; height: 64px; object-fit: cover;">
                             </div>
-                            <h6 class="fw-bold mb-0.5 text-truncate text-dark gk-podium-nama" title="{{ $g1->nama }}" style="font-size: 0.88rem;">{{ $g1->nama }}</h6>
-                            <small class="d-block mb-1.5 text-truncate font-mono text-warning gk-podium-jurusan" style="font-size: 0.68rem;">{{ strtoupper($g1->jurusan?->nama_jurusan ?? 'UMUM') }}</small>
-                            <div class="d-flex justify-content-between font-mono mb-1 gk-podium-statbox" style="font-size: 0.72rem;">
-                                <span class="text-dark fw-bold">Skor</span>
-                                <span class="fw-bold text-warning gk-podium-score">{{ round(($g1->rata_rata_nilai / 5) * 100) }}%</span>
+                            <h6 class="fw-bold mb-0.5 text-truncate gk-podium-nama" title="{{ $g1->nama }}" style="font-size: 0.88rem;">{{ $g1->nama }}</h6>
+                            <small class="d-block mb-1.5 text-truncate font-mono gk-podium-jurusan" style="font-size: 0.68rem;">{{ strtoupper($g1->jurusan?->nama_jurusan ?? 'UMUM') }}</small>
+                            <div class="gk-podium-statbox p-1.5 rounded-2 mb-1.5">
+                                <div class="d-flex justify-content-between font-mono mb-1" style="font-size: 0.72rem;">
+                                    <span class="text-dark fw-bold">Skor</span>
+                                    <span class="fw-bold gk-podium-score">{{ round(($g1->rata_rata_nilai / 5) * 100) }}%</span>
+                                </div>
+                                <div class="progress" style="height: 5px; border-radius: 4px; background: rgba(217, 119, 6, 0.2);">
+                                    <div class="progress-bar rounded-pill" style="width: {{ round(($g1->rata_rata_nilai / 5) * 100) }}%; background: #d97706;"></div>
+                                </div>
                             </div>
-                            <div class="progress mb-1.5" style="height: 5px; border-radius: 4px;">
-                                <div class="progress-bar bg-warning rounded-pill" style="width: {{ round(($g1->rata_rata_nilai / 5) * 100) }}%;"></div>
-                            </div>
-                            <a href="{{ route('siswa.guru.show', $g1) }}" class="btn btn-sm btn-primary-custom btn-podium w-100 rounded-pill py-1 fw-bold" style="font-size: 0.75rem;">
+                            <a href="{{ route('siswa.guru.show', $g1) }}" class="btn btn-sm btn-primary-custom btn-podium w-100 rounded-pill py-1 fw-bold" style="font-size: 0.75rem; background: #003366;">
                                 Detail
                             </a>
                         </div>
-                        @endif
                     </div>
 
                     {{-- #3 PERUNGGU (KANAN) --}}
                     <div class="col-4 order-3 order-md-3 gk-podium-col gk-podium-3">
-                        @if($g3)
-                        <div class="card-custom gk-podium-card p-2 p-md-3 text-center h-100" style="border: 1px solid rgba(217, 119, 6, 0.3); box-shadow: 0 4px 16px rgba(0,0,0,0.03);">
+                        <div class="card-custom gk-podium-card gk-podium-bronze p-2 p-md-3 text-center h-100" style="border-radius: 14px;">
                             <div class="mb-1 mb-md-2">
-                                <span class="badge rounded-pill px-2 py-0.5" style="background: #d97706; color: #fff; font-size: 0.68rem;">
+                                <span class="badge rounded-pill px-2 py-0.5" style="background: #c2410c; color: #fff; font-size: 0.68rem;">
                                     <i class="bi bi-award-fill me-1"></i> #3 PERUNGGU
                                 </span>
                             </div>
                             <div class="position-relative d-inline-block mb-1 mb-md-2">
-                                <img src="{{ $g3->photo_url }}" class="rounded-circle shadow-sm gk-podium-avatar-3" style="width: 54px; height: 54px; object-fit: cover; border: 2.5px solid #d97706;">
+                                <img src="{{ $g3->photo_url }}" class="rounded-circle shadow-sm gk-podium-avatar-3" style="width: 54px; height: 54px; object-fit: cover;">
                             </div>
                             <h6 class="fw-bold mb-0.5 text-truncate gk-podium-nama" title="{{ $g3->nama }}" style="font-size: 0.82rem;">{{ $g3->nama }}</h6>
-                            <small class="text-muted d-block mb-1.5 text-truncate font-mono gk-podium-jurusan" style="font-size: 0.65rem;">{{ strtoupper($g3->jurusan?->nama_jurusan ?? 'UMUM') }}</small>
-                            <div class="d-flex justify-content-between font-mono mb-1 gk-podium-statbox" style="font-size: 0.7rem;">
-                                <span class="text-muted">Skor</span>
-                                <span class="fw-bold text-primary gk-podium-score">{{ round(($g3->rata_rata_nilai / 5) * 100) }}%</span>
-                            </div>
-                            <div class="progress mb-1.5" style="height: 4px; border-radius: 4px;">
-                                <div class="progress-bar bg-primary rounded-pill" style="width: {{ round(($g3->rata_rata_nilai / 5) * 100) }}%;"></div>
+                            <small class="d-block mb-1.5 text-truncate font-mono gk-podium-jurusan" style="font-size: 0.65rem;">{{ strtoupper($g3->jurusan?->nama_jurusan ?? 'UMUM') }}</small>
+                            <div class="gk-podium-statbox p-1.5 rounded-2 mb-1.5">
+                                <div class="d-flex justify-content-between font-mono mb-1" style="font-size: 0.7rem;">
+                                    <span class="text-muted">Skor</span>
+                                    <span class="fw-bold gk-podium-score">{{ round(($g3->rata_rata_nilai / 5) * 100) }}%</span>
+                                </div>
+                                <div class="progress" style="height: 4px; border-radius: 4px; background: rgba(217, 119, 6, 0.2);">
+                                    <div class="progress-bar rounded-pill" style="width: {{ round(($g3->rata_rata_nilai / 5) * 100) }}%; background: #ea580c;"></div>
+                                </div>
                             </div>
                             <a href="{{ route('siswa.guru.show', $g3) }}" class="btn btn-sm btn-outline-custom btn-podium w-100 rounded-pill py-1" style="font-size: 0.72rem;">
                                 Detail
                             </a>
                         </div>
-                        @endif
                     </div>
                 </div>
             @endif
@@ -249,13 +341,4 @@
         </div>
     </div>
 </div>
-
-{{-- TOMBOL AKSI CEPAT --}}
-@if($totalGuru > $jumlahSudah)
-<div class="mt-4 text-center">
-    <a href="{{ route('siswa.guru.index') }}" class="btn btn-cta rounded-pill px-5 py-3 shadow-lg" style="font-size: 1rem;">
-        <i class="bi bi-pencil-square me-2"></i> Lanjutkan Penilaian Guru Sekarang
-    </a>
-</div>
-@endif
 @endsection

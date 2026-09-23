@@ -99,10 +99,12 @@
             <div class="mt-4">
                 @if($periodeAktif)
                     @if($sudahMenilai)
-                        <div class="alert alert-success mb-0 d-flex align-items-center">
-                            <i class="bi bi-check-circle-fill fs-4 me-3 text-success"></i>
+                        <div class="p-3 rounded-3 d-flex align-items-center gap-3 mb-0" style="background: rgba(37, 99, 235, 0.08); border: 1px solid rgba(37, 99, 235, 0.25);">
+                            <div class="rounded-circle d-flex align-items-center justify-content-center text-primary bg-white shadow-sm flex-shrink-0" style="width: 44px; height: 44px;">
+                                <i class="bi bi-patch-check-fill fs-4"></i>
+                            </div>
                             <div>
-                                <strong class="text-success">Penilaian Anda Sudah Tercatat!</strong>
+                                <strong class="text-primary d-block">Penilaian Anda Sudah Tercatat!</strong>
                                 <div class="small text-muted">Anda telah memberikan penilaian untuk guru ini pada periode <strong>{{ $periodeAktif->nama_periode }}</strong>. Anda dapat memberikan penilaian kembali pada periode semester berikutnya.</div>
                             </div>
                         </div>

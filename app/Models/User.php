@@ -94,11 +94,24 @@ class User extends Authenticatable
     }
 
     public function getPhotoUrlAttribute()
-
     {
-        return $this->photo
-            ? asset('storage/' . $this->photo)
-            : 'https://ui-avatars.com/api/?name=' . urlencode($this->name) . '&background=random';
+        if ($this->photo) {
+            if (filter_var($this->photo, FILTER_VALIDATE_URL) || str_starts_with($this->photo, 'http://') || str_starts_with($this->photo, 'https://')) {
+                return $this->photo;
+            }
+            return asset('storage/' . $this->photo);
+        }
+
+        $initials = collect(explode(' ', $this->name))
+            ->filter()
+            ->map(fn($word) => strtoupper(substr($word, 0, 1)))
+            ->take(2)
+            ->implode('');
+
+        $colors = ['003366', '00A86B', 'FFC107', '6366f1', 'ec4899'];
+        $color = $colors[$this->id % count($colors)];
+
+        return "https://ui-avatars.com/api/?name={$initials}&background={$color}&color=fff&size=200&bold=true";
     }
 
     public function kelas()
@@ -106,6 +119,15 @@ class User extends Authenticatable
         return $this->belongsToMany(\App\Models\Kelas::class, 'siswa_kelas')
                     ->withPivot('tahun_ajaran')
                     ->withTimestamps();
+    }
+
+    public function getKelasListAttribute()
+    {
+        try {
+            return $this->relationLoaded('kelas') ? $this->getRelation('kelas') : $this->kelas()->get();
+        } catch (\Throwable $e) {
+            return collect();
+        }
     }
 
     public function jurusan()

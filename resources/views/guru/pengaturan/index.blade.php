@@ -11,23 +11,23 @@
 </div>
 
 {{-- NAV PILLS --}}
-<ul class="nav nav-pills mb-4 gap-2" id="guruPengaturanTabs" role="tablist">
+<ul class="nav nav-pills mb-4" id="guruPengaturanTabs" role="tablist">
     <li class="nav-item">
-        <button class="nav-link active fw-bold" id="profil-tab" data-bs-toggle="pill" data-bs-target="#tabProfil" type="button">
-            <i class="bi bi-person-lines-fill me-1"></i> 1. Profil & Deskripsi Diri
+        <button class="nav-link active" id="profil-tab" data-bs-toggle="pill" data-bs-target="#tabProfil" type="button">
+            <i class="bi bi-person-lines-fill"></i> Profil Pengajar
         </button>
     </li>
     <li class="nav-item">
-        <button class="nav-link fw-bold" id="chat-tab" data-bs-toggle="pill" data-bs-target="#tabChat" type="button">
-            <i class="bi bi-chat-dots-fill me-1"></i> 2. Chat Admin
+        <button class="nav-link" id="chat-tab" data-bs-toggle="pill" data-bs-target="#tabChat" type="button">
+            <i class="bi bi-chat-dots"></i> Chat Admin
             @if(isset($pesanChat) && $pesanChat->whereNotNull('balasan')->count() > 0)
                 <span class="badge bg-success ms-1">{{ $pesanChat->whereNotNull('balasan')->count() }} Balasan</span>
             @endif
         </button>
     </li>
     <li class="nav-item">
-        <button class="nav-link fw-bold" id="legal-tab" data-bs-toggle="pill" data-bs-target="#tabLegalGuru" type="button">
-            <i class="bi bi-shield-check me-1"></i> 3. Kebijakan Privasi & Ketentuan
+        <button class="nav-link" id="legal-tab" data-bs-toggle="pill" data-bs-target="#tabLegalGuru" type="button">
+            <i class="bi bi-file-earmark-lock"></i> Kebijakan & Privasi
         </button>
     </li>
 </ul>

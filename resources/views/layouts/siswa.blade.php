@@ -126,8 +126,15 @@
         <div class="sidebar-subtitle">SMK NEGERI 1 BANGSRI • SISWA</div>
         
         <a href="{{ route('siswa.pengaturan') }}" class="sidebar-profile">
-            <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-3" style="width: 48px; height: 48px; font-size: 1.5rem; flex-shrink: 0;">
-                <i class="bi bi-person-fill"></i>
+            @php
+                $userInitials = collect(explode(' ', auth()->user()->name))
+                    ->filter()
+                    ->map(fn($w) => strtoupper(substr($w, 0, 1)))
+                    ->take(2)
+                    ->implode('');
+            @endphp
+            <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-3 fw-bold shadow-sm" style="width: 44px; height: 44px; font-size: 1rem; flex-shrink: 0; letter-spacing: 0.5px;">
+                {{ $userInitials ?: 'S' }}
             </div>
             <div class="overflow-hidden">
                 <div class="sidebar-profile-name text-truncate" title="{{ auth()->user()->name }}">{{ auth()->user()->name }}</div>
@@ -198,8 +205,18 @@
                 </div>
             </div>
         </div>
-        @if(session('success')) <div class="alert alert-success border-0 shadow-sm">{{ session('success') }}</div> @endif
-        @if(session('error')) <div class="alert alert-danger border-0 shadow-sm">{{ session('error') }}</div> @endif
+        @if(session('success') && !request()->routeIs('siswa.guru.show'))
+            <div class="alert alert-primary border-0 shadow-sm d-flex align-items-center gap-2 mb-4" style="background: rgba(37, 99, 235, 0.08); border-left: 4px solid var(--primary) !important; color: #1d4ed8; border-radius: 8px;">
+                <i class="bi bi-info-circle-fill text-primary fs-5"></i>
+                <span class="fw-semibold">{{ session('success') }}</span>
+            </div>
+        @endif
+        @if(session('error'))
+            <div class="alert alert-danger border-0 shadow-sm d-flex align-items-center gap-2 mb-4" style="border-left: 4px solid #dc2626 !important; border-radius: 8px;">
+                <i class="bi bi-exclamation-triangle-fill text-danger fs-5"></i>
+                <span class="fw-semibold">{{ session('error') }}</span>
+            </div>
+        @endif
         @yield('content')
     </main>
 
