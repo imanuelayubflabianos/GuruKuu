@@ -17,7 +17,9 @@ return new class extends Migration
         });
 
         // Buat kolom password menjadi nullable (untuk siswa yang belum diaktifkan)
-        DB::statement('ALTER TABLE users MODIFY password VARCHAR(255) NULL');
+        if (DB::getDriverName() !== 'sqlite') {
+            DB::statement('ALTER TABLE users MODIFY password VARCHAR(255) NULL');
+        }
     }
 
     public function down(): void
@@ -25,6 +27,8 @@ return new class extends Migration
         Schema::table('users', function (Blueprint $table) {
             $table->dropColumn(['tanggal_lahir', 'is_active', 'force_change_password', 'activated_at']);
         });
-        DB::statement('ALTER TABLE users MODIFY password VARCHAR(255) NOT NULL');
+        if (DB::getDriverName() !== 'sqlite') {
+            DB::statement('ALTER TABLE users MODIFY password VARCHAR(255) NOT NULL');
+        }
     }
 };

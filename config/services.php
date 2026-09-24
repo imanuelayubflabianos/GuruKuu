@@ -39,6 +39,7 @@ return [
         'base_url'      => env('SIPINTU_BASE_URL', 'https://sipintu.smkn1bangsri.sch.id'),
         'client_id'     => env('SIPINTU_CLIENT_ID'),
         'client_secret' => env('SIPINTU_CLIENT_SECRET'),
+        'redirect_uri'  => env('SIPINTU_REDIRECT_URI'),
         'timeout'       => env('SIPINTU_TIMEOUT', 60),
         'verify_ssl'    => env('SIPINTU_VERIFY_SSL', false),
     ],

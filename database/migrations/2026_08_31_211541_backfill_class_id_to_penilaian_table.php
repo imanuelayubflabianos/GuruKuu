@@ -18,12 +18,14 @@ return new class extends Migration
         }
 
         // Isi class_id berdasarkan relasi siswa -> kelas
-        DB::statement("
-            UPDATE penilaian p
-            INNER JOIN siswa_kelas sk ON p.siswa_id = sk.user_id
-            SET p.class_id = sk.kelas_id
-            WHERE p.class_id IS NULL
-        ");
+        if (DB::getDriverName() !== 'sqlite') {
+            DB::statement("
+                UPDATE penilaian p
+                INNER JOIN siswa_kelas sk ON p.siswa_id = sk.user_id
+                SET p.class_id = sk.kelas_id
+                WHERE p.class_id IS NULL
+            ");
+        }
 
         // Tambah unique constraint (jika belum ada)
         try {

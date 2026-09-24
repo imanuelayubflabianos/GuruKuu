@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\PeriodeController;
 use App\Http\Controllers\Admin\ProfilController as AdminProfilController;
 use App\Http\Controllers\Admin\SiswaController as AdminSiswaController;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Auth\OAuthController;
 use App\Http\Controllers\KontakController;
 use App\Http\Controllers\LandingController;
 use App\Http\Controllers\Siswa\DashboardController as SiswaDashboardController;
@@ -50,6 +51,9 @@ Route::get('/syarat-ketentuan', function () { return view('legal.terms'); })->na
 
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [LoginController::class, 'login'])->name('login.post');
+
+// SSO SiPintu OAuth Callback
+Route::get('/oauth/callback', [OAuthController::class, 'callback'])->name('oauth.callback');
 
 // KONTAK GUEST
 Route::get('/hubungi-admin', [KontakController::class, 'guestPage'])->name('kontak.guest.page');

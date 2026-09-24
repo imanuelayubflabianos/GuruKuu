@@ -63,6 +63,134 @@ class SiPintuService
         return $this->clientId;
     }
 
+    public function getRedirectUri(): string
+    {
+        $configured = config('services.sipintu.redirect_uri');
+        if (!empty($configured)) {
+            return $configured;
+        }
+
+        if (\Illuminate\Support\Facades\Route::has('oauth.callback')) {
+            return route('oauth.callback');
+        }
+
+        return url('/oauth/callback');
+    }
+
+    /**
+     * Exchange authorization code for access token via SiPintu OAuth Server
+     * POST {SIPINTU_BASE_URL}/oauth/token
+     */
+    public function exchangeAuthorizationCode(string $code, ?string $redirectUri = null): array
+    {
+        $redirectUri = $redirectUri ?: $this->getRedirectUri();
+
+        try {
+            $http = Http::connectTimeout(5)->timeout(min($this->timeout, 20))->acceptJson();
+            if (!$this->verifySsl) {
+                $http = $http->withoutVerifying();
+            }
+
+            $response = $http->asForm()->post("{$this->baseUrl}/oauth/token", [
+                'grant_type'    => 'authorization_code',
+                'client_id'     => $this->clientId,
+                'client_secret' => $this->clientSecret,
+                'redirect_uri'  => $redirectUri,
+                'code'          => $code,
+            ]);
+
+            if ($response->successful()) {
+                $data = $response->json();
+                $accessToken = $data['access_token'] ?? null;
+                if ($accessToken) {
+                    return [
+                        'success'      => true,
+                        'status_code'  => $response->status(),
+                        'access_token' => $accessToken,
+                        'data'         => $data,
+                        'message'      => 'Access token berhasil diperoleh.',
+                    ];
+                }
+
+                return [
+                    'success'     => false,
+                    'status_code' => $response->status(),
+                    'message'     => 'Format respons token SiPintu tidak menyertakan access_token.',
+                ];
+            }
+
+            Log::warning('SiPintu OAuth exchangeAuthorizationCode failed', [
+                'status' => $response->status(),
+                'error'  => $response->json('error_description') ?? $response->json('error') ?? $response->json('message') ?? 'HTTP ' . $response->status(),
+            ]);
+
+            $errorMsg = $response->json('error_description')
+                ?? $response->json('message')
+                ?? $response->json('error')
+                ?? "Gagal menukar authorization code (HTTP {$response->status()})";
+
+            return [
+                'success'     => false,
+                'status_code' => $response->status(),
+                'message'     => $errorMsg,
+            ];
+        } catch (\Exception $e) {
+            Log::error('SiPintu exchangeAuthorizationCode exception: ' . $e->getMessage());
+            return [
+                'success'     => false,
+                'status_code' => 0,
+                'message'     => 'Koneksi ke server OAuth SiPintu gagal: ' . $e->getMessage(),
+            ];
+        }
+    }
+
+    /**
+     * Fetch user profile from SiPintu using Bearer access token
+     * GET {SIPINTU_BASE_URL}/api/v1/user
+     */
+    public function getUserProfile(string $accessToken): array
+    {
+        try {
+            $http = Http::connectTimeout(5)->timeout(min($this->timeout, 20))->acceptJson();
+            if (!$this->verifySsl) {
+                $http = $http->withoutVerifying();
+            }
+
+            $response = $http->withToken($accessToken)->get("{$this->baseUrl}/api/v1/user");
+
+            if ($response->successful()) {
+                $data = $response->json();
+                $userData = $data['data'] ?? $data['user'] ?? $data;
+
+                return [
+                    'success'     => true,
+                    'status_code' => $response->status(),
+                    'data'        => $userData,
+                    'raw'         => $data,
+                    'message'     => 'Data user berhasil diambil dari SiPintu.',
+                ];
+            }
+
+            Log::warning('SiPintu getUserProfile failed', [
+                'status' => $response->status(),
+                'error'  => $response->json('message') ?? $response->json('error') ?? 'HTTP ' . $response->status(),
+            ]);
+
+            return [
+                'success'     => false,
+                'status_code' => $response->status(),
+                'message'     => $response->json('message') ?? "Gagal mengambil data user dari SiPintu (HTTP {$response->status()})",
+            ];
+        } catch (\Exception $e) {
+            Log::error('SiPintu getUserProfile exception: ' . $e->getMessage());
+            return [
+                'success'     => false,
+                'status_code' => 0,
+                'message'     => 'Gagal menghubungi endpoint user SiPintu: ' . $e->getMessage(),
+            ];
+        }
+    }
+
     protected function client()
     {
         $http = Http::withHeaders([
