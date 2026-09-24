@@ -85,7 +85,7 @@ class PengaturanController extends Controller
             }
             $filename = 'logo_' . \Illuminate\Support\Str::random(24) . '.' . $ext;
             $file->move($uploadDir, $filename);
-            Setting::set('site_logo', asset('uploads/logo/' . $filename));
+            Setting::set('site_logo', '/uploads/logo/' . $filename);
         } elseif ($request->filled('site_logo_url')) {
             Setting::set('site_logo', trim($request->site_logo_url));
         }
@@ -103,7 +103,7 @@ class PengaturanController extends Controller
             }
             $filename = 'hero_' . \Illuminate\Support\Str::random(24) . '.' . $ext;
             $file->move($uploadDir, $filename);
-            Setting::set('hero_image', asset('uploads/hero/' . $filename));
+            Setting::set('hero_image', '/uploads/hero/' . $filename);
         } elseif ($request->filled('hero_image_url')) {
             Setting::set('hero_image', trim($request->hero_image_url));
         }

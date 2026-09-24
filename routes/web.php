@@ -164,3 +164,10 @@ Route::middleware(['auth', 'role:siswa'])->prefix('siswa')->name('siswa.')->grou
     Route::delete('/kontak/{kontak}', [KontakController::class, 'siswaDestroy'])->name('kontak.destroy');
     Route::delete('/kontak/{kontak}/message', [KontakController::class, 'destroySiswaMessage'])->name('kontak.destroy-message');
 });
+
+use Illuminate\Support\Facades\Artisan;
+
+Route::get('/jalankan-symlink', function () {
+    Artisan::call('storage:link');
+    return 'Storage link berhasil dibuat!';
+});
