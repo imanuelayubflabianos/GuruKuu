@@ -140,6 +140,7 @@ class LoginController extends Controller
 
             Auth::login($user, $request->boolean('remember'));
             $request->session()->regenerate();
+            \App\Models\LoginHistory::recordLogin($user, $request);
 
             return redirect()->intended(route('siswa.dashboard'))
                 ->with('success', 'Selamat datang, ' . $user->name . '!');
@@ -187,6 +188,7 @@ class LoginController extends Controller
 
                 Auth::login($admin, $request->boolean('remember'));
                 $request->session()->regenerate();
+                \App\Models\LoginHistory::recordLogin($admin, $request);
 
                 return redirect()->intended(route('admin.dashboard'))
                     ->with('success', 'Selamat datang, Administrator!');
@@ -273,6 +275,7 @@ class LoginController extends Controller
 
             Auth::login($user, $request->boolean('remember'));
             $request->session()->regenerate();
+            \App\Models\LoginHistory::recordLogin($user, $request);
 
             return redirect()->intended(route('guru.dashboard'))
                 ->with('success', 'Selamat datang, ' . $user->name . '!');
@@ -322,6 +325,10 @@ class LoginController extends Controller
 
     public function logout(Request $request)
     {
+        $sessionId = $request->session()->getId();
+        $userId = Auth::id();
+        \App\Models\LoginHistory::markLoggedOut($sessionId, $userId);
+
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();

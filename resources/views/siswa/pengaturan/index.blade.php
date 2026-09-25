@@ -18,6 +18,16 @@
         </button>
     </li>
     <li class="nav-item">
+        <button class="nav-link" id="faq-tab" data-bs-toggle="pill" data-bs-target="#tabFaq" type="button">
+            <i class="bi bi-question-circle"></i> FAQ
+        </button>
+    </li>
+    <li class="nav-item">
+        <button class="nav-link" id="device-tab" data-bs-toggle="pill" data-bs-target="#tabDevice" type="button">
+            <i class="bi bi-laptop"></i> Riwayat Perangkat
+        </button>
+    </li>
+    <li class="nav-item">
         <button class="nav-link" id="chat-tab" data-bs-toggle="pill" data-bs-target="#tabChat" type="button">
             <i class="bi bi-chat-dots"></i> Hubungi Admin
             @if(isset($pesanChat) && $pesanChat->whereNotNull('balasan')->count() > 0)
@@ -71,9 +81,9 @@
                 <div class="card-custom p-4 h-100 d-flex flex-column justify-content-between">
                     <div>
                         <h5 class="fw-bold mb-3 d-flex align-items-center">
-                            <i class="bi bi-shield-check text-success me-2"></i>Status & Kebijakan Anonimitas
+                            <i class="bi bi-shield-check text-primary me-2"></i>Status & Keamanan Sesi Akun
                         </h5>
-                        <p class="text-muted small mb-4">Keamanan data dan privasi Anda dalam memberikan evaluasi guru.</p>
+                        <p class="text-muted small mb-4">Informasi status login dan sesi perangkat aktif Anda pada sistem evaluasi.</p>
 
                         <div class="p-3 rounded mb-3 border border-success border-opacity-25" style="background: rgba(16, 185, 129, 0.08);">
                             <div class="d-flex align-items-center gap-2 mb-1">
@@ -83,21 +93,40 @@
                             <small class="text-muted">Akun Anda memiliki hak akses penuh untuk memberikan penilaian pada periode aktif saat ini.</small>
                         </div>
 
-                        <div class="p-3 rounded border border-primary border-opacity-25" style="background: rgba(0, 51, 102, 0.08);">
-                            <div class="d-flex align-items-center gap-2 mb-1">
-                                <i class="bi bi-incognito text-primary fs-5"></i>
-                                <strong class="text-primary">100% Anonim Bagi Guru</strong>
+                        <div class="p-3 rounded border" style="background: var(--bg-light);">
+                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                <span class="small text-muted fw-bold">PERANGKAT SAAT INI</span>
+                                <span class="badge bg-success-subtle text-success border border-success">Sesi Aktif</span>
                             </div>
-                            <small class="text-muted">Nama, NIS, dan identitas Anda dirahasiakan sepenuhnya dari guru yang Anda nilai demi objektivitas.</small>
+                            <div class="d-flex align-items-center gap-2">
+                                <i class="bi bi-laptop fs-5 text-primary"></i>
+                                <div>
+                                    <div class="small fw-bold text-dark font-monospace">{{ request()->ip() }}</div>
+                                    <small class="text-muted" style="font-size: 0.75rem;">Login melalui portal siswa</small>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="text-muted small mt-4 pt-3 border-top">
-                        Jika terdapat kesalahan nama, NIS, atau rombel kelas, silakan hubungi melalui tab <strong>Hubungi Admin Operator Sekolah</strong>.
+                    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mt-4 pt-3 border-top">
+                        <small class="text-muted">Kelola sesi & perangkat yang login</small>
+                        <button type="button" class="btn btn-outline-primary btn-sm fw-semibold" onclick="document.getElementById('device-tab').click()">
+                            <i class="bi bi-laptop me-1"></i> Buka Riwayat Perangkat
+                        </button>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
+
+    {{-- TAB 2: FAQ SISWA --}}
+    <div class="tab-pane fade" id="tabFaq">
+        @include('components.faq-accordion')
+    </div>
+
+    {{-- TAB 3: RIWAYAT PERANGKAT --}}
+    <div class="tab-pane fade" id="tabDevice">
+        @include('components.device-history')
     </div>
 
     {{-- TAB 2: HUBUNGI ADMIN OPERATOR SEKOLAH --}}
@@ -201,11 +230,11 @@
                                 </button>
                             </div>
 
-                            {{-- KOTAK VERIFIKASI ANTI-SPAM --}}
+                            {{-- KOTAK VERIFIKASI --}}
                             <div class="p-2 rounded d-flex justify-content-between align-items-center flex-wrap gap-2" style="background: var(--bg-light); border: 1px dashed var(--border);">
                                 <div class="d-flex align-items-center gap-2">
                                     <i class="bi bi-shield-check-fill text-success"></i>
-                                    <label class="form-label mb-0 small fw-bold text-muted">VERIFIKASI ANTI-SPAM: {{ $num1 }} + {{ $num2 }} =</label>
+                                    <label class="form-label mb-0 small fw-bold text-muted">VERIFIKASI: {{ $num1 }} + {{ $num2 }} =</label>
                                 </div>
                                 <div class="d-flex gap-2 align-items-center">
                                     <input type="number" name="captcha" class="form-control form-control-sm text-center fw-bold" placeholder="?" required style="width: 75px; border-radius: 8px; border: 2px solid var(--border);" value="{{ old('captcha') }}">

@@ -5,7 +5,7 @@
 @section('content')
 <style>
     .settings-page { max-width: 1180px; }
-    .settings-nav { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: .5rem; margin-bottom: 1.25rem; }
+    .settings-nav { display: grid; grid-template-columns: repeat(auto-fill, minmax(105px, 1fr)); gap: .5rem; margin-bottom: 1.25rem; }
     .settings-nav__item { display: flex; align-items: center; justify-content: center; gap: .45rem; min-height: 44px; padding: .6rem .75rem; color: var(--text-muted); background: var(--bg-card); border: 1px solid var(--border); border-radius: .65rem; font-size: .84rem; font-weight: 600; transition: .18s ease; }
     .settings-nav__item:hover { color: var(--primary); border-color: var(--primary); }
     .settings-nav__item.active { color: #fff; background: var(--primary); border-color: var(--primary); }
@@ -43,6 +43,8 @@
         <button class="settings-nav__item" type="button" data-target="#tabModerasi"><i class="bi bi-shield-exclamation"></i> Moderasi</button>
         <button class="settings-nav__item" type="button" data-target="#tabPeriode"><i class="bi bi-calendar-range"></i> Periode</button>
         <button class="settings-nav__item" type="button" data-target="#tabAkun"><i class="bi bi-shield-lock"></i> Akun</button>
+        <button class="settings-nav__item" type="button" data-target="#tabPerangkat"><i class="bi bi-laptop"></i> Perangkat</button>
+        <button class="settings-nav__item" type="button" data-target="#tabFaq"><i class="bi bi-question-circle"></i> FAQ</button>
     </nav>
 
     <form action="{{ route('admin.pengaturan.landing') }}" method="POST" enctype="multipart/form-data" id="landingForm">
@@ -391,6 +393,14 @@
                 </div>
             </div>
         </div>
+    </section>
+
+    <section class="settings-panel" id="tabPerangkat" hidden>
+        @include('components.device-history')
+    </section>
+
+    <section class="settings-panel" id="tabFaq" hidden>
+        @include('components.faq-accordion')
     </section>
 </div>
 

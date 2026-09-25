@@ -67,6 +67,11 @@ Route::middleware('auth')->group(function () {
     Route::post('/ganti-password', [LoginController::class, 'gantiPassword'])->name('auth.ganti-password.post');
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
+    // MANAJEMEN SESI & PERANGKAT LOGIN
+    Route::post('/auth/device/{history}/logout', [\App\Http\Controllers\Auth\DeviceSessionController::class, 'logoutDevice'])->name('auth.device.logout');
+    Route::post('/auth/device/logout-others', [\App\Http\Controllers\Auth\DeviceSessionController::class, 'logoutOthers'])->name('auth.device.logout-others');
+    Route::post('/auth/device/logout-all', [\App\Http\Controllers\Auth\DeviceSessionController::class, 'logoutAll'])->name('auth.device.logout-all');
+
     // THREADED BALASAN ULASAN (SISWA, GURU, ADMIN)
     Route::post('/penilaian/{penilaian}/balasan', [\App\Http\Controllers\PenilaianBalasanController::class, 'store'])->name('penilaian.balasan.store');
     Route::delete('/penilaian-balasan/{balasan}', [\App\Http\Controllers\PenilaianBalasanController::class, 'destroy'])->name('penilaian.balasan.destroy');

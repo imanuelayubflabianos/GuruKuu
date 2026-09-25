@@ -36,12 +36,12 @@ class PengaturanController extends Controller
             'captcha' => 'required|numeric',
         ], [
             'pesan.required'   => 'Pesan tidak boleh kosong.',
-            'captcha.required' => 'Verifikasi anti-spam wajib diisi.',
-            'captcha.numeric'  => 'Jawaban anti-spam harus berupa angka.',
+            'captcha.required' => 'Verifikasi wajib diisi.',
+            'captcha.numeric'  => 'Jawaban verifikasi harus berupa angka.',
         ]);
 
         if ($request->captcha != session('siswa_chat_captcha')) {
-            return redirect()->to(route('siswa.pengaturan') . '#tabChat')->withInput()->withErrors(['captcha' => 'Jawaban verifikasi anti-spam tidak cocok. Silakan coba lagi.']);
+            return redirect()->to(route('siswa.pengaturan') . '#tabChat')->withInput()->withErrors(['captcha' => 'Jawaban verifikasi tidak cocok. Silakan coba lagi.']);
         }
 
         $user = Auth::user();

@@ -129,7 +129,7 @@
                                 </div>
                                 <div class="d-flex gap-2 align-items-center">
                                     <input type="number" name="captcha" class="form-control form-control-sm" placeholder="?" required style="border-radius: 8px; max-width: 80px; font-weight: 700; text-align: center; border: 2px solid var(--border);" value="{{ old('captcha') }}">
-                                    <small class="text-muted mb-0" style="font-size: 0.7rem;">Anti-spam</small>
+                                    <small class="text-muted mb-0" style="font-size: 0.7rem;">Verifikasi</small>
                                 </div>
                             </div>
                         </div>

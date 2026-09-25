@@ -18,6 +18,16 @@
         </button>
     </li>
     <li class="nav-item">
+        <button class="nav-link" id="faq-tab" data-bs-toggle="pill" data-bs-target="#tabFaqGuru" type="button">
+            <i class="bi bi-question-circle"></i> FAQ
+        </button>
+    </li>
+    <li class="nav-item">
+        <button class="nav-link" id="device-tab" data-bs-toggle="pill" data-bs-target="#tabDeviceGuru" type="button">
+            <i class="bi bi-laptop"></i> Riwayat Perangkat
+        </button>
+    </li>
+    <li class="nav-item">
         <button class="nav-link" id="chat-tab" data-bs-toggle="pill" data-bs-target="#tabChat" type="button">
             <i class="bi bi-chat-dots"></i> Chat Admin
             @if(isset($pesanChat) && $pesanChat->whereNotNull('balasan')->count() > 0)
@@ -110,6 +120,16 @@
                 </div>
             </div>
         </form>
+    </div>
+
+    {{-- TAB: FAQ GURU --}}
+    <div class="tab-pane fade" id="tabFaqGuru">
+        @include('components.faq-accordion')
+    </div>
+
+    {{-- TAB: RIWAYAT PERANGKAT GURU --}}
+    <div class="tab-pane fade" id="tabDeviceGuru">
+        @include('components.device-history')
     </div>
 
     {{-- TAB 2: CHAT ADMIN --}}
@@ -212,11 +232,11 @@
                                 </button>
                             </div>
 
-                            {{-- KOTAK VERIFIKASI ANTI-SPAM --}}
+                            {{-- KOTAK VERIFIKASI --}}
                             <div class="p-2 rounded d-flex justify-content-between align-items-center flex-wrap gap-2" style="background: var(--bg-light); border: 1px dashed var(--border);">
                                 <div class="d-flex align-items-center gap-2">
                                     <i class="bi bi-shield-check-fill text-success"></i>
-                                    <label class="form-label mb-0 small fw-bold text-muted">VERIFIKASI ANTI-SPAM: {{ $num1 }} + {{ $num2 }} =</label>
+                                    <label class="form-label mb-0 small fw-bold text-muted">VERIFIKASI: {{ $num1 }} + {{ $num2 }} =</label>
                                 </div>
                                 <div class="d-flex gap-2 align-items-center">
                                     <input type="number" name="captcha" class="form-control form-control-sm text-center fw-bold" placeholder="?" required style="width: 75px; border-radius: 8px; border: 2px solid var(--border);" value="{{ old('captcha') }}">
