@@ -7,10 +7,12 @@ use App\Models\Guru;
 use App\Models\Penilaian;
 use App\Models\Periode;
 use App\Models\Setting;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
 class PengaturanController extends Controller
@@ -75,16 +77,27 @@ class PengaturanController extends Controller
             Setting::set('site_logo', '');
         } elseif ($request->hasFile('site_logo_file')) {
             $file = $request->file('site_logo_file');
-            $uploadDir = public_path('uploads/logo');
-            if (!File::exists($uploadDir)) {
-                File::makeDirectory($uploadDir, 0755, true);
-            }
             $ext = strtolower($file->guessExtension() ?? 'png');
             if (!in_array($ext, ['jpeg', 'jpg', 'png', 'webp', 'svg'])) {
                 $ext = 'png';
             }
             $filename = 'logo_' . \Illuminate\Support\Str::random(24) . '.' . $ext;
-            $file->move($uploadDir, $filename);
+
+            // Simpan ke storage disk public (storage/app/public/uploads/logo)
+            Storage::disk('public')->putFileAs('uploads/logo', $file, $filename);
+
+            // Sinkronkan ke public_path('uploads/logo') jika folder writable
+            try {
+                $publicDir = public_path('uploads/logo');
+                if (!File::exists($publicDir)) {
+                    @File::makeDirectory($publicDir, 0775, true, true);
+                }
+                $src = storage_path('app/public/uploads/logo/' . $filename);
+                if (File::exists($src) && is_dir($publicDir) && is_writable($publicDir)) {
+                    @copy($src, $publicDir . DIRECTORY_SEPARATOR . $filename);
+                }
+            } catch (\Throwable $e) {}
+
             Setting::set('site_logo', '/uploads/logo/' . $filename);
         } elseif ($request->filled('site_logo_url')) {
             Setting::set('site_logo', trim($request->site_logo_url));
@@ -93,16 +106,27 @@ class PengaturanController extends Controller
         // 2. Thumbnail Hero
         if ($request->hasFile('hero_image_file')) {
             $file = $request->file('hero_image_file');
-            $uploadDir = public_path('uploads/hero');
-            if (!File::exists($uploadDir)) {
-                File::makeDirectory($uploadDir, 0755, true);
-            }
             $ext = strtolower($file->guessExtension() ?? 'jpg');
             if (!in_array($ext, ['jpeg', 'jpg', 'png', 'webp'])) {
                 $ext = 'jpg';
             }
             $filename = 'hero_' . \Illuminate\Support\Str::random(24) . '.' . $ext;
-            $file->move($uploadDir, $filename);
+
+            // Simpan ke storage disk public (storage/app/public/uploads/hero)
+            Storage::disk('public')->putFileAs('uploads/hero', $file, $filename);
+
+            // Sinkronkan ke public_path('uploads/hero') jika folder writable
+            try {
+                $publicDir = public_path('uploads/hero');
+                if (!File::exists($publicDir)) {
+                    @File::makeDirectory($publicDir, 0775, true, true);
+                }
+                $src = storage_path('app/public/uploads/hero/' . $filename);
+                if (File::exists($src) && is_dir($publicDir) && is_writable($publicDir)) {
+                    @copy($src, $publicDir . DIRECTORY_SEPARATOR . $filename);
+                }
+            } catch (\Throwable $e) {}
+
             Setting::set('hero_image', '/uploads/hero/' . $filename);
         } elseif ($request->filled('hero_image_url')) {
             Setting::set('hero_image', trim($request->hero_image_url));
@@ -243,17 +267,27 @@ class PengaturanController extends Controller
         $request->validate([
             'current_password' => 'required',
             'password'         => 'required|min:6|confirmed',
+        ], [
+            'current_password.required' => 'Password saat ini wajib diisi.',
+            'password.required'         => 'Password baru wajib diisi.',
+            'password.min'              => 'Password baru minimal 6 karakter.',
+            'password.confirmed'        => 'Konfirmasi password baru tidak cocok.',
         ]);
 
-        if (!Hash::check($request->current_password, auth()->user()->password)) {
+        /** @var \App\Models\User $user */
+        $user = User::find(auth()->id());
+        if (!$user) {
+            return back()->with('error', 'Sesi pengguna tidak valid.');
+        }
+
+        if (!Hash::check($request->current_password, $user->password)) {
             return back()->withErrors(['current_password' => 'Password saat ini tidak sesuai.'])->with('error', 'Gagal memperbarui password: Password lama salah.');
         }
 
-        auth()->user()->update([
-            'password' => \Illuminate\Support\Facades\Hash::make($request->password),
-        ]);
+        $user->password = Hash::make($request->password);
+        $user->save();
 
-        return back()->with('success', 'Password akun Admin berhasil diperbarui!');
+        return back()->with('success', 'Password akun Admin berhasil diperbarui! Silakan gunakan password baru ini untuk login berikutnya.');
     }
 
     public function simpanPeriode(Request $request)

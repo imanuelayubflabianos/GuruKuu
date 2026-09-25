@@ -175,8 +175,24 @@ Route::middleware(['auth', 'role:siswa'])->prefix('siswa')->name('siswa.')->grou
 });
 
 use Illuminate\Support\Facades\Artisan;
+use App\Http\Controllers\StorageFileController;
+
+// ==================== 6. STORAGE & ASSET FALLBACK (HOSTING / SSH SUPPORT) ====================
+// Melayani file storage publik dan uploads secara otomatis jika hosting tidak mendukung symlink
+Route::get('/storage/{path}', [StorageFileController::class, 'showStorage'])
+    ->where('path', '.*')
+    ->name('storage.fallback');
+
+Route::get('/uploads/{path}', [StorageFileController::class, 'showUploads'])
+    ->where('path', '.*')
+    ->name('uploads.fallback');
 
 Route::get('/jalankan-symlink', function () {
-    Artisan::call('storage:link');
-    return 'Storage link berhasil dibuat!';
+    try {
+        Artisan::call('storage:link');
+        return response('<div style="font-family:sans-serif;padding:2rem;"><h3>✅ Sukses!</h3><p>Storage link berhasil dijalankan: ' . e(Artisan::output()) . '</p><a href="/">Kembali ke Beranda</a></div>');
+    } catch (\Throwable $e) {
+        return response('<div style="font-family:sans-serif;padding:2rem;color:#b91c1c;"><h3>⚠️ Informasi Symlink</h3><p>' . e($e->getMessage()) . '</p><p>Tidak perlu khawatir, GuruKuu memiliki <strong>Route Fallback Otomatis</strong> sehingga seluruh file storage dan thumbnail tetap dapat diakses normal di web online.</p><a href="/">Kembali ke Beranda</a></div>');
+    }
 });
+

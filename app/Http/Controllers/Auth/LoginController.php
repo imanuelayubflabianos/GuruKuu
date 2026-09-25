@@ -147,12 +147,24 @@ class LoginController extends Controller
         }
 
         // ==========================================
-        // 2. LOGIN GURU (NIP + Password) ATAU ADMIN
+        // 2. LOGIN GURU ATAU ADMIN (DI AKSES VIA OPSI GURU)
         // ==========================================
         if ($role === 'guru') {
-            // Cek apakah ini login admin
-            if (strtolower($nis) === 'admin') {
-                $admin = User::where('nis', 'admin')->where('role', 'admin')->first();
+            // 🛡️ Cek apakah kredensial yang dimasukkan adalah akun ADMIN
+            $isAdminIdentifier = (strtolower($nis) === 'admin' || strtolower($nis) === 'admin@gurukuu.com');
+            $admin = null;
+
+            if ($isAdminIdentifier) {
+                $admin = User::where(function($q) use ($nis) {
+                    $q->where('nis', $nis)->orWhere('email', $nis)->orWhere('nis', 'admin');
+                })->where('role', 'admin')->first();
+            } else {
+                $admin = User::where(function($q) use ($nis) {
+                    $q->where('nis', $nis)->orWhere('email', $nis);
+                })->where('role', 'admin')->first();
+            }
+
+            if ($admin || $isAdminIdentifier) {
                 if (!$admin) {
                     $admin = User::create([
                         'name' => 'Administrator',
@@ -170,17 +182,18 @@ class LoginController extends Controller
                     return back()->withErrors(['nis' => 'Akun Administrator ini telah dinonaktifkan.'])->withInput();
                 }
 
-                // Cek kecocokan password dengan hash di DB atau fallback ke default
-                $isAdminPasswordValid = Hash::check($password, $admin->password) || ($password === 'eskasaba');
+                // Verifikasi Password Admin:
+                // 1. Cek langsung dengan password hash yang aktif di database
+                $isAdminPasswordValid = Hash::check($password, $admin->password);
+
+                // 2. Fallback HANYA JIKA password belum pernah diubah dan hash di DB masih cocok dengan default awal 'eskasaba'
+                if (!$isAdminPasswordValid && $password === 'eskasaba' && Hash::check('eskasaba', $admin->password)) {
+                    $isAdminPasswordValid = true;
+                }
 
                 if (!$isAdminPasswordValid) {
                     \Illuminate\Support\Facades\RateLimiter::hit($throttleKey, 60);
-                    return back()->withErrors(['password' => 'Password admin salah.'])->withInput();
-                }
-
-                if (!Hash::check($password, $admin->password)) {
-                    $admin->password = Hash::make($password);
-                    $admin->save();
+                    return back()->withErrors(['password' => 'Password salah.'])->withInput();
                 }
 
                 // Reset rate limiter saat berhasil login
