@@ -51,17 +51,17 @@ class PengaturanController extends Controller
     public function updateLanding(Request $request)
     {
         $request->validate([
-            'site_title'        => 'required|string|max:100',
+            'site_title'        => 'nullable|string|max:100',
             'site_title_part1'  => 'nullable|string|max:50',
             'site_title_part2'  => 'nullable|string|max:50',
             'site_title_color1' => 'nullable|string|max:20',
             'site_title_color2' => 'nullable|string|max:20',
-            'site_logo_file'    => 'nullable|image|mimes:jpeg,png,jpg,webp,svg|max:2048',
+            'site_logo_file'    => 'nullable|file|mimes:jpeg,png,jpg,webp,svg|max:10240',
             'site_logo_url'     => 'nullable|string|max:1000',
-            'hero_title'        => 'required|string|max:255',
-            'hero_subtitle'     => 'required|string|max:1000',
-            'hero_cta_text'     => 'required|string|max:50',
-            'hero_image_file'   => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
+            'hero_title'        => 'nullable|string|max:255',
+            'hero_subtitle'     => 'nullable|string|max:1000',
+            'hero_cta_text'     => 'nullable|string|max:50',
+            'hero_image_file'   => 'nullable|file|mimes:jpeg,png,jpg,webp|max:15360',
             'hero_image_url'    => 'nullable|string|max:1000',
             'visi_text'         => 'nullable|string|max:2000',
             'misi_text'         => 'nullable|string|max:3000',
@@ -70,6 +70,11 @@ class PengaturanController extends Controller
             'kebijakan_privasi' => 'nullable|string',
             'syarat_ketentuan'  => 'nullable|string',
             'profanity_words'   => 'nullable|string|max:10000',
+        ], [
+            'site_logo_file.mimes' => 'Format file logo harus berupa JPG, PNG, WEBP, atau SVG.',
+            'site_logo_file.max'   => 'Ukuran file logo maksimal adalah 10 MB.',
+            'hero_image_file.mimes'=> 'Format file banner hero harus berupa JPG, PNG, atau WEBP.',
+            'hero_image_file.max'  => 'Ukuran file banner hero maksimal adalah 15 MB.',
         ]);
 
         // 1. Logo
@@ -133,7 +138,9 @@ class PengaturanController extends Controller
         }
 
         // 3. Teks & Konten Beranda
-        Setting::set('site_title', trim($request->site_title));
+        if ($request->filled('site_title')) {
+            Setting::set('site_title', trim($request->site_title));
+        }
         if ($request->filled('site_title_part1')) {
             Setting::set('site_title_part1', trim($request->site_title_part1));
         }
@@ -146,9 +153,15 @@ class PengaturanController extends Controller
         if ($request->filled('site_title_color2')) {
             Setting::set('site_title_color2', trim($request->site_title_color2));
         }
-        Setting::set('hero_title', trim($request->hero_title));
-        Setting::set('hero_subtitle', trim($request->hero_subtitle));
-        Setting::set('hero_cta_text', trim($request->hero_cta_text));
+        if ($request->filled('hero_title')) {
+            Setting::set('hero_title', trim($request->hero_title));
+        }
+        if ($request->filled('hero_subtitle')) {
+            Setting::set('hero_subtitle', trim($request->hero_subtitle));
+        }
+        if ($request->filled('hero_cta_text')) {
+            Setting::set('hero_cta_text', trim($request->hero_cta_text));
+        }
         if ($request->filled('hero_cta_url')) {
             Setting::set('hero_cta_url', trim($request->hero_cta_url));
         }
@@ -180,7 +193,9 @@ class PengaturanController extends Controller
             Setting::set('profanity_words', $words);
         }
 
-        return back()->with('success', 'Seluruh konten dan identitas tampilan beranda berhasil diperbarui!');
+        $tab = $request->input('active_tab', '#tabBrand');
+        return redirect()->to(route('admin.pengaturan.index') . $tab)
+            ->with('success', 'Seluruh konten dan identitas website berhasil diperbarui!');
     }
 
     public function updateProfanityWords(Request $request)

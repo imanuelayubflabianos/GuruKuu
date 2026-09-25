@@ -47,7 +47,35 @@
         <button class="settings-nav__item" type="button" data-target="#tabFaq"><i class="bi bi-question-circle"></i> FAQ</button>
     </nav>
 
-    <form action="{{ route('admin.pengaturan.landing') }}" method="POST" enctype="multipart/form-data" id="landingForm">
+    @if(session('success'))
+        <div class="alert alert-success alert-dismissible fade show d-flex align-items-center gap-2 mb-3" role="alert">
+            <i class="bi bi-check-circle-fill fs-5"></i>
+            <div>{{ session('success') }}</div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
+    @if(session('error'))
+        <div class="alert alert-danger alert-dismissible fade show d-flex align-items-center gap-2 mb-3" role="alert">
+            <i class="bi bi-exclamation-octagon-fill fs-5"></i>
+            <div>{{ session('error') }}</div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
+    @if($errors->any())
+        <div class="alert alert-danger alert-dismissible fade show mb-3" role="alert">
+            <div class="fw-bold mb-1"><i class="bi bi-exclamation-triangle-fill me-1"></i> Terjadi kesalahan saat menyimpan pengaturan:</div>
+            <ul class="mb-0 ps-3 small">
+                @foreach($errors->all() as $err)
+                    <li>{{ $err }}</li>
+                @endforeach
+            </ul>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
+    <form action="{{ route('admin.pengaturan.landing') }}" method="POST" enctype="multipart/form-data" id="landingForm" novalidate>
         @csrf
 
         <section class="settings-panel" id="tabBrand">
@@ -132,15 +160,15 @@
                 <div class="row g-3">
                     <div class="col-lg-6">
                         <label class="form-label" for="heroTitleInput">Judul</label>
-                        <input type="text" name="hero_title" id="heroTitleInput" class="form-control" value="{{ $settings['hero_title'] }}" required>
+                        <input type="text" name="hero_title" id="heroTitleInput" class="form-control" value="{{ $settings['hero_title'] }}">
                     </div>
                     <div class="col-lg-6">
                         <label class="form-label" for="heroCtaInput">Teks tombol</label>
-                        <input type="text" name="hero_cta_text" id="heroCtaInput" class="form-control" value="{{ $settings['hero_cta_text'] }}" required>
+                        <input type="text" name="hero_cta_text" id="heroCtaInput" class="form-control" value="{{ $settings['hero_cta_text'] }}">
                     </div>
                     <div class="col-lg-8">
                         <label class="form-label" for="heroSubtitleInput">Deskripsi</label>
-                        <textarea name="hero_subtitle" id="heroSubtitleInput" rows="3" class="form-control" required>{{ $settings['hero_subtitle'] }}</textarea>
+                        <textarea name="hero_subtitle" id="heroSubtitleInput" rows="3" class="form-control">{{ $settings['hero_subtitle'] }}</textarea>
                     </div>
                     <div class="col-lg-4">
                         <label class="form-label" for="heroCtaUrlInput">Link tombol</label>
@@ -223,7 +251,8 @@
 
         <div id="landingSaveBar" class="settings-save">
             <span class="settings-muted"><i class="bi bi-cloud-check me-1"></i>Perubahan diterapkan setelah disimpan.</span>
-            <button type="submit" class="btn btn-primary-custom px-4"><i class="bi bi-check2 me-1"></i>Simpan</button>
+            <input type="hidden" name="active_tab" id="activeTabInput" value="#tabBrand">
+            <button type="submit" id="btnSaveLanding" class="btn btn-primary-custom px-4"><i class="bi bi-check2 me-1"></i>Simpan</button>
         </div>
     </form>
 
@@ -438,11 +467,13 @@ document.addEventListener('DOMContentLoaded', function() {
     const panels = document.querySelectorAll('.settings-panel');
     const landingSaveBar = document.getElementById('landingSaveBar');
     const landingTargets = ['#tabBrand', '#tabHero', '#tabVisiMisi', '#tabFooter', '#tabLegal', '#tabModerasi'];
+    const activeTabInput = document.getElementById('activeTabInput');
     function showTab(target, updateHash = true) {
         if (!document.querySelector(target)) return;
         panels.forEach(panel => panel.hidden = '#' + panel.id !== target);
         tabButtons.forEach(button => button.classList.toggle('active', button.dataset.target === target));
         landingSaveBar.hidden = !landingTargets.includes(target);
+        if (activeTabInput && landingTargets.includes(target)) activeTabInput.value = target;
         if (updateHash) history.replaceState(null, '', target);
     }
     tabButtons.forEach(button => button.addEventListener('click', () => showTab(button.dataset.target)));
@@ -505,9 +536,20 @@ document.addEventListener('DOMContentLoaded', function() {
         this.setAttribute('aria-label', visible ? 'Sembunyikan password' : 'Tampilkan password');
     }));
 
+    const landingForm = document.getElementById('landingForm');
+    const btnSaveLanding = document.getElementById('btnSaveLanding');
+    if (landingForm && btnSaveLanding) {
+        landingForm.addEventListener('submit', function() {
+            btnSaveLanding.disabled = true;
+            btnSaveLanding.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> Menyimpan...';
+        });
+    }
+
     @if($errors->has('reset_current_password') || $errors->has('reset_confirmation') || $errors->has('reset_acknowledged'))
         showTab('#tabAkun', false);
         bootstrap.Modal.getOrCreateInstance(resetModalElement).show();
+    @elseif($errors->any() && old('active_tab'))
+        showTab('{{ old("active_tab") }}', false);
     @endif
 });
 </script>
