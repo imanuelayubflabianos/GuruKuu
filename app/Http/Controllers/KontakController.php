@@ -45,10 +45,18 @@ class KontakController extends Controller
             ])->withInput();
         }
 
-        $request->validate(['pesan' => 'required|min:10|max:1000', 'captcha' => 'required|numeric']);
+        $request->validate(
+            ['pesan' => 'required|min:5|max:100', 'captcha' => 'required|numeric'],
+            ['pesan.max' => 'Pesan Anda melebihi batas maksimal 100 karakter.']
+        );
         if ($request->captcha != session('captcha_answer')) return back()->withErrors(['captcha' => 'Jawaban salah.'])->withInput();
 
         $pesanBersih = strip_tags(trim($request->pesan));
+
+        if (\App\Services\ProfanityFilterService::containsLink($pesanBersih)) {
+            return back()->withInput()->with('error', 'Demi keamanan, pengiriman pesan tidak boleh mengandung tautan / link URL luar.');
+        }
+
         $profanity = \App\Services\ProfanityFilterService::check($pesanBersih);
         if (!$profanity['clean']) {
             try {
@@ -85,14 +93,22 @@ class KontakController extends Controller
         if ($kontak->identifier !== $deviceId || $kontak->is_siswa) {
             return back()->with('error', 'Akses ditolak.');
         }
-        $request->validate(['pesan' => 'required|min:10']);
+        $request->validate(
+            ['pesan' => 'required|min:5|max:100'],
+            ['pesan.max' => 'Pesan Anda melebihi batas maksimal 100 karakter.']
+        );
 
-        $profanity = \App\Services\ProfanityFilterService::check($request->pesan);
+        $pesanBaru = strip_tags(trim($request->pesan));
+        if (\App\Services\ProfanityFilterService::containsLink($pesanBaru)) {
+            return back()->withInput()->with('error', 'Demi keamanan, pengiriman pesan tidak boleh mengandung tautan / link URL luar.');
+        }
+
+        $profanity = \App\Services\ProfanityFilterService::check($pesanBaru);
         if (!$profanity['clean']) {
             return back()->withInput()->with('error', $profanity['message']);
         }
 
-        $kontak->update(['pesan' => $request->pesan]);
+        $kontak->update(['pesan' => $pesanBaru]);
         return back()->with('success', 'Pesan berhasil diperbarui!');
     }
 
@@ -127,12 +143,20 @@ class KontakController extends Controller
             ])->withInput();
         }
 
-        $request->validate(['pesan' => 'required|min:10|max:1000', 'captcha' => 'required|numeric']);
+        $request->validate(
+            ['pesan' => 'required|min:3|max:100', 'captcha' => 'required|numeric'],
+            ['pesan.max' => 'Pesan Anda melebihi batas maksimal 100 karakter.']
+        );
         if ($request->captcha != session('siswa_chat_captcha')) {
             return back()->withErrors(['captcha' => 'Jawaban verifikasi matematika salah.'])->withInput();
         }
 
         $pesanBersih = strip_tags(trim($request->pesan));
+
+        if (\App\Services\ProfanityFilterService::containsLink($pesanBersih)) {
+            return back()->withInput()->with('error', 'Demi keamanan, pesan tidak boleh mengandung tautan / link URL luar.');
+        }
+
         $profanity = \App\Services\ProfanityFilterService::check($pesanBersih);
         if (!$profanity['clean']) {
             try {
@@ -167,8 +191,15 @@ class KontakController extends Controller
     public function editSiswa(Request $request, Kontak $kontak)
     {
         if ($kontak->identifier !== Auth::user()->nis) return back()->with('error', 'Akses ditolak.');
-        $request->validate(['pesan' => 'required|min:10']);
-        $kontak->update(['pesan' => $request->pesan]);
+        $request->validate(
+            ['pesan' => 'required|min:3|max:100'],
+            ['pesan.max' => 'Pesan Anda melebihi batas maksimal 100 karakter.']
+        );
+        $pesanBaru = strip_tags(trim($request->pesan));
+        if (\App\Services\ProfanityFilterService::containsLink($pesanBaru)) {
+            return back()->withInput()->with('error', 'Demi keamanan, pesan tidak boleh mengandung tautan / link URL luar.');
+        }
+        $kontak->update(['pesan' => $pesanBaru]);
         return back()->with('success', 'Pesan berhasil diperbarui!');
     }
 

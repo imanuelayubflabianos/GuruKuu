@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Login') - {{ $siteTitle ?? 'GuruKuu' }}</title>
     @if(!empty($siteLogo))
@@ -15,9 +15,6 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
     
-    @php
-        $heroImage = \App\Models\Setting::get('hero_image', 'https://images.unsplash.com/photo-1562774053-701939374585?w=1920');
-    @endphp
     <style>
         :root { 
             --primary: #003366; 
@@ -25,32 +22,33 @@
             --bg-light: #f8fafc; 
         }
         * { font-family: 'Inter', sans-serif; box-sizing: border-box; }
+        html {
+            height: 100%;
+        }
         body.auth-page { 
-            min-height: 100dvh;
             min-height: 100vh;
+            min-height: 100dvh;
             display: flex;
-            align-items: center;
-            justify-content: center;
-            background: linear-gradient(135deg, rgba(15, 23, 42, 0.72), rgba(0, 51, 102, 0.82)), url('{{ $heroImage }}') center/cover no-repeat fixed;
+            flex-direction: column;
+            background-color: var(--bg-light, #f8fafc);
+            color: var(--text-dark, #0f172a);
             position: relative;
-            padding: 1rem;
+            padding: 0;
             margin: 0;
+            overflow-y: auto !important;
             overflow-x: hidden;
         }
-        body.auth-page::before {
-            content: '';
-            position: fixed;
-            inset: 0;
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            background: rgba(0, 0, 0, 0.15);
-            pointer-events: none;
-            z-index: 0;
+        [data-theme="dark"] body.auth-page {
+            background-color: #0b1329;
+            color: #f1f5f9;
         }
         .auth-container-wrapper {
             position: relative;
             z-index: 2;
             width: 100%;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
         .font-mono {
             font-family: 'JetBrains Mono', monospace;
@@ -64,21 +62,19 @@
             align-items: center;
             gap: 0.6rem;
         }
-        .auth-controls-floating .btn-glass-nav {
-            background: rgba(255, 255, 255, 0.25);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.4);
-            color: #ffffff;
+        .auth-controls-floating .btn-theme-nav {
+            background: rgba(255, 255, 255, 0.85);
+            border: 1px solid var(--border, #e2e8f0);
+            color: var(--text-dark, #0f172a);
             transition: all 0.25s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
         }
-        .auth-controls-floating .btn-glass-nav:hover {
-            background: rgba(255, 255, 255, 0.4);
+        .auth-controls-floating .btn-theme-nav:hover {
             transform: translateY(-2px);
-            color: #ffffff;
+            background: #ffffff;
         }
-        [data-theme="dark"] .auth-controls-floating .btn-glass-nav {
-            background: rgba(15, 23, 42, 0.6);
+        [data-theme="dark"] .auth-controls-floating .btn-theme-nav {
+            background: rgba(15, 23, 42, 0.85);
             border-color: rgba(255, 255, 255, 0.15);
             color: #f8fafc;
         }
@@ -89,7 +85,7 @@
 <body class="auth-page">
     {{-- FLOATING THEME CONTROL --}}
     <div class="auth-controls-floating">
-        <button class="btn btn-glass-nav p-2 rounded-circle shadow-sm" type="button" onclick="GuruKuuTheme.toggleTheme()" title="Mode Gelap / Terang">
+        <button class="btn btn-theme-nav p-2 rounded-circle shadow-sm" type="button" onclick="GuruKuuTheme.toggleTheme()" title="Mode Gelap / Terang">
             <i class="bi bi-moon-stars-fill gk-theme-icon fs-5"></i>
         </button>
     </div>

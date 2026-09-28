@@ -67,10 +67,13 @@ class GuruController extends Controller
                 ->exists();
         }
 
-        // ✅ FIX: Ambil semua feedback siswa lain untuk guru ini
+        // ✅ FIX: Ambil semua feedback siswa lain untuk guru ini (kecuali yang disensor/toxic)
         $semuaFeedback = Penilaian::with('siswa')
             ->where('guru_id', $guru->id)
             ->where('periode_id', $periodeId)
+            ->where(function($q) {
+                $q->where('is_censored', false)->orWhereNull('is_censored');
+            })
             ->where(function($q) {
                 $q->whereNotNull('kritik')->where('kritik', '!=', '')
                   ->orWhereNotNull('saran')->where('saran', '!=', '');

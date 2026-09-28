@@ -93,10 +93,10 @@
                 <div>
                     <h4 class="fw-bold mb-1 text-dark">{{ $guru->nama }}</h4>
                     <div class="text-muted small font-mono d-flex align-items-center gap-2 flex-wrap">
-                        <span>NIP: <strong>{{ $guru->nip }}</strong></span>
                         <span class="badge rounded-pill px-2.5 py-1" style="background: var(--bg-light); color: var(--primary); border: 1px solid var(--border);">
                             {{ strtoupper($guru->jurusan?->nama_jurusan ?? 'UMUM') }}
                         </span>
+                        <span>{{ $guru->kategori_label }}</span>
                     </div>
                 </div>
             </div>

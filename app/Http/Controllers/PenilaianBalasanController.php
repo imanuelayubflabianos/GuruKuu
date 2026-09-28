@@ -45,12 +45,17 @@ class PenilaianBalasanController extends Controller
         }
 
         $validated = $request->validate([
-            'pesan' => 'required|string|min:2|max:1000',
+            'pesan' => 'required|string|min:2|max:100',
             'parent_id' => 'nullable|exists:penilaian_balasans,id',
         ], [
             'pesan.required' => 'Isi balasan tidak boleh kosong.',
-            'pesan.max' => 'Panjang balasan maksimal 1000 karakter.',
+            'pesan.max' => 'Panjang balasan melebihi batas maksimal 100 karakter.',
         ]);
+
+        // 🛡️ KEAMANAN: Cegah link/URL sembarangan
+        if (\App\Services\ProfanityFilterService::containsLink($validated['pesan'])) {
+            return back()->withInput()->with('error', 'Balasan ulasan tidak boleh mengandung tautan / link URL luar demi keamanan sistem.');
+        }
 
         // PENEGAKAN FILTER KATA KASAR (SISWA DAN GURU TIDAK KEBAL)
         $profanityFilter = new ProfanityFilterService();

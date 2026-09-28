@@ -26,4 +26,40 @@ class Kontak extends Model
         'is_read' => 'boolean',
         'is_replied' => 'boolean',
     ];
+
+    public function getPesanAttribute($value): ?string
+    {
+        if (empty($value)) return $value;
+        try {
+            $value = \Illuminate\Support\Facades\Crypt::decryptString($value);
+        } catch (\Throwable $e) {}
+        return \App\Services\ProfanityFilterService::mask($value);
+    }
+
+    public function setPesanAttribute($value): void
+    {
+        if (!empty($value)) {
+            $this->attributes['pesan'] = \Illuminate\Support\Facades\Crypt::encryptString($value);
+        } else {
+            $this->attributes['pesan'] = $value;
+        }
+    }
+
+    public function getBalasanAttribute($value): ?string
+    {
+        if (empty($value)) return $value;
+        try {
+            $value = \Illuminate\Support\Facades\Crypt::decryptString($value);
+        } catch (\Throwable $e) {}
+        return \App\Services\ProfanityFilterService::mask($value);
+    }
+
+    public function setBalasanAttribute($value): void
+    {
+        if (!empty($value)) {
+            $this->attributes['balasan'] = \Illuminate\Support\Facades\Crypt::encryptString($value);
+        } else {
+            $this->attributes['balasan'] = $value;
+        }
+    }
 }

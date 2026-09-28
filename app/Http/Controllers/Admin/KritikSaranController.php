@@ -11,19 +11,71 @@ class KritikSaranController extends Controller
 {
     public function index(Request $request)
     {
-        $feedbacks = Penilaian::with(['guru', 'siswa', 'kelas', 'periode'])
-            ->where(function ($query) {
-                $query->where(function ($q) {
-                    $q->whereNotNull('kritik')->whereRaw("TRIM(kritik) != ''");
-                })->orWhere(function ($q) {
-                    $q->whereNotNull('saran')->whereRaw("TRIM(saran) != ''");
+        $query = Penilaian::with(['guru.jurusan', 'siswa', 'kelas', 'periode']);
+
+        // Filter cakupan data (default: hanya yang memiliki kritik atau saran tertulis)
+        if ($request->get('cakupan') !== 'semua') {
+            $query->where(function ($q) {
+                $q->where(function ($sub) {
+                    $sub->whereNotNull('kritik')->whereRaw("TRIM(kritik) != ''");
+                })->orWhere(function ($sub) {
+                    $sub->whereNotNull('saran')->whereRaw("TRIM(saran) != ''");
                 });
-            })
-            ->latest()
+            });
+        }
+
+        // Pencarian (Siswa, Guru, NIS, NIP, isi kritik atau saran)
+        if ($request->filled('search')) {
+            $search = trim($request->search);
+            $query->where(function ($q) use ($search) {
+                $q->where('kritik', 'like', "%{$search}%")
+                  ->orWhere('saran', 'like', "%{$search}%")
+                  ->orWhereHas('guru', function ($g) use ($search) {
+                      $g->where('nama', 'like', "%{$search}%")
+                        ->orWhere('nip', 'like', "%{$search}%");
+                  })
+                  ->orWhereHas('siswa', function ($s) use ($search) {
+                      $s->where('name', 'like', "%{$search}%")
+                        ->orWhere('nis', 'like', "%{$search}%");
+                  });
+            });
+        }
+
+        // Filter Rating Bintang (1 - 5) berdasarkan pembulatan nilai rata-rata (total_nilai / 5)
+        if ($request->filled('rating')) {
+            $rating = (int) $request->rating;
+            if ($rating >= 1 && $rating <= 5) {
+                $query->whereRaw('ROUND(total_nilai / 5) = ?', [$rating]);
+            }
+        }
+
+        // Filter Status Sensor
+        if ($request->filled('status')) {
+            if ($request->status === 'censored') {
+                $query->where('is_censored', true);
+            } elseif ($request->status === 'clean') {
+                $query->where('is_censored', false);
+            }
+        }
+
+        $feedbacks = $query->latest()
             ->paginate(15)
             ->withQueryString();
 
-        return view('admin.kritik-saran.index', compact('feedbacks'));
+        // Statistik ringkas untuk cards
+        $avgTotal = Penilaian::avg('total_nilai');
+        $stats = [
+            'total_ulasan' => Penilaian::where(function ($q) {
+                $q->whereNotNull('kritik')->whereRaw("TRIM(kritik) != ''")
+                  ->orWhereNotNull('saran')->whereRaw("TRIM(saran) != ''");
+            })->count(),
+            'total_penilaian' => Penilaian::count(),
+            'rata_rata_bintang' => $avgTotal ? round($avgTotal / 5, 2) : 0,
+            'bintang_5' => Penilaian::whereRaw('ROUND(total_nilai / 5) = 5')->count(),
+            'total_disensor' => Penilaian::where('is_censored', true)->count(),
+        ];
+
+        return view('admin.kritik-saran.index', compact('feedbacks', 'stats'));
     }
 
     public function destroy(Penilaian $kritikSaran)

@@ -30,7 +30,10 @@
                 @forelse($kontak as $k)
                 <tr>
                     <td>
-                        <strong>{{ $k->pengirim }}</strong>
+                        <a href="{{ route('admin.kontak.chat', $k->identifier) }}" class="text-decoration-none text-dark fw-bold d-inline-flex align-items-center gap-1" title="Klik untuk membuka ruang chat">
+                            <span>{{ $k->pengirim }}</span>
+                            <i class="bi bi-box-arrow-up-right text-primary small" style="font-size: 0.72rem;"></i>
+                        </a>
                         <br><small class="text-muted font-mono">{{ $k->is_siswa ? 'Siswa (NIS: ' . $k->identifier . ')' : 'Pengguna / Tamu' }}</small>
                     </td>
                     <td style="max-width: 320px;">
@@ -49,13 +52,20 @@
                     </td>
                     <td>
                         @if($k->is_replied) 
-                            <span class="badge bg-success">Dibalas</span>
+                            <span class="badge bg-success d-inline-flex align-items-center gap-1">
+                                <i class="bi bi-check2-all text-white"></i> Dibalas
+                            </span>
                         @else 
-                            <span class="badge bg-warning text-dark">Belum</span> 
+                            <span class="badge bg-light text-muted border d-inline-flex align-items-center gap-1">
+                                <i class="bi bi-check2-all text-secondary"></i> Menunggu
+                            </span> 
                         @endif
                     </td>
                     <td class="font-mono small">{{ $k->created_at->format('d M Y, H:i') }}</td>
                     <td class="text-center">
+                        <a href="{{ route('admin.kontak.chat', $k->identifier) }}" class="btn btn-sm btn-outline-primary mb-1 me-1" title="Buka Ruang Chat">
+                            <i class="bi bi-chat-dots-fill"></i> Chat
+                        </a>
                         <button type="button" class="btn btn-sm btn-primary-custom mb-1" 
                                 onclick='openReplyModal(@json($k))' 
                                 title="Balas / Edit Balasan">
@@ -105,8 +115,14 @@
                     </div>
 
                     <div class="mb-2">
-                        <label class="form-label small fw-bold text-dark">Tulis Tanggapan / Jawaban Administrator:</label>
-                        <textarea name="balasan" id="modalBalasTextarea" class="form-control" rows="4" required placeholder="Tuliskan solusi atau jawaban resmi..."></textarea>
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <label class="form-label small fw-bold text-dark mb-0">Tulis Tanggapan / Jawaban Administrator:</label>
+                            <span id="modalBalasCounter" class="badge bg-light text-muted border small">0 / 100</span>
+                        </div>
+                        <textarea name="balasan" id="modalBalasTextarea" class="form-control" rows="3" maxlength="100" required placeholder="Tuliskan solusi atau jawaban resmi... (maks. 100 karakter)"></textarea>
+                        <div id="modalBalasWarn" class="text-danger small mt-1 fw-bold" style="display: none;">
+                            <i class="bi bi-exclamation-circle-fill me-1"></i> Anda telah mencapai batas maksimal 100 karakter!
+                        </div>
                     </div>
                 </div>
                 
@@ -139,6 +155,18 @@
 <script>
 let activeKontakId = null;
 
+const modalBalasTextarea = document.getElementById('modalBalasTextarea');
+const modalBalasCounter = document.getElementById('modalBalasCounter');
+const modalBalasWarn = document.getElementById('modalBalasWarn');
+
+if (modalBalasTextarea) {
+    modalBalasTextarea.addEventListener('input', function() {
+        const len = this.value.length;
+        if (modalBalasCounter) modalBalasCounter.textContent = `${len} / 100`;
+        if (modalBalasWarn) modalBalasWarn.style.display = len >= 100 ? 'block' : 'none';
+    });
+}
+
 function openReplyModal(k) {
     activeKontakId = k.id;
     const form = document.getElementById('formBalasKontak');
@@ -147,7 +175,11 @@ function openReplyModal(k) {
     document.getElementById('modalBalasTitle').innerText = (k.balasan ? 'Edit' : 'Kirim') + ' Balasan';
     document.getElementById('modalBalasPengirim').innerText = k.pengirim + (k.is_siswa ? ' (Siswa NIS: ' + k.identifier + ')' : ' (Pengguna/Tamu)');
     document.getElementById('modalBalasPesanAsli').innerText = '"' + k.pesan + '"';
-    document.getElementById('modalBalasTextarea').value = k.balasan || '';
+    
+    const val = k.balasan || '';
+    modalBalasTextarea.value = val;
+    if (modalBalasCounter) modalBalasCounter.textContent = `${val.length} / 100`;
+    if (modalBalasWarn) modalBalasWarn.style.display = val.length >= 100 ? 'block' : 'none';
 
     const btnHapus = document.getElementById('btnHapusBalasan');
     if (k.balasan) {
@@ -167,6 +199,5 @@ function submitHapusBalasan() {
         delForm.submit();
     }
 }
-
 </script>
 @endpush

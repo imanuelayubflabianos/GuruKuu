@@ -70,6 +70,13 @@
             <button class="btn btn-light border p-1.5 rounded-circle shadow-sm" type="button" onclick="GuruKuuTheme.toggleTheme()" title="Ganti Mode Gelap / Terang">
                 <i class="bi bi-moon-stars-fill gk-theme-icon" style="font-size: 1rem;"></i>
             </button>
+            {{-- CHAT DROPDOWN MOBILE --}}
+            <a href="{{ route('admin.kontak.index') }}" class="btn btn-light border position-relative p-1.5 rounded-circle shadow-sm" title="Pesan Masuk">
+                <i class="bi bi-chat-dots-fill {{ ($unreadChatCount ?? 0) > 0 ? 'text-primary' : 'text-secondary' }}" style="font-size: 1rem;"></i>
+                @if(($unreadChatCount ?? 0) > 0)
+                    <span class="position-absolute top-0 start-100 translate-middle p-1 bg-primary border border-light rounded-circle"></span>
+                @endif
+            </a>
             {{-- NOTIF DROPDOWN MOBILE --}}
             <a href="{{ route('admin.pelanggaran.index') }}" class="btn btn-light border position-relative p-1.5 rounded-circle shadow-sm" title="Notifikasi Pelanggaran">
                 <i class="bi bi-bell-fill {{ ($unreadPelanggaranCount ?? 0) > 0 ? 'text-danger' : 'text-secondary' }}" style="font-size: 1rem;"></i>
@@ -132,11 +139,12 @@
                 </div>
             </div>
 
+            @php $totalReportNotif = ($unreadPelanggaranCount ?? 0) + ($unreadChatCount ?? 0); @endphp
             <div class="sidebar-link d-flex align-items-center justify-content-between" data-bs-toggle="collapse" data-bs-target="#menuLaporan">
                 <div><i class="bi bi-file-earmark-bar-graph"></i> Laporan & Feedback</div>
                 <div class="d-flex align-items-center gap-1">
-                    @if(($unreadPelanggaranCount ?? 0) > 0)
-                        <span class="badge bg-danger rounded-pill px-1.5 py-0.5" style="font-size: 0.65rem;">{{ $unreadPelanggaranCount }}</span>
+                    @if($totalReportNotif > 0)
+                        <span class="badge bg-danger rounded-pill px-1.5 py-0.5" style="font-size: 0.65rem;">{{ $totalReportNotif }}</span>
                     @endif
                     <i class="bi bi-chevron-down" style="font-size:0.8rem;"></i>
                 </div>
@@ -145,7 +153,12 @@
                 <div class="sidebar-submenu">
                     <a href="{{ route('admin.leaderboard.index') }}" class="sidebar-link {{ request()->routeIs('admin.leaderboard.*') ? 'active' : '' }}">Leaderboard</a>
                     <a href="{{ route('admin.kritik-saran.index') }}" class="sidebar-link {{ request()->routeIs('admin.kritik-saran.*') ? 'active' : '' }}">Kritik & Saran</a>
-                    <a href="{{ route('admin.kontak.index') }}" class="sidebar-link {{ request()->routeIs('admin.kontak.*') ? 'active' : '' }}">Pesan Masuk</a>
+                    <a href="{{ route('admin.kontak.index') }}" class="sidebar-link d-flex align-items-center justify-content-between {{ request()->routeIs('admin.kontak.*') ? 'active' : '' }}">
+                        <span>Pesan Masuk</span>
+                        @if(($unreadChatCount ?? 0) > 0)
+                            <span class="badge bg-primary rounded-pill px-2" style="font-size: 0.65rem;">{{ $unreadChatCount }} baru</span>
+                        @endif
+                    </a>
                     <a href="{{ route('admin.pelanggaran.index') }}" class="sidebar-link d-flex align-items-center justify-content-between {{ request()->routeIs('admin.pelanggaran.*') ? 'active' : '' }}">
                         <span>Log Pelanggaran</span>
                         @if(($unreadPelanggaranCount ?? 0) > 0)
@@ -178,6 +191,63 @@
                 <button class="btn btn-light border p-2 rounded-circle shadow-sm" type="button" onclick="GuruKuuTheme.toggleTheme()" title="Ganti Mode Gelap / Terang">
                     <i class="bi bi-moon-stars-fill gk-theme-icon fs-5"></i>
                 </button>
+
+                {{-- CHAT NOTIFIKASI DROPDOWN --}}
+                <div class="dropdown">
+                    <button class="btn btn-light position-relative p-2 rounded-circle border shadow-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="Pesan Masuk / Chat Bantuan">
+                        <i class="bi bi-chat-dots-fill {{ ($unreadChatCount ?? 0) > 0 ? 'text-primary' : 'text-secondary' }} fs-5"></i>
+                        @if(($unreadChatCount ?? 0) > 0)
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary border border-light" style="font-size: 0.65rem;">
+                                {{ $unreadChatCount }}
+                                <span class="visually-hidden">pesan belum dibalas</span>
+                            </span>
+                        @endif
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 p-0" style="width: 360px; max-width: 92vw;">
+                        <li class="p-3 bg-light border-bottom d-flex align-items-center justify-content-between">
+                            <span class="fw-bold text-dark small"><i class="bi bi-chat-left-dots-fill text-primary me-1"></i> Pesan Chat Masuk</span>
+                            @if(($unreadChatCount ?? 0) > 0)
+                                <span class="badge bg-primary rounded-pill">{{ $unreadChatCount }} Baru</span>
+                            @endif
+                        </li>
+                        <div style="max-height: 320px; overflow-y: auto;">
+                            @forelse(($recentChats ?? collect()) as $c)
+                                <li>
+                                    <a class="dropdown-item p-3 border-bottom text-wrap" href="{{ route('admin.kontak.chat', $c->identifier) }}">
+                                        <div class="d-flex align-items-start gap-2.5">
+                                            <span class="badge bg-primary-subtle text-primary rounded-circle p-1.5 mt-0.5 flex-shrink-0">
+                                                <i class="bi bi-chat-quote-fill"></i>
+                                            </span>
+                                            <div class="flex-grow-1">
+                                                <div class="d-flex justify-content-between align-items-center mb-0.5">
+                                                    <strong class="text-dark small" style="font-size: 0.85rem;">{{ $c->pengirim }}</strong>
+                                                    <span class="badge bg-light text-muted border font-mono" style="font-size: 0.65rem;">{{ $c->is_siswa ? 'Siswa' : 'Pengguna/Guru' }}</span>
+                                                </div>
+                                                <p class="text-muted mb-1 small text-truncate" style="max-width: 250px; font-size: 0.78rem;">
+                                                    "{{ Str::limit($c->pesan, 55) }}"
+                                                </p>
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <span class="text-muted font-mono" style="font-size: 0.68rem;">{{ $c->created_at->diffForHumans() }}</span>
+                                                    <span class="text-primary small fw-semibold" style="font-size: 0.72rem;">Buka Chat &rarr;</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </li>
+                            @empty
+                                <li class="p-4 text-center text-muted small">
+                                    <i class="bi bi-chat-check text-success fs-4 d-block mb-1"></i>
+                                    Tidak ada pesan chat masuk baru
+                                </li>
+                            @endforelse
+                        </div>
+                        <li class="p-2 text-center bg-light border-top">
+                            <a href="{{ route('admin.kontak.index') }}" class="btn btn-outline-custom btn-sm w-100 py-1.5 rounded-pill fw-semibold" style="font-size: 0.8rem;">
+                                Lihat Semua Pesan Masuk
+                            </a>
+                        </li>
+                    </ul>
+                </div>
 
                 {{-- NOTIFIKASI BELL DROPDOWN --}}
                 <div class="dropdown">
@@ -271,8 +341,8 @@
                 {{-- USER BADGE DROPDOWN --}}
                 <div class="dropdown border-start ps-3">
                     <button class="btn btn-light d-flex align-items-center gap-2 p-1.5 px-2.5 rounded-pill border shadow-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center fw-bold" style="width: 28px; height: 28px; font-size: 0.8rem;">
-                            {{ strtoupper(substr(auth()->user()->name ?? 'A', 0, 1)) }}
+                        <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center shadow-sm" style="width: 28px; height: 28px;">
+                            <i class="bi bi-headset" style="font-size: 0.95rem;"></i>
                         </div>
                         <span class="d-none d-sm-inline small fw-bold text-dark">{{ auth()->user()->name ?? 'Admin' }}</span>
                         <i class="bi bi-chevron-down text-muted small"></i>

@@ -113,19 +113,27 @@
                     <div class="flex-grow-1">
                         <textarea name="pesan"
                                   rows="2"
-                                  class="form-control form-control-sm border-0 bg-light rounded-3 px-3 py-2"
+                                  class="form-control form-control-sm border-0 bg-light rounded-3 px-3 py-2 thread-reply-input"
                                   style="resize: none; font-size: 0.82rem;"
-                                  placeholder="{{ $replyPlaceholder }}"
-                                  maxlength="1000"
+                                  placeholder="{{ $replyPlaceholder }} (maks. 100 karakter)"
+                                  maxlength="100"
+                                  oninput="updateThreadCounter(this)"
                                   required></textarea>
 
+                        <div class="thread-limit-warn text-danger small fw-bold mt-1" style="display: none; font-size: 0.72rem;">
+                            <i class="bi bi-exclamation-circle-fill me-1"></i> Anda telah mencapai batas maksimal 100 karakter!
+                        </div>
+
                         <div class="d-flex align-items-center justify-content-between mt-1.5 pt-1">
-                            <span class="text-muted font-mono" style="font-size: 0.7rem;">
-                                @if($user->role === 'siswa')
-                                    <i class="bi bi-shield-check text-success me-0.5"></i> Identitas Anda anonim
-                                @else
-                                    <i class="bi bi-pen me-0.5"></i> Balas sebagai {{ $senderBadge }}
-                                @endif
+                            <span class="text-muted font-mono d-flex align-items-center gap-2" style="font-size: 0.7rem;">
+                                <span>
+                                    @if($user->role === 'siswa')
+                                        <i class="bi bi-shield-check text-success me-0.5"></i> Identitas Anda anonim
+                                    @else
+                                        <i class="bi bi-pen me-0.5"></i> Balas sebagai {{ $senderBadge }}
+                                    @endif
+                                </span>
+                                <span class="badge bg-light text-muted border thread-counter py-0.5 px-1.5" style="font-size: 0.68rem;">0 / 100</span>
                             </span>
 
                             <button type="submit" class="btn btn-primary-custom btn-sm px-3 py-1 rounded-pill fw-semibold shadow-xs d-inline-flex align-items-center gap-1" style="font-size: 0.78rem;">
@@ -139,3 +147,19 @@
         </div>
     @endif
 </div>
+
+@once
+@push('scripts')
+<script>
+function updateThreadCounter(el) {
+    const parent = el.closest('.flex-grow-1');
+    if (!parent) return;
+    const counter = parent.querySelector('.thread-counter');
+    const warn = parent.querySelector('.thread-limit-warn');
+    const len = el.value.length;
+    if (counter) counter.textContent = `${len} / 100`;
+    if (warn) warn.style.display = len >= 100 ? 'block' : 'none';
+}
+</script>
+@endpush
+@endonce

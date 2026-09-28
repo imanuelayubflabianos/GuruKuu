@@ -28,7 +28,7 @@ class DashboardController extends Controller
             ->limit(3)
             ->get();
             
-        // Ambil ulasan terbaru dari tabel penilaian (yang memiliki teks kritik atau saran)
+        // Ambil ulasan terbaru dari tabel penilaian (yang memiliki teks kritik atau saran dan tidak disensor)
         $feedbacks = Penilaian::with(['guru', 'siswa', 'kelas'])
             ->where(function ($query) {
                 $query->where(function ($q) {
@@ -36,6 +36,9 @@ class DashboardController extends Controller
                 })->orWhere(function ($q) {
                     $q->whereNotNull('saran')->whereRaw("TRIM(saran) != ''");
                 });
+            })
+            ->where(function ($query) {
+                $query->where('is_censored', false)->orWhereNull('is_censored');
             })
             ->latest()
             ->limit(5)

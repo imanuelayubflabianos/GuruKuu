@@ -236,7 +236,7 @@
                                 @if($isSelf)
                                     <span class="badge bg-success ms-1" style="font-size: 0.65rem;">Anda</span>
                                 @endif
-                                <div class="text-muted small font-mono">{{ $g->nip }}</div>
+                                <div class="text-muted small">{{ $g->kategori_label }}</div>
                             </div>
                         </div>
                     </td>

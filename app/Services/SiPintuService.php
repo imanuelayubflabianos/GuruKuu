@@ -580,10 +580,14 @@ class SiPintuService
     public function syncTeacherToLocal(array $teacherData, ?int $jurusanId = null): array
     {
         try {
-            $nip = $teacherData['nip'] ?? $teacherData['nik'] ?? null;
-            $nama = $teacherData['nama'] ?? $teacherData['name'] ?? $teacherData['nama_guru'] ?? null;
+            $rawNip = $teacherData['nip'] ?? $teacherData['nik'] ?? null;
+            $nip = ($rawNip !== null && $rawNip !== '') ? (string) $rawNip : '';
+            $nama = trim((string) ($teacherData['nama'] ?? $teacherData['name'] ?? $teacherData['nama_guru'] ?? ''));
 
-            if (!$nip || !$nama) return ['success' => false, 'message' => 'Data guru tidak lengkap (NIP/Nama kosong).'];
+            if ($nip === '' || $nama === '') return ['success' => false, 'message' => 'Data guru tidak lengkap (NIP/Nama kosong).'];
+
+            $email = $teacherData['user']['email'] ?? $teacherData['email'] ?? null;
+            $phone = $teacherData['hp'] ?? $teacherData['phone'] ?? $teacherData['telepon'] ?? $teacherData['no_hp'] ?? null;
 
             $bio = $teacherData['bio'] ?? null;
             if (empty($bio)) {
@@ -610,18 +614,27 @@ class SiPintuService
                 'bio' => $bio,
             ]);
 
-            // Sync or create User account for Guru so teacher can log in
-            $guruUserEmail = $email ?: ($nip . '@gurukuu.local');
-            User::updateOrCreate(
-                ['nis' => (string) $nip],
-                [
+            // Sinkronkan atau buat akun User login untuk Guru
+            $guruUserEmail = $email ?: (($nip !== '0' && $nip !== '') ? ($nip . '@gurukuu.local') : ('guru.' . ($teacherData['id'] ?? uniqid()) . '@gurukuu.local'));
+            $user = User::where('nis', (string) $nip)->orWhere('email', $guruUserEmail)->first();
+            if ($user) {
+                $user->update([
                     'name' => $nama,
+                    'nis' => (string) $nip,
+                    'email' => $guruUserEmail,
+                    'role' => 'guru',
+                    'is_active' => true,
+                ]);
+            } else {
+                User::create([
+                    'name' => $nama,
+                    'nis' => (string) $nip,
                     'email' => $guruUserEmail,
                     'role' => 'guru',
                     'password' => Hash::make((string) $nip),
                     'is_active' => true,
-                ]
-            );
+                ]);
+            }
 
             return ['success' => true, 'guru' => $guru, 'message' => "Guru {$guru->nama} berhasil disinkronkan."];
         } catch (\Exception $e) {

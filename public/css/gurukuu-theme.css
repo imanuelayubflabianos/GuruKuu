@@ -971,3 +971,55 @@ body:not(.role-admin) .stat-card-modern:hover {
     border-color: #0284c7 !important;
     color: #ffffff !important;
 }
+
+/* ===================================================
+   11. LIGHTWEIGHT ANIMATIONS FOR PUBLIC LEADERBOARD & HERO
+   =================================================== */
+@keyframes gk-podium-gentle-float {
+    0%, 100% {
+        transform: translateY(-8px);
+    }
+    50% {
+        transform: translateY(-13px);
+    }
+}
+
+@keyframes gk-gold-glow-pulse {
+    0%, 100% {
+        box-shadow: 0 12px 30px rgba(245, 158, 11, 0.22);
+    }
+    50% {
+        box-shadow: 0 16px 38px rgba(245, 158, 11, 0.36);
+    }
+}
+
+.gk-public-podium-gold {
+    animation: gk-podium-gentle-float 4.5s ease-in-out infinite, gk-gold-glow-pulse 3s ease-in-out infinite;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.gk-public-podium {
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
+}
+
+.gk-public-podium:hover {
+    transform: translateY(-5px) !important;
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08) !important;
+}
+
+#heroSlider .carousel-indicators [data-bs-target] {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin: 0 5px;
+    background-color: rgba(255, 255, 255, 0.5);
+    border: none;
+    transition: all 0.3s ease;
+}
+
+#heroSlider .carousel-indicators .active {
+    width: 28px;
+    border-radius: 10px;
+    background-color: #f59e0b;
+}
+

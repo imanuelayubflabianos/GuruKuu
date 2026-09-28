@@ -80,11 +80,19 @@ class AppServiceProvider extends ServiceProvider
                     ->latest()
                     ->take(5)
                     ->get();
-                $view->with(compact('unreadPelanggaranCount', 'recentPelanggarans'));
+                $unreadChatCount = \App\Models\Kontak::where('is_read', false)->where('is_replied', false)->count();
+                $recentChats = \App\Models\Kontak::where('is_read', false)
+                    ->where('is_replied', false)
+                    ->latest()
+                    ->take(5)
+                    ->get();
+                $view->with(compact('unreadPelanggaranCount', 'recentPelanggarans', 'unreadChatCount', 'recentChats'));
             } catch (\Throwable $e) {
                 $view->with([
                     'unreadPelanggaranCount' => 0,
                     'recentPelanggarans' => collect(),
+                    'unreadChatCount' => 0,
+                    'recentChats' => collect(),
                 ]);
             }
         });

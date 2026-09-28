@@ -42,30 +42,22 @@ class PengaturanController extends Controller
         }
 
         $request->validate([
-            'nama'  => 'required|string|max:255',
-            'email' => 'nullable|email|max:255|unique:guru,email,' . $guru->id,
-            'phone' => 'nullable|string|max:50',
-            'bio'   => 'nullable|string|max:1000',
+            'bio'   => 'nullable|string|max:100',
             'photo' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+        ], [
+            'bio.max' => 'Deskripsi diri maksimal 100 karakter.',
         ]);
 
-        $defaultBio = 'Guru pengajar di SMK Negeri 1 Bangsri yang berdedikasi membimbing dan mendidik generasi muda berprestasi.';
-        $bio = trim($request->bio);
+        $defaultBio = 'Guru pengajar di SMK Negeri 1 Bangsri yang berdedikasi membimbing generasi muda.';
+        $bio = trim((string) $request->bio);
         if (empty($bio)) {
             $bio = $guru->bio ?: $defaultBio;
         }
 
         $guruData = [
-            'nama'  => trim($request->nama),
-            'email' => $request->filled('email') ? trim($request->email) : null,
-            'phone' => $request->filled('phone') ? trim($request->phone) : null,
-            'bio'   => $bio,
+            'bio' => $bio,
         ];
-
-        $userData = [
-            'name'  => trim($request->nama),
-            'email' => $request->filled('email') ? trim($request->email) : $user->email,
-        ];
+        $userData = [];
 
         if ($request->hasFile('photo')) {
             if ($guru->photo && Storage::disk('public')->exists($guru->photo)) {
@@ -77,18 +69,21 @@ class PengaturanController extends Controller
         }
 
         $guru->update($guruData);
-        $user->update($userData);
+        if (!empty($userData)) {
+            $user->update($userData);
+        }
 
-        return back()->with('success', 'Profil dan informasi guru berhasil diperbarui!');
+        return back()->with('success', 'Foto profil dan deskripsi diri berhasil diperbarui!');
     }
 
     public function kirimPesanAdmin(Request $request)
     {
         $request->validate([
-            'pesan'   => 'required|string|min:3|max:1000',
+            'pesan'   => 'required|string|min:3|max:100',
             'captcha' => 'required|numeric',
         ], [
             'pesan.required'   => 'Pesan tidak boleh kosong.',
+            'pesan.max'        => 'Pesan Anda melebihi batas maksimal 100 karakter.',
             'captcha.required' => 'Verifikasi wajib diisi.',
             'captcha.numeric'  => 'Jawaban verifikasi harus berupa angka.',
         ]);
@@ -97,13 +92,23 @@ class PengaturanController extends Controller
             return redirect()->to(route('guru.pengaturan') . '#tabChat')->withInput()->withErrors(['captcha' => 'Jawaban verifikasi tidak cocok. Silakan coba lagi.']);
         }
 
+        $pesanTeks = trim($request->pesan);
+        if (\App\Services\ProfanityFilterService::containsLink($pesanTeks)) {
+            return redirect()->to(route('guru.pengaturan') . '#tabChat')->withInput()->withErrors(['pesan' => 'Demi keamanan, pesan tidak boleh mengandung tautan / link URL luar.']);
+        }
+
+        $profanity = \App\Services\ProfanityFilterService::check($pesanTeks);
+        if (!$profanity['clean']) {
+            return redirect()->to(route('guru.pengaturan') . '#tabChat')->withInput()->withErrors(['pesan' => $profanity['message']]);
+        }
+
         $user = Auth::user();
         $guru = Guru::where('nip', $user->nis)->orWhere('email', $user->email)->first();
 
         Kontak::create([
             'pengirim'   => $guru?->nama ?? $user->name,
             'identifier' => $guru?->nip ?? $user->nis,
-            'pesan'      => trim($request->pesan),
+            'pesan'      => $pesanTeks,
             'is_siswa'   => false,
         ]);
 
@@ -120,8 +125,21 @@ class PengaturanController extends Controller
             return back()->with('error', 'Akses ditolak.');
         }
 
-        $request->validate(['pesan' => 'required|string|min:3|max:1000']);
-        $kontak->update(['pesan' => trim($request->pesan)]);
+        $request->validate(['pesan' => 'required|string|min:3|max:100'], [
+            'pesan.max' => 'Pesan Anda melebihi batas maksimal 100 karakter.'
+        ]);
+
+        $pesanTeks = trim($request->pesan);
+        if (\App\Services\ProfanityFilterService::containsLink($pesanTeks)) {
+            return redirect()->to(route('guru.pengaturan') . '#tabChat')->withInput()->withErrors(['pesan' => 'Demi keamanan, pesan tidak boleh mengandung tautan / link URL luar.']);
+        }
+
+        $profanity = \App\Services\ProfanityFilterService::check($pesanTeks);
+        if (!$profanity['clean']) {
+            return redirect()->to(route('guru.pengaturan') . '#tabChat')->withInput()->withErrors(['pesan' => $profanity['message']]);
+        }
+
+        $kontak->update(['pesan' => $pesanTeks]);
 
         return redirect()->to(route('guru.pengaturan') . '#tabChat')->with('success', 'Pesan Anda berhasil diperbarui!');
     }

@@ -26,9 +26,17 @@
                 </li>
             </ul>
         </div>
-        <a href="{{ route('admin.sipintu.guru') }}" class="btn btn-outline-primary">
-            <i class="bi bi-cloud-arrow-down me-1"></i> Tarik dari SiPintu
-        </a>
+        <div class="btn-group shadow-sm">
+            <form action="{{ route('admin.sipintu.guru.sync-all') }}" method="POST" id="formSyncGuru" class="d-inline" onsubmit="return confirmSyncGuru(event)">
+                @csrf
+                <button type="submit" class="btn btn-primary-custom" id="btnSyncGuru" title="Tarik dan sinkronkan seluruh data guru dari SiPintu ke GuruKuu" style="border-top-right-radius: 0; border-bottom-right-radius: 0;">
+                    <i class="bi bi-cloud-arrow-down me-1"></i> Tarik dari SiPintu
+                </button>
+            </form>
+            <a href="{{ route('admin.sipintu.guru') }}" class="btn btn-outline-primary" title="Buka Halaman Data Guru SiPintu Gateway" style="border-top-left-radius: 0; border-bottom-left-radius: 0; border-left: 0;">
+                <i class="bi bi-box-arrow-up-right"></i>
+            </a>
+        </div>
     </div>
 </div>
 
@@ -260,6 +268,17 @@ function openDeactivateGuruModal(id, name) {
     document.getElementById('formDeactivateGuru').action = '/admin/guru/' + id + '/toggle';
     document.getElementById('deactivateGuruName').innerText = name;
     new bootstrap.Modal(document.getElementById('modalDeactivateGuru')).show();
+}
+
+function confirmSyncGuru(e) {
+    if (!confirm('Tarik dan sinkronkan seluruh data guru dari SiPintu Gateway ke database lokal GuruKuu sekarang?')) {
+        e.preventDefault();
+        return false;
+    }
+    const btn = document.getElementById('btnSyncGuru');
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> Menarik Data...';
+    btn.classList.add('disabled');
+    return true;
 }
 
 function toggleGuruDeactDuration() {

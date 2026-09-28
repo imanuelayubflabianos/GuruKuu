@@ -44,11 +44,22 @@ class PenilaianController extends Controller
             'tanggung_jawab' => 'required|integer|min:1|max:5',
             'kreativitas' => 'required|integer|min:1|max:5',
             'keramahan' => 'required|integer|min:1|max:5',
-            'kritik' => 'nullable|string|max:500',
-            'saran' => 'nullable|string|max:500',
+            'kritik' => 'nullable|string|max:100',
+            'saran' => 'nullable|string|max:100',
+        ], [
+            'kritik.max' => 'Kritik dan masukan Anda melebihi batas maksimal 100 karakter.',
+            'saran.max' => 'Saran dan harapan Anda melebihi batas maksimal 100 karakter.',
         ]);
 
         $user = auth()->user();
+
+        // 🛡️ KEAMANAN: Cegah pengiriman link/URL sembarangan
+        if (\App\Services\ProfanityFilterService::containsLink($request->kritik) || \App\Services\ProfanityFilterService::containsLink($request->saran)) {
+            return redirect()
+                ->route('siswa.penilaian.create', $guru)
+                ->withInput()
+                ->with('error', 'Kritik dan saran tidak boleh mengandung tautan / link URL luar demi keamanan sistem.');
+        }
 
         // 🛡️ FILTER OTOMATIS KATA KASAR, EJEKAN, & TOXIC (Bilingual: ID & EN)
         $combinedText = trim(($request->kritik ?? '') . ' ' . ($request->saran ?? ''));

@@ -33,7 +33,6 @@
                 @csrf
                 <button type="submit" class="btn btn-outline-light btn-sm px-3"><i class="bi bi-arrow-clockwise me-1"></i>Bersihkan Cache</button>
             </form>
-            <a href="{{ route('admin.pengaturan.index') }}" class="btn btn-light btn-sm px-3"><i class="bi bi-gear me-1"></i>Pengaturan</a>
             <a href="{{ route('admin.sipintu.index') }}" class="btn btn-outline-light btn-sm px-3"><i class="bi bi-cloud-arrow-down me-1"></i>SiPintu</a>
         </div>
     </div>
@@ -45,12 +44,12 @@
         </div>
     @endif
 
-    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3 w-100">
         <div>
-            <div class="page-label">RINGKASAN</div>
-            <h2 class="h5 mb-0">Data sistem</h2>
+            <div class="page-label text-primary fw-bold" style="font-size: 0.75rem; letter-spacing: 1px;">RINGKASAN</div>
+            <h2 class="h5 mb-0 fw-bold text-dark">Data Sistem</h2>
         </div>
-        <span class="badge {{ $periodeAktif ? 'bg-success' : 'bg-secondary' }} px-3 py-2">
+        <span class="badge {{ $periodeAktif ? 'bg-success' : 'bg-secondary' }} px-3 py-2 rounded-pill">
             <i class="bi bi-calendar-check me-1"></i>{{ $periodeAktif?->nama_periode ?? 'Belum ada periode aktif' }}
         </span>
     </div>
@@ -127,44 +126,13 @@
             <section class="dashboard-panel d-flex align-items-center justify-content-between flex-wrap gap-3">
                 <div>
                     <h2 class="dashboard-panel__title"><i class="bi bi-hdd-network text-primary me-2"></i>SiPintu Gateway</h2>
-                    <div id="gatewayStatus" class="small text-muted mt-1">Status belum diperiksa.</div>
+                    <div class="small text-muted mt-1">Sinkronisasi data guru dan siswa dari server SiPintu sekolah.</div>
                 </div>
-                <div class="d-flex gap-2">
-                    <button type="button" class="btn btn-outline-custom btn-sm" id="checkGatewayButton" data-url="{{ route('admin.sipintu.check-connection') }}"><i class="bi bi-arrow-clockwise me-1"></i>Cek koneksi</button>
-                    <a href="{{ route('admin.sipintu.index') }}" class="btn btn-primary-custom btn-sm">Buka Gateway</a>
+                <div>
+                    <a href="{{ route('admin.sipintu.index') }}" class="btn btn-primary-custom btn-sm px-3">Buka Gateway</a>
                 </div>
             </section>
         </div>
     </div>
 </div>
 @endsection
-
-@push('scripts')
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-    const button = document.getElementById('checkGatewayButton');
-    const status = document.getElementById('gatewayStatus');
-    if (!button || !status) return;
-
-    button.addEventListener('click', async function () {
-        button.disabled = true;
-        status.textContent = 'Memeriksa koneksi...';
-
-        try {
-            const response = await fetch(button.dataset.url, { credentials: 'same-origin', headers: { Accept: 'application/json' } });
-            const result = await response.json();
-            const ping = result.ping || {};
-            status.textContent = ping.success
-                ? `Terhubung · ${ping.latency_ms || 0} ms`
-                : (ping.message || 'Gateway tidak dapat dihubungi.');
-            status.className = `small mt-1 ${ping.success ? 'text-success' : 'text-danger'}`;
-        } catch (_) {
-            status.textContent = 'Gateway tidak dapat dihubungi.';
-            status.className = 'small mt-1 text-danger';
-        } finally {
-            button.disabled = false;
-        }
-    });
-});
-</script>
-@endpush

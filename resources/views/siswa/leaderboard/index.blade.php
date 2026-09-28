@@ -230,7 +230,7 @@
                             <img src="{{ $g->photo_url }}" class="rounded-circle me-3" width="44" height="44" style="object-fit: cover;">
                             <div>
                                 <strong>{{ $g->nama }}</strong>
-                                <div class="text-muted small font-mono">{{ $g->nip }}</div>
+                                <div class="text-muted small">{{ $g->kategori_label }}</div>
                             </div>
                         </div>
                     </td>

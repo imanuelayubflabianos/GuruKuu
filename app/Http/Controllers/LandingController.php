@@ -42,6 +42,12 @@ class LandingController extends Controller
         $kelasList = \App\Models\Kelas::with('jurusan')->orderBy('tingkat')->orderBy('nama_kelas')->get();
         $mode = $request->input('mode', 'rating');
         $kelasId = $request->integer('kelas_id') ?: null;
+        if ($mode === 'partisipasi' && !$kelasId && $kelasList->isNotEmpty()) {
+            $kelasId = $kelasList->first()->id;
+        }
+        if ($mode === 'rating') {
+            $kelasId = null;
+        }
         $leaderboard = Guru::leaderboardFor($mode, $kelasId, $periodeAktif?->id);
 
         return view('landing.leaderboard', compact(
@@ -95,6 +101,9 @@ class LandingController extends Controller
             ->where(function($q) {
                 $q->whereNotNull('kritik')->where('kritik', '!=', '')
                   ->orWhereNotNull('saran')->where('saran', '!=', '');
+            })
+            ->where(function ($query) {
+                $query->where('is_censored', false)->orWhereNull('is_censored');
             })
             ->latest()
             ->get();

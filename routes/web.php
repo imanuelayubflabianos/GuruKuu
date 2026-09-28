@@ -112,13 +112,22 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/pengaturan', [PengaturanController::class, 'index'])->name('pengaturan.index');
     Route::post('/pengaturan/landing', [PengaturanController::class, 'updateLanding'])->name('pengaturan.landing');
     Route::post('/pelanggaran/kata-toxic', [PengaturanController::class, 'updateProfanityWords'])->name('pelanggaran.words.update');
+    Route::post('/pelanggaran/kata-toxic/delete', [PengaturanController::class, 'deleteProfanityWord'])->name('pelanggaran.words.delete');
     Route::post('/pengaturan/landing/reset', [PengaturanController::class, 'resetLandingHero'])->name('pengaturan.landing.reset');
     Route::post('/pengaturan/reset', [PengaturanController::class, 'reset'])->name('pengaturan.reset');
     Route::post('/pengaturan/ganti-password', [PengaturanController::class, 'gantiPassword'])->name('pengaturan.password');
     Route::post('/pengaturan/periode', [PengaturanController::class, 'simpanPeriode'])->name('pengaturan.periode');
     Route::post('/pengaturan/periode/{periode}/aktifkan', [PengaturanController::class, 'aktifkanPeriode'])->name('pengaturan.periode.aktifkan');
     
+    // PENGATURAN FAQ
+    Route::post('/pengaturan/faq', [PengaturanController::class, 'storeFaq'])->name('pengaturan.faq.store');
+    Route::put('/pengaturan/faq/{id}', [PengaturanController::class, 'updateFaq'])->name('pengaturan.faq.update');
+    Route::delete('/pengaturan/faq/{id}', [PengaturanController::class, 'destroyFaq'])->name('pengaturan.faq.destroy');
+    Route::post('/pengaturan/faq/reset', [PengaturanController::class, 'resetFaq'])->name('pengaturan.faq.reset');
+    
     Route::get('/kontak', [AdminKontakController::class, 'index'])->name('kontak.index');
+    Route::get('/kontak/chat/{identifier}', [AdminKontakController::class, 'chat'])->name('kontak.chat');
+    Route::post('/kontak/chat/{identifier}', [AdminKontakController::class, 'sendChatMessage'])->name('kontak.chat.send');
     Route::post('/kontak/{kontak}/reply', [AdminKontakController::class, 'reply'])->name('kontak.reply');
     Route::put('/kontak/{kontak}/reply', [AdminKontakController::class, 'editReply'])->name('kontak.edit-reply');
     Route::delete('/kontak/{kontak}', [AdminKontakController::class, 'destroy'])->name('kontak.destroy');

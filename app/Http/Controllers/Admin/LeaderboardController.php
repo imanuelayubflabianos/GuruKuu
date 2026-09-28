@@ -18,6 +18,12 @@ class LeaderboardController extends Controller
         $kelasList = Kelas::with('jurusan')->orderBy('tingkat')->orderBy('nama_kelas')->get();
         $mode = $request->input('mode', 'rating');
         $kelasId = $request->integer('kelas_id') ?: null;
+        if ($mode === 'partisipasi' && !$kelasId && $kelasList->isNotEmpty()) {
+            $kelasId = $kelasList->first()->id;
+        }
+        if ($mode === 'rating') {
+            $kelasId = null;
+        }
         $leaderboard = Guru::leaderboardFor($mode, $kelasId, $periodeAktif?->id);
 
         return view('admin.leaderboard.index', compact(

@@ -128,6 +128,9 @@ class SiswaController extends Controller
 
     public function destroy(User $siswa)
     {
+        if ($siswa->photo && \Illuminate\Support\Facades\Storage::disk('public')->exists($siswa->photo)) {
+            \Illuminate\Support\Facades\Storage::disk('public')->delete($siswa->photo);
+        }
         $siswa->delete();
         return redirect()->route('admin.siswa.index')->with('success', 'Siswa berhasil dihapus!');
     }

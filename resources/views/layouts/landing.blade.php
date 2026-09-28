@@ -97,8 +97,8 @@
             margin-bottom: 1.5rem;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
         }
-        .hero-title { font-size: 3.2rem; font-weight: 900; line-height: 1.15; margin-bottom: 1.25rem; letter-spacing: -0.5px; }
-        .hero-subtitle { font-size: 1.15rem; opacity: 0.92; margin-bottom: 2.25rem; max-width: 640px; line-height: 1.7; }
+        .hero-title { font-size: 3.2rem; font-weight: 900; line-height: 1.15; margin-bottom: 1.25rem; letter-spacing: -0.5px; color: #ffffff !important; }
+        .hero-subtitle { font-size: 1.15rem; opacity: 0.95; margin-bottom: 2.25rem; max-width: 640px; line-height: 1.7; color: rgba(255, 255, 255, 0.92) !important; }
         .btn-cta {
             background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
             color: #0f172a !important;
@@ -233,6 +233,7 @@
                     <a class="nav-link nav-link-custom" data-nav-target="guru" href="{{ route('landing.index') }}#guru">Guru</a>
                     <a class="nav-link nav-link-custom" data-nav-target="panduan" href="{{ route('landing.index') }}#panduan">Panduan</a>
                     <a class="nav-link nav-link-custom" data-nav-target="tentang" href="{{ route('landing.index') }}#tentang">Tentang</a>
+                    <a class="nav-link nav-link-custom" data-nav-target="faq" href="{{ route('landing.index') }}#faq">FAQ</a>
                 </div>
                 <div class="nav-actions">
                     @auth
@@ -431,7 +432,9 @@
             });
         });
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="{{ asset('js/gurukuu-modal.js') }}"></script>
+    @stack('scripts')
 </body>
 </html>

@@ -160,17 +160,17 @@
                     <div class="mb-2">
                         <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 mb-1.5" style="font-size: 0.7rem;">Saran & Pujian:</span>
                         <div class="d-flex flex-wrap gap-1.5">
-                            <button type="button" class="btn btn-sm btn-outline-secondary quick-chip py-1 px-2.5 rounded-pill" data-target="saran" data-text="Penyampaian materi sangat terstruktur, jelas, dan mudah dipahami." style="font-size: 0.75rem;">
-                                ✨ Penjelasan Sangat Jelas
+                            <button type="button" class="btn btn-sm btn-outline-secondary quick-chip py-1 px-2.5 rounded-pill" data-target="saran" data-text="Penyampaian materi terstruktur, jelas, dan mudah dipahami." style="font-size: 0.75rem;">
+                                ✨ Penjelasan Jelas
                             </button>
-                            <button type="button" class="btn btn-sm btn-outline-secondary quick-chip py-1 px-2.5 rounded-pill" data-target="saran" data-text="Bapak/Ibu guru sangat sabar, ramah, dan memotivasi siswa saat belajar." style="font-size: 0.75rem;">
+                            <button type="button" class="btn btn-sm btn-outline-secondary quick-chip py-1 px-2.5 rounded-pill" data-target="saran" data-text="Guru sangat sabar, ramah, dan memotivasi siswa saat belajar." style="font-size: 0.75rem;">
                                 😊 Ramah & Memotivasi
                             </button>
-                            <button type="button" class="btn btn-sm btn-outline-secondary quick-chip py-1 px-2.5 rounded-pill" data-target="saran" data-text="Suasana belajar di kelas interaktif, menyenangkan, dan komunikatif." style="font-size: 0.75rem;">
-                                🎯 Kelas Interaktif & Seru
+                            <button type="button" class="btn btn-sm btn-outline-secondary quick-chip py-1 px-2.5 rounded-pill" data-target="saran" data-text="Suasana belajar di kelas seru, interaktif, dan komunikatif." style="font-size: 0.75rem;">
+                                🎯 Kelas Interaktif
                             </button>
-                            <button type="button" class="btn btn-sm btn-outline-secondary quick-chip py-1 px-2.5 rounded-pill" data-target="saran" data-text="Akan lebih baik dan aplikatif jika ditambah lebih banyak contoh praktik nyata." style="font-size: 0.75rem;">
-                                💡 Perbanyak Contoh Praktik
+                            <button type="button" class="btn btn-sm btn-outline-secondary quick-chip py-1 px-2.5 rounded-pill" data-target="saran" data-text="Mohon perbanyak contoh praktik nyata yang aplikatif." style="font-size: 0.75rem;">
+                                💡 Contoh Praktik
                             </button>
                         </div>
                     </div>
@@ -178,11 +178,11 @@
                     <div>
                         <span class="badge bg-warning bg-opacity-10 text-warning-emphasis border border-warning border-opacity-25 mb-1.5" style="font-size: 0.7rem;">Masukan Santun:</span>
                         <div class="d-flex flex-wrap gap-1.5">
-                            <button type="button" class="btn btn-sm btn-outline-secondary quick-chip py-1 px-2.5 rounded-pill" data-target="kritik" data-text="Mohon izin, alangkah baiknya jika tempo penyampaian materi tertentu dapat sedikit diperlambat agar siswa lebih memahami." style="font-size: 0.75rem;">
+                            <button type="button" class="btn btn-sm btn-outline-secondary quick-chip py-1 px-2.5 rounded-pill" data-target="kritik" data-text="Mohon izin agar tempo penyampaian materi dapat sedikit diperlambat." style="font-size: 0.75rem;">
                                 ⏳ Tempo Sedikit Diperlambat
                             </button>
-                            <button type="button" class="btn btn-sm btn-outline-secondary quick-chip py-1 px-2.5 rounded-pill" data-target="kritik" data-text="Semoga bisa diberikan lebih banyak sesi tanya jawab dan diskusi sebelum pergantian materi." style="font-size: 0.75rem;">
-                                💬 Perbanyak Sesi Tanya Jawab
+                            <button type="button" class="btn btn-sm btn-outline-secondary quick-chip py-1 px-2.5 rounded-pill" data-target="kritik" data-text="Mohon perbanyak sesi diskusi dan tanya jawab sebelum ganti materi." style="font-size: 0.75rem;">
+                                💬 Perbanyak Tanya Jawab
                             </button>
                         </div>
                     </div>
@@ -194,20 +194,26 @@
                             <label class="form-label font-mono small fw-bold text-danger mb-0">
                                 <i class="bi bi-chat-dots me-1"></i>KRITIK / MASUKAN SANTUN
                             </label>
-                            <span class="font-mono text-muted small" id="kritikCounter" style="font-size: 0.72rem;">0 / 500</span>
+                            <span class="font-mono text-muted small" id="kritikCounter" style="font-size: 0.72rem;">0 / 100</span>
                         </div>
-                        <textarea name="kritik" id="kritikInput" class="form-control" rows="3" maxlength="500" placeholder="Sampaikan masukan perbaikan secara sopan, objektif, dan konstruktif..." style="border-radius: 8px;">{{ old('kritik') }}</textarea>
-                        <div class="form-text small text-muted">Maksimal 500 karakter. Gunakan tata krama yang baik.</div>
+                        <textarea name="kritik" id="kritikInput" class="form-control" rows="3" maxlength="100" placeholder="Sampaikan masukan perbaikan secara sopan, objektif, dan konstruktif..." style="border-radius: 8px;">{{ old('kritik') }}</textarea>
+                        <div class="form-text small text-muted">Maksimal 100 karakter. Sampaikan masukan secara santun.</div>
+                        <div class="form-text text-danger fw-bold d-none" id="kritikLimitWarn">
+                            <i class="bi bi-exclamation-triangle-fill me-1"></i>Anda telah mencapai batas maksimal 100 karakter!
+                        </div>
                     </div>
                     <div class="col-md-6">
                         <div class="d-flex justify-content-between align-items-center mb-1">
                             <label class="form-label font-mono small fw-bold text-success mb-0">
                                 <i class="bi bi-lightbulb me-1"></i>SARAN & HARAPAN PERBAIKAN
                             </label>
-                            <span class="font-mono text-muted small" id="saranCounter" style="font-size: 0.72rem;">0 / 500</span>
+                            <span class="font-mono text-muted small" id="saranCounter" style="font-size: 0.72rem;">0 / 100</span>
                         </div>
-                        <textarea name="saran" id="saranInput" class="form-control" rows="3" maxlength="500" placeholder="Sampaikan ide, harapan, atau apresiasi Anda untuk guru tercinta..." style="border-radius: 8px;">{{ old('saran') }}</textarea>
-                        <div class="form-text small text-muted">Maksimal 500 karakter. Saran yang baik membantu guru berinovasi.</div>
+                        <textarea name="saran" id="saranInput" class="form-control" rows="3" maxlength="100" placeholder="Sampaikan ide, harapan, atau apresiasi Anda untuk guru tercinta..." style="border-radius: 8px;">{{ old('saran') }}</textarea>
+                        <div class="form-text small text-muted">Maksimal 100 karakter. Saran yang baik membantu guru berinovasi.</div>
+                        <div class="form-text text-danger fw-bold d-none" id="saranLimitWarn">
+                            <i class="bi bi-exclamation-triangle-fill me-1"></i>Anda telah mencapai batas maksimal 100 karakter!
+                        </div>
                     </div>
                 </div>
             </div>
@@ -366,21 +372,30 @@ document.addEventListener('DOMContentLoaded', function() {
     const kritikCounter = document.getElementById('kritikCounter');
     const saranCounter = document.getElementById('saranCounter');
 
+    const kritikLimitWarn = document.getElementById('kritikLimitWarn');
+    const saranLimitWarn = document.getElementById('saranLimitWarn');
+
     function updateCounters() {
         if (kritikInput && kritikCounter) {
-            kritikCounter.innerText = `${kritikInput.value.length} / 500`;
-            if (kritikInput.value.length >= 480) {
+            const len = kritikInput.value.length;
+            kritikCounter.innerText = `${len} / 100`;
+            if (len >= 100) {
                 kritikCounter.classList.add('text-danger', 'fw-bold');
+                if (kritikLimitWarn) kritikLimitWarn.classList.remove('d-none');
             } else {
                 kritikCounter.classList.remove('text-danger', 'fw-bold');
+                if (kritikLimitWarn) kritikLimitWarn.classList.add('d-none');
             }
         }
         if (saranInput && saranCounter) {
-            saranCounter.innerText = `${saranInput.value.length} / 500`;
-            if (saranInput.value.length >= 480) {
+            const len = saranInput.value.length;
+            saranCounter.innerText = `${len} / 100`;
+            if (len >= 100) {
                 saranCounter.classList.add('text-danger', 'fw-bold');
+                if (saranLimitWarn) saranLimitWarn.classList.remove('d-none');
             } else {
                 saranCounter.classList.remove('text-danger', 'fw-bold');
+                if (saranLimitWarn) saranLimitWarn.classList.add('d-none');
             }
         }
         // Update chip active visual
@@ -416,17 +431,17 @@ document.addEventListener('DOMContentLoaded', function() {
                 curVal = curVal.replace(textToAdd, '').replace(/\s+/g, ' ').trim();
                 target.value = curVal;
             } else {
-                // Check 500 limit
+                // Check 100 limit
                 const newLength = curVal ? (curVal.length + 1 + textToAdd.length) : textToAdd.length;
-                if (newLength > 500) {
+                if (newLength > 100) {
                     if (typeof Swal !== 'undefined') {
                         Swal.fire({
                             title: 'Batas Karakter Tercapai',
-                            text: 'Pesan masukan/saran maksimal 500 karakter.',
-                            icon: 'info'
+                            text: 'Pesan masukan/saran Anda melebihi batas maksimal 100 karakter.',
+                            icon: 'warning'
                         });
                     } else {
-                        alert('Pesan masukan/saran maksimal 500 karakter.');
+                        alert('Pesan masukan/saran Anda melebihi batas maksimal 100 karakter.');
                     }
                     return;
                 }

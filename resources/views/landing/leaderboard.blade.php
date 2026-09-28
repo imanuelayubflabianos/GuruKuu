@@ -39,7 +39,7 @@
                 @php $pct1 = round(($top1->rata_rata_nilai / 5) * 100); @endphp
                 <div class="row justify-content-center mb-4 mb-md-5" data-aos="zoom-in">
                     <div class="col-12 col-sm-10 col-md-8 col-lg-6">
-                        <div class="card-custom gk-podium-gold p-4 p-md-5 text-center position-relative shadow" style="border-radius: 20px;">
+                        <div class="card-custom gk-podium-gold gk-public-podium-gold p-4 p-md-5 text-center position-relative shadow" style="border-radius: 20px;">
                             <div class="mb-3">
                                 <span class="badge rounded-pill px-3.5 py-1.5 fw-bold shadow-sm" style="background: linear-gradient(135deg, #d97706, #b45309); color: #ffffff; font-size: 0.85rem; letter-spacing: 0.5px;">
                                     <i class="bi bi-trophy-fill me-1"></i> #1 EMAS - PERINGKAT TERTINGGI
@@ -72,7 +72,7 @@
                 <div class="row g-3 g-md-4 justify-content-center align-items-end mb-4 mb-md-5">
                     {{-- #2 PERAK --}}
                     <div class="col-6 col-md-5" data-aos="fade-right">
-                        <div class="card-custom gk-podium-silver p-3 p-md-4 text-center h-100 shadow-sm" style="border-radius: 16px;">
+                        <div class="card-custom gk-podium-silver gk-public-podium p-3 p-md-4 text-center h-100 shadow-sm" style="border-radius: 16px;">
                             <div class="mb-2 mb-md-3">
                                 <span class="badge rounded-pill px-2.5 py-1 fw-bold" style="background: #64748b; color: #fff; font-size: 0.75rem;">
                                     <i class="bi bi-award-fill me-1"></i> #2 PERAK
@@ -98,7 +98,7 @@
 
                     {{-- #1 EMAS --}}
                     <div class="col-6 col-md-5" data-aos="fade-left">
-                        <div class="card-custom gk-podium-gold p-3 p-md-4 text-center position-relative shadow" style="border-radius: 18px;">
+                        <div class="card-custom gk-podium-gold gk-public-podium-gold p-3 p-md-4 text-center position-relative shadow" style="border-radius: 18px;">
                             <div class="mb-2 mb-md-3">
                                 <span class="badge rounded-pill px-3 py-1 fw-bold shadow-sm" style="background: linear-gradient(135deg, #d97706, #b45309); color: #ffffff; font-size: 0.8rem;">
                                     <i class="bi bi-trophy-fill me-1"></i> #1 EMAS
@@ -132,7 +132,7 @@
                 <div class="row g-2 g-md-4 mb-4 mb-md-5 align-items-end justify-content-center gk-podium-row">
                     {{-- #2 PERAK --}}
                     <div class="col-4 col-md-4 order-1 order-md-1 gk-podium-col gk-podium-2" data-aos="fade-right">
-                        <div class="card-custom gk-podium-card gk-podium-silver p-2 p-md-4 text-center h-100 shadow-sm" style="border-radius: 16px;">
+                        <div class="card-custom gk-podium-card gk-podium-silver gk-public-podium p-2 p-md-4 text-center h-100 shadow-sm" style="border-radius: 16px;">
                             <div class="mb-2 mb-md-3">
                                 <span class="badge rounded-pill px-2.5 py-1 fw-bold" style="background: #64748b; color: #fff; font-size: 0.75rem;">
                                     <i class="bi bi-award-fill me-1"></i> #2 PERAK
@@ -158,7 +158,7 @@
 
                     {{-- #1 EMAS (CENTER PODIUM) --}}
                     <div class="col-4 col-md-4 order-2 order-md-2 mb-0 gk-podium-col gk-podium-1" data-aos="zoom-in">
-                        <div class="card-custom gk-podium-card gk-podium-gold p-2.5 p-md-5 text-center position-relative shadow" style="border-radius: 18px; transform: translateY(-8px);">
+                        <div class="card-custom gk-podium-card gk-podium-gold gk-public-podium-gold p-2.5 p-md-5 text-center position-relative shadow" style="border-radius: 18px; transform: translateY(-8px);">
                             <div class="mb-2 mb-md-3">
                                 <span class="badge rounded-pill px-2.5 px-md-3.5 py-1 py-md-1.5 fw-bold shadow-sm" style="background: linear-gradient(135deg, #d97706, #b45309); color: #ffffff; font-size: 0.8rem; letter-spacing: 0.5px;">
                                     <i class="bi bi-trophy-fill me-1"></i> #1 EMAS
@@ -184,7 +184,7 @@
 
                     {{-- #3 PERUNGGU --}}
                     <div class="col-4 col-md-4 order-3 order-md-3 gk-podium-col gk-podium-3" data-aos="fade-left">
-                        <div class="card-custom gk-podium-card gk-podium-bronze p-2 p-md-4 text-center h-100 shadow-sm" style="border-radius: 16px;">
+                        <div class="card-custom gk-podium-card gk-podium-bronze gk-public-podium p-2 p-md-4 text-center h-100 shadow-sm" style="border-radius: 16px;">
                             <div class="mb-2 mb-md-3">
                                 <span class="badge rounded-pill px-2.5 py-1 fw-bold" style="background: #b45309; color: #fff; font-size: 0.75rem;">
                                     <i class="bi bi-award-fill me-1"></i> #3 PERUNGGU
@@ -245,7 +245,7 @@
                                     <img src="{{ $g->photo_url }}" class="rounded-circle me-3" width="44" height="44" style="object-fit: cover;">
                                     <div>
                                         <strong>{{ $g->nama }}</strong>
-                                        <div class="text-muted small font-mono">{{ $g->nip }}</div>
+                                        <div class="text-muted small">{{ $g->kategori_label }}</div>
                                     </div>
                                 </div>
                             </td>

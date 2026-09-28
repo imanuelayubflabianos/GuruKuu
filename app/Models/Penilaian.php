@@ -71,26 +71,34 @@ class Penilaian extends Model
         return round($this->total_nilai / 5, 2);
     }
 
+    public function getKritikAttribute($value): ?string
+    {
+        if (empty($value)) return $value;
+        return \App\Services\ProfanityFilterService::mask($value);
+    }
+
+    public function getSaranAttribute($value): ?string
+    {
+        if (empty($value)) return $value;
+        return \App\Services\ProfanityFilterService::mask($value);
+    }
+
+    public function getBalasanGuruAttribute($value): ?string
+    {
+        if (empty($value)) return $value;
+        return \App\Services\ProfanityFilterService::mask($value);
+    }
+
     // ==================== DETEKSI TOXIC ====================
 
     public static function detectToxic(?string $text): bool
     {
         if (!$text) return false;
-        $toxicWords = [
-            'anjing', 'babi', 'goblok', 'tolol', 'bodoh', 'bangsat', 'keparat',
-            'sialan', 'brengsek', 'kampret', 'monyet', 'bego', 'dungu', 'idiot',
-            'setan', 'iblis', 'bajingan', 'pecundang', 'sampah', 'busuk', 'mampus',
-            'mati aja', 'gila', 'sinting', 'bebal', 'otak udang',
-        ];
-        $textLower = strtolower($text);
-        foreach ($toxicWords as $word) {
-            if (str_contains($textLower, $word)) return true;
-        }
-        return false;
+        return !\App\Services\ProfanityFilterService::isClean($text);
     }
 
     public function isToxic(): bool
     {
-        return self::detectToxic($this->kritik) || self::detectToxic($this->saran);
+        return self::detectToxic($this->getRawOriginal('kritik')) || self::detectToxic($this->getRawOriginal('saran'));
     }
 }

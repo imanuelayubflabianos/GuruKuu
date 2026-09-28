@@ -26,9 +26,17 @@
                 </li>
             </ul>
         </div>
-        <a href="{{ route('admin.sipintu.siswa') }}" class="btn btn-outline-success">
-            <i class="bi bi-cloud-arrow-down me-1"></i> Tarik dari SiPintu
-        </a>
+        <div class="btn-group shadow-sm">
+            <form action="{{ route('admin.sipintu.siswa.sync-all') }}" method="POST" id="formSyncSiswa" class="d-inline" onsubmit="return confirmSyncSiswa(event)">
+                @csrf
+                <button type="submit" class="btn btn-success" id="btnSyncSiswa" title="Tarik dan sinkronkan seluruh data siswa dari SiPintu ke GuruKuu" style="border-top-right-radius: 0; border-bottom-right-radius: 0;">
+                    <i class="bi bi-cloud-arrow-down me-1"></i> Tarik dari SiPintu
+                </button>
+            </form>
+            <a href="{{ route('admin.sipintu.siswa') }}" class="btn btn-outline-success" title="Buka Halaman Data Siswa SiPintu Gateway" style="border-top-left-radius: 0; border-bottom-left-radius: 0; border-left: 0;">
+                <i class="bi bi-box-arrow-up-right"></i>
+            </a>
+        </div>
     </div>
 </div>
 
@@ -279,6 +287,17 @@ function openDeactivateModal(id, name) {
     document.getElementById('formDeactivateSiswa').action = '/admin/siswa/' + id + '/toggle';
     document.getElementById('deactivateSiswaName').innerText = name;
     new bootstrap.Modal(document.getElementById('modalDeactivateSiswa')).show();
+}
+
+function confirmSyncSiswa(e) {
+    if (!confirm('Tarik dan sinkronkan seluruh data siswa aktif dari SiPintu Gateway ke database lokal GuruKuu sekarang?')) {
+        e.preventDefault();
+        return false;
+    }
+    const btn = document.getElementById('btnSyncSiswa');
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> Menarik Data...';
+    btn.classList.add('disabled');
+    return true;
 }
 
 </script>

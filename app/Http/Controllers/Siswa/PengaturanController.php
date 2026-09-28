@@ -32,10 +32,11 @@ class PengaturanController extends Controller
     public function kirimPesanAdmin(Request $request)
     {
         $request->validate([
-            'pesan'   => 'required|string|min:3|max:1000',
+            'pesan'   => 'required|string|min:3|max:100',
             'captcha' => 'required|numeric',
         ], [
             'pesan.required'   => 'Pesan tidak boleh kosong.',
+            'pesan.max'        => 'Pesan Anda melebihi batas maksimal 100 karakter.',
             'captcha.required' => 'Verifikasi wajib diisi.',
             'captcha.numeric'  => 'Jawaban verifikasi harus berupa angka.',
         ]);
@@ -44,12 +45,22 @@ class PengaturanController extends Controller
             return redirect()->to(route('siswa.pengaturan') . '#tabChat')->withInput()->withErrors(['captcha' => 'Jawaban verifikasi tidak cocok. Silakan coba lagi.']);
         }
 
+        $pesanTeks = trim($request->pesan);
+        if (\App\Services\ProfanityFilterService::containsLink($pesanTeks)) {
+            return redirect()->to(route('siswa.pengaturan') . '#tabChat')->withInput()->withErrors(['pesan' => 'Demi keamanan, pesan tidak boleh mengandung tautan / link URL luar.']);
+        }
+
+        $profanity = \App\Services\ProfanityFilterService::check($pesanTeks);
+        if (!$profanity['clean']) {
+            return redirect()->to(route('siswa.pengaturan') . '#tabChat')->withInput()->withErrors(['pesan' => $profanity['message']]);
+        }
+
         $user = Auth::user();
 
         Kontak::create([
             'pengirim'   => $user->name,
             'identifier' => $user->nis,
-            'pesan'      => trim($request->pesan),
+            'pesan'      => $pesanTeks,
             'is_siswa'   => true,
         ]);
 

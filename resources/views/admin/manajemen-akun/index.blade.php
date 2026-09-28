@@ -67,7 +67,7 @@
         </div>
         <div class="col-md-3">
             <label class="form-label font-mono small">STATUS</label>
-            <select name="filter" class="form-select" style="border-radius: 8px;">
+            <select name="filter" class="form-select" style="border-radius: 8px;" onchange="this.form.submit()">
                 <option value="">Semua</option>
                 <option value="aktif" {{ request('filter') === 'aktif' ? 'selected' : '' }}>Aktif</option>
                 <option value="belum" {{ request('filter') === 'belum' ? 'selected' : '' }}>Belum Aktif</option>

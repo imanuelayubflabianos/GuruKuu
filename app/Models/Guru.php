@@ -29,7 +29,7 @@ class Guru extends Model
         'total_penilaian' => 'integer',
     ];
 
-    protected $appends = ['photo_url'];
+    protected $appends = ['photo_url', 'kategori_label'];
 
     // ==================== RELASI ELOQUENT ====================
 
@@ -150,6 +150,17 @@ class Guru extends Model
         $color = $colors[$this->id % count($colors)];
         
         return "https://ui-avatars.com/api/?name={$initials}&background={$color}&color=fff&size=200&bold=true";
+    }
+
+    public function getKategoriLabelAttribute(): string
+    {
+        if ($this->kategori === 'produktif') {
+            return $this->jurusan ? 'Guru Produktif ' . $this->jurusan->nama_jurusan : 'Guru Produktif';
+        }
+        if ($this->kategori === 'normada') {
+            return 'Guru Normada';
+        }
+        return $this->jurusan ? 'Guru ' . $this->jurusan->nama_jurusan : 'Guru Pengajar';
     }
 
     public function getPersentasePartisipasiDiKelas(?int $kelasId = null, ?int $periodeId = null): float

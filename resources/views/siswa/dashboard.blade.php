@@ -42,6 +42,64 @@
     </div>
 @endif
 
+{{-- PANDUAN CARA MEMBERI PENILAIAN (TERHUBUNG KE PENGATURAN ADMIN) --}}
+<div class="card-glass p-3.5 p-md-4 mb-3 mb-md-4 shadow-sm" style="border-left: 4px solid var(--primary);">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+        <div>
+            <div class="text-primary small font-mono fw-bold text-uppercase" style="letter-spacing: 0.8px; font-size: 0.72rem;">
+                <i class="bi bi-info-circle-fill me-1"></i> {{ \App\Models\Setting::get('panduan_label', 'PANDUAN PENGGUNAAN') }}
+            </div>
+            <h5 class="fw-bold mb-0 text-dark mt-1" style="font-size: clamp(1rem, 2.5vw, 1.25rem);">
+                {{ \App\Models\Setting::get('panduan_title', 'Bagaimana Cara Memberi Penilaian?') }}
+            </h5>
+            <p class="text-muted mb-0 small" style="font-size: 0.82rem;">
+                {{ \App\Models\Setting::get('panduan_subtitle', 'Hanya butuh 3 langkah mudah untuk berkontribusi bagi sekolahmu') }}
+            </p>
+        </div>
+        <div>
+            <a href="{{ route('siswa.guru.index') }}" class="btn btn-sm btn-primary-custom rounded-pill px-3 py-1.5 fw-semibold shadow-sm" style="font-size: 0.8rem;">
+                <i class="bi bi-pencil-square me-1"></i> Mulai Nilai Guru
+            </a>
+        </div>
+    </div>
+    
+    <div class="row g-2.5 g-md-3">
+        <div class="col-12 col-md-4">
+            <div class="p-3 rounded-3 h-100 border d-flex gap-3 align-items-start" style="background: var(--bg-card, #ffffff); border-color: var(--border) !important;">
+                <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0 fw-bold shadow-sm" style="width: 36px; height: 36px; background: var(--primary); color: #ffffff; font-size: 0.95rem;">
+                    1
+                </div>
+                <div>
+                    <h6 class="fw-bold mb-1 text-dark" style="font-size: 0.88rem;">{{ \App\Models\Setting::get('panduan_step1_title', 'Login NIS') }}</h6>
+                    <p class="text-muted mb-0 small" style="font-size: 0.78rem; line-height: 1.45;">{{ \App\Models\Setting::get('panduan_step1_desc', 'Masuk dengan akun NIS & tanggal lahir resmi terverifikasi.') }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-md-4">
+            <div class="p-3 rounded-3 h-100 border d-flex gap-3 align-items-start" style="background: var(--bg-card, #ffffff); border-color: var(--border) !important;">
+                <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0 fw-bold shadow-sm" style="width: 36px; height: 36px; background: var(--accent); color: #ffffff; font-size: 0.95rem;">
+                    2
+                </div>
+                <div>
+                    <h6 class="fw-bold mb-1 text-dark" style="font-size: 0.88rem;">{{ \App\Models\Setting::get('panduan_step2_title', 'Beri Nilai') }}</h6>
+                    <p class="text-muted mb-0 small" style="font-size: 0.78rem; line-height: 1.45;">{{ \App\Models\Setting::get('panduan_step2_desc', 'Pilih guru Normada/Produktif, beri nilai (1-5) pada 5 kriteria.') }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-md-4">
+            <div class="p-3 rounded-3 h-100 border d-flex gap-3 align-items-start" style="background: var(--bg-card, #ffffff); border-color: var(--border) !important;">
+                <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0 fw-bold shadow-sm" style="width: 36px; height: 36px; background: #f59e0b; color: #ffffff; font-size: 0.95rem;">
+                    3
+                </div>
+                <div>
+                    <h6 class="fw-bold mb-1 text-dark" style="font-size: 0.88rem;">{{ \App\Models\Setting::get('panduan_step3_title', 'Kirim Anonim') }}</h6>
+                    <p class="text-muted mb-0 small" style="font-size: 0.78rem; line-height: 1.45;">{{ \App\Models\Setting::get('panduan_step3_desc', 'Data tersimpan aman & anonim untuk perbaikan pengajaran.') }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 {{-- STATISTIK CEPAT (FROSTED GLASS CARDS) --}}
 <div class="row g-2 g-md-4 mb-3 mb-md-4">
     <div class="col-4 col-md-4">

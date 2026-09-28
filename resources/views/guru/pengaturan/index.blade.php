@@ -70,43 +70,52 @@
                         <h5 class="fw-bold mb-1" style="color: var(--text-dark);">
                             <i class="bi bi-person-vcard text-primary me-2"></i>Informasi & Deskripsi Pengajar
                         </h5>
-                        <p class="text-muted small mb-4">Informasi ini akan ditampilkan kepada siswa di kartu profil guru.</p>
+                        <p class="text-muted small mb-3">Informasi profil ini ditampilkan kepada siswa. Sesuai kebijakan sekolah, data resmi dikelola oleh Admin/SiPintu.</p>
+
+                        <div class="alert alert-info py-2 px-3 small border-0 d-flex align-items-center gap-2 mb-3">
+                            <i class="bi bi-info-circle-fill text-primary"></i>
+                            <span>Data resmi Nama, NIP, Jurusan, dan Email dikelola oleh Administrator/SiPintu. Anda dapat memperbarui <strong>Foto Profil</strong> dan <strong>Deskripsi Diri</strong> di bawah ini.</span>
+                        </div>
 
                         <div class="row g-3">
                             <div class="col-md-6">
-                                <label class="form-label small fw-bold">NIP / Identitas (Resmi)</label>
+                                <label class="form-label small fw-bold">NIP / Identitas (Resmi) <i class="bi bi-lock-fill text-muted ms-1"></i></label>
                                 <input type="text" class="form-control bg-light" value="{{ $guru->nip ?? $user->nis }}" readonly disabled>
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label small fw-bold">Departemen / Jurusan</label>
+                                <label class="form-label small fw-bold">Departemen / Jurusan <i class="bi bi-lock-fill text-muted ms-1"></i></label>
                                 <input type="text" class="form-control bg-light" value="{{ $guru->jurusan?->nama_jurusan ?? 'Umum' }}" readonly disabled>
                             </div>
 
                             <div class="col-md-12">
-                                <label class="form-label small fw-bold">Nama Lengkap & Gelar <span class="text-danger">*</span></label>
-                                <input type="text" name="nama" class="form-control" value="{{ old('nama', $guru->nama ?? $user->name) }}" required>
+                                <label class="form-label small fw-bold">Nama Lengkap & Gelar <i class="bi bi-lock-fill text-muted ms-1"></i></label>
+                                <input type="text" class="form-control bg-light" value="{{ $guru->nama ?? $user->name }}" readonly disabled>
                             </div>
 
                             <div class="col-md-6">
-                                <label class="form-label small fw-bold">Alamat Email</label>
-                                <input type="email" name="email" class="form-control" value="{{ old('email', $guru->email ?? $user->email) }}" placeholder="contoh@smkn1bangsri.sch.id">
+                                <label class="form-label small fw-bold">Alamat Email <i class="bi bi-lock-fill text-muted ms-1"></i></label>
+                                <input type="email" class="form-control bg-light" value="{{ $guru->email ?? $user->email }}" readonly disabled>
                             </div>
 
                             <div class="col-md-6">
-                                <label class="form-label small fw-bold">Nomor Kontak / WhatsApp</label>
-                                <input type="text" name="phone" class="form-control" value="{{ old('phone', $guru->phone ?? '') }}" placeholder="08xxxxxxxxxx">
+                                <label class="form-label small fw-bold">Nomor Kontak / WhatsApp <i class="bi bi-lock-fill text-muted ms-1"></i></label>
+                                <input type="text" class="form-control bg-light" value="{{ $guru->phone ?? '-' }}" readonly disabled>
                             </div>
 
                             <div class="col-12">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <label class="form-label small fw-bold mb-1">Deskripsi Diri & Tentang Saya</label>
-                                    <button type="button" class="btn btn-link p-0 text-decoration-none small text-primary" onclick="useDefaultBio()">
-                                        <i class="bi bi-arrow-repeat me-1"></i>Gunakan Deskripsi Bawaan
-                                    </button>
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <label class="form-label small fw-bold mb-0">Deskripsi Diri & Tentang Saya <span class="text-primary">*</span></label>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span class="font-mono text-muted small" id="bioCounter">0 / 100</span>
+                                        <button type="button" class="btn btn-link p-0 text-decoration-none small text-primary" onclick="useDefaultBio()">
+                                            <i class="bi bi-arrow-repeat me-1"></i>Bawaan
+                                        </button>
+                                    </div>
                                 </div>
-                                <textarea name="bio" id="bioTextarea" class="form-control" rows="4" placeholder="Tuliskan perkenalan singkat mengenai dedikasi mengajar, visi mendidik, atau pesan inspiratif bagi siswa...">{{ old('bio', $guru->bio ?? $defaultBio) }}</textarea>
-                                <div class="form-text small">
-                                    <i class="bi bi-info-circle me-1"></i> Jika dikosongkan, sistem akan otomatis menggunakan deskripsi standar: <em>"{{ $defaultBio }}"</em>
+                                <textarea name="bio" id="bioTextarea" class="form-control" rows="3" maxlength="100" placeholder="Tuliskan perkenalan singkat mengenai dedikasi mengajar (maks. 100 karakter)...">{{ old('bio', $guru->bio ?? $defaultBio) }}</textarea>
+                                <div class="form-text small text-muted">Maksimal 100 karakter. Ditampilkan pada profil guru saat dinilai siswa.</div>
+                                <div class="form-text text-danger fw-bold d-none" id="bioLimitWarn">
+                                    <i class="bi bi-exclamation-triangle-fill me-1"></i>Anda telah mencapai batas maksimal 100 karakter!
                                 </div>
                             </div>
 
@@ -179,9 +188,9 @@
                                         <div class="text-end mt-2 d-flex justify-content-end gap-2 align-items-center" style="font-size: 0.7rem; opacity: 0.9;">
                                             <span>{{ $chat->created_at->format('H:i') }}</span>
                                             @if($chat->is_replied)
-                                                <i class="bi bi-check2-all" style="color: #4fc3f7;" title="Telah dibalas admin"></i>
+                                                <i class="bi bi-check2-all" style="color: #38bdf8; font-weight: bold;" title="Telah dibalas admin"></i>
                                             @else
-                                                <i class="bi bi-check2" title="Terkirim"></i>
+                                                <i class="bi bi-check2-all" style="color: rgba(255,255,255,0.7);" title="Terkirim"></i>
                                             @endif
                                             @if($chat->pesan !== '[Pesan Dihapus]')
                                                 <button type="button" class="btn btn-sm p-0 text-white border-0 ms-1" onclick="openEditModalGuru({{ $chat->id }}, '{{ addslashes($chat->pesan) }}')" title="Edit Pesan">
@@ -225,11 +234,18 @@
                     <div class="border-top p-3" style="background: var(--bg-card);">
                         <form action="{{ route('guru.pengaturan.chat') }}" method="POST">
                             @csrf
-                            <div class="d-flex gap-2 align-items-end mb-2">
-                                <textarea name="pesan" maxlength="1000" class="form-control" rows="2" placeholder="Tulis pesan atau pertanyaan Anda di sini (maks. 1000 karakter)..." required style="border-radius: 12px; resize: none; border: 2px solid var(--border);" onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='var(--border)'">{{ old('pesan') }}</textarea>
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <label class="form-label small fw-bold mb-0 text-muted">KIRIM PESAN BANTUAN</label>
+                                <span class="font-mono text-muted small" id="guruChatCounter" style="font-size: 0.72rem;">0 / 100</span>
+                            </div>
+                            <div class="d-flex gap-2 align-items-end mb-1">
+                                <textarea name="pesan" id="guruChatInput" maxlength="100" class="form-control" rows="2" placeholder="Tulis pesan atau pertanyaan Anda di sini (maks. 100 karakter)..." required style="border-radius: 12px; resize: none; border: 2px solid var(--border);" onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='var(--border)'">{{ old('pesan') }}</textarea>
                                 <button type="submit" class="btn btn-primary-custom d-flex align-items-center justify-content-center" style="height: 48px; width: 48px; border-radius: 12px; padding: 0;" title="Kirim Pesan">
                                     <i class="bi bi-send-fill fs-5"></i>
                                 </button>
+                            </div>
+                            <div class="form-text text-danger fw-bold d-none mb-2" id="guruChatLimitWarn">
+                                <i class="bi bi-exclamation-triangle-fill me-1"></i>Anda telah mencapai batas maksimal 100 karakter!
                             </div>
 
                             {{-- KOTAK VERIFIKASI --}}
@@ -297,7 +313,8 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <textarea name="pesan" id="editTextareaGuru" class="form-control" rows="4" required style="border-radius: 12px; border: 2px solid var(--border);"></textarea>
+                    <textarea name="pesan" id="editTextareaGuru" class="form-control" rows="3" maxlength="100" required style="border-radius: 12px; border: 2px solid var(--border);"></textarea>
+                    <div class="form-text small text-muted">Maksimal 100 karakter.</div>
                 </div>
                 <div class="modal-footer border-0 pt-0">
                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" style="border-radius: 8px;">Batal</button>
@@ -327,9 +344,48 @@
 </div>
 
 <script>
-function useDefaultBio() {
-    document.getElementById('bioTextarea').value = "{{ $defaultBio }}";
+function updateBioCounter() {
+    const el = document.getElementById('bioTextarea');
+    const counter = document.getElementById('bioCounter');
+    const warn = document.getElementById('bioLimitWarn');
+    if (!el || !counter) return;
+    const len = el.value.length;
+    counter.innerText = `${len} / 100`;
+    if (len >= 100) {
+        counter.classList.add('text-danger', 'fw-bold');
+        if (warn) warn.classList.remove('d-none');
+    } else {
+        counter.classList.remove('text-danger', 'fw-bold');
+        if (warn) warn.classList.add('d-none');
+    }
 }
+
+function updateGuruChatCounter() {
+    const el = document.getElementById('guruChatInput');
+    const counter = document.getElementById('guruChatCounter');
+    const warn = document.getElementById('guruChatLimitWarn');
+    if (!el || !counter) return;
+    const len = el.value.length;
+    counter.innerText = `${len} / 100`;
+    if (len >= 100) {
+        counter.classList.add('text-danger', 'fw-bold');
+        if (warn) warn.classList.remove('d-none');
+    } else {
+        counter.classList.remove('text-danger', 'fw-bold');
+        if (warn) warn.classList.add('d-none');
+    }
+}
+
+function useDefaultBio() {
+    const el = document.getElementById('bioTextarea');
+    if (el) {
+        el.value = "{{ $defaultBio }}";
+        updateBioCounter();
+    }
+}
+
+document.getElementById('bioTextarea')?.addEventListener('input', updateBioCounter);
+document.getElementById('guruChatInput')?.addEventListener('input', updateGuruChatCounter);
 
 document.getElementById('photoInput')?.addEventListener('change', function() {
     if (this.files && this.files[0]) {
@@ -347,6 +403,8 @@ function scrollGuruChat() {
 }
 
 window.addEventListener('DOMContentLoaded', function() {
+    updateBioCounter();
+    updateGuruChatCounter();
     scrollGuruChat();
 
     if (window.location.hash === '#tabChat') {

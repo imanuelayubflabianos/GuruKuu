@@ -44,6 +44,12 @@ class PenilaianBalasan extends Model
         return $this->hasMany(PenilaianBalasan::class, 'parent_id')->oldest();
     }
 
+    public function getPesanAttribute($value): ?string
+    {
+        if (empty($value)) return $value;
+        return \App\Services\ProfanityFilterService::mask($value);
+    }
+
     /**
      * Dapatkan nama tampilan pengirim yang aman untuk publik & guru
      */

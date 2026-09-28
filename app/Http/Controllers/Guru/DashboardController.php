@@ -26,7 +26,7 @@ class DashboardController extends Controller
 
         $periodeAktif = Periode::where('status', 'aktif')->first();
 
-        // Ambil ulasan & kritik saran dari siswa untuk guru ini (100% Anonim)
+        // Ambil ulasan & kritik saran dari siswa untuk guru ini (100% Anonim, tidak disensor)
         $ulasanTerbaru = Penilaian::where('guru_id', $guru->id)
             ->where(function ($query) {
                 $query->where(function ($q) {
@@ -34,6 +34,9 @@ class DashboardController extends Controller
                 })->orWhere(function ($q) {
                     $q->whereNotNull('saran')->whereRaw("TRIM(saran) != ''");
                 });
+            })
+            ->where(function ($query) {
+                $query->where('is_censored', false)->orWhereNull('is_censored');
             })
             ->with(['periode'])
             ->latest()
@@ -111,7 +114,9 @@ class DashboardController extends Controller
     public function replyPenilaian(Request $request, Penilaian $penilaian)
     {
         $request->validate([
-            'balasan_guru' => 'required|string|max:1000',
+            'balasan_guru' => 'required|string|max:100',
+        ], [
+            'balasan_guru.max' => 'Balasan Anda melebihi batas maksimal 100 karakter.',
         ]);
 
         $user = Auth::user();
@@ -121,6 +126,11 @@ class DashboardController extends Controller
 
         if (!$guru || $penilaian->guru_id !== $guru->id) {
             return back()->with('error', 'Anda hanya dapat membalas ulasan yang ditujukan untuk profil Anda.');
+        }
+
+        // 🛡️ KEAMANAN: Cegah link/URL sembarangan
+        if (\App\Services\ProfanityFilterService::containsLink($request->balasan_guru)) {
+            return back()->withInput()->with('error', 'Balasan ulasan tidak boleh mengandung tautan / link URL luar demi keamanan sistem.');
         }
 
         // 🛡️ Filter kata tidak pantas pada balasan guru (Guru tidak kebal aturan)
@@ -190,6 +200,12 @@ class DashboardController extends Controller
         $kelasList = \App\Models\Kelas::with('jurusan')->orderBy('tingkat')->orderBy('nama_kelas')->get();
         $mode = $request->input('mode', 'rating');
         $kelasId = $request->integer('kelas_id') ?: null;
+        if ($mode === 'partisipasi' && !$kelasId && $kelasList->isNotEmpty()) {
+            $kelasId = $kelasList->first()->id;
+        }
+        if ($mode === 'rating') {
+            $kelasId = null;
+        }
         $leaderboard = Guru::leaderboardFor($mode, $kelasId, $periodeAktif?->id);
 
         return view('guru.leaderboard', compact(
@@ -217,6 +233,9 @@ class DashboardController extends Controller
 
         $semuaFeedback = Penilaian::with('siswa')
             ->where('guru_id', $guru->id)
+            ->where(function($q) {
+                $q->where('is_censored', false)->orWhereNull('is_censored');
+            })
             ->when($periodeId, fn($q) => $q->where('periode_id', $periodeId))
             ->latest()
             ->get();

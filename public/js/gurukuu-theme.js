@@ -8,7 +8,7 @@
     'use strict';
 
     // 1. Initial Fast-Boot (Zero Flicker / Instant Exec before render)
-    const savedTheme = localStorage.getItem('gk_theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    const savedTheme = localStorage.getItem('gk_theme') || 'light';
     document.documentElement.setAttribute('data-theme', savedTheme);
     document.documentElement.setAttribute('data-bs-theme', savedTheme);
     if (savedTheme === 'dark') {

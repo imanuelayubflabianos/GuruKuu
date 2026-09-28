@@ -77,9 +77,9 @@
                                         <div class="text-end mt-1 d-flex justify-content-end gap-2 align-items-center" style="font-size: 0.7rem; opacity: 0.9;">
                                             <span>{{ $chat->created_at->format('H:i') }}</span>
                                             @if($chat->is_replied)
-                                                <i class="bi bi-check2-all" style="color: #4fc3f7;"></i>
+                                                <i class="bi bi-check2-all" style="color: #38bdf8; font-weight: bold;" title="Telah dibalas admin"></i>
                                             @else
-                                                <i class="bi bi-check2"></i>
+                                                <i class="bi bi-check2-all" style="color: rgba(255,255,255,0.7);" title="Terkirim"></i>
                                             @endif
 
                                             @if($chat->pesan !== '[Pesan Dihapus]')
@@ -144,11 +144,18 @@
                             <input type="hidden" name="_device_id" value="{{ $deviceId }}">
 
                             <div class="p-3">
-                                <div class="d-flex gap-2 align-items-end mb-2.5">
-                                    <textarea name="pesan" maxlength="1000" class="form-control" rows="2" placeholder="Jelaskan masalah Anda secara jelas (maks. 1000 karakter)..." required style="border-radius: 12px; resize: none; border: 2px solid var(--border); transition: all 0.25s;" onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='var(--border)'">{{ old('pesan') }}</textarea>
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <label class="form-label small fw-bold mb-0 text-muted">KIRIM PESAN BANTUAN</label>
+                                    <span class="font-mono text-muted small" id="guestChatCounter" style="font-size: 0.72rem;">0 / 100</span>
+                                </div>
+                                <div class="d-flex gap-2 align-items-end mb-1">
+                                    <textarea name="pesan" id="guestChatInput" maxlength="100" class="form-control" rows="2" placeholder="Jelaskan masalah Anda secara jelas (maks. 100 karakter)..." required style="border-radius: 12px; resize: none; border: 2px solid var(--border); transition: all 0.25s;" onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='var(--border)'">{{ old('pesan') }}</textarea>
                                     <button type="submit" class="btn btn-primary-custom d-flex align-items-center justify-content-center" style="height: 46px; width: 46px; border-radius: 12px; padding: 0; flex-shrink: 0;" title="Kirim Pesan">
                                         <i class="bi bi-send-fill fs-5"></i>
                                     </button>
+                                </div>
+                                <div class="form-text text-danger fw-bold d-none mb-2" id="guestChatLimitWarn">
+                                    <i class="bi bi-exclamation-triangle-fill me-1"></i>Anda telah mencapai batas maksimal 100 karakter!
                                 </div>
 
                                 <div class="p-2 rounded" style="background: var(--bg-light); border: 1px dashed var(--border);">
@@ -190,7 +197,8 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <textarea name="pesan" id="editGuestTextarea" maxlength="1000" class="form-control" rows="4" required style="border-radius: 12px; border: 2px solid var(--border);"></textarea>
+                    <textarea name="pesan" id="editGuestTextarea" maxlength="100" class="form-control" rows="3" required style="border-radius: 12px; border: 2px solid var(--border);"></textarea>
+                    <div class="form-text small text-muted">Maksimal 100 karakter.</div>
                 </div>
                 <div class="modal-footer border-0 pt-0">
                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" style="border-radius: 8px;">Batal</button>
@@ -205,7 +213,26 @@
 
 @push('scripts')
 <script>
+    function updateGuestChatCounter() {
+        const el = document.getElementById('guestChatInput');
+        const counter = document.getElementById('guestChatCounter');
+        const warn = document.getElementById('guestChatLimitWarn');
+        if (!el || !counter) return;
+        const len = el.value.length;
+        counter.innerText = `${len} / 100`;
+        if (len >= 100) {
+            counter.classList.add('text-danger', 'fw-bold');
+            if (warn) warn.classList.remove('d-none');
+        } else {
+            counter.classList.remove('text-danger', 'fw-bold');
+            if (warn) warn.classList.add('d-none');
+        }
+    }
+
+    document.getElementById('guestChatInput')?.addEventListener('input', updateGuestChatCounter);
+
     window.addEventListener('load', function() { 
+        updateGuestChatCounter();
         const c = document.getElementById('chatContainer'); 
         if (c) c.scrollTop = c.scrollHeight; 
     });

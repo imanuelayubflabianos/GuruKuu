@@ -119,6 +119,9 @@ class GuruController extends Controller
 
         $semuaFeedback = \App\Models\Penilaian::with('siswa')
             ->where('guru_id', $guru->id)
+            ->where(function($q) {
+                $q->where('is_censored', false)->orWhereNull('is_censored');
+            })
             ->when($periodeId, fn($q) => $q->where('periode_id', $periodeId))
             ->latest()
             ->get();
