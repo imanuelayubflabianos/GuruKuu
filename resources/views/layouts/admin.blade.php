@@ -68,6 +68,11 @@
             </a>
         </div>
         <div class="d-flex align-items-center gap-2">
+            {{-- KEMBALI KE SIPINTU MOBILE --}}
+            <a href="{{ config('services.sipintu.base_url', 'https://sipintu.smkn1bangsri.sch.id') }}" target="_blank" class="btn btn-light border p-1 rounded-circle shadow-sm d-flex align-items-center justify-content-center" title="Kembali ke SiPintu" style="width: 32px; height: 32px;">
+                <img src="{{ asset('images/sipintu-logo.png') }}" alt="SiPintu" style="width: 18px; height: 18px; object-fit: contain;">
+            </a>
+
             {{-- BERANDA PUBLIK MOBILE --}}
             <a href="{{ url('/') }}" target="_blank" class="btn btn-light border p-1.5 rounded-circle shadow-sm" title="Buka Beranda Publik">
                 <i class="bi bi-globe2 text-primary" style="font-size: 1rem;"></i>
@@ -180,12 +185,17 @@
 
     <div class="main-content">
         {{-- TOPBAR HEADER --}}
-        <div class="d-none d-lg-flex align-items-center justify-content-between bg-white px-4 py-2.5 rounded-3 border mb-4 shadow-sm">
+        <div class="d-none d-lg-flex align-items-center justify-content-between bg-white px-4 py-2.5 rounded-3 border mb-4 shadow-sm" style="position: sticky; top: 0.75rem; z-index: 1020; backdrop-filter: blur(10px); background: rgba(255, 255, 255, 0.95) !important;">
             <div class="d-flex align-items-center gap-2">
                 <span class="badge bg-primary-subtle text-primary fw-bold px-2.5 py-1">ADMINISTRATOR</span>
                 <span class="text-muted small d-none d-md-inline">| Sistem Evaluasi & Akuntabilitas Pendidik</span>
             </div>
             <div class="d-flex align-items-center gap-2">
+                {{-- KEMBALI KE SIPINTU --}}
+                <a href="{{ config('services.sipintu.base_url', 'https://sipintu.smkn1bangsri.sch.id') }}" target="_blank" class="btn btn-light border p-2 rounded-circle shadow-sm d-flex align-items-center justify-content-center" title="Portal SiPintu" style="width: 40px; height: 40px;">
+                    <img src="{{ asset('images/sipintu-logo.png') }}" alt="SiPintu" style="width: 22px; height: 22px; object-fit: contain;">
+                </a>
+
                 {{-- BERANDA PUBLIK ICON BUTTON (TOPBAR) --}}
                 <a href="{{ url('/') }}" target="_blank" class="btn btn-light border p-2 rounded-circle shadow-sm" title="Buka Beranda Publik">
                     <i class="bi bi-globe2 text-primary fs-5"></i>

@@ -69,6 +69,35 @@
                         <label class="form-label font-mono small fw-bold text-muted">BIO / ALAMAT / KETERANGAN</label>
                         <textarea name="bio" class="form-control" rows="3" style="border-radius: 8px;">{{ old('bio', $guru->bio) }}</textarea>
                     </div>
+
+                    {{-- OPSI EDIT BADGE GURU --}}
+                    <div class="col-12 mt-3">
+                        <label class="form-label font-mono small fw-bold text-muted d-flex align-items-center justify-content-between mb-2">
+                            <span><i class="bi bi-award-fill text-warning me-1"></i> SEMATKAN LENCANA & BADGE</span>
+                            <span class="badge bg-light text-muted border font-mono fw-normal">Pilih satu atau lebih</span>
+                        </label>
+                        <div class="row g-2">
+                            @foreach($badges as $b)
+                                @php $isAssigned = in_array($b->id, old('badge_ids', $assignedBadgeIds ?? [])); @endphp
+                                <div class="col-sm-6 col-md-4">
+                                    <label class="p-2.5 rounded-3 border d-flex align-items-center gap-2.5 w-100 {{ $isAssigned ? 'border-primary bg-primary-subtle' : 'bg-light' }}" style="cursor: pointer; transition: all 0.2s;">
+                                        <input type="checkbox" name="badge_ids[]" value="{{ $b->id }}" class="form-check-input mt-0 flex-shrink-0" {{ $isAssigned ? 'checked' : '' }}>
+                                        <div class="d-flex align-items-center justify-content-center rounded-2 flex-shrink-0" style="width: 32px; height: 32px; background: {{ $b->warna ?: '#003366' }}18; color: {{ $b->warna ?: '#003366' }}; font-size: 1.15rem; border: 1px solid {{ $b->warna ?: '#003366' }}33;">
+                                            @if(str_starts_with($b->icon, 'bi-'))
+                                                <i class="bi {{ $b->icon }}"></i>
+                                            @else
+                                                {{ $b->icon }}
+                                            @endif
+                                        </div>
+                                        <div class="overflow-hidden">
+                                            <div class="fw-bold small text-dark text-truncate">{{ $b->nama_badge }}</div>
+                                            <div class="text-muted text-truncate" style="font-size: 0.72rem;">{{ $b->deskripsi ?: 'Badge Guru' }}</div>
+                                        </div>
+                                    </label>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
                 </div>
                 <div class="mt-4 d-flex justify-content-end gap-2">
                     <a href="{{ route('admin.guru.index') }}" class="btn btn-outline-custom">Batal</a>

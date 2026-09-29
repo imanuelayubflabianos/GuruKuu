@@ -51,6 +51,7 @@ class GuruController extends Controller
 
     public function show(Guru $guru)
     {
+        $guru->load(['jurusan', 'penghargaan.badge']);
         $user = auth()->user();
         $periodeAktif = Periode::where('status', 'aktif')->first();
         $periodeId = $periodeAktif?->id;
@@ -59,24 +60,21 @@ class GuruController extends Controller
             ->wherePivot('tahun_ajaran', $periodeAktif?->tahun_ajaran)
             ->first();
 
-        $sudahMenilai = false;
+        $penilaianSaya = null;
         if ($periodeId) {
-            $sudahMenilai = Penilaian::where('siswa_id', $user->id)
+            $penilaianSaya = Penilaian::where('siswa_id', $user->id)
                 ->where('guru_id', $guru->id)
                 ->where('periode_id', $periodeId)
-                ->exists();
+                ->first();
         }
+        $sudahMenilai = (bool) $penilaianSaya;
 
-        // ✅ FIX: Ambil semua feedback siswa lain untuk guru ini (kecuali yang disensor/toxic)
-        $semuaFeedback = Penilaian::with('siswa')
+        // Ambil semua penilaian/feedback siswa untuk guru ini (termasuk yang hanya memberi rating bintang)
+        $semuaFeedback = Penilaian::with(['siswa', 'balasans.user'])
             ->where('guru_id', $guru->id)
             ->where('periode_id', $periodeId)
             ->where(function($q) {
                 $q->where('is_censored', false)->orWhereNull('is_censored');
-            })
-            ->where(function($q) {
-                $q->whereNotNull('kritik')->where('kritik', '!=', '')
-                  ->orWhereNotNull('saran')->where('saran', '!=', '');
             })
             ->latest()
             ->get();
@@ -107,7 +105,7 @@ class GuruController extends Controller
             ->get();
 
         return view('siswa.guru.show', compact(
-            'guru', 'kelasAktif', 'periodeId', 'sudahMenilai', 
+            'guru', 'kelasAktif', 'periodeId', 'sudahMenilai', 'penilaianSaya',
             'semuaFeedback', 'stats', 'arsipPeriode'
         ));
     }

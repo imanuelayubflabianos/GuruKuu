@@ -82,11 +82,15 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
     Route::post('/dashboard/clear-cache', [AdminDashboardController::class, 'clearCache'])->name('dashboard.clear-cache');
     Route::get('/profil', [AdminProfilController::class, 'index'])->name('profil.index');
-    Route::put('/profil', [AdminProfilController::class, 'update'])->name('profil.update');
-    Route::resource('guru', AdminGuruController::class)->except(['create', 'store']);
+    Route::resource('guru', AdminGuruController::class);
     Route::patch('/guru/{guru}/toggle', [AdminGuruController::class, 'toggleStatus'])->name('guru.toggle');
-    Route::resource('siswa', AdminSiswaController::class)->except(['create', 'store', 'edit', 'update']);
+    Route::resource('siswa', AdminSiswaController::class);
     Route::patch('/siswa/{siswa}/toggle', [AdminSiswaController::class, 'toggleStatus'])->name('siswa.toggle');
+
+    // MANAJEMEN BADGE
+    Route::post('/badge', [\App\Http\Controllers\Admin\BadgeController::class, 'store'])->name('badge.store');
+    Route::put('/badge/{badge}', [\App\Http\Controllers\Admin\BadgeController::class, 'update'])->name('badge.update');
+    Route::delete('/badge/{badge}', [\App\Http\Controllers\Admin\BadgeController::class, 'destroy'])->name('badge.destroy');
     Route::get('/jurusan', [AdminJurusanController::class, 'index'])->name('jurusan.index');
     Route::post('/jurusan', [AdminJurusanController::class, 'store'])->name('jurusan.store');
     Route::get('/jurusan/{jurusan}', [AdminJurusanController::class, 'show'])->name('jurusan.show');
@@ -167,6 +171,7 @@ Route::middleware(['auth', 'role:siswa'])->prefix('siswa')->name('siswa.')->grou
     Route::middleware('periode.active')->group(function () {
         Route::get('/penilaian/{guru}/create', [PenilaianController::class, 'create'])->name('penilaian.create');
         Route::post('/penilaian/{guru}', [PenilaianController::class, 'store'])->name('penilaian.store');
+        Route::post('/penilaian/{guru}/reset', [PenilaianController::class, 'resetPenilaian'])->name('penilaian.reset');
     });
     Route::get('/riwayat', [PenilaianController::class, 'riwayat'])->name('riwayat');
     Route::delete('/riwayat/{penilaian}', [PenilaianController::class, 'destroy'])->name('riwayat.destroy');

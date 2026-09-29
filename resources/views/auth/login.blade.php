@@ -39,7 +39,7 @@
         }
     }
     .auth-hero-side {
-        background: linear-gradient(145deg, #002244 0%, #003366 50%, #004d99 100%);
+        background: linear-gradient(180deg, #38bdf8 0%, #0284c7 18%, #003366 58%, #001228 100%);
         color: #ffffff;
         position: relative;
         overflow: hidden;
@@ -250,19 +250,19 @@
                     <i class="bi bi-patch-check-fill text-warning"></i>
                     <span class="small fw-bold letter-spacing-1 text-white">{{ \App\Models\Setting::get('about_label', 'SMK NEGERI 1 BANGSRI • JUARA') }}</span>
                 </div>
-                <div class="d-flex align-items-center gap-3">
+                <div class="d-inline-flex align-items-center gap-3 p-2.5 px-3.5 rounded-4" style="background: rgba(255, 255, 255, 0.22); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.4); box-shadow: 0 8px 24px -4px rgba(0, 34, 68, 0.12);">
                     @if(!empty($siteLogo))
                         <img src="{{ $siteLogo }}" alt="{{ $siteTitle ?? 'GuruKuu' }}" style="height: 44px; max-width: 140px; object-fit: contain;">
                     @else
-                        <div class="rounded-circle bg-white text-primary p-2 d-flex align-items-center justify-content-center shadow-sm" style="width: 44px; height: 44px;">
-                            <i class="bi bi-mortarboard-fill fs-4"></i>
+                        <div class="rounded-circle bg-white p-2 d-flex align-items-center justify-content-center shadow-sm" style="width: 44px; height: 44px;">
+                            <i class="bi bi-mortarboard-fill fs-4" style="color: #003366;"></i>
                         </div>
                     @endif
                     <div>
                         <h2 class="fw-bold mb-0 font-mono tracking-tight" style="font-size: 1.85rem; line-height: 1.15;">
-                            <span style="color: {{ $siteTitleColor1 ?? '#003366' }} !important;">{{ $siteTitlePart1 ?? 'Guru' }}</span><span style="color: {{ $siteTitleColor2 ?? '#FFC107' }} !important;">{{ $siteTitlePart2 ?? 'Kuu' }}</span>
+                            <span style="color: {{ $siteTitleColor1 ?? '#003366' }} !important; text-shadow: 0 1px 2px rgba(255,255,255,0.6);">{{ $siteTitlePart1 ?? 'Guru' }}</span><span style="color: {{ $siteTitleColor2 ?? '#FFC107' }} !important; text-shadow: 0 1px 2px rgba(0,0,0,0.15);">{{ $siteTitlePart2 ?? 'Kuu' }}</span>
                         </h2>
-                        <span class="text-white-50" style="font-size: 0.8rem; font-weight: 500;">{{ $schoolName ?? 'SMK Negeri 1 Bangsri' }}</span>
+                        <span class="fw-bold" style="font-size: 0.8rem; color: #002244 !important; opacity: 0.85;">{{ $schoolName ?? 'SMK Negeri 1 Bangsri' }}</span>
                     </div>
                 </div>
             </div>

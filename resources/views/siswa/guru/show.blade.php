@@ -32,6 +32,24 @@
                 </span>
             </div>
 
+            {{-- BADGE GURU --}}
+            @if($guru->penghargaan && $guru->penghargaan->isNotEmpty())
+                <div class="d-flex flex-wrap align-items-center justify-content-center gap-1.5 mb-3">
+                    @foreach($guru->penghargaan as $p)
+                        @if($p->badge)
+                            <span class="badge rounded-pill px-2.5 py-1 d-inline-flex align-items-center gap-1 shadow-sm" style="background: {{ $p->badge->warna }}18; color: {{ $p->badge->warna }}; border: 1px solid {{ $p->badge->warna }}33; font-size: 0.75rem;" title="{{ $p->badge->deskripsi }}">
+                                @if(str_starts_with($p->badge->icon, 'bi-'))
+                                    <i class="bi {{ $p->badge->icon }}"></i>
+                                @else
+                                    <span>{{ $p->badge->icon }}</span>
+                                @endif
+                                <span>{{ $p->badge->nama_badge }}</span>
+                            </span>
+                        @endif
+                    @endforeach
+                </div>
+            @endif
+
             {{-- DESKRIPSI & TENTANG GURU --}}
             <div class="text-start p-3 rounded" style="background: var(--bg-light); border: 1px solid var(--border);">
                 <div class="d-flex align-items-center gap-2 mb-2">
@@ -64,11 +82,11 @@
                 <div class="row g-3">
                     @php
                         $aspects = [
-                            'Kedisiplinan' => $stats['rata_kedisiplinan'],
-                            'Komunikasi' => $stats['rata_komunikasi'],
-                            'Tanggung Jawab' => $stats['rata_tanggung_jawab'],
-                            'Kreativitas' => $stats['rata_kreativitas'],
-                            'Keramahan' => $stats['rata_keramahan'],
+                            'Ketepatan Waktu' => $stats['rata_kedisiplinan'],
+                            'Kehadiran di Kelas' => $stats['rata_komunikasi'],
+                            'Penyampaian Materi' => $stats['rata_tanggung_jawab'],
+                            'Interaksi Siswa' => $stats['rata_kreativitas'],
+                            'Suasana Belajar' => $stats['rata_keramahan'],
                         ];
                     @endphp
                     @foreach($aspects as $label => $value)
@@ -106,6 +124,42 @@
                             <div>
                                 <strong class="text-primary d-block">Penilaian Anda Sudah Tercatat!</strong>
                                 <div class="small text-muted">Anda telah memberikan penilaian untuk guru ini pada periode <strong>{{ $periodeAktif->nama_periode }}</strong>. Anda dapat memberikan penilaian kembali pada periode semester berikutnya.</div>
+                            </div>
+                        </div>
+
+                        {{-- 2 OPSI TOMBOL: NILAI KEMBALI & HAPUS PENILAIAN --}}
+                        <div class="row g-2 mt-2.5">
+                            {{-- OPSI 1: NILAI KEMBALI --}}
+                            <div class="col-sm-6">
+                                <form action="{{ route('siswa.penilaian.reset', $guru) }}" method="POST"
+                                      data-confirm="Anda yakin ingin menilai kembali? Ulasan sebelumnya akan dihapus dan Anda dapat mengisi penilaian baru."
+                                      data-confirm-title="Konfirmasi Nilai Kembali"
+                                      data-confirm-btn="Ya, Nilai Kembali"
+                                      data-confirm-type="warning">
+                                    @csrf
+                                    <button type="submit" class="btn btn-outline-warning text-dark fw-bold w-100 py-2 rounded-3 shadow-sm d-flex align-items-center justify-content-center gap-2" style="font-size: 0.88rem;">
+                                        <i class="bi bi-arrow-repeat fs-5 text-warning-emphasis"></i>
+                                        <span>Nilai Kembali</span>
+                                    </button>
+                                </form>
+                            </div>
+
+                            {{-- OPSI 2: HAPUS PENILAIAN --}}
+                            <div class="col-sm-6">
+                                @if($penilaianSaya)
+                                    <form action="{{ route('siswa.riwayat.destroy', $penilaianSaya->id) }}" method="POST"
+                                          data-confirm="Anda yakin ingin menghapus penilaian ini? Ulasan Anda untuk guru ini akan dihapus dan rating guru akan dihitung ulang."
+                                          data-confirm-title="Konfirmasi Hapus Penilaian"
+                                          data-confirm-btn="Ya, Hapus Penilaian"
+                                          data-confirm-type="danger">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-outline-danger fw-bold w-100 py-2 rounded-3 shadow-sm d-flex align-items-center justify-content-center gap-2" style="font-size: 0.88rem;">
+                                            <i class="bi bi-trash3 fs-5"></i>
+                                            <span>Hapus Penilaian</span>
+                                        </button>
+                                    </form>
+                                @endif
                             </div>
                         </div>
                     @else
@@ -174,11 +228,11 @@
                 <div class="row g-1 text-center">
                     @php
                         $aspectsFb = [
-                            'Kedisiplinan' => $fb->kedisiplinan,
-                            'Komunikasi' => $fb->komunikasi,
-                            'Tanggung Jawab' => $fb->tanggung_jawab,
-                            'Kreativitas' => $fb->kreativitas,
-                            'Keramahan' => $fb->keramahan,
+                            'Ketepatan Waktu' => $fb->kedisiplinan,
+                            'Kehadiran di Kelas' => $fb->komunikasi,
+                            'Penyampaian Materi' => $fb->tanggung_jawab,
+                            'Interaksi Siswa' => $fb->kreativitas,
+                            'Suasana Belajar' => $fb->keramahan,
                         ];
                     @endphp
                     @foreach($aspectsFb as $aspLabel => $aspVal)
@@ -208,6 +262,11 @@
                 @if($fb->saran)
                     <div class="p-2 rounded small mb-2" style="background: #e1f5fe; border-left: 3px solid #0288d1;">
                         <strong class="text-primary">Saran Perbaikan:</strong> {{ $fb->saran }}
+                    </div>
+                @endif
+                @if(!$fb->kritik && !$fb->saran)
+                    <div class="p-2 rounded small mb-2 bg-light border text-muted fst-italic">
+                        <i class="bi bi-star-fill text-warning me-1"></i> Memberikan penilaian bintang tanpa ulasan tertulis.
                     </div>
                 @endif
             @endif

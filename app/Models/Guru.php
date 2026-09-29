@@ -48,6 +48,13 @@ class Guru extends Model
         return $this->hasMany(Penghargaan::class, 'guru_id');
     }
 
+    public function badges()
+    {
+        return $this->belongsToMany(Badge::class, 'penghargaan', 'guru_id', 'badge_id')
+                    ->withPivot('periode_id')
+                    ->withTimestamps();
+    }
+
     public function kelas()
     {
         return $this->belongsToMany(Kelas::class, 'guru_kelas', 'guru_id', 'kelas_id')
@@ -84,7 +91,7 @@ class Guru extends Model
 
     public static function leaderboardFor(string $mode = 'rating', ?int $kelasId = null, ?int $periodeId = null)
     {
-        $query = self::with('jurusan');
+        $query = self::with(['jurusan', 'penghargaan.badge']);
 
         if ($mode === 'partisipasi') {
             if (!$kelasId) return collect();

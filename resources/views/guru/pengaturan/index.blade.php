@@ -18,13 +18,13 @@
         </button>
     </li>
     <li class="nav-item">
-        <button class="nav-link" id="faq-tab" data-bs-toggle="pill" data-bs-target="#tabFaqGuru" type="button">
-            <i class="bi bi-question-circle"></i> FAQ
+        <button class="nav-link" id="device-tab" data-bs-toggle="pill" data-bs-target="#tabDeviceGuru" type="button">
+            <i class="bi bi-laptop"></i> Riwayat Perangkat
         </button>
     </li>
     <li class="nav-item">
-        <button class="nav-link" id="device-tab" data-bs-toggle="pill" data-bs-target="#tabDeviceGuru" type="button">
-            <i class="bi bi-laptop"></i> Riwayat Perangkat
+        <button class="nav-link" id="faq-tab" data-bs-toggle="pill" data-bs-target="#tabFaqGuru" type="button">
+            <i class="bi bi-question-circle"></i> FAQ
         </button>
     </li>
     <li class="nav-item">
@@ -131,14 +131,14 @@
         </form>
     </div>
 
-    {{-- TAB: FAQ GURU --}}
-    <div class="tab-pane fade" id="tabFaqGuru">
-        @include('components.faq-accordion')
-    </div>
-
     {{-- TAB: RIWAYAT PERANGKAT GURU --}}
     <div class="tab-pane fade" id="tabDeviceGuru">
         @include('components.device-history')
+    </div>
+
+    {{-- TAB: FAQ GURU --}}
+    <div class="tab-pane fade" id="tabFaqGuru">
+        @include('components.faq-accordion')
     </div>
 
     {{-- TAB 2: CHAT ADMIN --}}

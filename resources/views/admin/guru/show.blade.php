@@ -30,7 +30,21 @@
                 <img src="{{ $guru->photo_url }}" class="shadow-sm" style="width: 180px; height: 180px; object-fit: cover; border-radius: 16px; border: 4px solid var(--primary);">
             </div>
             <h4 class="fw-bold mb-1 text-dark">{{ $guru->nama }}</h4>
-            <p class="text-muted small font-mono mb-3">NIP: {{ $guru->nip }}</p>
+            <p class="text-muted small font-mono mb-2">NIP: {{ $guru->nip }}</p>
+
+            {{-- LENCANA & BADGE PENGHARGAAN --}}
+            @if($guru->penghargaan && $guru->penghargaan->count() > 0)
+                <div class="d-flex flex-wrap justify-content-center gap-1.5 mb-3">
+                    @foreach($guru->penghargaan as $p)
+                        @if($p->badge)
+                            <span class="badge rounded-pill border py-1.5 px-2.5 d-inline-flex align-items-center gap-1.5" style="background: {{ $p->badge->warna }}15; color: {{ $p->badge->warna }}; border-color: {{ $p->badge->warna }}33 !important; font-size: 0.75rem;" title="{{ $p->badge->deskripsi }}">
+                                @if(str_starts_with($p->badge->icon, 'bi-'))<i class="bi {{ $p->badge->icon }}"></i>@else{{ $p->badge->icon }}@endif
+                                <span>{{ $p->badge->nama_badge }}</span>
+                            </span>
+                        @endif
+                    @endforeach
+                </div>
+            @endif
 
             {{-- DESKRIPSI & TENTANG GURU --}}
             <div class="text-start p-3 rounded mb-3" style="background: var(--bg-light); border: 1px solid var(--border);">
@@ -91,11 +105,11 @@
             <div class="row g-3">
                 @php
                     $aspects = [
-                        'Kedisiplinan' => $stats['rata_kedisiplinan'],
-                        'Komunikasi' => $stats['rata_komunikasi'],
-                        'Tanggung Jawab' => $stats['rata_tanggung_jawab'],
-                        'Kreativitas' => $stats['rata_kreativitas'],
-                        'Keramahan' => $stats['rata_keramahan'],
+                        'Ketepatan Waktu' => $stats['rata_kedisiplinan'],
+                        'Kehadiran di Kelas' => $stats['rata_tanggung_jawab'],
+                        'Penyampaian Materi' => $stats['rata_komunikasi'],
+                        'Interaksi dengan Siswa' => $stats['rata_keramahan'],
+                        'Keterlibatan & Suasana Belajar' => $stats['rata_kreativitas'],
                     ];
                 @endphp
                 @foreach($aspects as $label => $value)
@@ -179,11 +193,11 @@
             <div class="row g-1 text-center">
                 @php
                     $aspectsFb = [
-                        'Kedisiplinan' => $fb->kedisiplinan,
-                        'Komunikasi' => $fb->komunikasi,
-                        'Tanggung Jawab' => $fb->tanggung_jawab,
-                        'Kreativitas' => $fb->kreativitas,
-                        'Keramahan' => $fb->keramahan,
+                        'Ketepatan Waktu' => $fb->kedisiplinan,
+                        'Kehadiran di Kelas' => $fb->tanggung_jawab,
+                        'Penyampaian Materi' => $fb->komunikasi,
+                        'Interaksi dengan Siswa' => $fb->keramahan,
+                        'Keterlibatan & Suasana Belajar' => $fb->kreativitas,
                     ];
                 @endphp
                 @foreach($aspectsFb as $aspLabel => $aspVal)
@@ -209,6 +223,11 @@
                 </details>
             </div>
         @else
+            @if(!$fb->kritik && !$fb->saran)
+                <div class="p-2 rounded small mb-2 bg-white text-muted fst-italic border">
+                    <i class="bi bi-star-fill text-warning me-1"></i> Siswa memberikan nilai bintang tanpa kritik & saran tertulis.
+                </div>
+            @endif
             @if($fb->kritik)
                 <div class="p-2 rounded small mb-2 bg-white border-start border-3 border-warning">
                     <strong class="text-warning-emphasis">Kritik:</strong> {{ $fb->kritik }}

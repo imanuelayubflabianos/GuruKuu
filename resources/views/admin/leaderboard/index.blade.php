@@ -41,36 +41,57 @@
 
 @if($top1)
     @if(!$top2)
-        {{-- HANYA 1 GURU TOP (TIDAK DEMPET, PROPORSI LEBAR & BERSIH) --}}
+        {{-- HANYA 1 GURU TOP --}}
         @php $pct1 = round(($top1->rata_rata_nilai / 5) * 100); @endphp
         <div class="row justify-content-center mb-4 mb-md-5">
-            <div class="col-12 col-sm-10 col-md-8 col-lg-6">
-                <div class="card-custom gk-podium-gold p-4 p-md-5 text-center position-relative shadow" style="border-radius: 20px;">
-                    <div class="mb-3">
-                        <span class="badge rounded-pill px-3.5 py-1.5 fw-bold shadow-sm" style="background: linear-gradient(135deg, #d97706, #b45309); color: #ffffff; font-size: 0.85rem; letter-spacing: 0.5px;">
-                            <i class="bi bi-trophy-fill me-1"></i> #1 EMAS - PERINGKAT TERTINGGI
-                        </span>
-                    </div>
-                    <div class="position-relative d-inline-block mb-3">
-                        <img src="{{ $top1->photo_url }}" class="rounded-circle shadow" width="115" height="115" style="object-fit: cover;">
-                    </div>
-                    <h3 class="fw-bold mb-1 gk-podium-nama" title="{{ $top1->nama }}">{{ $top1->nama }}</h3>
-                    <div class="font-mono mb-3 gk-podium-jurusan" style="font-size: 0.85rem; letter-spacing: 1px;" title="{{ strtoupper($top1->jurusan?->nama_jurusan ?? 'UMUM') }}">{{ strtoupper($top1->jurusan?->nama_jurusan ?? 'UMUM') }}</div>
-                    <div class="p-3 rounded-3 mb-3.5 gk-podium-statbox">
-                        <div class="fw-bold gk-podium-score" style="font-size: 2.4rem; line-height: 1;">{{ $pct1 }}% <span class="text-warning fs-5">@for($star = 1; $star <= 5; $star++){{ $star <= round($pct1 / 20) ? '★' : '☆' }}@endfor</span></div>
-                        <div class="progress mt-2 mb-1.5" style="height: 6px; background-color: rgba(217, 119, 6, 0.2); border-radius: 10px;">
-                            <div class="progress-bar rounded-pill" style="width: {{ $pct1 }}%; background: #d97706;"></div>
+            <div class="col-12 col-sm-10 col-md-8 col-lg-5">
+                <div class="gk-podium-card-revised is-first p-4 p-md-5 text-center d-flex flex-column justify-content-between shadow position-relative">
+                    <div>
+                        <div class="mb-3">
+                            <span class="badge rounded-pill px-4 py-1.5 fw-bold" style="background: #fef08a; color: #854d0e; font-size: 0.9rem;">
+                                #1st
+                            </span>
                         </div>
-                        <small class="text-muted font-mono d-block mt-1 gk-podium-reviews" style="font-size: 0.78rem;">{{ $top1->total_penilaian }} {{ $mode === 'partisipasi' ? 'siswa memilih' : 'ulasan' }}</small>
+                        <div class="gk-avatar-red-wrap mb-3" style="width: 114px; height: 114px; padding: 4px;">
+                            <img src="{{ $top1->photo_url }}" width="114" height="114" alt="{{ $top1->nama }}">
+                        </div>
+                        <h4 class="fw-bold mb-1 text-dark" style="font-size: 1.25rem;" title="{{ $top1->nama }}">{{ $top1->nama }}</h4>
+                        <div class="text-muted small mb-2">{{ strtoupper($top1->jurusan?->nama_jurusan ?? 'UMUM') }}</div>
+                        <div class="text-warning mb-2" style="font-size: 1.1rem; letter-spacing: 2.5px;">
+                            @php $stars1 = round($pct1 / 20); @endphp
+                            @for($i = 1; $i <= 5; $i++)
+                                <i class="bi {{ $i <= $stars1 ? 'bi-star-fill' : 'bi-star text-muted opacity-25' }}"></i>
+                            @endfor
+                        </div>
+                        <div class="mb-2">
+                            <div class="gk-progress-pill mx-auto" style="width: 155px; background: #334155;">
+                                <div class="gk-progress-pill-fill" style="width: {{ $pct1 }}%;"></div>
+                                <span class="position-relative" style="z-index: 2;">{{ $pct1 }}%</span>
+                            </div>
+                        </div>
+                        <small class="text-muted font-mono d-block mb-3" style="font-size: 0.8rem;">{{ $top1->total_penilaian }} {{ $mode === 'partisipasi' ? 'siswa memilih' : 'ulasan' }}</small>
                     </div>
-                    <a href="{{ route('admin.guru.show', $top1->id) }}" class="btn btn-primary-custom w-100 rounded-pill py-2.5 fw-semibold" style="font-size: 0.95rem; background: #003366;">
+
+                    <a href="{{ route('admin.guru.show', $top1->id) }}" class="btn btn-primary-custom w-100 rounded-pill py-2.5 fw-semibold mb-3" style="background: #003366;">
                         <i class="bi bi-eye me-1"></i> Detail Guru
                     </a>
+
+                    <div class="d-flex align-items-center justify-content-end gap-1.5 pt-3 border-top mt-auto" style="min-height: 42px;">
+                        @forelse($top1->penghargaan as $penghargaan)
+                            @if($penghargaan->badge)
+                                <span class="gk-badge-mini-icon" style="background: {{ $penghargaan->badge->warna }}18; color: {{ $penghargaan->badge->warna }}; border-color: {{ $penghargaan->badge->warna }}33;" data-bs-toggle="tooltip" title="{{ $penghargaan->badge->nama_badge }}: {{ $penghargaan->badge->deskripsi }}">
+                                    @if(str_starts_with($penghargaan->badge->icon, 'bi-'))<i class="bi {{ $penghargaan->badge->icon }}"></i>@else{{ $penghargaan->badge->icon }}@endif
+                                </span>
+                            @endif
+                        @empty
+                            <span class="gk-badge-mini-icon" style="background: #ec489918; color: #db2777; border-color: #ec489933;" title="Guru Terbaik">🏆</span>
+                        @endforelse
+                    </div>
                 </div>
             </div>
         </div>
     @elseif(!$top3)
-        {{-- HANYA 2 GURU TOP (SEIMBANG 2 KOLOM) --}}
+        {{-- HANYA 2 GURU TOP --}}
         @php
             $pct1 = round(($top1->rata_rata_nilai / 5) * 100);
             $pct2 = round(($top2->rata_rata_nilai / 5) * 100);
@@ -78,53 +99,91 @@
         <div class="row g-3 g-md-4 justify-content-center align-items-end mb-4 mb-md-5">
             {{-- #2 PERAK --}}
             <div class="col-6 col-md-5">
-                <div class="card-custom gk-podium-silver p-3 p-md-4 text-center h-100 shadow-sm" style="border-radius: 16px;">
-                    <div class="mb-2 mb-md-3">
-                        <span class="badge rounded-pill px-2.5 py-1 fw-bold" style="background: #64748b; color: #fff; font-size: 0.75rem;">
-                            <i class="bi bi-award-fill me-1"></i> #2 PERAK
-                        </span>
-                    </div>
-                    <div class="position-relative d-inline-block mb-2 mb-md-3">
-                        <img src="{{ $top2->photo_url }}" class="rounded-circle shadow-sm" width="90" height="90" style="object-fit: cover;">
-                    </div>
-                    <h5 class="fw-bold mb-1 gk-podium-nama" title="{{ $top2->nama }}">{{ $top2->nama }}</h5>
-                    <div class="font-mono mb-2 mb-md-3 gk-podium-jurusan" style="font-size: 0.72rem;" title="{{ strtoupper($top2->jurusan?->nama_jurusan ?? 'UMUM') }}">{{ strtoupper($top2->jurusan?->nama_jurusan ?? 'UMUM') }}</div>
-                    <div class="p-2 p-md-3 rounded-3 mb-2 mb-md-3 gk-podium-statbox">
-                        <div class="fw-bold gk-podium-score" style="font-size: 1.8rem; line-height: 1;">{{ $pct2 }}% <span class="text-warning fs-6">@for($star = 1; $star <= 5; $star++){{ $star <= round($pct2 / 20) ? '★' : '☆' }}@endfor</span></div>
-                        <div class="progress mt-1.5 mb-1" style="height: 5px; border-radius: 10px; background: rgba(100, 116, 139, 0.2);">
-                            <div class="progress-bar rounded-pill" style="width: {{ $pct2 }}%; background: #64748b;"></div>
+                <div class="gk-podium-card-revised p-3.5 p-md-4 text-center h-100 d-flex flex-column justify-content-between shadow-sm">
+                    <div>
+                        <div class="mb-3">
+                            <span class="badge rounded-pill px-3 py-1.5 fw-bold" style="background: #f1f5f9; color: #475569; font-size: 0.8rem;">
+                                #2nd
+                            </span>
                         </div>
-                        <small class="text-muted font-mono gk-podium-reviews" style="font-size: 0.72rem;">{{ $top2->total_penilaian }} {{ $mode === 'partisipasi' ? 'siswa memilih' : 'ulasan' }}</small>
+                        <div class="gk-avatar-red-wrap mb-3">
+                            <img src="{{ $top2->photo_url }}" width="96" height="96" alt="{{ $top2->nama }}">
+                        </div>
+                        <h5 class="fw-bold mb-1 text-dark" style="font-size: 1.05rem;" title="{{ $top2->nama }}">{{ $top2->nama }}</h5>
+                        <div class="text-muted small mb-2">{{ strtoupper($top2->jurusan?->nama_jurusan ?? 'UMUM') }}</div>
+                        <div class="text-warning mb-2" style="font-size: 0.95rem; letter-spacing: 2px;">
+                            @php $stars2 = round($pct2 / 20); @endphp
+                            @for($i = 1; $i <= 5; $i++)
+                                <i class="bi {{ $i <= $stars2 ? 'bi-star-fill' : 'bi-star text-muted opacity-25' }}"></i>
+                            @endfor
+                        </div>
+                        <div class="mb-2">
+                            <div class="gk-progress-pill mx-auto" style="width: 140px; background: #64748b;">
+                                <div class="gk-progress-pill-fill" style="width: {{ $pct2 }}%;"></div>
+                                <span class="position-relative" style="z-index: 2;">{{ $pct2 }}%</span>
+                            </div>
+                        </div>
+                        <small class="text-muted font-mono d-block mb-3" style="font-size: 0.78rem;">{{ $top2->total_penilaian }} {{ $mode === 'partisipasi' ? 'siswa memilih' : 'ulasan' }}</small>
                     </div>
-                    <a href="{{ route('admin.guru.show', $top2->id) }}" class="btn btn-outline-custom btn-sm w-100 rounded-pill py-2">
+                    <a href="{{ route('admin.guru.show', $top2->id) }}" class="btn btn-outline-custom btn-sm w-100 rounded-pill py-2 mb-3">
                         <i class="bi bi-eye me-1"></i> Detail
                     </a>
+                    <div class="d-flex align-items-center justify-content-end gap-1.5 pt-3 border-top mt-auto" style="min-height: 42px;">
+                        @forelse($top2->penghargaan as $penghargaan)
+                            @if($penghargaan->badge)
+                                <span class="gk-badge-mini-icon" style="background: {{ $penghargaan->badge->warna }}18; color: {{ $penghargaan->badge->warna }}; border-color: {{ $penghargaan->badge->warna }}33;" data-bs-toggle="tooltip" title="{{ $penghargaan->badge->nama_badge }}: {{ $penghargaan->badge->deskripsi }}">
+                                    @if(str_starts_with($penghargaan->badge->icon, 'bi-'))<i class="bi {{ $penghargaan->badge->icon }}"></i>@else{{ $penghargaan->badge->icon }}@endif
+                                </span>
+                            @endif
+                        @empty
+                            <span class="gk-badge-mini-icon" style="background: #f59e0b18; color: #d97706; border-color: #f59e0b33;" title="Berprestasi"><i class="bi bi-arrow-up"></i></span>
+                        @endforelse
+                    </div>
                 </div>
             </div>
 
             {{-- #1 EMAS --}}
             <div class="col-6 col-md-5">
-                <div class="card-custom gk-podium-gold p-3 p-md-4 text-center position-relative shadow" style="border-radius: 18px;">
-                    <div class="mb-2 mb-md-3">
-                        <span class="badge rounded-pill px-3 py-1 fw-bold shadow-sm" style="background: linear-gradient(135deg, #d97706, #b45309); color: #ffffff; font-size: 0.8rem;">
-                            <i class="bi bi-trophy-fill me-1"></i> #1 EMAS
-                        </span>
-                    </div>
-                    <div class="position-relative d-inline-block mb-2 mb-md-3">
-                        <img src="{{ $top1->photo_url }}" class="rounded-circle shadow" width="100" height="100" style="object-fit: cover;">
-                    </div>
-                    <h5 class="fw-bold mb-1 gk-podium-nama" title="{{ $top1->nama }}">{{ $top1->nama }}</h5>
-                    <div class="font-mono mb-2 mb-md-3 gk-podium-jurusan" style="font-size: 0.75rem; letter-spacing: 1px;" title="{{ strtoupper($top1->jurusan?->nama_jurusan ?? 'UMUM') }}">{{ strtoupper($top1->jurusan?->nama_jurusan ?? 'UMUM') }}</div>
-                    <div class="p-2 p-md-3 rounded-3 mb-2 mb-md-3 gk-podium-statbox">
-                        <div class="fw-bold gk-podium-score" style="font-size: 2rem; line-height: 1;">{{ $pct1 }}% <span class="text-warning fs-6">@for($star = 1; $star <= 5; $star++){{ $star <= round($pct1 / 20) ? '★' : '☆' }}@endfor</span></div>
-                        <div class="progress mt-1.5 mb-1" style="height: 6px; background-color: rgba(217, 119, 6, 0.2); border-radius: 10px;">
-                            <div class="progress-bar rounded-pill" style="width: {{ $pct1 }}%; background: #d97706;"></div>
+                <div class="gk-podium-card-revised is-first p-3.5 p-md-4 text-center h-100 d-flex flex-column justify-content-between shadow position-relative">
+                    <div>
+                        <div class="mb-3">
+                            <span class="badge rounded-pill px-4 py-1.5 fw-bold" style="background: #fef08a; color: #854d0e; font-size: 0.9rem;">
+                                #1st
+                            </span>
                         </div>
-                        <small class="text-muted font-mono d-block mt-1 gk-podium-reviews" style="font-size: 0.72rem;">{{ $top1->total_penilaian }} {{ $mode === 'partisipasi' ? 'siswa memilih' : 'ulasan' }}</small>
+                        <div class="gk-avatar-red-wrap mb-3" style="width: 114px; height: 114px; padding: 4px;">
+                            <img src="{{ $top1->photo_url }}" width="114" height="114" alt="{{ $top1->nama }}">
+                        </div>
+                        <h4 class="fw-bold mb-1 text-dark" style="font-size: 1.25rem;" title="{{ $top1->nama }}">{{ $top1->nama }}</h4>
+                        <div class="text-muted small mb-2">{{ strtoupper($top1->jurusan?->nama_jurusan ?? 'UMUM') }}</div>
+                        <div class="text-warning mb-2" style="font-size: 1.1rem; letter-spacing: 2.5px;">
+                            @php $stars1 = round($pct1 / 20); @endphp
+                            @for($i = 1; $i <= 5; $i++)
+                                <i class="bi {{ $i <= $stars1 ? 'bi-star-fill' : 'bi-star text-muted opacity-25' }}"></i>
+                            @endfor
+                        </div>
+                        <div class="mb-2">
+                            <div class="gk-progress-pill mx-auto" style="width: 155px; background: #334155;">
+                                <div class="gk-progress-pill-fill" style="width: {{ $pct1 }}%;"></div>
+                                <span class="position-relative" style="z-index: 2;">{{ $pct1 }}%</span>
+                            </div>
+                        </div>
+                        <small class="text-muted font-mono d-block mb-3" style="font-size: 0.8rem;">{{ $top1->total_penilaian }} {{ $mode === 'partisipasi' ? 'siswa memilih' : 'ulasan' }}</small>
                     </div>
-                    <a href="{{ route('admin.guru.show', $top1->id) }}" class="btn btn-primary-custom w-100 rounded-pill py-2 fw-semibold" style="background: #003366;">
+                    <a href="{{ route('admin.guru.show', $top1->id) }}" class="btn btn-primary-custom w-100 rounded-pill py-2 fw-semibold mb-3" style="background: #003366;">
                         <i class="bi bi-eye me-1"></i> Detail
                     </a>
+                    <div class="d-flex align-items-center justify-content-end gap-1.5 pt-3 border-top mt-auto" style="min-height: 42px;">
+                        @forelse($top1->penghargaan as $penghargaan)
+                            @if($penghargaan->badge)
+                                <span class="gk-badge-mini-icon" style="background: {{ $penghargaan->badge->warna }}18; color: {{ $penghargaan->badge->warna }}; border-color: {{ $penghargaan->badge->warna }}33;" data-bs-toggle="tooltip" title="{{ $penghargaan->badge->nama_badge }}: {{ $penghargaan->badge->deskripsi }}">
+                                    @if(str_starts_with($penghargaan->badge->icon, 'bi-'))<i class="bi {{ $penghargaan->badge->icon }}"></i>@else{{ $penghargaan->badge->icon }}@endif
+                                </span>
+                            @endif
+                        @empty
+                            <span class="gk-badge-mini-icon" style="background: #ec489918; color: #db2777; border-color: #ec489933;" title="Guru Terbaik">🏆</span>
+                        @endforelse
+                    </div>
                 </div>
             </div>
         </div>
@@ -137,80 +196,137 @@
         @endphp
         <div class="row g-2 g-md-4 mb-4 mb-md-5 align-items-end justify-content-center gk-podium-row">
             {{-- #2 PERAK --}}
-            <div class="col-4 col-md-4 order-1 order-md-1 gk-podium-col gk-podium-2">
-                <div class="card-custom gk-podium-card gk-podium-silver p-2 p-md-4 text-center h-100 shadow-sm" style="border-radius: 16px;">
-                    <div class="mb-2 mb-md-3">
-                        <span class="badge rounded-pill px-2.5 py-1 fw-bold" style="background: #64748b; color: #fff; font-size: 0.75rem;">
-                            <i class="bi bi-award-fill me-1"></i> #2 PERAK
-                        </span>
-                    </div>
-                    <div class="position-relative d-inline-block mb-2 mb-md-3">
-                        <img src="{{ $top2->photo_url }}" class="rounded-circle shadow-sm gk-podium-avatar-2" width="90" height="90" style="object-fit: cover;">
-                    </div>
-                    <h5 class="fw-bold mb-1 gk-podium-nama" title="{{ $top2->nama }}">{{ $top2->nama }}</h5>
-                    <div class="font-mono mb-2 mb-md-3 gk-podium-jurusan" style="font-size: 0.72rem;" title="{{ strtoupper($top2->jurusan?->nama_jurusan ?? 'UMUM') }}">{{ strtoupper($top2->jurusan?->nama_jurusan ?? 'UMUM') }}</div>
-                    <div class="p-1.5 p-md-3 rounded-3 mb-2 mb-md-3 gk-podium-statbox">
-                        <div class="fw-bold gk-podium-score" style="font-size: 1.8rem; line-height: 1;">{{ $pct2 }}% <span class="text-warning fs-6">@for($star = 1; $star <= 5; $star++){{ $star <= round($pct2 / 20) ? '★' : '☆' }}@endfor</span></div>
-                        <div class="progress mt-1 mt-md-2 mb-1" style="height: 5px; border-radius: 10px; background: rgba(100, 116, 139, 0.2);">
-                            <div class="progress-bar rounded-pill" style="width: {{ $pct2 }}%; background: #64748b;"></div>
+            <div class="col-12 col-md-4 order-2 order-md-1 gk-podium-col gk-podium-2">
+                <div class="gk-podium-card-revised p-3 p-md-4 text-center h-100 d-flex flex-column justify-content-between shadow-sm">
+                    <div>
+                        <div class="mb-3">
+                            <span class="badge rounded-pill px-3 py-1.5 fw-bold" style="background: #f1f5f9; color: #475569; font-size: 0.8rem;">
+                                #2nd
+                            </span>
                         </div>
-                        <small class="text-muted font-mono gk-podium-reviews" style="font-size: 0.72rem;">{{ $top2->total_penilaian }} {{ $mode === 'partisipasi' ? 'siswa memilih' : 'ulasan' }}</small>
+                        <div class="gk-avatar-red-wrap mb-3">
+                            <img src="{{ $top2->photo_url }}" width="96" height="96" alt="{{ $top2->nama }}">
+                        </div>
+                        <h5 class="fw-bold mb-1 text-dark" style="font-size: 1.05rem;" title="{{ $top2->nama }}">{{ $top2->nama }}</h5>
+                        <div class="text-muted small mb-2">{{ strtoupper($top2->jurusan?->nama_jurusan ?? 'UMUM') }}</div>
+                        <div class="text-warning mb-2" style="font-size: 0.95rem; letter-spacing: 2px;">
+                            @php $stars2 = round($pct2 / 20); @endphp
+                            @for($i = 1; $i <= 5; $i++)
+                                <i class="bi {{ $i <= $stars2 ? 'bi-star-fill' : 'bi-star text-muted opacity-25' }}"></i>
+                            @endfor
+                        </div>
+                        <div class="mb-2">
+                            <div class="gk-progress-pill mx-auto" style="width: 140px; background: #64748b;">
+                                <div class="gk-progress-pill-fill" style="width: {{ $pct2 }}%;"></div>
+                                <span class="position-relative" style="z-index: 2;">{{ $pct2 }}%</span>
+                            </div>
+                        </div>
+                        <small class="text-muted font-mono d-block mb-3" style="font-size: 0.78rem;">{{ $top2->total_penilaian }} {{ $mode === 'partisipasi' ? 'siswa memilih' : 'ulasan' }}</small>
                     </div>
-                    <a href="{{ route('admin.guru.show', $top2->id) }}" class="btn btn-outline-custom btn-sm btn-podium w-100 rounded-pill">
+                    <a href="{{ route('admin.guru.show', $top2->id) }}" class="btn btn-outline-custom btn-sm w-100 rounded-pill py-2 mb-3">
                         <i class="bi bi-eye me-1"></i> Detail
                     </a>
+                    <div class="d-flex align-items-center justify-content-end gap-1.5 pt-3 border-top mt-auto" style="min-height: 42px;">
+                        @forelse($top2->penghargaan as $penghargaan)
+                            @if($penghargaan->badge)
+                                <span class="gk-badge-mini-icon" style="background: {{ $penghargaan->badge->warna }}18; color: {{ $penghargaan->badge->warna }}; border-color: {{ $penghargaan->badge->warna }}33;" data-bs-toggle="tooltip" title="{{ $penghargaan->badge->nama_badge }}: {{ $penghargaan->badge->deskripsi }}">
+                                    @if(str_starts_with($penghargaan->badge->icon, 'bi-'))<i class="bi {{ $penghargaan->badge->icon }}"></i>@else{{ $penghargaan->badge->icon }}@endif
+                                </span>
+                            @endif
+                        @empty
+                            <span class="gk-badge-mini-icon" style="background: #f59e0b18; color: #d97706; border-color: #f59e0b33;" title="Berprestasi"><i class="bi bi-arrow-up"></i></span>
+                        @endforelse
+                    </div>
                 </div>
             </div>
 
             {{-- #1 EMAS (CENTER PODIUM) --}}
-            <div class="col-4 col-md-4 order-2 order-md-2 mb-0 gk-podium-col gk-podium-1">
-                <div class="card-custom gk-podium-card gk-podium-gold p-2.5 p-md-5 text-center position-relative shadow" style="border-radius: 18px; transform: translateY(-8px);">
-                    <div class="mb-2 mb-md-3">
-                        <span class="badge rounded-pill px-2.5 px-md-3.5 py-1 py-md-1.5 fw-bold shadow-sm" style="background: linear-gradient(135deg, #d97706, #b45309); color: #ffffff; font-size: 0.8rem; letter-spacing: 0.5px;">
-                            <i class="bi bi-trophy-fill me-1"></i> #1 EMAS
-                        </span>
-                    </div>
-                    <div class="position-relative d-inline-block mb-2 mb-md-3">
-                        <img src="{{ $top1->photo_url }}" class="rounded-circle shadow gk-podium-avatar-1" width="115" height="115" style="object-fit: cover;">
-                    </div>
-                    <h4 class="fw-bold mb-1 gk-podium-nama" title="{{ $top1->nama }}">{{ $top1->nama }}</h4>
-                    <div class="font-mono mb-2 mb-md-3 gk-podium-jurusan" style="font-size: 0.75rem; letter-spacing: 1px;" title="{{ strtoupper($top1->jurusan?->nama_jurusan ?? 'UMUM') }}">{{ strtoupper($top1->jurusan?->nama_jurusan ?? 'UMUM') }}</div>
-                    <div class="p-2 p-md-3 rounded-3 mb-2 mb-md-3 gk-podium-statbox">
-                        <div class="fw-bold gk-podium-score" style="font-size: 2.3rem; line-height: 1;">{{ $pct1 }}% <span class="text-warning fs-6">@for($star = 1; $star <= 5; $star++){{ $star <= round($pct1 / 20) ? '★' : '☆' }}@endfor</span></div>
-                        <div class="progress mt-1 mt-md-2 mb-1" style="height: 6px; background-color: rgba(217, 119, 6, 0.2); border-radius: 10px;">
-                            <div class="progress-bar rounded-pill" style="width: {{ $pct1 }}%; background: #d97706;"></div>
+            <div class="col-12 col-md-4 order-1 order-md-2 mb-3 mb-md-0 gk-podium-col gk-podium-1">
+                <div class="gk-podium-card-revised is-first p-3.5 p-md-4 text-center h-100 d-flex flex-column justify-content-between shadow position-relative" style="transform: translateY(-8px);">
+                    <div>
+                        <div class="mb-3">
+                            <span class="badge rounded-pill px-4 py-1.5 fw-bold" style="background: #fef08a; color: #854d0e; font-size: 0.9rem;">
+                                #1st
+                            </span>
                         </div>
-                        <small class="text-muted font-mono d-block mt-0.5 mt-md-1 gk-podium-reviews" style="font-size: 0.75rem;">{{ $top1->total_penilaian }} {{ $mode === 'partisipasi' ? 'siswa memilih' : 'ulasan' }}</small>
+                        <div class="gk-avatar-red-wrap mb-3" style="width: 114px; height: 114px; padding: 4px;">
+                            <img src="{{ $top1->photo_url }}" width="114" height="114" alt="{{ $top1->nama }}">
+                        </div>
+                        <h4 class="fw-bold mb-1 text-dark" style="font-size: 1.25rem;" title="{{ $top1->nama }}">{{ $top1->nama }}</h4>
+                        <div class="text-muted small mb-2">{{ strtoupper($top1->jurusan?->nama_jurusan ?? 'UMUM') }}</div>
+                        <div class="text-warning mb-2" style="font-size: 1.1rem; letter-spacing: 2.5px;">
+                            @php $stars1 = round($pct1 / 20); @endphp
+                            @for($i = 1; $i <= 5; $i++)
+                                <i class="bi {{ $i <= $stars1 ? 'bi-star-fill' : 'bi-star text-muted opacity-25' }}"></i>
+                            @endfor
+                        </div>
+                        <div class="mb-2">
+                            <div class="gk-progress-pill mx-auto" style="width: 155px; background: #334155;">
+                                <div class="gk-progress-pill-fill" style="width: {{ $pct1 }}%;"></div>
+                                <span class="position-relative" style="z-index: 2;">{{ $pct1 }}%</span>
+                            </div>
+                        </div>
+                        <small class="text-muted font-mono d-block mb-3" style="font-size: 0.8rem;">{{ $top1->total_penilaian }} {{ $mode === 'partisipasi' ? 'siswa memilih' : 'ulasan' }}</small>
                     </div>
-                    <a href="{{ route('admin.guru.show', $top1->id) }}" class="btn btn-primary-custom btn-podium w-100 rounded-pill py-1.5 py-md-2 fw-semibold" style="background: #003366;">
+                    <a href="{{ route('admin.guru.show', $top1->id) }}" class="btn btn-primary-custom w-100 rounded-pill py-2 fw-semibold mb-3" style="background: #003366;">
                         <i class="bi bi-eye me-1"></i> Detail
                     </a>
+                    <div class="d-flex align-items-center justify-content-end gap-1.5 pt-3 border-top mt-auto" style="min-height: 42px;">
+                        @forelse($top1->penghargaan as $penghargaan)
+                            @if($penghargaan->badge)
+                                <span class="gk-badge-mini-icon" style="background: {{ $penghargaan->badge->warna }}18; color: {{ $penghargaan->badge->warna }}; border-color: {{ $penghargaan->badge->warna }}33;" data-bs-toggle="tooltip" title="{{ $penghargaan->badge->nama_badge }}: {{ $penghargaan->badge->deskripsi }}">
+                                    @if(str_starts_with($penghargaan->badge->icon, 'bi-'))<i class="bi {{ $penghargaan->badge->icon }}"></i>@else{{ $penghargaan->badge->icon }}@endif
+                                </span>
+                            @endif
+                        @empty
+                            <span class="gk-badge-mini-icon" style="background: #ec489918; color: #db2777; border-color: #ec489933;" title="Guru Terbaik">🏆</span>
+                        @endforelse
+                    </div>
                 </div>
             </div>
 
             {{-- #3 PERUNGGU --}}
-            <div class="col-4 col-md-4 order-3 order-md-3 gk-podium-col gk-podium-3">
-                <div class="card-custom gk-podium-card gk-podium-bronze p-2 p-md-4 text-center h-100 shadow-sm" style="border-radius: 16px;">
-                    <div class="mb-2 mb-md-3">
-                        <span class="badge rounded-pill px-2.5 py-1 fw-bold" style="background: #b45309; color: #fff; font-size: 0.75rem;">
-                            <i class="bi bi-award-fill me-1"></i> #3 PERUNGGU
-                        </span>
-                    </div>
-                    <div class="position-relative d-inline-block mb-2 mb-md-3">
-                        <img src="{{ $top3->photo_url }}" class="rounded-circle shadow-sm gk-podium-avatar-3" width="90" height="90" style="object-fit: cover;">
-                    </div>
-                    <h5 class="fw-bold mb-1 gk-podium-nama" title="{{ $top3->nama }}">{{ $top3->nama }}</h5>
-                    <div class="font-mono mb-2 mb-md-3 gk-podium-jurusan" style="font-size: 0.72rem;" title="{{ strtoupper($top3->jurusan?->nama_jurusan ?? 'UMUM') }}">{{ strtoupper($top3->jurusan?->nama_jurusan ?? 'UMUM') }}</div>
-                    <div class="p-1.5 p-md-3 rounded-3 mb-2 mb-md-3 gk-podium-statbox">
-                        <div class="fw-bold gk-podium-score" style="font-size: 1.8rem; line-height: 1;">{{ $pct3 }}% <span class="text-warning fs-6">@for($star = 1; $star <= 5; $star++){{ $star <= round($pct3 / 20) ? '★' : '☆' }}@endfor</span></div>
-                        <div class="progress mt-1 mt-md-2 mb-1" style="height: 5px; border-radius: 10px; background: rgba(180, 83, 9, 0.2);">
-                            <div class="progress-bar rounded-pill" style="width: {{ $pct3 }}%; background: #b45309;"></div>
+            <div class="col-12 col-md-4 order-3 order-md-3 gk-podium-col gk-podium-3">
+                <div class="gk-podium-card-revised p-3 p-md-4 text-center h-100 d-flex flex-column justify-content-between shadow-sm">
+                    <div>
+                        <div class="mb-3">
+                            <span class="badge rounded-pill px-3 py-1.5 fw-bold" style="background: #fed7aa; color: #9a3412; font-size: 0.8rem;">
+                                #3rd
+                            </span>
                         </div>
-                        <small class="text-muted font-mono gk-podium-reviews" style="font-size: 0.72rem;">{{ $top3->total_penilaian }} {{ $mode === 'partisipasi' ? 'siswa memilih' : 'ulasan' }}</small>
+                        <div class="gk-avatar-red-wrap mb-3">
+                            <img src="{{ $top3->photo_url }}" width="96" height="96" alt="{{ $top3->nama }}">
+                        </div>
+                        <h5 class="fw-bold mb-1 text-dark" style="font-size: 1.05rem;" title="{{ $top3->nama }}">{{ $top3->nama }}</h5>
+                        <div class="text-muted small mb-2">{{ strtoupper($top3->jurusan?->nama_jurusan ?? 'UMUM') }}</div>
+                        <div class="text-warning mb-2" style="font-size: 0.95rem; letter-spacing: 2px;">
+                            @php $stars3 = round($pct3 / 20); @endphp
+                            @for($i = 1; $i <= 5; $i++)
+                                <i class="bi {{ $i <= $stars3 ? 'bi-star-fill' : 'bi-star text-muted opacity-25' }}"></i>
+                            @endfor
+                        </div>
+                        <div class="mb-2">
+                            <div class="gk-progress-pill mx-auto" style="width: 140px; background: #94a3b8;">
+                                <div class="gk-progress-pill-fill" style="width: {{ $pct3 }}%;"></div>
+                                <span class="position-relative" style="z-index: 2;">{{ $pct3 }}%</span>
+                            </div>
+                        </div>
+                        <small class="text-muted font-mono d-block mb-3" style="font-size: 0.78rem;">{{ $top3->total_penilaian }} {{ $mode === 'partisipasi' ? 'siswa memilih' : 'ulasan' }}</small>
                     </div>
-                    <a href="{{ route('admin.guru.show', $top3->id) }}" class="btn btn-outline-custom btn-sm btn-podium w-100 rounded-pill">
+                    <a href="{{ route('admin.guru.show', $top3->id) }}" class="btn btn-outline-custom btn-sm w-100 rounded-pill py-2 mb-3">
                         <i class="bi bi-eye me-1"></i> Detail
                     </a>
+                    <div class="d-flex align-items-center justify-content-end gap-1.5 pt-3 border-top mt-auto" style="min-height: 42px;">
+                        @forelse($top3->penghargaan as $penghargaan)
+                            @if($penghargaan->badge)
+                                <span class="gk-badge-mini-icon" style="background: {{ $penghargaan->badge->warna }}18; color: {{ $penghargaan->badge->warna }}; border-color: {{ $penghargaan->badge->warna }}33;" data-bs-toggle="tooltip" title="{{ $penghargaan->badge->nama_badge }}: {{ $penghargaan->badge->deskripsi }}">
+                                    @if(str_starts_with($penghargaan->badge->icon, 'bi-'))<i class="bi {{ $penghargaan->badge->icon }}"></i>@else{{ $penghargaan->badge->icon }}@endif
+                                </span>
+                            @endif
+                        @empty
+                            <span class="gk-badge-mini-icon" style="background: #10b98118; color: #059669; border-color: #10b98133;" title="Inspiratif"><i class="bi bi-lightbulb"></i></span>
+                        @endforelse
+                    </div>
                 </div>
             </div>
         </div>
@@ -250,7 +366,16 @@
                         <div class="d-flex align-items-center">
                             <img src="{{ $g->photo_url }}" class="rounded-circle me-3" width="44" height="44" style="object-fit: cover;">
                             <div>
-                                <strong>{{ $g->nama }}</strong>
+                                <div class="d-flex align-items-center gap-1.5 flex-wrap">
+                                    <strong>{{ $g->nama }}</strong>
+                                    @foreach($g->penghargaan ?? [] as $p)
+                                        @if($p->badge)
+                                            <span class="badge rounded-pill border" style="background: {{ $p->badge->warna }}15; color: {{ $p->badge->warna }}; border-color: {{ $p->badge->warna }}40 !important; font-size: 0.68rem;" title="{{ $p->badge->deskripsi }}">
+                                                @if(str_starts_with($p->badge->icon, 'bi-'))<i class="bi {{ $p->badge->icon }}"></i>@else{{ $p->badge->icon }}@endif {{ $p->badge->nama_badge }}
+                                            </span>
+                                        @endif
+                                    @endforeach
+                                </div>
                                 <div class="text-muted small font-mono">{{ $g->nip }}</div>
                             </div>
                         </div>

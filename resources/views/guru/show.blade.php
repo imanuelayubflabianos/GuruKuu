@@ -59,11 +59,11 @@
             <div class="row g-3">
                 @php
                     $aspects = [
-                        'Kedisiplinan' => $stats['rata_kedisiplinan'],
-                        'Komunikasi' => $stats['rata_komunikasi'],
-                        'Tanggung Jawab' => $stats['rata_tanggung_jawab'],
-                        'Kreativitas' => $stats['rata_kreativitas'],
-                        'Keramahan' => $stats['rata_keramahan'],
+                        'Ketepatan Waktu' => $stats['rata_kedisiplinan'],
+                        'Kehadiran di Kelas' => $stats['rata_tanggung_jawab'],
+                        'Penyampaian Materi' => $stats['rata_komunikasi'],
+                        'Interaksi dengan Siswa' => $stats['rata_keramahan'],
+                        'Keterlibatan & Suasana Belajar' => $stats['rata_kreativitas'],
                     ];
                 @endphp
                 @foreach($aspects as $label => $value)
@@ -142,11 +142,11 @@
             <div class="row g-1 text-center">
                 @php
                     $aspectsFb = [
-                        'Kedisiplinan' => $fb->kedisiplinan,
-                        'Komunikasi' => $fb->komunikasi,
-                        'Tanggung Jawab' => $fb->tanggung_jawab,
-                        'Kreativitas' => $fb->kreativitas,
-                        'Keramahan' => $fb->keramahan,
+                        'Ketepatan Waktu' => $fb->kedisiplinan,
+                        'Kehadiran di Kelas' => $fb->tanggung_jawab,
+                        'Penyampaian Materi' => $fb->komunikasi,
+                        'Interaksi dengan Siswa' => $fb->keramahan,
+                        'Keterlibatan & Suasana Belajar' => $fb->kreativitas,
                     ];
                 @endphp
                 @foreach($aspectsFb as $aspLabel => $aspVal)
@@ -168,6 +168,11 @@
                 <i class="bi bi-shield-exclamation text-warning me-1"></i> Ulasan ini disembunyikan karena tidak memenuhi kriteria kebijakan.
             </div>
         @else
+            @if(!$fb->kritik && !$fb->saran)
+                <div class="p-2 rounded small mb-2 bg-white text-muted fst-italic border">
+                    <i class="bi bi-star-fill text-warning me-1"></i> Siswa memberikan nilai bintang tanpa kritik & saran tertulis.
+                </div>
+            @endif
             @if($fb->kritik)
                 <div class="p-2 rounded small mb-2 bg-white border-start border-3 border-warning">
                     <strong class="text-warning-emphasis">Kritik:</strong> {{ $fb->kritik }}

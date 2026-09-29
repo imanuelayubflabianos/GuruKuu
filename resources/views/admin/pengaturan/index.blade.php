@@ -39,6 +39,7 @@
         <button class="settings-nav__item" type="button" data-target="#tabHero"><i class="bi bi-image"></i> Beranda & Slider</button>
         <button class="settings-nav__item" type="button" data-target="#tabKonten"><i class="bi bi-card-checklist"></i> Panduan & Tentang</button>
         <button class="settings-nav__item" type="button" data-target="#tabVisiMisi"><i class="bi bi-bullseye"></i> Profil & Fitur</button>
+        <button class="settings-nav__item" type="button" data-target="#tabBadge"><i class="bi bi-award"></i> Lencana & Badge</button>
         <button class="settings-nav__item" type="button" data-target="#tabFooter"><i class="bi bi-layout-text-window-reverse"></i> Footer</button>
         <button class="settings-nav__item" type="button" data-target="#tabLegal"><i class="bi bi-file-earmark-lock"></i> Legal</button>
         <button class="settings-nav__item" type="button" data-target="#tabModerasi"><i class="bi bi-shield-exclamation"></i> Moderasi</button>
@@ -859,6 +860,174 @@
             @include('components.faq-accordion')
         </div>
     </section>
+
+    {{-- TAB LENCANA & BADGE PENGHARGAAN --}}
+    <section class="settings-panel" id="tabBadge" hidden>
+        <div class="settings-card mb-4">
+            <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-3">
+                <div>
+                    <h2 class="settings-heading mb-1 fs-5"><i class="bi bi-award-fill text-warning me-2"></i>Manajemen Lencana & Badge</h2>
+                    <p class="settings-muted mb-0">Atur daftar badge/lencana prestasi untuk guru dan siswa. Badge dapat disematkan saat tambah/edit data dan otomatis tampil di leaderboard.</p>
+                </div>
+                <div>
+                    <button type="button" class="btn btn-primary-custom btn-sm px-3.5 py-2 fw-semibold rounded-pill shadow-sm" data-bs-toggle="modal" data-bs-target="#modalTambahBadge">
+                        <i class="bi bi-plus-circle me-1"></i> Tambah Badge Baru
+                    </button>
+                </div>
+            </div>
+
+            <div class="row g-3">
+                @forelse($badges ?? [] as $badge)
+                    <div class="col-md-6 col-lg-4">
+                        <div class="p-3.5 rounded-3 border bg-white h-100 d-flex flex-column justify-content-between shadow-sm position-relative" style="border-left: 4.5px solid {{ $badge->warna ?: '#003366' }} !important;">
+                            <div>
+                                <div class="d-flex align-items-center justify-content-between mb-2.5">
+                                    <div class="d-flex align-items-center gap-2.5">
+                                        <div class="d-flex align-items-center justify-content-center rounded-3 shadow-sm flex-shrink-0" style="width: 44px; height: 44px; background: {{ $badge->warna ?: '#003366' }}18; color: {{ $badge->warna ?: '#003366' }}; font-size: 1.4rem; border: 1.5px solid {{ $badge->warna ?: '#003366' }}33;">
+                                            @if(str_starts_with($badge->icon, 'bi-'))
+                                                <i class="bi {{ $badge->icon }}"></i>
+                                            @else
+                                                {{ $badge->icon }}
+                                            @endif
+                                        </div>
+                                        <div class="overflow-hidden">
+                                            <h6 class="fw-bold mb-0.5 text-dark text-truncate" title="{{ $badge->nama_badge }}">{{ $badge->nama_badge }}</h6>
+                                            <span class="badge rounded-pill" style="background: {{ $badge->warna ?: '#003366' }}; color: #fff; font-size: 0.68rem; font-weight: 600;">{{ $badge->warna ?: '#003366' }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <p class="text-secondary small mb-3" style="line-height: 1.45; font-size: 0.82rem; min-height: 38px;">
+                                    {{ $badge->deskripsi ?: 'Tidak ada deskripsi.' }}
+                                </p>
+                            </div>
+
+                            <div class="d-flex align-items-center justify-content-between pt-2.5 border-top">
+                                <span class="text-muted font-mono" style="font-size: 0.72rem;">
+                                    <i class="bi bi-person-check me-1"></i> {{ $badge->penghargaan_count ?? 0 }} penerima
+                                </span>
+                                <div class="d-flex align-items-center gap-1.5">
+                                    <button type="button" class="btn btn-sm btn-outline-secondary btn-edit-badge py-1 px-2.5 rounded-pill"
+                                        data-id="{{ $badge->id }}"
+                                        data-nama="{{ $badge->nama_badge }}"
+                                        data-icon="{{ $badge->icon }}"
+                                        data-warna="{{ $badge->warna }}"
+                                        data-deskripsi="{{ $badge->deskripsi }}"
+                                        title="Edit Badge">
+                                        <i class="bi bi-pencil-square"></i> Edit
+                                    </button>
+                                    <form action="{{ route('admin.badge.destroy', $badge) }}" method="POST" class="d-inline" onsubmit="return confirm('Apakah Anda yakin ingin menghapus badge {{ $badge->nama_badge }}?')">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-sm btn-outline-danger py-1 px-2 rounded-pill" title="Hapus Badge">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                @empty
+                    <div class="col-12 text-center text-muted py-5">
+                        <i class="bi bi-award display-4 d-block mb-2 opacity-50"></i>
+                        Belum ada badge yang ditambahkan. Klik "Tambah Badge Baru" untuk membuat badge.
+                    </div>
+                @endforelse
+            </div>
+        </div>
+    </section>
+{{-- MODAL TAMBAH BADGE --}}
+<div class="modal fade" id="modalTambahBadge" tabindex="-1" aria-labelledby="modalTambahBadgeLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header border-bottom">
+                <h5 class="modal-title fw-bold" id="modalTambahBadgeLabel"><i class="bi bi-plus-circle text-primary me-2"></i>Tambah Badge Baru</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="{{ route('admin.badge.store') }}" method="POST">
+                @csrf
+                <div class="modal-body p-4">
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label fw-bold">Nama Badge <span class="text-danger">*</span></label>
+                            <input type="text" name="nama_badge" class="form-control" placeholder="Contoh: Guru Ter-Top, Disiplin Berturut-turut" required>
+                        </div>
+                        <div class="col-md-7">
+                            <label class="form-label fw-bold">Icon / Simbol <span class="text-danger">*</span></label>
+                            <input type="text" name="icon" id="addBadgeIconInput" class="form-control" value="🏆" placeholder="Emoji (🏆, ⭐) atau class bi-trophy" required>
+                            <div class="d-flex flex-wrap gap-1 mt-2">
+                                <button type="button" class="btn btn-sm btn-outline-secondary py-0.5 px-2 quick-icon-btn" data-icon="🏆">🏆</button>
+                                <button type="button" class="btn btn-sm btn-outline-secondary py-0.5 px-2 quick-icon-btn" data-icon="⭐">⭐</button>
+                                <button type="button" class="btn btn-sm btn-outline-secondary py-0.5 px-2 quick-icon-btn" data-icon="💡">💡</button>
+                                <button type="button" class="btn btn-sm btn-outline-secondary py-0.5 px-2 quick-icon-btn" data-icon="🤝">🤝</button>
+                                <button type="button" class="btn btn-sm btn-outline-secondary py-0.5 px-2 quick-icon-btn" data-icon="📅">📅</button>
+                                <button type="button" class="btn btn-sm btn-outline-secondary py-0.5 px-2 quick-icon-btn" data-icon="🚀">🚀</button>
+                                <button type="button" class="btn btn-sm btn-outline-secondary py-0.5 px-2 quick-icon-btn" data-icon="🎖️">🎖️</button>
+                                <button type="button" class="btn btn-sm btn-outline-secondary py-0.5 px-2 quick-icon-btn" data-icon="📈">📈</button>
+                            </div>
+                        </div>
+                        <div class="col-md-5">
+                            <label class="form-label fw-bold">Warna Tema</label>
+                            <div class="d-flex gap-2">
+                                <input type="color" name="warna" id="addBadgeColorInput" class="form-control form-control-color flex-shrink-0" value="#d97706" style="width: 45px; height: 38px;">
+                                <input type="text" id="addBadgeColorHex" class="form-control font-mono" value="#d97706">
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-bold">Deskripsi Badge</label>
+                            <textarea name="deskripsi" class="form-control" rows="3" placeholder="Jelaskan kriteria perolehan lencana ini..."></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-top bg-light">
+                    <button type="button" class="btn btn-light border" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary-custom px-4"><i class="bi bi-save me-1"></i>Simpan Badge</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{{-- MODAL EDIT BADGE --}}
+<div class="modal fade" id="modalEditBadge" tabindex="-1" aria-labelledby="modalEditBadgeLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header border-bottom">
+                <h5 class="modal-title fw-bold" id="modalEditBadgeLabel"><i class="bi bi-pencil-square text-primary me-2"></i>Edit Badge</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="formEditBadge" method="POST">
+                @csrf
+                @method('PUT')
+                <div class="modal-body p-4">
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label fw-bold">Nama Badge <span class="text-danger">*</span></label>
+                            <input type="text" name="nama_badge" id="editBadgeNama" class="form-control" required>
+                        </div>
+                        <div class="col-md-7">
+                            <label class="form-label fw-bold">Icon / Simbol <span class="text-danger">*</span></label>
+                            <input type="text" name="icon" id="editBadgeIcon" class="form-control" required>
+                        </div>
+                        <div class="col-md-5">
+                            <label class="form-label fw-bold">Warna Tema</label>
+                            <div class="d-flex gap-2">
+                                <input type="color" name="warna" id="editBadgeWarnaColor" class="form-control form-control-color flex-shrink-0" style="width: 45px; height: 38px;">
+                                <input type="text" id="editBadgeWarnaText" class="form-control font-mono">
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-bold">Deskripsi Badge</label>
+                            <textarea name="deskripsi" id="editBadgeDeskripsi" class="form-control" rows="3"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-top bg-light">
+                    <button type="button" class="btn btn-light border" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary-custom px-4"><i class="bi bi-save me-1"></i>Perbarui Badge</button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
 
 {{-- MODAL TAMBAH FAQ --}}
@@ -1285,6 +1454,60 @@ document.addEventListener('DOMContentLoaded', function() {
     bindUrlPreview('heroImageUrlInput', 'previewHero1Wrapper');
     bindUrlPreview('heroImageUrl2Input', 'previewHero2Wrapper');
     bindUrlPreview('heroImageUrl3Input', 'previewHero3Wrapper');
+
+    // ==================== BADGE HANDLERS ====================
+    // Quick icon picker buttons
+    document.querySelectorAll('.quick-icon-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const icon = this.getAttribute('data-icon');
+            const targetInput = document.getElementById('addBadgeIconInput');
+            if (targetInput) targetInput.value = icon;
+        });
+    });
+
+    // Color sync Add Badge
+    const addBadgeColor = document.getElementById('addBadgeColorInput');
+    const addBadgeHex = document.getElementById('addBadgeColorHex');
+    if (addBadgeColor && addBadgeHex) {
+        addBadgeColor.addEventListener('input', () => addBadgeHex.value = addBadgeColor.value);
+        addBadgeHex.addEventListener('input', () => {
+            if (/^#[0-9A-Fa-f]{6}$/.test(addBadgeHex.value)) addBadgeColor.value = addBadgeHex.value;
+        });
+    }
+
+    // Color sync Edit Badge
+    const editBadgeColor = document.getElementById('editBadgeWarnaColor');
+    const editBadgeHex = document.getElementById('editBadgeWarnaText');
+    if (editBadgeColor && editBadgeHex) {
+        editBadgeColor.addEventListener('input', () => editBadgeHex.value = editBadgeColor.value);
+        editBadgeHex.addEventListener('input', () => {
+            if (/^#[0-9A-Fa-f]{6}$/.test(editBadgeHex.value)) editBadgeColor.value = editBadgeHex.value;
+        });
+    }
+
+    // Edit Badge Modal Trigger
+    const formEditBadge = document.getElementById('formEditBadge');
+    document.querySelectorAll('.btn-edit-badge').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const id = this.getAttribute('data-id');
+            const nama = this.getAttribute('data-nama');
+            const icon = this.getAttribute('data-icon');
+            const warna = this.getAttribute('data-warna') || '#003366';
+            const deskripsi = this.getAttribute('data-deskripsi') || '';
+
+            if (formEditBadge) {
+                formEditBadge.action = `{{ url('admin/badge') }}/${id}`;
+                document.getElementById('editBadgeNama').value = nama;
+                document.getElementById('editBadgeIcon').value = icon;
+                if (editBadgeColor) editBadgeColor.value = warna;
+                if (editBadgeHex) editBadgeHex.value = warna;
+                document.getElementById('editBadgeDeskripsi').value = deskripsi;
+
+                const modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('modalEditBadge'));
+                modal.show();
+            }
+        });
+    });
 
     @if($errors->has('reset_current_password') || $errors->has('reset_confirmation') || $errors->has('reset_acknowledged'))
         showTab('#tabAkun', false);

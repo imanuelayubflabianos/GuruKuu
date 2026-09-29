@@ -18,13 +18,13 @@
         </button>
     </li>
     <li class="nav-item">
-        <button class="nav-link" id="faq-tab" data-bs-toggle="pill" data-bs-target="#tabFaq" type="button">
-            <i class="bi bi-question-circle"></i> FAQ
+        <button class="nav-link" id="device-tab" data-bs-toggle="pill" data-bs-target="#tabDevice" type="button">
+            <i class="bi bi-laptop"></i> Riwayat Perangkat
         </button>
     </li>
     <li class="nav-item">
-        <button class="nav-link" id="device-tab" data-bs-toggle="pill" data-bs-target="#tabDevice" type="button">
-            <i class="bi bi-laptop"></i> Riwayat Perangkat
+        <button class="nav-link" id="faq-tab" data-bs-toggle="pill" data-bs-target="#tabFaq" type="button">
+            <i class="bi bi-question-circle"></i> FAQ
         </button>
     </li>
     <li class="nav-item">
@@ -119,14 +119,14 @@
         </div>
     </div>
 
-    {{-- TAB 2: FAQ SISWA --}}
-    <div class="tab-pane fade" id="tabFaq">
-        @include('components.faq-accordion')
-    </div>
-
-    {{-- TAB 3: RIWAYAT PERANGKAT --}}
+    {{-- TAB 2: RIWAYAT PERANGKAT --}}
     <div class="tab-pane fade" id="tabDevice">
         @include('components.device-history')
+    </div>
+
+    {{-- TAB 3: FAQ SISWA --}}
+    <div class="tab-pane fade" id="tabFaq">
+        @include('components.faq-accordion')
     </div>
 
     {{-- TAB 2: HUBUNGI ADMIN --}}

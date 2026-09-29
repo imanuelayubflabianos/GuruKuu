@@ -71,6 +71,20 @@
                         </span>
                     </div>
 
+                    {{-- LENCANA & BADGE PENGHARGAAN --}}
+                    @if($guru->penghargaan && $guru->penghargaan->count() > 0)
+                        <div class="d-flex flex-wrap justify-content-center gap-1.5 mb-3">
+                            @foreach($guru->penghargaan as $p)
+                                @if($p->badge)
+                                    <span class="badge rounded-pill border py-1.5 px-2.5 d-inline-flex align-items-center gap-1.5" style="background: {{ $p->badge->warna }}15; color: {{ $p->badge->warna }}; border-color: {{ $p->badge->warna }}33 !important; font-size: 0.75rem;" title="{{ $p->badge->deskripsi }}">
+                                        @if(str_starts_with($p->badge->icon, 'bi-'))<i class="bi {{ $p->badge->icon }}"></i>@else{{ $p->badge->icon }}@endif
+                                        <span>{{ $p->badge->nama_badge }}</span>
+                                    </span>
+                                @endif
+                            @endforeach
+                        </div>
+                    @endif
+
                     {{-- DESKRIPSI & TENTANG GURU --}}
                     <div class="text-start p-3 rounded" style="background: var(--bg-light); border: 1px solid var(--border);">
                         <div class="d-flex align-items-center gap-2 mb-2">
@@ -103,11 +117,11 @@
                         <div class="row g-3">
                             @php
                                 $aspects = [
-                                    'Kedisiplinan' => $stats['rata_kedisiplinan'],
-                                    'Komunikasi' => $stats['rata_komunikasi'],
-                                    'Tanggung Jawab' => $stats['rata_tanggung_jawab'],
-                                    'Kreativitas' => $stats['rata_kreativitas'],
-                                    'Keramahan' => $stats['rata_keramahan'],
+                                    'Ketepatan Waktu' => $stats['rata_kedisiplinan'],
+                                    'Kehadiran di Kelas' => $stats['rata_komunikasi'],
+                                    'Penyampaian Materi' => $stats['rata_tanggung_jawab'],
+                                    'Interaksi Siswa' => $stats['rata_kreativitas'],
+                                    'Suasana Belajar' => $stats['rata_keramahan'],
                                 ];
                             @endphp
                             @foreach($aspects as $label => $value)
@@ -235,11 +249,11 @@
                         <div class="row g-1 text-center">
                             @php
                                 $aspectsFb = [
-                                    'Kedisiplinan' => $fb->kedisiplinan,
-                                    'Komunikasi' => $fb->komunikasi,
-                                    'Tanggung Jawab' => $fb->tanggung_jawab,
-                                    'Kreativitas' => $fb->kreativitas,
-                                    'Keramahan' => $fb->keramahan,
+                                    'Ketepatan Waktu' => $fb->kedisiplinan,
+                                    'Kehadiran di Kelas' => $fb->komunikasi,
+                                    'Penyampaian Materi' => $fb->tanggung_jawab,
+                                    'Interaksi Siswa' => $fb->kreativitas,
+                                    'Suasana Belajar' => $fb->keramahan,
                                 ];
                             @endphp
                             @foreach($aspectsFb as $aspLabel => $aspVal)
@@ -269,6 +283,11 @@
                         @if($fb->saran)
                             <div class="p-2 rounded small mb-2" style="background: #e1f5fe; border-left: 3px solid #0288d1;">
                                 <strong class="text-primary">Saran Perbaikan:</strong> {{ $fb->saran }}
+                            </div>
+                        @endif
+                        @if(!$fb->kritik && !$fb->saran)
+                            <div class="p-2 rounded small mb-2 bg-light border text-muted fst-italic">
+                                <i class="bi bi-star-fill text-warning me-1"></i> Memberikan penilaian bintang tanpa ulasan tertulis.
                             </div>
                         @endif
                     @endif

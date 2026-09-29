@@ -157,4 +157,25 @@ class PenilaianController extends Controller
 
         return back()->with('success', 'Riwayat penilaian berhasil dihapus.');
     }
+
+    public function resetPenilaian(Guru $guru)
+    {
+        $periodeAktif = Periode::where('status', 'aktif')->first();
+        if (!$periodeAktif) {
+            return back()->with('error', 'Tidak ada periode evaluasi aktif saat ini.');
+        }
+
+        $penilaian = Penilaian::where('siswa_id', auth()->id())
+            ->where('guru_id', $guru->id)
+            ->where('periode_id', $periodeAktif->id)
+            ->first();
+
+        if ($penilaian) {
+            $penilaian->delete();
+            $guru->updateRataRata();
+        }
+
+        return redirect()->route('siswa.penilaian.create', $guru)
+            ->with('success', 'Penilaian sebelumnya telah dihapus. Silakan berikan penilaian baru Anda.');
+    }
 }

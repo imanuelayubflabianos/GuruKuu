@@ -69,6 +69,7 @@ class LandingController extends Controller
 
     public function guruDetail(Guru $guru)
     {
+        $guru->load(['jurusan', 'penghargaan.badge']);
         $periodeAktif = Periode::where('status', 'aktif')->first();
         $periodeId = $periodeAktif?->id;
 
@@ -98,10 +99,6 @@ class LandingController extends Controller
         $semuaFeedback = Penilaian::with(['siswa', 'balasans.user'])
             ->where('guru_id', $guru->id)
             ->when($periodeId, fn($q) => $q->where('periode_id', $periodeId))
-            ->where(function($q) {
-                $q->whereNotNull('kritik')->where('kritik', '!=', '')
-                  ->orWhereNotNull('saran')->where('saran', '!=', '');
-            })
             ->where(function ($query) {
                 $query->where('is_censored', false)->orWhereNull('is_censored');
             })

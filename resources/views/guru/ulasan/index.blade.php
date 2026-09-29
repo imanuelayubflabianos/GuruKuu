@@ -129,32 +129,32 @@
                 <div class="row g-2 text-center" style="font-size: 0.78rem;">
                     <div class="col-4 col-md">
                         <div class="p-1 bg-white rounded border">
-                            <span class="text-muted d-block">Disiplin</span>
+                            <span class="text-muted d-block text-truncate" title="Ketepatan Waktu">Waktu</span>
                             <strong class="text-primary">{{ $review->kedisiplinan }}/5</strong>
                         </div>
                     </div>
                     <div class="col-4 col-md">
                         <div class="p-1 bg-white rounded border">
-                            <span class="text-muted d-block">Komunikasi</span>
-                            <strong class="text-primary">{{ $review->komunikasi }}/5</strong>
-                        </div>
-                    </div>
-                    <div class="col-4 col-md">
-                        <div class="p-1 bg-white rounded border">
-                            <span class="text-muted d-block">Tanggung Jwb</span>
+                            <span class="text-muted d-block text-truncate" title="Kehadiran di Kelas">Kehadiran</span>
                             <strong class="text-primary">{{ $review->tanggung_jawab }}/5</strong>
                         </div>
                     </div>
                     <div class="col-4 col-md">
                         <div class="p-1 bg-white rounded border">
-                            <span class="text-muted d-block">Kreativitas</span>
-                            <strong class="text-primary">{{ $review->kreativitas }}/5</strong>
+                            <span class="text-muted d-block text-truncate" title="Penyampaian Materi">Materi</span>
+                            <strong class="text-primary">{{ $review->komunikasi }}/5</strong>
                         </div>
                     </div>
                     <div class="col-4 col-md">
                         <div class="p-1 bg-white rounded border">
-                            <span class="text-muted d-block">Keramahan</span>
+                            <span class="text-muted d-block text-truncate" title="Interaksi dengan Siswa">Interaksi</span>
                             <strong class="text-primary">{{ $review->keramahan }}/5</strong>
+                        </div>
+                    </div>
+                    <div class="col-4 col-md">
+                        <div class="p-1 bg-white rounded border">
+                            <span class="text-muted d-block text-truncate" title="Keterlibatan & Suasana Belajar">Suasana</span>
+                            <strong class="text-primary">{{ $review->kreativitas }}/5</strong>
                         </div>
                     </div>
                 </div>

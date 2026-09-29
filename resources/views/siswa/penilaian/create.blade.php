@@ -95,11 +95,11 @@
 
                 @php
                     $kriteriaList = [
-                        'kedisiplinan'   => ['label' => 'Kedisiplinan', 'desc' => 'Ketepatan waktu masuk kelas, keteraturan jam pelajaran, dan komitmen kehadiran.', 'icon' => 'bi-clock-history', 'color' => '#0284c7', 'bg' => '#e0f2fe'],
-                        'komunikasi'     => ['label' => 'Komunikasi', 'desc' => 'Kejelasan instruksi, interaksi dua arah, dan keterbukaan dalam mendengarkan siswa.', 'icon' => 'bi-chat-dots-fill', 'color' => '#0d9488', 'bg' => '#ccfbf1'],
-                        'tanggung_jawab' => ['label' => 'Tanggung Jawab', 'desc' => 'Tanggung jawab terhadap penugasan, keadilan penilaian, dan bimbingan tugas.', 'icon' => 'bi-shield-check', 'color' => '#16a34a', 'bg' => '#dcfce7'],
-                        'kreativitas'    => ['label' => 'Kreativitas', 'desc' => 'Penggunaan metode belajar yang variatif, media digital, dan tidak monoton.', 'icon' => 'bi-lightbulb-fill', 'color' => '#d97706', 'bg' => '#fef3c7'],
-                        'keramahan'      => ['label' => 'Keramahan & Sikap', 'desc' => 'Sikap menghargai siswa, kesabaran dalam membimbing, dan empati di kelas.', 'icon' => 'bi-emoji-smile-fill', 'color' => '#e11d48', 'bg' => '#ffe4e6'],
+                        'kedisiplinan'   => ['label' => 'Ketepatan Waktu', 'desc' => 'Guru masuk kelas tepat waktu dan memulai pembelajaran sesuai jadwal.', 'icon' => 'bi-clock-history', 'color' => '#0284c7', 'bg' => '#e0f2fe'],
+                        'komunikasi'     => ['label' => 'Kehadiran di Kelas', 'desc' => 'Guru tetap berada di kelas selama proses pembelajaran dan tidak sering meninggalkan kelas tanpa alasan yang jelas.', 'icon' => 'bi-person-check-fill', 'color' => '#0d9488', 'bg' => '#ccfbf1'],
+                        'tanggung_jawab' => ['label' => 'Penyampaian Materi', 'desc' => 'Guru menyampaikan materi ajar dengan jelas, sistematis, dan mudah dipahami.', 'icon' => 'bi-book-half', 'color' => '#16a34a', 'bg' => '#dcfce7'],
+                        'kreativitas'    => ['label' => 'Interaksi dengan Siswa', 'desc' => 'Guru berinteraksi dengan baik, memberikan kesempatan bertanya/berpendapat, dan merespons siswa dengan baik.', 'icon' => 'bi-chat-dots-fill', 'color' => '#d97706', 'bg' => '#fef3c7'],
+                        'keramahan'      => ['label' => 'Keterlibatan & Suasana Belajar', 'desc' => 'Guru menciptakan pembelajaran yang menarik, melibatkan siswa secara aktif, dan membuat suasana belajar nyaman.', 'icon' => 'bi-emoji-smile-fill', 'color' => '#e11d48', 'bg' => '#ffe4e6'],
                     ];
                 @endphp
 

@@ -71,7 +71,8 @@ class GuruController extends Controller
     public function create()
     {
         $jurusans = Jurusan::orderBy('nama_jurusan')->get();
-        return view('admin.guru.create', compact('jurusans'));
+        $badges = \App\Models\Badge::orderBy('nama_badge')->get();
+        return view('admin.guru.create', compact('jurusans', 'badges'));
     }
 
     public function store(Request $request)
@@ -85,9 +86,11 @@ class GuruController extends Controller
             'jurusan_id' => 'nullable|exists:jurusan,id',
             'bio'        => 'nullable|string',
             'photo'      => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'badge_ids'  => 'nullable|array',
+            'badge_ids.*'=> 'exists:badge,id',
         ]);
 
-        $data = $request->except(['photo']);
+        $data = $request->except(['photo', 'badge_ids']);
         $data['kategori'] = $request->input('kategori') ?: 'normada';
 
         if ($request->hasFile('photo')) {
@@ -95,7 +98,19 @@ class GuruController extends Controller
             $data['photo'] = $path;
         }
 
-        Guru::create($data);
+        $guru = Guru::create($data);
+
+        if ($request->filled('badge_ids')) {
+            $periodeAktif = \App\Models\Periode::where('status', 'aktif')->first() ?? \App\Models\Periode::first();
+            foreach ($request->input('badge_ids', []) as $badgeId) {
+                \App\Models\Penghargaan::firstOrCreate([
+                    'guru_id'    => $guru->id,
+                    'badge_id'   => $badgeId,
+                    'periode_id' => $periodeAktif?->id,
+                ]);
+            }
+        }
+
         return redirect()->route('admin.guru.index')->with('success', 'Guru berhasil ditambahkan!');
     }
 
@@ -136,15 +151,17 @@ class GuruController extends Controller
             ->latest('tanggal_mulai')
             ->get();
 
-        $guru->load('kelas.jurusan');
+        $guru->load(['kelas.jurusan', 'penghargaan.badge']);
         return view('admin.guru.show', compact('guru', 'periodeAktif', 'stats', 'semuaFeedback', 'arsipPeriode'));
     }
 
     public function edit(Guru $guru)
     {
         $kelasList = Kelas::with('jurusan')->orderBy('tingkat')->orderBy('nama_kelas')->get();
-        $guru->load('kelas');
-        return view('admin.guru.edit', compact('guru', 'kelasList'));
+        $badges = \App\Models\Badge::orderBy('nama_badge')->get();
+        $guru->load(['kelas', 'penghargaan']);
+        $assignedBadgeIds = $guru->penghargaan->pluck('badge_id')->toArray();
+        return view('admin.guru.edit', compact('guru', 'kelasList', 'badges', 'assignedBadgeIds'));
     }
 
     public function update(Request $request, Guru $guru)
@@ -159,9 +176,11 @@ class GuruController extends Controller
             'kelas_ids.*' => 'exists:kelas,id',
             'bio'        => 'nullable|string',
             'photo'      => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'badge_ids'  => 'nullable|array',
+            'badge_ids.*'=> 'exists:badge,id',
         ]);
 
-        $data = $request->except(['photo', 'kelas_ids']);
+        $data = $request->except(['photo', 'kelas_ids', 'badge_ids']);
         $data['kategori'] = $request->input('kategori') ?: ($guru->kategori ?: 'normada');
 
         if ($request->hasFile('photo')) {
@@ -174,6 +193,19 @@ class GuruController extends Controller
 
         $guru->update($data);
         $guru->kelas()->sync($request->input('kelas_ids', []));
+
+        // Sync Badges
+        $periodeAktif = \App\Models\Periode::where('status', 'aktif')->first() ?? \App\Models\Periode::first();
+        \App\Models\Penghargaan::where('guru_id', $guru->id)->delete();
+        if ($request->filled('badge_ids')) {
+            foreach ($request->input('badge_ids', []) as $badgeId) {
+                \App\Models\Penghargaan::create([
+                    'guru_id'    => $guru->id,
+                    'badge_id'   => $badgeId,
+                    'periode_id' => $periodeAktif?->id,
+                ]);
+            }
+        }
 
         // Sinkronkan ke akun User jika guru ini memiliki akun login sistem
         $linkedUser = \App\Models\User::where('nis', $guru->nip)

@@ -32,7 +32,7 @@ class SiswaController extends Controller
     {
         abort_unless($siswa->role === 'siswa', 404);
 
-        $siswa->load(['jurusan', 'kelas.jurusan']);
+        $siswa->load(['jurusan', 'kelas.jurusan', 'badges']);
         $penilaian = Penilaian::with(['guru', 'periode', 'kelas'])
             ->where('siswa_id', $siswa->id)
             ->latest()
@@ -49,7 +49,8 @@ class SiswaController extends Controller
     {
         $kelasList = Kelas::orderBy('tingkat')->orderBy('nama_kelas')->get();
         $jurusan = \App\Models\Jurusan::orderBy('nama_jurusan')->get();
-        return view('admin.siswa.create', compact('kelasList', 'jurusan'));
+        $badges = \App\Models\Badge::orderBy('nama_badge')->get();
+        return view('admin.siswa.create', compact('kelasList', 'jurusan', 'badges'));
     }
 
     public function store(Request $request)
@@ -61,6 +62,8 @@ class SiswaController extends Controller
             'jurusan_id' => 'nullable|exists:jurusan,id',
             'tanggal_lahir' => 'required|date',
             'photo' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+            'badge_ids' => 'nullable|array',
+            'badge_ids.*' => 'exists:badge,id',
         ]);
 
         $photoPath = null;
@@ -68,7 +71,7 @@ class SiswaController extends Controller
             $photoPath = $request->file('photo')->store('siswa', 'public');
         }
 
-        User::create([
+        $siswa = User::create([
             'name' => $request->name,
             'nis' => $request->nis,
             'email' => $request->nis . '@gurukuu.local',
@@ -81,6 +84,10 @@ class SiswaController extends Controller
             'is_active' => true,
         ]);
 
+        if ($request->filled('badge_ids')) {
+            $siswa->badges()->sync($request->input('badge_ids', []));
+        }
+
         return redirect()->route('admin.siswa.index')->with('success', 'Siswa berhasil ditambahkan!');
     }
 
@@ -88,7 +95,10 @@ class SiswaController extends Controller
     {
         $kelasList = Kelas::orderBy('tingkat')->orderBy('nama_kelas')->get();
         $jurusan = \App\Models\Jurusan::orderBy('nama_jurusan')->get();
-        return view('admin.siswa.edit', compact('siswa', 'kelasList', 'jurusan'));
+        $badges = \App\Models\Badge::orderBy('nama_badge')->get();
+        $siswa->load('badges');
+        $assignedBadgeIds = $siswa->badges->pluck('id')->toArray();
+        return view('admin.siswa.edit', compact('siswa', 'kelasList', 'jurusan', 'badges', 'assignedBadgeIds'));
     }
 
     public function update(Request $request, User $siswa)
@@ -100,6 +110,8 @@ class SiswaController extends Controller
             'jurusan_id' => 'nullable|exists:jurusan,id',
             'tanggal_lahir' => 'required|date',
             'photo' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+            'badge_ids' => 'nullable|array',
+            'badge_ids.*' => 'exists:badge,id',
         ]);
 
         $data = [
@@ -122,6 +134,7 @@ class SiswaController extends Controller
         }
 
         $siswa->update($data);
+        $siswa->badges()->sync($request->input('badge_ids', []));
 
         return redirect()->route('admin.siswa.index')->with('success', 'Data siswa berhasil diperbarui!');
     }

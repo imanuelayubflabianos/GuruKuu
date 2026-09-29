@@ -19,4 +19,18 @@ class Badge extends Model
     {
         return $this->hasMany(Penghargaan::class);
     }
+
+    public function gurus()
+    {
+        return $this->belongsToMany(Guru::class, 'penghargaan', 'badge_id', 'guru_id')
+                    ->withPivot('periode_id')
+                    ->withTimestamps();
+    }
+
+    public function users()
+    {
+        return $this->belongsToMany(User::class, 'user_badges', 'badge_id', 'user_id')
+                    ->withPivot('periode_id')
+                    ->withTimestamps();
+    }
 }

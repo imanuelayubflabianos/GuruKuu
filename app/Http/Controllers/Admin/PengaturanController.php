@@ -105,6 +105,7 @@ class PengaturanController extends Controller
 
         $semuaPeriode = Periode::orderBy('tahun_ajaran', 'desc')->orderBy('semester', 'desc')->get();
         $jumlahPenilaian = Penilaian::count();
+        $badges = \App\Models\Badge::withCount('penghargaan')->get();
 
         return view('admin.pengaturan.index', compact(
             'periodeAktif',
@@ -114,7 +115,8 @@ class PengaturanController extends Controller
             'defaultBadWords',
             'customBadWords',
             'allBadWords',
-            'faqs'
+            'faqs',
+            'badges'
         ));
     }
 

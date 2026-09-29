@@ -140,6 +140,13 @@ class User extends Authenticatable
         return $this->hasOne(\App\Models\Guru::class, 'nip', 'nis');
     }
 
+    public function badges()
+    {
+        return $this->belongsToMany(\App\Models\Badge::class, 'user_badges', 'user_id', 'badge_id')
+                    ->withPivot('periode_id')
+                    ->withTimestamps();
+    }
+
     public function getDetailRoleLabelAttribute()
     {
         if ($this->role === 'guru') {

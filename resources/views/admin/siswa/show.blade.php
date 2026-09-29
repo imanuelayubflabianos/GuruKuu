@@ -17,7 +17,21 @@
             <div class="text-center mb-4">
                 <img src="{{ $siswa->photo_url }}" alt="{{ $siswa->name }}" class="rounded-circle border" style="width: 104px; height: 104px; object-fit: cover;">
                 <h4 class="fw-bold mt-3 mb-1">{{ $siswa->name }}</h4>
-                <span class="badge {{ $siswa->is_active ? 'bg-success' : 'bg-danger' }}">{{ $siswa->is_active ? 'Aktif' : 'Nonaktif' }}</span>
+                <div class="mb-2">
+                    <span class="badge {{ $siswa->is_active ? 'bg-success' : 'bg-danger' }}">{{ $siswa->is_active ? 'Aktif' : 'Nonaktif' }}</span>
+                </div>
+
+                {{-- LENCANA & BADGE SISWA --}}
+                @if($siswa->badges && $siswa->badges->count() > 0)
+                    <div class="d-flex flex-wrap justify-content-center gap-1.5 mb-3">
+                        @foreach($siswa->badges as $b)
+                            <span class="badge rounded-pill border py-1.5 px-2.5 d-inline-flex align-items-center gap-1.5" style="background: {{ $b->warna ?: '#003366' }}15; color: {{ $b->warna ?: '#003366' }}; border-color: {{ $b->warna ?: '#003366' }}33 !important; font-size: 0.75rem;" title="{{ $b->deskripsi }}">
+                                @if(str_starts_with($b->icon, 'bi-'))<i class="bi {{ $b->icon }}"></i>@else{{ $b->icon }}@endif
+                                <span>{{ $b->nama_badge }}</span>
+                            </span>
+                        @endforeach
+                    </div>
+                @endif
             </div>
             <dl class="row small mb-0">
                 <dt class="col-5 text-muted">NIS</dt><dd class="col-7 font-mono">{{ $siswa->nis }}</dd>

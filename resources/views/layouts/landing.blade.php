@@ -297,8 +297,8 @@
             width: 48px;
             height: 48px;
             border-radius: 12px;
-            background: #dc2626;
-            color: #ffffff;
+            background: rgba(0, 78, 167, 1);
+            color: #ffffffff;
             border: none;
             display: flex;
             align-items: center;
@@ -342,16 +342,25 @@
 <body>
     <nav class="navbar navbar-expand-lg navbar-custom fixed-top">
         <div class="container">
-            <a class="navbar-brand navbar-brand-custom d-flex align-items-center gap-2" href="{{ route('landing.index') }}">
-                @if(!empty($siteLogo))
-                    <img src="{{ $siteLogo }}" alt="{{ $siteTitle ?? 'GuruKuu' }}" style="height: 36px; max-width: 45px; object-fit: contain;">
-                @else
-                    <i class="bi bi-mortarboard-fill fs-3" style="color: {{ $siteTitleColor1 ?? '#003366' }};"></i>
-                @endif
-                <span class="fs-4 fw-bold">
-                    <span style="color: {{ $siteTitleColor1 ?? '#003366' }} !important;">{{ $siteTitlePart1 ?? 'Guru' }}</span><span style="color: {{ $siteTitleColor2 ?? '#FFC107' }} !important;">{{ $siteTitlePart2 ?? 'Kuu' }}</span>
-                </span>
-            </a>
+            <div class="d-flex align-items-center gap-2">
+                <a class="navbar-brand navbar-brand-custom d-flex align-items-center gap-2 m-0" href="{{ route('landing.index') }}">
+                    @if(!empty($siteLogo))
+                        <img src="{{ $siteLogo }}" alt="{{ $siteTitle ?? 'GuruKuu' }}" style="height: 36px; max-width: 45px; object-fit: contain;">
+                    @else
+                        <i class="bi bi-mortarboard-fill fs-3" style="color: {{ $siteTitleColor1 ?? '#003366' }};"></i>
+                    @endif
+                    <span class="fs-4 fw-bold">
+                        <span style="color: {{ $siteTitleColor1 ?? '#003366' }} !important;">{{ $siteTitlePart1 ?? 'Guru' }}</span><span style="color: {{ $siteTitleColor2 ?? '#FFC107' }} !important;">{{ $siteTitlePart2 ?? 'Kuu' }}</span>
+                    </span>
+                </a>
+                <a href="{{ config('services.sipintu.base_url', 'https://sipintu.smkn1bangsri.sch.id') }}" 
+                   target="_blank" rel="noopener noreferrer"
+                   class="btn btn-light border p-1 rounded-circle shadow-sm d-flex align-items-center justify-content-center"
+                   style="width: 36px; height: 36px;"
+                   title="Portal SiPintu">
+                    <img src="{{ asset('images/sipintu-logo.png') }}" alt="SiPintu" style="height: 22px; width: 22px; object-fit: contain;">
+                </a>
+            </div>
             <button class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navMenu"><span class="navbar-toggler-icon"></span></button>
             <div class="collapse navbar-collapse" id="navMenu">
                 <div class="nav-menu-center">

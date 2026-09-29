@@ -103,6 +103,79 @@ window.onSelectKelasChange = function(select) {
     const modeInput = document.getElementById('leaderboardModeInput');
     const form = document.getElementById('leaderboardFilterForm');
     if (modeInput) modeInput.value = 'partisipasi';
-    if (form) form.submit();
 };
 </script>
+
+<style>
+.gk-podium-card-revised {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 20px;
+    box-shadow: 0 10px 28px -6px rgba(0, 0, 0, 0.06);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+.gk-podium-card-revised:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 16px 36px -8px rgba(0, 0, 0, 0.1);
+}
+.gk-podium-card-revised.is-first {
+    border: 2px solid rgba(217, 119, 6, 0.28) !important;
+    box-shadow: 0 16px 36px -8px rgba(217, 119, 6, 0.16) !important;
+}
+.gk-avatar-red-wrap {
+    width: 104px;
+    height: 104px;
+    border-radius: 50%;
+    background: #ef4444;
+    padding: 3px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 0.75rem;
+    box-shadow: 0 6px 16px -3px rgba(239, 68, 68, 0.35);
+}
+.gk-avatar-red-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+}
+.gk-badge-mini-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    border: 1px solid;
+    transition: transform 0.15s ease;
+    text-decoration: none;
+    line-height: 1;
+}
+.gk-badge-mini-icon:hover {
+    transform: scale(1.15);
+}
+.gk-progress-pill {
+    background: #475569;
+    border-radius: 50px;
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 0.85rem;
+    padding: 0.35rem 1rem;
+    display: inline-block;
+    min-width: 130px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+.gk-progress-pill-fill {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.25);
+    border-radius: 50px;
+}
+</style>

@@ -144,11 +144,11 @@
 
                     // Rincian 5 aspek
                     $aspekList = [
-                        'Disiplin' => ['val' => $f->kedisiplinan, 'label' => 'Kedisiplinan', 'icon' => 'bi-clock-history', 'color' => '#0284c7', 'bg' => '#e0f2fe'],
-                        'Komunikasi' => ['val' => $f->komunikasi, 'label' => 'Komunikasi', 'icon' => 'bi-chat-dots', 'color' => '#0d9488', 'bg' => '#ccfbf1'],
-                        'T. Jawab' => ['val' => $f->tanggung_jawab, 'label' => 'Tanggung Jawab', 'icon' => 'bi-shield-check', 'color' => '#16a34a', 'bg' => '#dcfce7'],
-                        'Kreatif' => ['val' => $f->kreativitas, 'label' => 'Kreativitas', 'icon' => 'bi-lightbulb', 'color' => '#d97706', 'bg' => '#fef3c7'],
-                        'Ramah' => ['val' => $f->keramahan, 'label' => 'Keramahan & Sikap', 'icon' => 'bi-emoji-smile', 'color' => '#e11d48', 'bg' => '#ffe4e6'],
+                        'Waktu' => ['val' => $f->kedisiplinan, 'label' => 'Ketepatan Waktu', 'icon' => 'bi-clock-history', 'color' => '#0284c7', 'bg' => '#e0f2fe'],
+                        'Kehadiran' => ['val' => $f->tanggung_jawab, 'label' => 'Kehadiran di Kelas', 'icon' => 'bi-door-open', 'color' => '#16a34a', 'bg' => '#dcfce7'],
+                        'Materi' => ['val' => $f->komunikasi, 'label' => 'Penyampaian Materi', 'icon' => 'bi-book-half', 'color' => '#0d9488', 'bg' => '#ccfbf1'],
+                        'Interaksi' => ['val' => $f->keramahan, 'label' => 'Interaksi dengan Siswa', 'icon' => 'bi-people', 'color' => '#e11d48', 'bg' => '#ffe4e6'],
+                        'Suasana' => ['val' => $f->kreativitas, 'label' => 'Keterlibatan & Suasana', 'icon' => 'bi-stars', 'color' => '#d97706', 'bg' => '#fef3c7'],
                     ];
                 @endphp
                 <tr>
@@ -477,11 +477,11 @@
                                     <div class="card-body p-3">
                                         @php
                                             $detailAspek = [
-                                                'kedisiplinan'   => ['label' => 'Kedisiplinan', 'val' => $f->kedisiplinan, 'desc' => 'Ketepatan waktu masuk kelas, keteraturan jam pelajaran, dan komitmen kehadiran.', 'icon' => 'bi-clock-history', 'color' => '#0284c7'],
-                                                'komunikasi'     => ['label' => 'Komunikasi', 'val' => $f->komunikasi, 'desc' => 'Kejelasan instruksi, interaksi dua arah, dan keterbukaan dalam mendengarkan siswa.', 'icon' => 'bi-chat-dots-fill', 'color' => '#0d9488'],
-                                                'tanggung_jawab' => ['label' => 'Tanggung Jawab', 'val' => $f->tanggung_jawab, 'desc' => 'Tanggung jawab terhadap penugasan, keadilan penilaian, dan bimbingan tugas.', 'icon' => 'bi-shield-check', 'color' => '#16a34a'],
-                                                'kreativitas'    => ['label' => 'Kreativitas', 'val' => $f->kreativitas, 'desc' => 'Penggunaan metode belajar yang variatif, media digital, dan suasana kelas hidup.', 'icon' => 'bi-lightbulb-fill', 'color' => '#d97706'],
-                                                'keramahan'      => ['label' => 'Keramahan & Sikap', 'val' => $f->keramahan, 'desc' => 'Sikap menghargai siswa, kesabaran dalam membimbing, dan empati di kelas.', 'icon' => 'bi-emoji-smile-fill', 'color' => '#e11d48'],
+                                                'kedisiplinan'   => ['label' => 'Ketepatan Waktu', 'val' => $f->kedisiplinan, 'desc' => 'Guru masuk kelas tepat waktu dan memulai pembelajaran sesuai jadwal.', 'icon' => 'bi-clock-history', 'color' => '#0284c7'],
+                                                'tanggung_jawab' => ['label' => 'Kehadiran di Kelas', 'val' => $f->tanggung_jawab, 'desc' => 'Guru tetap berada di kelas selama proses pembelajaran dan tidak sering meninggalkan kelas tanpa alasan yang jelas.', 'icon' => 'bi-door-open-fill', 'color' => '#16a34a'],
+                                                'komunikasi'     => ['label' => 'Penyampaian Materi', 'val' => $f->komunikasi, 'desc' => 'Guru menyampaikan materi ajar dengan jelas, sistematis, dan mudah dipahami.', 'icon' => 'bi-book-half', 'color' => '#0d9488'],
+                                                'keramahan'      => ['label' => 'Interaksi dengan Siswa', 'val' => $f->keramahan, 'desc' => 'Guru berinteraksi dengan baik, memberikan kesempatan bertanya/berpendapat, dan merespons siswa dengan baik.', 'icon' => 'bi-people-fill', 'color' => '#e11d48'],
+                                                'kreativitas'    => ['label' => 'Keterlibatan & Suasana Belajar', 'val' => $f->kreativitas, 'desc' => 'Guru menciptakan pembelajaran yang menarik, melibatkan siswa secara aktif, dan membuat suasana belajar nyaman.', 'icon' => 'bi-stars', 'color' => '#d97706'],
                                             ];
                                         @endphp
 
