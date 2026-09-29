@@ -3,11 +3,11 @@
 
 @section('content')
 @php
-    $heroBadge = \App\Models\Setting::get('hero_badge', 'SMK NEGERI 1 BANGSRI • JUARA');
-    $heroTitle = \App\Models\Setting::get('hero_title', 'Bangun Sekolah yang Lebih Baik Melalui Penilaian Guru yang Objektif');
-    $heroSubtitle = \App\Models\Setting::get('hero_subtitle', 'Suarakan aspirasimu secara aman untuk meningkatkan kualitas pengajaran dan menciptakan lingkungan belajar yang inspiratif.');
-    $heroCtaText = \App\Models\Setting::get('hero_cta_text', 'Siap Memulai?');
-    $heroCtaUrl = \App\Models\Setting::get('hero_cta_url', route('login'));
+    $heroBadge = \App\Models\Setting::get('hero_badge') ?: 'SMK NEGERI 1 BANGSRI • JUARA';
+    $heroTitle = \App\Models\Setting::get('hero_title') ?: 'Bangun Sekolah yang Lebih Baik Melalui Penilaian Guru yang Objektif';
+    $heroSubtitle = \App\Models\Setting::get('hero_subtitle') ?: 'Suarakan aspirasimu secara aman untuk meningkatkan kualitas pengajaran dan menciptakan lingkungan belajar yang inspiratif.';
+    $heroCtaText = \App\Models\Setting::get('hero_cta_text') ?: 'Siap Memulai?';
+    $heroCtaUrl = \App\Models\Setting::get('hero_cta_url') ?: route('login');
 
     $heroImg1 = \App\Models\Setting::get('hero_image', '/uploads/hero/hero_KRCqd4TJtmyGUMoMVp58Vr6Z.png');
     $heroImg2 = \App\Models\Setting::get('hero_image_2', '');
@@ -53,12 +53,64 @@
     0%, 100% { transform: translateY(0); box-shadow: 0 4px 15px rgba(255, 193, 7, 0.25); }
     50% { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(255, 193, 7, 0.45); }
 }
-.btn-cta {
-    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+.hero-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.65rem;
+    padding: 0.85rem 2.2rem;
+    min-height: 52px;
+    border-radius: 50px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    text-decoration: none;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
 }
-.btn-cta:hover {
-    transform: translateY(-3px) scale(1.02);
-    box-shadow: 0 12px 25px rgba(0, 51, 102, 0.35);
+.hero-btn-primary {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    color: #0f172a !important;
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    box-shadow: 0 8px 24px -4px rgba(245, 158, 11, 0.5);
+}
+.hero-btn-primary:hover {
+    background: linear-gradient(135deg, #fbbf24 0%, #b45309 100%);
+    color: #000000 !important;
+    transform: translateY(-3px);
+    box-shadow: 0 14px 30px -4px rgba(245, 158, 11, 0.65);
+}
+.hero-btn-secondary {
+    background: rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    color: #ffffff !important;
+    border: 1.5px solid rgba(255, 255, 255, 0.38);
+    box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.25);
+}
+.hero-btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.25);
+    border-color: #ffffff;
+    color: #ffffff !important;
+    transform: translateY(-3px);
+    box-shadow: 0 14px 30px -4px rgba(0, 0, 0, 0.35);
+}
+/* Smooth Public Dashboard Interactive Transitions */
+.stat-card-modern, .teacher-card, .tutorial-card, .gk-vm-card, .gk-feature-card, .card-custom {
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease;
+}
+.stat-card-modern:hover, .tutorial-card:hover, .gk-feature-card:hover {
+    transform: translateY(-6px);
+}
+.gk-vm-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 28px rgba(0, 51, 102, 0.08);
+}
+.accordion-button {
+    transition: background-color 0.25s ease, color 0.25s ease, box-shadow 0.25s ease;
+}
+.accordion-button:not(.collapsed) {
+    background-color: var(--primary-subtle, rgba(0, 51, 102, 0.08)) !important;
+    color: var(--primary, #003366) !important;
 }
 </style>
 
@@ -83,12 +135,12 @@
             @endforeach
         </div>
 
-        {{-- Next / Prev Arrows --}}
-        <button class="carousel-control-prev" type="button" data-bs-target="#heroBgSlider" data-bs-slide="prev" style="z-index: 4; width: 5%;">
-            <span class="carousel-control-prev-icon rounded-circle p-2.5" style="background-color: rgba(0,0,0,0.3); backdrop-filter: blur(4px);" aria-hidden="true"></span>
+        {{-- Next / Prev Arrows: Slide 1 only Next; Slide 2 Prev & Next; Slide 3 only Prev --}}
+        <button class="carousel-control-prev" id="heroPrevBtn" type="button" data-bs-target="#heroBgSlider" data-bs-slide="prev" style="z-index: 4; width: 5%; display: none;">
+            <span class="carousel-control-prev-icon rounded-circle p-2.5" style="background-color: rgba(0,0,0,0.35); backdrop-filter: blur(4px);" aria-hidden="true"></span>
         </button>
-        <button class="carousel-control-next" type="button" data-bs-target="#heroBgSlider" data-bs-slide="next" style="z-index: 4; width: 5%;">
-            <span class="carousel-control-next-icon rounded-circle p-2.5" style="background-color: rgba(0,0,0,0.3); backdrop-filter: blur(4px);" aria-hidden="true"></span>
+        <button class="carousel-control-next" id="heroNextBtn" type="button" data-bs-target="#heroBgSlider" data-bs-slide="next" style="z-index: 4; width: 5%;">
+            <span class="carousel-control-next-icon rounded-circle p-2.5" style="background-color: rgba(0,0,0,0.35); backdrop-filter: blur(4px);" aria-hidden="true"></span>
         </button>
     </div>
 
@@ -103,12 +155,13 @@
                 <h1 class="hero-title text-white">{{ $heroTitle }}</h1>
                 <p class="hero-subtitle text-white" style="color: rgba(255, 255, 255, 0.92) !important;">{{ $heroSubtitle }}</p>
                 <div class="d-flex flex-wrap gap-3 align-items-center">
-                    <a href="{{ $heroCtaUrl }}" class="btn btn-cta">
+                    <a href="{{ $heroCtaUrl }}" class="hero-btn hero-btn-primary">
                         <span>{{ $heroCtaText }}</span>
                         <i class="bi bi-arrow-right"></i>
                     </a>
-                    <a href="#statistik" class="btn btn-outline-light rounded-pill px-4 py-2.5 fw-semibold d-inline-flex align-items-center gap-2" style="border: 1px solid rgba(255,255,255,0.3); backdrop-filter: blur(8px);">
-                        <i class="bi bi-bar-chart-line"></i> Lihat Statistik
+                    <a href="#statistik" class="hero-btn hero-btn-secondary">
+                        <i class="bi bi-bar-chart-line"></i>
+                        <span>Lihat Statistik</span>
                     </a>
                 </div>
             </div>
@@ -120,13 +173,60 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const heroSlider = document.getElementById('heroBgSlider');
-    if (heroSlider && typeof bootstrap !== 'undefined') {
-        new bootstrap.Carousel(heroSlider, {
-            interval: 4500,
-            ride: 'carousel',
-            wrap: true
-        });
+    const prevBtn = document.getElementById('heroPrevBtn');
+    const nextBtn = document.getElementById('heroNextBtn');
+    const totalSlides = {{ count($heroImages) }};
+
+    function updateHeroArrows(index) {
+        if (!prevBtn || !nextBtn) return;
+        if (index <= 0) {
+            prevBtn.style.display = 'none';
+            nextBtn.style.display = 'flex';
+        } else if (index >= totalSlides - 1) {
+            prevBtn.style.display = 'flex';
+            nextBtn.style.display = 'none';
+        } else {
+            prevBtn.style.display = 'flex';
+            nextBtn.style.display = 'flex';
+        }
     }
+
+    if (heroSlider && typeof bootstrap !== 'undefined') {
+        const carousel = new bootstrap.Carousel(heroSlider, {
+            interval: 5000,
+            ride: 'carousel',
+            wrap: false
+        });
+
+        heroSlider.addEventListener('slid.bs.carousel', function(e) {
+            updateHeroArrows(e.to);
+        });
+
+        updateHeroArrows(0);
+    }
+
+    // FAQ Accordion Toggle (Buka & Tutup)
+    document.querySelectorAll('#landingFaqAccordion .accordion-button').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const targetSelector = this.getAttribute('data-bs-target');
+            const targetEl = targetSelector ? document.querySelector(targetSelector) : null;
+            if (!targetEl || typeof bootstrap === 'undefined') return;
+
+            const bsCollapse = bootstrap.Collapse.getOrCreateInstance(targetEl, { toggle: false });
+            const isShown = targetEl.classList.contains('show');
+
+            if (isShown) {
+                bsCollapse.hide();
+                this.classList.add('collapsed');
+                this.setAttribute('aria-expanded', 'false');
+            } else {
+                bsCollapse.show();
+                this.classList.remove('collapsed');
+                this.setAttribute('aria-expanded', 'true');
+            }
+        });
+    });
 });
 </script>
 @endpush
@@ -435,7 +535,7 @@ document.addEventListener('DOMContentLoaded', function() {
         <div class="text-center mb-4 mb-md-5" data-aos="fade-up">
             <div class="section-label">FAQ & BANTUAN</div>
             <h2 class="section-title">Pertanyaan yang Sering Diajukan</h2>
-            <p class="text-muted mb-0 small" style="max-width: 600px; margin: 0 auto;">Jawaban ringkas seputar platform evaluasi GuruKuu bagi publik, siswa, dan guru.</p>
+            <p class="text-muted mb-0 small" style="max-width: 600px; margin: 0 auto;">Jawaban ringkas seputar platform evaluasi {{ $siteTitle ?? 'GuruKuu' }} bagi publik, siswa, dan guru.</p>
         </div>
         <div class="row justify-content-center" data-aos="fade-up" data-aos-delay="100">
             <div class="col-lg-9 col-xl-8">
@@ -448,7 +548,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                     {{ $faq['q'] }}
                                 </button>
                             </h2>
-                            <div id="collapseLandingFaq{{ $index }}" class="accordion-collapse collapse" aria-labelledby="headingLandingFaq{{ $index }}" data-bs-parent="#landingFaqAccordion">
+                            <div id="collapseLandingFaq{{ $index }}" class="accordion-collapse collapse" aria-labelledby="headingLandingFaq{{ $index }}">
                                 <div class="accordion-body text-secondary lh-base p-3.5 bg-white border-top small">
                                     {{ $faq['a'] }}
                                 </div>

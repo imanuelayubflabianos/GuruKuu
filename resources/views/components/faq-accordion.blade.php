@@ -26,7 +26,7 @@
                         {{ $faq['q'] }}
                     </button>
                 </h2>
-                <div id="collapseFaq{{ $index }}" class="accordion-collapse collapse" aria-labelledby="headingFaq{{ $index }}" data-bs-parent="#faqAccordionCustom">
+                <div id="collapseFaq{{ $index }}" class="accordion-collapse collapse" aria-labelledby="headingFaq{{ $index }}">
                     <div class="accordion-body text-secondary small lh-base p-3.5 bg-white border-top">
                         {{ $faq['a'] }}
                     </div>

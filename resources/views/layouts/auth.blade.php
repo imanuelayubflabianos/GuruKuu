@@ -22,21 +22,34 @@
             --bg-light: #f8fafc; 
         }
         * { font-family: 'Inter', sans-serif; box-sizing: border-box; }
-        html {
+        html, body.auth-page { 
             height: 100%;
-        }
-        body.auth-page { 
-            min-height: 100vh;
-            min-height: 100dvh;
-            display: flex;
-            flex-direction: column;
+            margin: 0;
+            padding: 0;
             background-color: var(--bg-light, #f8fafc);
             color: var(--text-dark, #0f172a);
-            position: relative;
-            padding: 0;
-            margin: 0;
-            overflow-y: auto !important;
-            overflow-x: hidden;
+        }
+        @media (min-width: 992px) {
+            html, body.auth-page {
+                height: 100vh;
+                max-height: 100vh;
+                overflow: hidden !important;
+            }
+            .auth-container-wrapper {
+                height: 100vh;
+                max-height: 100vh;
+                overflow: hidden !important;
+            }
+        }
+        @media (max-width: 991.98px) {
+            body.auth-page {
+                min-height: 100vh;
+                overflow-y: auto !important;
+                overflow-x: hidden;
+            }
+            .auth-container-wrapper {
+                min-height: 100vh;
+            }
         }
         [data-theme="dark"] body.auth-page {
             background-color: #0b1329;
@@ -46,7 +59,6 @@
             position: relative;
             z-index: 2;
             width: 100%;
-            min-height: 100vh;
             display: flex;
             flex-direction: column;
         }
@@ -83,13 +95,6 @@
     <script src="{{ asset('js/gurukuu-theme.js') }}"></script>
 </head>
 <body class="auth-page">
-    {{-- FLOATING THEME CONTROL --}}
-    <div class="auth-controls-floating">
-        <button class="btn btn-theme-nav p-2 rounded-circle shadow-sm" type="button" onclick="GuruKuuTheme.toggleTheme()" title="Mode Gelap / Terang">
-            <i class="bi bi-moon-stars-fill gk-theme-icon fs-5"></i>
-        </button>
-    </div>
-
     <div class="auth-container-wrapper">
         @yield('content')
     </div>

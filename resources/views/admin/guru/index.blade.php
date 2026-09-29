@@ -214,7 +214,7 @@
                                 <input class="form-check-input ms-1 me-2" type="radio" name="deactivation_type" value="permanen" id="guruDeactTypePermanen" checked onchange="toggleGuruDeactDuration()">
                                 <label class="form-check-label fw-semibold text-danger small" for="guruDeactTypePermanen">
                                     <i class="bi bi-slash-circle me-1"></i> Nonaktifkan Permanen
-                                    <span class="d-block text-muted fw-normal" style="font-size: 0.73rem;">Akun guru dinonaktifkan tanpa batas waktu. Wajib menghubungi Admin Operator Sekolah untuk membuka akun.</span>
+                                    <span class="d-block text-muted fw-normal" style="font-size: 0.73rem;">Akun guru dinonaktifkan tanpa batas waktu. Wajib menghubungi Admin untuk membuka akun.</span>
                                 </label>
                             </div>
 
@@ -245,7 +245,7 @@
 
                     <div class="mb-2">
                         <label class="form-label small fw-bold text-dark">Alasan Penonaktifan Akun:</label>
-                        <textarea name="deactivated_reason" class="form-control rounded-3" rows="2" required placeholder="Contoh: Mengirimkan balasan yang melanggar etika tata tertib sekolah.">Akun dinonaktifkan oleh Admin Operator Sekolah karena pelanggaran tata tertib etika.</textarea>
+                        <textarea name="deactivated_reason" class="form-control rounded-3" rows="2" required placeholder="Contoh: Mengirimkan balasan yang melanggar etika tata tertib sekolah.">Akun dinonaktifkan oleh Admin karena pelanggaran tata tertib etika.</textarea>
                         <div class="form-text small text-muted" style="font-size: 0.72rem;">Alasan ini akan ditampilkan di portal saat guru mencoba login.</div>
                     </div>
                 </div>

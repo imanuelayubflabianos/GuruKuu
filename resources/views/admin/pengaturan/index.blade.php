@@ -37,7 +37,7 @@
     <nav class="settings-nav" id="pengaturanTabs" aria-label="Kategori pengaturan">
         <button class="settings-nav__item active" type="button" data-target="#tabBrand"><i class="bi bi-stars"></i> Identitas</button>
         <button class="settings-nav__item" type="button" data-target="#tabHero"><i class="bi bi-image"></i> Beranda & Slider</button>
-        <button class="settings-nav__item" type="button" data-target="#tabKonten"><i class="bi bi-card-checklist"></i> Panduan & Beranda</button>
+        <button class="settings-nav__item" type="button" data-target="#tabKonten"><i class="bi bi-card-checklist"></i> Panduan & Tentang</button>
         <button class="settings-nav__item" type="button" data-target="#tabVisiMisi"><i class="bi bi-bullseye"></i> Profil & Fitur</button>
         <button class="settings-nav__item" type="button" data-target="#tabFooter"><i class="bi bi-layout-text-window-reverse"></i> Footer</button>
         <button class="settings-nav__item" type="button" data-target="#tabLegal"><i class="bi bi-file-earmark-lock"></i> Legal</button>
@@ -76,7 +76,7 @@
         </div>
     @endif
 
-    <form action="{{ route('admin.pengaturan.landing') }}" method="POST" enctype="multipart/form-data" id="landingForm" novalidate>
+    <form action="{{ route('admin.pengaturan.landing') }}" method="POST" enctype="multipart/form-data" id="landingForm" novalidate data-confirm="Apakah Anda yakin ingin menyimpan seluruh perubahan pengaturan ini?" data-confirm-title="Simpan Pengaturan" data-confirm-btn="Ya, Simpan" data-confirm-type="warning">
         @csrf
 
         <section class="settings-panel" id="tabBrand">
@@ -599,7 +599,7 @@
     </form>
 
     {{-- Form Tersembunyi untuk Hapus Kata Kustom --}}
-    <form id="deleteCustomWordForm" action="{{ route('pelanggaran.words.delete') }}" method="POST" style="display: none;">
+    <form id="deleteCustomWordForm" action="{{ route('admin.pelanggaran.words.delete') }}" method="POST" style="display: none;">
         @csrf
         <input type="hidden" name="word" id="deleteWordInput">
         <input type="hidden" name="active_tab" value="#tabModerasi">
@@ -626,7 +626,7 @@
                 <h2 class="settings-heading" id="formPeriodeTitle"><i class="bi bi-calendar-plus me-2"></i>Periode</h2>
                 <button type="button" class="btn btn-light border btn-sm" onclick="resetPeriodeForm()"><i class="bi bi-plus-lg me-1"></i>Baru</button>
             </div>
-            <form action="{{ route('admin.pengaturan.periode') }}" method="POST" id="formPeriode">
+            <form action="{{ route('admin.pengaturan.periode') }}" method="POST" id="formPeriode" data-confirm="Apakah Anda yakin ingin menyimpan perubahan data periode ini?" data-confirm-title="Simpan Periode" data-confirm-btn="Ya, Simpan" data-confirm-type="warning">
                 @csrf
                 <input type="hidden" name="periode_id" id="periodeIdInput">
                 <div class="row g-3">
@@ -861,12 +861,6 @@
     </section>
 </div>
 
-{{-- FORM DELETE KATA KUSTOM HIDDEN --}}
-<form id="deleteCustomWordForm" action="{{ route('admin.pelanggaran.words.delete') }}" method="POST" style="display: none;">
-    @csrf
-    <input type="hidden" name="word" id="deleteWordInput">
-</form>
-
 {{-- MODAL TAMBAH FAQ --}}
 <div class="modal fade" id="modalTambahFaq" tabindex="-1" aria-labelledby="modalTambahFaqLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
@@ -875,7 +869,7 @@
                 <h5 class="modal-title fw-bold" id="modalTambahFaqLabel"><i class="bi bi-plus-circle text-primary me-2"></i>Tambah Pertanyaan FAQ</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form action="{{ route('admin.pengaturan.faq.store') }}" method="POST">
+            <form action="{{ route('admin.pengaturan.faq.store') }}" method="POST" data-confirm="Apakah Anda yakin ingin menambahkan pertanyaan FAQ ini?" data-confirm-title="Tambah FAQ" data-confirm-btn="Ya, Tambahkan" data-confirm-type="question">
                 @csrf
                 <div class="modal-body p-4">
                     <div class="row g-3">
@@ -919,7 +913,7 @@
                 <h5 class="modal-title fw-bold" id="modalEditFaqLabel"><i class="bi bi-pencil-square text-primary me-2"></i>Edit Pertanyaan FAQ</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form id="formEditFaq" method="POST">
+            <form id="formEditFaq" method="POST" data-confirm="Apakah Anda yakin ingin memperbarui pertanyaan FAQ ini?" data-confirm-title="Perbarui FAQ" data-confirm-btn="Ya, Perbarui" data-confirm-type="question">
                 @csrf
                 @method('PUT')
                 <div class="modal-body p-4">

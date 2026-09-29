@@ -1,5 +1,5 @@
 @extends('layouts.landing')
-@section('title', 'Hubungi Admin Operator Sekolah')
+@section('title', 'Hubungi Admin')
 
 @section('content')
 <div style="padding-top: 105px; padding-bottom: 60px; background: var(--bg-light); min-height: 85vh;">
@@ -8,16 +8,16 @@
             <div class="col-lg-9 col-xl-8">
                 
                 <div class="mb-3">
-                    <a href="{{ route('landing.index') }}" class="btn btn-outline-custom btn-sm">
-                        <i class="bi bi-arrow-left me-1"></i> Kembali ke Beranda
+                    <a href="{{ route('landing.index') }}" class="btn btn-outline-custom btn-sm rounded-pill px-3 py-1.5 fw-semibold d-inline-flex align-items-center gap-1.5">
+                        <i class="bi bi-arrow-left"></i> Kembali ke Beranda
                     </a>
                 </div>
 
                 <div class="text-center mb-4">
                     <span class="badge rounded-pill px-3 py-1.5 mb-2 font-mono" style="background: rgba(0, 51, 102, 0.08); color: var(--primary); font-size: 0.72rem; letter-spacing: 0.5px; border: 1px solid var(--border);">
-                        <i class="bi bi-headset me-1"></i> PUSAT BANTUAN OPERATOR
+                        <i class="bi bi-headset me-1"></i> PUSAT BANTUAN ADMIN
                     </span>
-                    <h2 class="fw-bold mb-1" style="color: var(--primary);">Hubungi Admin Operator Sekolah</h2>
+                    <h2 class="fw-bold mb-1" style="color: var(--primary);">Hubungi Admin</h2>
                     <p class="text-muted small mb-0">Punya kendala saat login, akun dinonaktifkan, atau pertanyaan lainnya? Kirim pesan di sini.</p>
                 </div>
 
@@ -40,7 +40,7 @@
                             <i class="bi bi-headset fs-4"></i>
                         </div>
                         <div class="flex-grow-1">
-                            <h6 class="fw-bold mb-0">Admin Operator Sekolah</h6>
+                            <h6 class="fw-bold mb-0">Admin Sekolah</h6>
                             <small style="opacity: 0.92;"><i class="bi bi-circle-fill text-success me-1" style="font-size: 0.5rem;"></i> Online • Siap membantu Anda</small>
                         </div>
                         <div>
@@ -106,7 +106,7 @@
                                         </div>
                                         <div style="background: white; border: 1px solid var(--border); padding: 0.85rem 1.15rem; border-radius: 18px 18px 18px 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
                                             <div class="fw-bold mb-1" style="color: var(--primary); font-size: 0.78rem;">
-                                                <i class="bi bi-patch-check-fill me-1"></i> Admin Operator Sekolah
+                                                <i class="bi bi-patch-check-fill me-1"></i> Admin Sekolah
                                             </div>
                                             <p class="mb-1" style="line-height: 1.5; word-wrap: break-word; font-size: 0.92rem;">{{ $chat->balasan }}</p>
                                             <div class="text-end" style="font-size: 0.7rem; color: var(--text-muted);">

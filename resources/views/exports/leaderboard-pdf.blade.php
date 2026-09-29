@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>Laporan Leaderboard Guru - GuruKuu</title>
+    <title>Laporan Leaderboard Guru - {{ $siteTitle ?? 'GuruKuu' }}</title>
     <style>
         body { font-family: 'Helvetica', Arial, sans-serif; font-size: 11px; color: #1a1a2e; margin: 20px; }
         .header { text-align: center; border-bottom: 2px solid #003366; padding-bottom: 12px; margin-bottom: 20px; }
@@ -25,7 +25,7 @@
 <body>
     <div class="header">
         <div class="title">Laporan Peringkat Leaderboard Guru</div>
-        <div class="subtitle">SMK Negeri 1 Bangsri - Sistem Penilaian Guru GuruKuu</div>
+        <div class="subtitle">{{ $schoolName ?? 'SMK Negeri 1 Bangsri' }} - Sistem Penilaian Guru {{ $siteTitle ?? 'GuruKuu' }}</div>
         <div class="meta">Periode: {{ $periodeAktif->nama_periode ?? 'Semua Periode' }} | Dicetak pada: {{ now()->translatedFormat('d F Y, H:i') }} WIB</div>
     </div>
 
@@ -68,7 +68,7 @@
     </table>
 
     <div class="footer">
-        Dokumen ini di-generate secara otomatis oleh Sistem GuruKuu - SMK Negeri 1 Bangsri
+        Dokumen ini di-generate secara otomatis oleh Sistem {{ $siteTitle ?? 'GuruKuu' }} - {{ $schoolName ?? 'SMK Negeri 1 Bangsri' }}
     </div>
 </body>
 </html>

@@ -51,15 +51,16 @@ class AppServiceProvider extends ServiceProvider
         });
 
         // 2. View Composer Optimal: Menggunakan in-memory cache Setting
-        View::composer(['layouts.*', 'landing.*', 'admin.*', 'guru.*', 'siswa.*', 'auth.*', 'errors.*'], function ($view) {
+        View::composer('*', function ($view) {
             try {
-                $siteLogo = \App\Models\Setting::get('site_logo', '');
-                $siteTitle = \App\Models\Setting::get('site_title', 'GuruKuu');
-                $siteTitlePart1 = \App\Models\Setting::get('site_title_part1', 'Guru');
-                $siteTitlePart2 = \App\Models\Setting::get('site_title_part2', 'Kuu');
-                $siteTitleColor1 = \App\Models\Setting::get('site_title_color1', '#003366');
-                $siteTitleColor2 = \App\Models\Setting::get('site_title_color2', '#FFC107');
-                $view->with(compact('siteLogo', 'siteTitle', 'siteTitlePart1', 'siteTitlePart2', 'siteTitleColor1', 'siteTitleColor2'));
+                $siteLogo = \App\Models\Setting::get('site_logo') ?: '';
+                $siteTitle = \App\Models\Setting::get('site_title') ?: 'GuruKuu';
+                $siteTitlePart1 = \App\Models\Setting::get('site_title_part1') ?: 'Guru';
+                $siteTitlePart2 = \App\Models\Setting::get('site_title_part2') ?: 'Kuu';
+                $siteTitleColor1 = \App\Models\Setting::get('site_title_color1') ?: '#003366';
+                $siteTitleColor2 = \App\Models\Setting::get('site_title_color2') ?: '#FFC107';
+                $schoolName = \App\Models\Setting::get('school_name') ?: 'SMK Negeri 1 Bangsri';
+                $view->with(compact('siteLogo', 'siteTitle', 'siteTitlePart1', 'siteTitlePart2', 'siteTitleColor1', 'siteTitleColor2', 'schoolName'));
             } catch (\Throwable $e) {
                 $view->with([
                     'siteLogo' => '',
@@ -68,6 +69,7 @@ class AppServiceProvider extends ServiceProvider
                     'siteTitlePart2' => 'Kuu',
                     'siteTitleColor1' => '#003366',
                     'siteTitleColor2' => '#FFC107',
+                    'schoolName' => 'SMK Negeri 1 Bangsri',
                 ]);
             }
         });

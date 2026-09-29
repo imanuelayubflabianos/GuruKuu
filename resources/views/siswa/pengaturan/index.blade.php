@@ -129,18 +129,18 @@
         @include('components.device-history')
     </div>
 
-    {{-- TAB 2: HUBUNGI ADMIN OPERATOR SEKOLAH --}}
+    {{-- TAB 2: HUBUNGI ADMIN --}}
     <div class="tab-pane fade" id="tabChat">
         <div class="row justify-content-center">
             <div class="col-lg-10">
-                {{-- HEADER CHAT DENGAN ADMIN OPERATOR --}}
+                {{-- HEADER CHAT DENGAN ADMIN --}}
                 <div class="card-custom mb-3" style="overflow: hidden;">
                     <div class="p-3 d-flex align-items-center gap-3" style="background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%); color: white;">
                         <div class="d-flex align-items-center justify-content-center rounded-circle" style="width: 48px; height: 48px; background: rgba(255,255,255,0.2); backdrop-filter: blur(10px);">
                             <i class="bi bi-headset-fill fs-4"></i>
                         </div>
                         <div class="flex-grow-1">
-                            <h6 class="fw-bold mb-0 text-white">Admin Operator Sekolah GuruKuu</h6>
+                            <h6 class="fw-bold mb-0 text-white">Admin {{ $siteTitle ?? 'GuruKuu' }}</h6>
                             <small style="opacity: 0.9;"><i class="bi bi-circle-fill text-success me-1" style="font-size: 0.5rem;"></i> Online • Siap membantu kendala Anda</small>
                         </div>
                         <div class="d-none d-md-block">
@@ -160,7 +160,7 @@
                                 <div class="d-inline-flex align-items-center justify-content-center rounded-circle mb-3" style="width: 70px; height: 70px; background: rgba(0,51,102,0.08);">
                                     <i class="bi bi-chat-square-dots-fill fs-2" style="color: var(--primary);"></i>
                                 </div>
-                                <h6 class="fw-bold mb-1">Mulai Percakapan dengan Admin Operator Sekolah</h6>
+                                <h6 class="fw-bold mb-1">Mulai Percakapan dengan Admin</h6>
                                 <p class="text-muted small mb-0">Tanyakan kendala penilaian, verifikasi kelas, atau bantuan akun di formulir bawah ini.</p>
                             </div>
 
@@ -278,7 +278,7 @@
                     <h5 class="fw-bold mb-3 d-flex align-items-center text-primary">
                         <i class="bi bi-file-earmark-text-fill me-2"></i>Syarat & Ketentuan
                     </h5>
-                    <p class="text-muted small mb-3">Aturan penggunaan platform evaluasi GuruKuu bagi siswa.</p>
+                    <p class="text-muted small mb-3">Aturan penggunaan platform evaluasi {{ $siteTitle ?? 'GuruKuu' }} bagi siswa.</p>
                     <div class="p-3 bg-light rounded border text-muted small" style="line-height: 1.8; max-height: 480px; overflow-y: auto;">
                         @php
                             $terms = \App\Models\Setting::get('syarat_ketentuan', "1. Eligibilitas\nPlatform ini hanya dapat digunakan oleh siswa dan guru yang terdaftar resmi di sekolah. Akun harus diaktifkan oleh administrator sekolah sebelum dapat digunakan.\n\n2. Tanggung Jawab Pengguna\nSiswa wajib memberikan penilaian secara jujur dan objektif. Dilarang memberikan penilaian berdasarkan dendam pribadi, SARA, atau konten yang tidak pantas.\n\n3. Keamanan Akun\nPengguna bertanggung jawab penuh atas kerahasiaan password akun mereka. Dilarang membagikan password kepada orang lain.\n\n4. Kontak & Pengaduan\nJika Anda menemukan pelanggaran atau memiliki keluhan, silakan hubungi administrator sekolah melalui fitur Chat Admin yang tersedia di footer website ini.");

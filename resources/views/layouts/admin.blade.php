@@ -56,9 +56,15 @@
             <button class="btn btn-light border p-1 px-2.5 rounded-3" type="button" onclick="GuruKuuTheme.toggleSidebar()" aria-label="Menu Utama">
                 <i class="bi bi-list fs-4"></i>
             </button>
-            <a href="{{ route('admin.dashboard') }}" class="text-decoration-none fw-bold text-dark d-flex align-items-center gap-1.5" style="font-size: 1.1rem;">
-                <span class="badge bg-primary text-white py-1 px-1.5 rounded">SMK</span>
-                <span>{{ $siteTitlePart2 ?? 'Bangsri' }}</span>
+            <a href="{{ route('admin.dashboard') }}" class="text-decoration-none d-flex align-items-center gap-2" style="font-size: 1.1rem;">
+                @if(!empty($siteLogo))
+                    <img src="{{ $siteLogo }}" alt="{{ $siteTitle ?? 'GuruKuu' }}" style="height: 28px; max-width: 36px; object-fit: contain;">
+                @else
+                    <i class="bi bi-mortarboard-fill fs-4" style="color: {{ $siteTitleColor1 ?? '#003366' }};"></i>
+                @endif
+                <span class="fw-bold fs-5">
+                    <span style="color: {{ $siteTitleColor1 ?? '#003366' }} !important;">{{ $siteTitlePart1 ?? 'Guru' }}</span><span style="color: {{ $siteTitleColor2 ?? '#FFC107' }} !important;">{{ $siteTitlePart2 ?? 'Kuu' }}</span>
+                </span>
             </a>
         </div>
         <div class="d-flex align-items-center gap-2">
@@ -66,24 +72,22 @@
             <a href="{{ url('/') }}" target="_blank" class="btn btn-light border p-1.5 rounded-circle shadow-sm" title="Buka Beranda Publik">
                 <i class="bi bi-globe2 text-primary" style="font-size: 1rem;"></i>
             </a>
-            {{-- THEME TOGGLE MOBILE --}}
-            <button class="btn btn-light border p-1.5 rounded-circle shadow-sm" type="button" onclick="GuruKuuTheme.toggleTheme()" title="Ganti Mode Gelap / Terang">
-                <i class="bi bi-moon-stars-fill gk-theme-icon" style="font-size: 1rem;"></i>
-            </button>
-            {{-- CHAT DROPDOWN MOBILE --}}
-            <a href="{{ route('admin.kontak.index') }}" class="btn btn-light border position-relative p-1.5 rounded-circle shadow-sm" title="Pesan Masuk">
-                <i class="bi bi-chat-dots-fill {{ ($unreadChatCount ?? 0) > 0 ? 'text-primary' : 'text-secondary' }}" style="font-size: 1rem;"></i>
-                @if(($unreadChatCount ?? 0) > 0)
-                    <span class="position-absolute top-0 start-100 translate-middle p-1 bg-primary border border-light rounded-circle"></span>
-                @endif
-            </a>
-            {{-- NOTIF DROPDOWN MOBILE --}}
-            <a href="{{ route('admin.pelanggaran.index') }}" class="btn btn-light border position-relative p-1.5 rounded-circle shadow-sm" title="Notifikasi Pelanggaran">
-                <i class="bi bi-bell-fill {{ ($unreadPelanggaranCount ?? 0) > 0 ? 'text-danger' : 'text-secondary' }}" style="font-size: 1rem;"></i>
-                @if(($unreadPelanggaranCount ?? 0) > 0)
-                    <span class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle"></span>
-                @endif
-            </a>
+
+            {{-- NOTIFIKASI GABUNGAN MOBILE (PELANGGARAN & CHAT) --}}
+            @php $totalNotif = ($unreadPelanggaranCount ?? 0) + ($unreadChatCount ?? 0); @endphp
+            <div class="dropdown">
+                <button class="btn btn-light border position-relative p-1.5 rounded-circle shadow-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="Pusat Notifikasi">
+                    <i class="bi bi-bell-fill {{ $totalNotif > 0 ? 'text-danger' : 'text-secondary' }}" style="font-size: 1rem;"></i>
+                    @if($totalNotif > 0)
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger border border-light" style="font-size: 0.6rem; padding: 0.2em 0.45em;">
+                            {{ $totalNotif }}
+                        </span>
+                    @endif
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 p-0" style="width: 320px; max-width: 90vw;">
+                    @include('components.admin-notif-dropdown', ['prefix' => 'mobile'])
+                </ul>
+            </div>
         </div>
     </header>
 
@@ -96,7 +100,7 @@
                     <i class="bi bi-mortarboard-fill fs-4" style="color: {{ $siteTitleColor1 ?? '#003366' }} !important;"></i>
                 @endif
                 <span class="fs-5 fw-bold brand-logo-text">
-                    <span style="color: {{ $siteTitleColor1 ?? '#003366' }} !important;">{{ $siteTitlePart1 ?? 'Guru' }}</span><span style="color: {{ $siteTitleColor2 ?? '#F59E0B' }} !important;">{{ $siteTitlePart2 ?? 'Kuu' }}</span>
+                    <span style="color: {{ $siteTitleColor1 ?? '#003366' }} !important;">{{ $siteTitlePart1 ?? 'Guru' }}</span><span style="color: {{ $siteTitleColor2 ?? '#FFC107' }} !important;">{{ $siteTitlePart2 ?? 'Kuu' }}</span>
                 </span>
             </a>
             {{-- CLOSE BUTTON MOBILE --}}
@@ -187,155 +191,21 @@
                     <i class="bi bi-globe2 text-primary fs-5"></i>
                 </a>
 
-                {{-- THEME TOGGLE DESKTOP --}}
-                <button class="btn btn-light border p-2 rounded-circle shadow-sm" type="button" onclick="GuruKuuTheme.toggleTheme()" title="Ganti Mode Gelap / Terang">
-                    <i class="bi bi-moon-stars-fill gk-theme-icon fs-5"></i>
-                </button>
-
-                {{-- CHAT NOTIFIKASI DROPDOWN --}}
+                {{-- NOTIFIKASI GABUNGAN DESKTOP (PELANGGARAN & CHAT) --}}
+                @php $totalNotif = ($unreadPelanggaranCount ?? 0) + ($unreadChatCount ?? 0); @endphp
                 <div class="dropdown">
-                    <button class="btn btn-light position-relative p-2 rounded-circle border shadow-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="Pesan Masuk / Chat Bantuan">
-                        <i class="bi bi-chat-dots-fill {{ ($unreadChatCount ?? 0) > 0 ? 'text-primary' : 'text-secondary' }} fs-5"></i>
-                        @if(($unreadChatCount ?? 0) > 0)
-                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary border border-light" style="font-size: 0.65rem;">
-                                {{ $unreadChatCount }}
-                                <span class="visually-hidden">pesan belum dibalas</span>
-                            </span>
-                        @endif
-                    </button>
-                    <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 p-0" style="width: 360px; max-width: 92vw;">
-                        <li class="p-3 bg-light border-bottom d-flex align-items-center justify-content-between">
-                            <span class="fw-bold text-dark small"><i class="bi bi-chat-left-dots-fill text-primary me-1"></i> Pesan Chat Masuk</span>
-                            @if(($unreadChatCount ?? 0) > 0)
-                                <span class="badge bg-primary rounded-pill">{{ $unreadChatCount }} Baru</span>
-                            @endif
-                        </li>
-                        <div style="max-height: 320px; overflow-y: auto;">
-                            @forelse(($recentChats ?? collect()) as $c)
-                                <li>
-                                    <a class="dropdown-item p-3 border-bottom text-wrap" href="{{ route('admin.kontak.chat', $c->identifier) }}">
-                                        <div class="d-flex align-items-start gap-2.5">
-                                            <span class="badge bg-primary-subtle text-primary rounded-circle p-1.5 mt-0.5 flex-shrink-0">
-                                                <i class="bi bi-chat-quote-fill"></i>
-                                            </span>
-                                            <div class="flex-grow-1">
-                                                <div class="d-flex justify-content-between align-items-center mb-0.5">
-                                                    <strong class="text-dark small" style="font-size: 0.85rem;">{{ $c->pengirim }}</strong>
-                                                    <span class="badge bg-light text-muted border font-mono" style="font-size: 0.65rem;">{{ $c->is_siswa ? 'Siswa' : 'Pengguna/Guru' }}</span>
-                                                </div>
-                                                <p class="text-muted mb-1 small text-truncate" style="max-width: 250px; font-size: 0.78rem;">
-                                                    "{{ Str::limit($c->pesan, 55) }}"
-                                                </p>
-                                                <div class="d-flex justify-content-between align-items-center">
-                                                    <span class="text-muted font-mono" style="font-size: 0.68rem;">{{ $c->created_at->diffForHumans() }}</span>
-                                                    <span class="text-primary small fw-semibold" style="font-size: 0.72rem;">Buka Chat &rarr;</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </a>
-                                </li>
-                            @empty
-                                <li class="p-4 text-center text-muted small">
-                                    <i class="bi bi-chat-check text-success fs-4 d-block mb-1"></i>
-                                    Tidak ada pesan chat masuk baru
-                                </li>
-                            @endforelse
-                        </div>
-                        <li class="p-2 text-center bg-light border-top">
-                            <a href="{{ route('admin.kontak.index') }}" class="btn btn-outline-custom btn-sm w-100 py-1.5 rounded-pill fw-semibold" style="font-size: 0.8rem;">
-                                Lihat Semua Pesan Masuk
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-
-                {{-- NOTIFIKASI BELL DROPDOWN --}}
-                <div class="dropdown">
-                    <button class="btn btn-light position-relative p-2 rounded-circle border shadow-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="Notifikasi Pelanggaran">
-                        <i class="bi bi-bell-fill {{ ($unreadPelanggaranCount ?? 0) > 0 ? 'text-danger' : 'text-secondary' }} fs-5"></i>
-                        @if(($unreadPelanggaranCount ?? 0) > 0)
+                    <button class="btn btn-light position-relative p-2 rounded-circle border shadow-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="Pusat Notifikasi">
+                        <i class="bi bi-bell-fill {{ $totalNotif > 0 ? 'text-danger' : 'text-secondary' }} fs-5"></i>
+                        @if($totalNotif > 0)
                             <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger border border-light" style="font-size: 0.65rem;">
-                                {{ $unreadPelanggaranCount }}
+                                {{ $totalNotif }}
                                 <span class="visually-hidden">notifikasi belum dibaca</span>
                             </span>
                         @endif
                     </button>
-                    <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 p-0" style="width: 360px; max-width: 92vw;">
-                        <li class="p-3 bg-light border-bottom d-flex align-items-center justify-content-between">
-                            <span class="fw-bold text-dark small"><i class="bi bi-shield-exclamation text-danger me-1"></i> Notifikasi Pelanggaran</span>
-                            @if(($unreadPelanggaranCount ?? 0) > 0)
-                                <span class="badge bg-danger rounded-pill">{{ $unreadPelanggaranCount }} Perlu Tindakan</span>
-                            @endif
-                        </li>
-                        <div style="max-height: 320px; overflow-y: auto;">
-                            @forelse(($recentPelanggarans ?? collect()) as $notif)
-                                <li>
-                                    <a class="dropdown-item p-3 border-bottom text-wrap" href="{{ route('admin.pelanggaran.index') }}">
-                                        <div class="d-flex align-items-start gap-2.5">
-                                            <span class="badge bg-danger text-white rounded-circle p-1.5 mt-0.5 flex-shrink-0">
-                                                <i class="bi bi-exclamation-octagon-fill"></i>
-                                            </span>
-                                            <div class="flex-grow-1">
-                                                @if($notif->user)
-                                                    <div class="d-flex justify-content-between align-items-center mb-0.5">
-                                                        <strong class="text-danger small" style="font-size: 0.85rem;">{{ $notif->user->name }}</strong>
-                                                        @if($notif->user->warning_count > 0)
-                                                            <span class="badge bg-warning text-dark font-mono" style="font-size: 0.65rem;">⚠️ {{ $notif->user->warning_count }}x Sanksi</span>
-                                                        @endif
-                                                    </div>
-                                                    <div class="text-dark small font-mono" style="font-size: 0.73rem;">
-                                                        NIS: <strong>{{ $notif->user->nis ?? '-' }}</strong> &bull; 
-                                                        {{ $notif->user->nama_kelas }}
-                                                    </div>
-
-                                                @else
-                                                    <div class="fw-bold text-dark small">Tamu Publik (Anonim)</div>
-                                                    <div class="text-muted small font-mono" style="font-size: 0.7rem;">IP: {{ $notif->ip_address ?? '-' }}</div>
-                                                @endif
-
-                                                <div class="text-muted my-1" style="font-size: 0.72rem;">
-                                                    <span class="badge bg-light text-secondary border me-1">{{ $notif->tipe_label }}</span>
-                                                    @if($notif->guru)
-                                                        ke Guru: <strong class="text-dark">{{ $notif->guru->nama }}</strong>
-                                                    @endif
-                                                </div>
-
-                                                @if(is_array($notif->kata_terdeteksi) && count($notif->kata_terdeteksi) > 0)
-                                                    <div class="mb-1 d-flex flex-wrap gap-1">
-                                                        @foreach($notif->kata_terdeteksi as $kw)
-                                                            <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-1.5 py-0.5" style="font-size: 0.68rem;">
-                                                                "{{ $kw }}"
-                                                            </span>
-                                                        @endforeach
-                                                    </div>
-                                                @endif
-
-                                                <div class="d-flex justify-content-between align-items-center mt-1">
-                                                    <span class="text-secondary font-mono" style="font-size: 0.68rem;">
-                                                        <i class="bi bi-clock me-1"></i>{{ $notif->created_at->diffForHumans() }}
-                                                    </span>
-                                                    <span class="text-primary small fw-semibold" style="font-size: 0.72rem;">
-                                                        Lihat Detail &rarr;
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </a>
-                                </li>
-                            @empty
-                                <li class="p-4 text-center text-muted small">
-                                    <i class="bi bi-check-circle text-success fs-4 d-block mb-1"></i>
-                                    Tidak ada pelanggaran baru
-                                </li>
-                            @endforelse
-                        </div>
-                        <li class="p-2 text-center bg-light border-top">
-                            <a href="{{ route('admin.pelanggaran.index') }}" class="btn btn-primary-custom btn-sm w-100 py-1.5 rounded-pill fw-semibold" style="font-size: 0.8rem;">
-                                Kelola & Tinjau Semua Pelanggaran
-                            </a>
-                        </li>
+                    <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 p-0" style="width: 380px; max-width: 92vw;">
+                        @include('components.admin-notif-dropdown', ['prefix' => 'desktop'])
                     </ul>
-
                 </div>
 
                 {{-- USER BADGE DROPDOWN --}}

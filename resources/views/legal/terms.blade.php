@@ -29,13 +29,15 @@
                         </div>
                         <div class="mb-0">
                             <h5 class="fw-bold mb-3"><i class="bi bi-telephone me-2" style="color: var(--accent);"></i>4. Kontak & Pengaduan</h5>
-                            <p class="text-muted mb-0">Jika Anda menemukan kendala akun, pelanggaran etika, atau memiliki keluhan, silakan hubungi Admin Operator Sekolah melalui formulir <strong>Hubungi Admin Operator Sekolah</strong> yang tersedia.</p>
+                            <p class="text-muted mb-0">Jika Anda menemukan kendala akun, pelanggaran etika, atau memiliki keluhan, silakan hubungi Admin melalui formulir <strong>Hubungi Admin</strong> yang tersedia.</p>
 
                         </div>
                     @endif
                 </div>
                 <div class="text-center mt-4">
-                    <a href="{{ route('landing.index') }}" class="btn btn-outline-custom"><i class="bi bi-arrow-left"></i> Kembali ke Beranda</a>
+                    <a href="{{ route('landing.index') }}" class="btn btn-outline-custom rounded-pill px-4 py-2 fw-semibold d-inline-flex align-items-center gap-2">
+                        <i class="bi bi-arrow-left"></i> Kembali ke Beranda
+                    </a>
                 </div>
             </div>
         </div>

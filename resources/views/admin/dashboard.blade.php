@@ -11,13 +11,15 @@
     .dashboard-stat:hover { color: inherit; transform: translateY(-2px); box-shadow: var(--card-hover-shadow); }
     .dashboard-stat__label { color: var(--text-muted); font-size: .75rem; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
     .dashboard-stat__value { margin-top: .4rem; color: var(--text-dark); font-size: 1.75rem; font-weight: 750; line-height: 1; }
-    .dashboard-panel { height: 100%; padding: 1.25rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: .85rem; box-shadow: var(--card-shadow); }
+    .dashboard-panel { height: 100%; padding: 1.25rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: .85rem; box-shadow: var(--card-shadow); overflow: hidden; }
     .dashboard-panel__title { font-size: 1rem; font-weight: 700; margin: 0; }
-    .dashboard-list-item { display: flex; align-items: center; gap: .85rem; padding: .8rem 0; color: inherit; text-decoration: none; border-bottom: 1px solid var(--border-subtle); }
+    .dashboard-list-item { display: flex; align-items: center; gap: .85rem; padding: .8rem 0; color: inherit; text-decoration: none; border-bottom: 1px solid var(--border-subtle); min-width: 0; max-width: 100%; overflow: hidden; }
     .dashboard-list-item:last-child { padding-bottom: 0; border-bottom: 0; }
     .dashboard-list-item:hover { color: var(--primary); }
+    .dashboard-list-item > div { min-width: 0; }
+    .min-w-0 { min-width: 0 !important; }
     .dashboard-rank { width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center; flex: 0 0 auto; color: var(--primary); background: var(--primary-subtle); border-radius: 50%; font-size: .78rem; font-weight: 700; }
-    .dashboard-avatar { width: 38px; height: 38px; object-fit: cover; border: 1px solid var(--border); border-radius: 50%; }
+    .dashboard-avatar { width: 38px; height: 38px; object-fit: cover; border: 1px solid var(--border); border-radius: 50%; flex: 0 0 auto; }
     .dashboard-empty { padding: 2.5rem 1rem; color: var(--text-muted); text-align: center; }
 </style>
 
@@ -92,11 +94,11 @@
                     <a href="{{ route('admin.guru.show', $guru) }}" class="dashboard-list-item">
                         <span class="dashboard-rank">{{ $index + 1 }}</span>
                         <img src="{{ $guru->photo_url }}" alt="" class="dashboard-avatar">
-                        <div class="flex-grow-1 min-w-0">
+                        <div class="flex-grow-1 min-w-0" style="min-width: 0; overflow: hidden;">
                             <div class="fw-semibold text-truncate">{{ $guru->nama }}</div>
-                            <small class="text-muted">{{ $guru->jurusan?->nama_jurusan ?? 'Umum' }} · {{ $guru->total_penilaian }} penilaian</small>
+                            <small class="text-muted d-block text-truncate">{{ $guru->jurusan?->nama_jurusan ?? 'Umum' }} · {{ $guru->total_penilaian }} penilaian</small>
                         </div>
-                        <strong class="text-primary">{{ number_format(($guru->rata_rata_nilai / 5) * 100, 0) }}%</strong>
+                        <strong class="text-primary flex-shrink-0 ms-2">{{ number_format(($guru->rata_rata_nilai / 5) * 100, 0) }}%</strong>
                     </a>
                 @empty
                     <div class="dashboard-empty"><i class="bi bi-inbox d-block fs-4 mb-2"></i>Belum ada penilaian.</div>
@@ -110,27 +112,17 @@
                     <a href="{{ route('admin.kritik-saran.index') }}" class="small text-decoration-none">Lihat semua</a>
                 </div>
                 @forelse($feedbacks as $feedback)
-                    <a href="{{ route('admin.kritik-saran.index') }}" class="dashboard-list-item">
+                    @php $fbText = $feedback->kritik ?: $feedback->saran; @endphp
+                    <a href="{{ route('admin.kritik-saran.index') }}" class="dashboard-list-item" title="{{ $fbText }}">
                         <span class="dashboard-rank"><i class="bi bi-chat-dots"></i></span>
-                        <div class="flex-grow-1 min-w-0">
-                            <div class="small text-truncate">{{ Str::limit($feedback->kritik ?: $feedback->saran, 88) }}</div>
-                            <small class="text-muted">{{ $feedback->guru?->nama ?? '-' }} · {{ $feedback->created_at->diffForHumans() }}</small>
+                        <div class="flex-grow-1 min-w-0" style="min-width: 0; overflow: hidden;">
+                            <div class="small text-truncate text-dark fw-medium" style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ $fbText }}</div>
+                            <small class="text-muted d-block text-truncate">{{ $feedback->guru?->nama ?? '-' }} · {{ $feedback->created_at->diffForHumans() }}</small>
                         </div>
                     </a>
                 @empty
                     <div class="dashboard-empty"><i class="bi bi-chat-square-dots d-block fs-4 mb-2"></i>Belum ada feedback.</div>
                 @endforelse
-            </section>
-        </div>
-        <div class="col-12">
-            <section class="dashboard-panel d-flex align-items-center justify-content-between flex-wrap gap-3">
-                <div>
-                    <h2 class="dashboard-panel__title"><i class="bi bi-hdd-network text-primary me-2"></i>SiPintu Gateway</h2>
-                    <div class="small text-muted mt-1">Sinkronisasi data guru dan siswa dari server SiPintu sekolah.</div>
-                </div>
-                <div>
-                    <a href="{{ route('admin.sipintu.index') }}" class="btn btn-primary-custom btn-sm px-3">Buka Gateway</a>
-                </div>
             </section>
         </div>
     </div>

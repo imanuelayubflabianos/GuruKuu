@@ -1,12 +1,12 @@
 @extends('layouts.siswa')
-@section('title', 'Hubungi Admin Operator Sekolah')
+@section('title', 'Hubungi Admin')
 
 @section('content')
 <div class="page-header">
     <div>
         <div class="page-label">PUSAT BANTUAN</div>
-        <h1 class="page-title">Hubungi Admin Operator Sekolah</h1>
-        <p class="page-subtitle">Sampaikan kendala, permohonan pembukaan akun, atau pertanyaan langsung kepada Admin Operator Sekolah.</p>
+        <h1 class="page-title">Hubungi Admin</h1>
+        <p class="page-subtitle">Sampaikan kendala, permohonan pembukaan akun, atau pertanyaan langsung kepada Admin.</p>
     </div>
 </div>
 
@@ -20,7 +20,7 @@
                     <i class="bi bi-headset-fill fs-4"></i>
                 </div>
                 <div class="flex-grow-1">
-                    <h6 class="fw-bold mb-0">Admin Operator Sekolah</h6>
+                    <h6 class="fw-bold mb-0">Admin Sekolah</h6>
                     <small style="opacity: 0.9;"><i class="bi bi-circle-fill text-success me-1" style="font-size: 0.5rem;"></i> Online • Siap membantu Anda</small>
                 </div>
 

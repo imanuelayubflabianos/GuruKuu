@@ -7,15 +7,47 @@
 (function() {
     'use strict';
 
-    // 1. Initial Fast-Boot (Zero Flicker / Instant Exec before render)
-    const savedTheme = localStorage.getItem('gk_theme') || 'light';
-    document.documentElement.setAttribute('data-theme', savedTheme);
-    document.documentElement.setAttribute('data-bs-theme', savedTheme);
-    if (savedTheme === 'dark') {
-        document.documentElement.classList.add('dark-theme');
-    } else {
-        document.documentElement.classList.remove('dark-theme');
+    // 1. Initial Fast-Boot: Follow System Theme (Dark / Light) Automatically
+    function getSystemTheme() {
+        try {
+            if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                return 'dark';
+            }
+        } catch (e) {}
+        return 'light';
     }
+
+    function applyTheme(theme) {
+        document.documentElement.setAttribute('data-theme', theme);
+        document.documentElement.setAttribute('data-bs-theme', theme);
+        if (theme === 'dark') {
+            document.documentElement.classList.add('dark-theme');
+        } else {
+            document.documentElement.classList.remove('dark-theme');
+        }
+    }
+
+    // Always follow device/system mode & clean up manual override
+    try { localStorage.removeItem('gk_theme'); } catch (e) {}
+    const initialTheme = getSystemTheme();
+    applyTheme(initialTheme);
+
+    // Listen for OS/device dark mode changes in real-time
+    try {
+        const darkMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+        const onThemeChange = function(e) {
+            const nextTheme = e.matches ? 'dark' : 'light';
+            applyTheme(nextTheme);
+            if (window.GuruKuuTheme && window.GuruKuuTheme.updateIcons) {
+                window.GuruKuuTheme.updateIcons();
+            }
+        };
+        if (darkMediaQuery.addEventListener) {
+            darkMediaQuery.addEventListener('change', onThemeChange);
+        } else if (darkMediaQuery.addListener) {
+            darkMediaQuery.addListener(onThemeChange);
+        }
+    } catch (e) {}
 
     const savedAnim = localStorage.getItem('gk_anim') ?? '1';
     const savedBlur = localStorage.getItem('gk_blur') ?? '1';
@@ -28,22 +60,19 @@
     if (savedCompact === '1') document.documentElement.classList.add('compact-mode');
 
     window.GuruKuuTheme = {
-        // Toggle Dark / Light Theme
+        getSystemTheme: getSystemTheme,
+        applyTheme: applyTheme,
+
+        // Legacy compatibility
         toggleTheme: function() {
             const current = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
             const next = current === 'dark' ? 'light' : 'dark';
-            this.setTheme(next);
+            applyTheme(next);
+            this.updateIcons();
         },
 
         setTheme: function(theme) {
-            document.documentElement.setAttribute('data-theme', theme);
-            document.documentElement.setAttribute('data-bs-theme', theme);
-            if (theme === 'dark') {
-                document.documentElement.classList.add('dark-theme');
-            } else {
-                document.documentElement.classList.remove('dark-theme');
-            }
-            localStorage.setItem('gk_theme', theme);
+            applyTheme(theme);
             this.updateIcons();
         },
 

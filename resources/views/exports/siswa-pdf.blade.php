@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>Laporan Data Siswa - GuruKuu</title>
+    <title>Laporan Data Siswa - {{ $siteTitle ?? 'GuruKuu' }}</title>
     <style>
         body { font-family: 'Helvetica', Arial, sans-serif; font-size: 11px; color: #1a1a2e; margin: 20px; }
         .header { text-align: center; border-bottom: 2px solid #003366; padding-bottom: 12px; margin-bottom: 20px; }
@@ -20,7 +20,7 @@
 <body>
     <div class="header">
         <div class="title">Master Data Siswa</div>
-        <div class="subtitle">SMK Negeri 1 Bangsri - Sistem Evaluasi Guru GuruKuu</div>
+        <div class="subtitle">{{ $schoolName ?? 'SMK Negeri 1 Bangsri' }} - Sistem Evaluasi Guru {{ $siteTitle ?? 'GuruKuu' }}</div>
         <div class="meta">Total: {{ $siswa->count() }} Siswa Terdaftar | Dicetak pada: {{ now()->translatedFormat('d F Y, H:i') }} WIB</div>
     </div>
 
@@ -67,7 +67,7 @@
     </table>
 
     <div class="footer">
-        Dokumen resmi di-generate oleh Sistem GuruKuu - SMK Negeri 1 Bangsri
+        Dokumen resmi di-generate oleh Sistem {{ $siteTitle ?? 'GuruKuu' }} - {{ $schoolName ?? 'SMK Negeri 1 Bangsri' }}
     </div>
 </body>
 </html>

@@ -91,9 +91,15 @@
             <button class="btn btn-light border p-1 px-2.5 rounded-3" type="button" onclick="GuruKuuTheme.toggleSidebar()" aria-label="Buka Menu">
                 <i class="bi bi-list fs-4"></i>
             </button>
-            <a href="{{ route('siswa.dashboard') }}" class="text-decoration-none fw-bold text-dark d-flex align-items-center gap-1.5" style="font-size: 1.1rem;">
-                <span class="badge bg-primary text-white py-1 px-1.5 rounded">SISWA</span>
-                <span>SMKN 1 Bangsri</span>
+            <a href="{{ route('siswa.dashboard') }}" class="text-decoration-none d-flex align-items-center gap-2" style="font-size: 1.1rem;">
+                @if(!empty($siteLogo))
+                    <img src="{{ $siteLogo }}" alt="{{ $siteTitle ?? 'GuruKuu' }}" style="height: 28px; max-width: 36px; object-fit: contain;">
+                @else
+                    <i class="bi bi-mortarboard-fill fs-4" style="color: {{ $siteTitleColor1 ?? '#003366' }};"></i>
+                @endif
+                <span class="fw-bold fs-5">
+                    <span style="color: {{ $siteTitleColor1 ?? '#003366' }} !important;">{{ $siteTitlePart1 ?? 'Guru' }}</span><span style="color: {{ $siteTitleColor2 ?? '#FFC107' }} !important;">{{ $siteTitlePart2 ?? 'Kuu' }}</span>
+                </span>
             </a>
         </div>
         <div class="d-flex align-items-center gap-2">
@@ -101,9 +107,6 @@
             <a href="{{ url('/') }}" target="_blank" class="btn btn-light border p-1.5 rounded-circle shadow-sm" title="Buka Beranda Publik">
                 <i class="bi bi-globe2 text-primary" style="font-size: 1rem;"></i>
             </a>
-            <button class="btn btn-light border p-1.5 rounded-circle shadow-sm" type="button" onclick="GuruKuuTheme.toggleTheme()" title="Mode Gelap/Terang">
-                <i class="bi bi-moon-stars-fill gk-theme-icon" style="font-size: 1rem;"></i>
-            </button>
         </div>
     </header>
 
@@ -116,7 +119,7 @@
                     <i class="bi bi-mortarboard-fill fs-4" style="color: {{ $siteTitleColor1 ?? '#003366' }} !important;"></i>
                 @endif
                 <span class="fs-5 fw-bold brand-logo-text">
-                    <span style="color: {{ $siteTitleColor1 ?? '#003366' }} !important;">{{ $siteTitlePart1 ?? 'Guru' }}</span><span style="color: {{ $siteTitleColor2 ?? '#F59E0B' }} !important;">{{ $siteTitlePart2 ?? 'Kuu' }}</span>
+                    <span style="color: {{ $siteTitleColor1 ?? '#003366' }} !important;">{{ $siteTitlePart1 ?? 'Guru' }}</span><span style="color: {{ $siteTitleColor2 ?? '#FFC107' }} !important;">{{ $siteTitlePart2 ?? 'Kuu' }}</span>
                 </span>
             </a>
             <button type="button" class="btn btn-sm btn-light border d-lg-none rounded-circle" onclick="GuruKuuTheme.closeSidebar()" aria-label="Tutup">
@@ -169,9 +172,6 @@
                 <a href="{{ url('/') }}" target="_blank" class="btn btn-light border p-2 rounded-circle shadow-sm" title="Buka Beranda Publik">
                     <i class="bi bi-globe2 text-primary fs-5"></i>
                 </a>
-                <button class="btn btn-light border p-2 rounded-circle shadow-sm" type="button" onclick="GuruKuuTheme.toggleTheme()" title="Ganti Mode Gelap / Terang">
-                    <i class="bi bi-moon-stars-fill gk-theme-icon fs-5"></i>
-                </button>
 
                 {{-- USER BADGE DROPDOWN (PERSIS SEPERTI ADMIN) --}}
                 <div class="dropdown border-start ps-3 ms-2">
@@ -229,9 +229,9 @@
             <h4 class="fw-bold text-dark mb-1">Akses Akun Dinonaktifkan</h4>
             <p class="text-muted small mb-4">
                 @if(auth()->user()->deactivation_type === 'berkala' && auth()->user()->deactivated_until)
-                    Akun siswa Anda dinonaktifkan sementara hingga <strong>{{ auth()->user()->deactivated_until->translatedFormat('d F Y H:i') }}</strong> ({{ auth()->user()->deactivated_until->diffForHumans() }}) oleh Admin Operator Sekolah.
+                    Akun siswa Anda dinonaktifkan sementara hingga <strong>{{ auth()->user()->deactivated_until->translatedFormat('d F Y H:i') }}</strong> ({{ auth()->user()->deactivated_until->diffForHumans() }}) oleh Admin Sekolah.
                 @else
-                    Akun siswa Anda telah dinonaktifkan secara permanen oleh Admin Operator Sekolah.
+                    Akun siswa Anda telah dinonaktifkan secara permanen oleh Admin Sekolah.
                 @endif
             </p>
 
@@ -240,13 +240,13 @@
                     <i class="bi bi-exclamation-triangle-fill me-1"></i>Alasan Penonaktifan:
                 </strong>
                 <p class="text-dark small mb-0 font-italic" style="line-height: 1.5;">
-                    "{{ auth()->user()->deactivated_reason ?: 'Akun Anda dinonaktifkan oleh Admin Operator Sekolah. Silakan hubungi Admin Operator Sekolah untuk pengaktifan kembali.' }}"
+                    "{{ auth()->user()->deactivated_reason ?: 'Akun Anda dinonaktifkan oleh Admin. Silakan hubungi Admin untuk pengaktifan kembali.' }}"
                 </p>
             </div>
 
             <div class="d-flex flex-column gap-2">
                 <a href="{{ route('siswa.pengaturan') }}#tabChat" class="btn btn-primary-custom py-2 fw-semibold">
-                    <i class="bi bi-chat-dots-fill me-1"></i> Hubungi Admin Operator Sekolah
+                    <i class="bi bi-chat-dots-fill me-1"></i> Hubungi Admin
                 </a>
 
                 <form action="{{ route('logout') }}" method="POST">

@@ -25,11 +25,23 @@
         }
         * { font-family: 'Inter', sans-serif; box-sizing: border-box; }
         .font-mono { font-family: 'JetBrains Mono', monospace; }
+
+        /* Safety fallback: ensure elements with data-aos are never permanently hidden if AOS CDN or script delays */
+        html:not(.aos-init) [data-aos] {
+            opacity: 1 !important;
+            transform: none !important;
+            visibility: visible !important;
+        }
         
         .navbar-custom {
-            background: rgba(255,255,255,0.98); backdrop-filter: blur(10px);
-            border-bottom: 1px solid var(--border); padding: 0.75rem 0;
-            transition: all 0.3s; z-index: 1030;
+            background: rgba(246, 248, 251, 0.98) !important;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid #e2e8f0;
+            box-shadow: 0 2px 14px rgba(15, 23, 42, 0.05);
+            padding: 0.85rem 0;
+            transition: all 0.3s;
+            z-index: 1030;
         }
         .navbar-brand-custom { font-weight: 800; font-size: 1.5rem; color: var(--primary); margin-right: 2rem; text-decoration: none; }
         .nav-menu-center { flex: 1; display: flex; justify-content: center; gap: 2rem; }
@@ -60,20 +72,25 @@
         }
         .nav-actions { display: flex; align-items: center; margin-left: auto; gap: 0.75rem; }
         .btn-masuk {
-            background: var(--primary); color: white; padding: 0.5rem 1.25rem;
-            border-radius: 8px; font-weight: 600; font-size: 0.9rem; border: none; text-decoration: none; transition: all 0.3s;
+            background: var(--primary); color: white; padding: 0.55rem 1.35rem;
+            border-radius: 8px; font-weight: 600; font-size: 0.88rem; border: none; text-decoration: none; transition: all 0.25s ease;
+            display: inline-flex; align-items: center; gap: 0.45rem;
+            box-shadow: 0 2px 8px rgba(0, 51, 102, 0.2);
         }
-        .btn-masuk:hover { background: var(--primary-light); color: white; transform: translateY(-1px); }
+        .btn-masuk:hover { background: var(--primary-light); color: white; transform: translateY(-1px); box-shadow: 0 4px 14px rgba(0, 51, 102, 0.3); }
         .btn-dashboard {
-            background: var(--accent); color: white; padding: 0.5rem 1.25rem;
-            border-radius: 8px; font-weight: 600; font-size: 0.9rem; border: none; text-decoration: none; transition: all 0.3s;
+            background: var(--primary); color: white; padding: 0.55rem 1.25rem;
+            border-radius: 8px; font-weight: 600; font-size: 0.88rem; border: none; text-decoration: none; transition: all 0.25s ease;
+            display: inline-flex; align-items: center; gap: 0.45rem;
+            box-shadow: 0 2px 8px rgba(0, 51, 102, 0.2);
         }
-        .btn-dashboard:hover { background: #008f5a; color: white; transform: translateY(-1px); }
+        .btn-dashboard:hover { background: var(--primary-light); color: white; transform: translateY(-1px); box-shadow: 0 4px 14px rgba(0, 51, 102, 0.3); }
         .btn-logout {
-            background: #dc3545; color: white; padding: 0.5rem 1rem;
-            border-radius: 8px; font-weight: 600; font-size: 0.85rem; border: none; cursor: pointer; transition: all 0.3s;
+            background: rgba(225, 29, 72, 0.08); color: #e11d48; padding: 0.55rem 1.15rem;
+            border-radius: 8px; font-weight: 600; font-size: 0.88rem; border: 1px solid rgba(225, 29, 72, 0.25); cursor: pointer; transition: all 0.25s ease;
+            display: inline-flex; align-items: center; gap: 0.45rem;
         }
-        .btn-logout:hover { background: #c82333; color: white; }
+        .btn-logout:hover { background: #e11d48; color: white; border-color: #e11d48; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(225, 29, 72, 0.25); }
 
         .hero-section {
             background: linear-gradient(rgba(10, 25, 47, 0.8), rgba(0, 51, 102, 0.75)), url('https://images.unsplash.com/photo-1562774053-701939374585?w=1920') center/cover no-repeat;
@@ -187,11 +204,125 @@
             margin: 0 auto; font-size: 1.4rem; font-weight: 900; box-shadow: 0 4px 15px rgba(0,0,0,0.15);
         }
 
-        .footer-custom { background: var(--bg-light); padding: 3.5rem 0 2rem; border-top: 1px solid var(--border); }
-        .footer-title { font-weight: 800; color: var(--primary); font-size: 1.35rem; margin-bottom: 0.75rem; }
-        .footer-link { color: var(--text-muted); text-decoration: none; display: inline-block; margin-bottom: 0.4rem; font-size: 0.88rem; transition: color 0.2s; }
-        .footer-link:hover { color: var(--primary); }
-        .footer-label { font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; font-weight: 600; letter-spacing: 2px; color: var(--text-dark); margin-bottom: 0.75rem; text-transform: uppercase; }
+        .footer-custom { 
+            background: linear-gradient(180deg, #1c2438 0%, #151d30 100%) !important; 
+            color: #e2e8f0 !important;
+            padding: 4.5rem 0 2.2rem; 
+            border-top: 1px solid rgba(255, 255, 255, 0.08); 
+            position: relative;
+        }
+        [data-theme="dark"] .footer-custom,
+        html.dark-theme .footer-custom,
+        body.dark-theme .footer-custom {
+            background: linear-gradient(180deg, #131929 0%, #0d1220 100%) !important;
+            border-top-color: rgba(255, 255, 255, 0.06);
+        }
+        .footer-brand-title {
+            font-weight: 800;
+            color: #ffffff;
+            font-size: 1.5rem;
+            letter-spacing: -0.5px;
+            margin-bottom: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+        .footer-col-title {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.82rem;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            color: #ffffff;
+            margin-bottom: 1.25rem;
+            text-transform: uppercase;
+        }
+        .footer-links-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .footer-links-list li {
+            margin-bottom: 0.75rem;
+        }
+        .footer-nav-link {
+            color: #94a3b8;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.25s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .footer-nav-link i.arrow-icon {
+            font-size: 0.75rem;
+            color: #64748b;
+            transition: transform 0.25s ease, color 0.25s ease;
+        }
+        .footer-nav-link:hover {
+            color: #38bdf8;
+            transform: translateX(4px);
+        }
+        .footer-nav-link:hover i.arrow-icon {
+            color: #38bdf8;
+            transform: translateX(2px);
+        }
+        .footer-contact-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            color: #94a3b8;
+            font-size: 0.88rem;
+            margin-bottom: 0.85rem;
+            line-height: 1.5;
+        }
+        .footer-contact-item i {
+            color: #f59e0b;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+            margin-top: 0.15rem;
+        }
+        .footer-bottom-bar {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 1.8rem;
+            margin-top: 2.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+        .btn-floating-top {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: #dc2626;
+            color: #ffffff;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            z-index: 1045;
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgba(220, 38, 38, 0.4);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(20px);
+            transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), background 0.2s ease;
+        }
+        .btn-floating-top.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        .btn-floating-top:hover {
+            background: #b91c1c;
+            color: #ffffff;
+            transform: translateY(-4px);
+            box-shadow: 0 10px 25px rgba(220, 38, 38, 0.55);
+        }
 
         .btn-primary-custom { background: var(--primary); color: white; padding: 0.75rem 1.5rem; border-radius: 8px; font-weight: 600; border: none; text-decoration: none; display: inline-block; }
         .btn-primary-custom:hover { background: var(--primary-light); color: white; }
@@ -213,19 +344,14 @@
         <div class="container">
             <a class="navbar-brand navbar-brand-custom d-flex align-items-center gap-2" href="{{ route('landing.index') }}">
                 @if(!empty($siteLogo))
-                    <img src="{{ $siteLogo }}" alt="Logo" style="height: 36px; max-width: 45px; object-fit: contain;">
+                    <img src="{{ $siteLogo }}" alt="{{ $siteTitle ?? 'GuruKuu' }}" style="height: 36px; max-width: 45px; object-fit: contain;">
                 @else
-                    <i class="bi bi-mortarboard-fill fs-3" style="color: {{ $siteTitleColor1 }};"></i>
+                    <i class="bi bi-mortarboard-fill fs-3" style="color: {{ $siteTitleColor1 ?? '#003366' }};"></i>
                 @endif
                 <span class="fs-4 fw-bold">
-                    <span style="color: {{ $siteTitleColor1 }};">{{ $siteTitlePart1 }}</span><span style="color: {{ $siteTitleColor2 }};">{{ $siteTitlePart2 }}</span>
+                    <span style="color: {{ $siteTitleColor1 ?? '#003366' }} !important;">{{ $siteTitlePart1 ?? 'Guru' }}</span><span style="color: {{ $siteTitleColor2 ?? '#FFC107' }} !important;">{{ $siteTitlePart2 ?? 'Kuu' }}</span>
                 </span>
             </a>
-            <div class="d-flex align-items-center gap-1.5 d-lg-none ms-auto me-2">
-                <button class="btn btn-light border p-1.5 rounded-circle shadow-sm" type="button" onclick="GuruKuuTheme.toggleTheme()" title="Mode Gelap / Terang">
-                    <i class="bi bi-moon-stars-fill gk-theme-icon" style="font-size: 0.95rem;"></i>
-                </button>
-            </div>
             <button class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navMenu"><span class="navbar-toggler-icon"></span></button>
             <div class="collapse navbar-collapse" id="navMenu">
                 <div class="nav-menu-center">
@@ -233,7 +359,6 @@
                     <a class="nav-link nav-link-custom" data-nav-target="guru" href="{{ route('landing.index') }}#guru">Guru</a>
                     <a class="nav-link nav-link-custom" data-nav-target="panduan" href="{{ route('landing.index') }}#panduan">Panduan</a>
                     <a class="nav-link nav-link-custom" data-nav-target="tentang" href="{{ route('landing.index') }}#tentang">Tentang</a>
-                    <a class="nav-link nav-link-custom" data-nav-target="faq" href="{{ route('landing.index') }}#faq">FAQ</a>
                 </div>
                 <div class="nav-actions">
                     @auth
@@ -259,22 +384,20 @@
                         
                         <form action="{{ route('logout') }}" method="POST" class="d-inline">
                             @csrf
-                            <button type="submit" class="btn btn-danger btn-sm">
-                                <i class="bi bi-box-arrow-right me-1"></i> Logout
+                        <form action="{{ route('logout') }}" method="POST" class="d-inline" data-confirm="Apakah Anda yakin ingin keluar dari sistem?" data-confirm-title="Konfirmasi Logout" data-confirm-btn="Ya, Logout" data-confirm-type="danger">
+                            @csrf
+                            <button type="submit" class="btn-logout">
+                                <i class="bi bi-box-arrow-right"></i>
+                                <span>Logout</span>
                             </button>
                         </form>
                     @else
-                        <a href="{{ route('login') }}" class="btn btn-primary">
-                            <i class="bi bi-box-arrow-in-right me-1"></i> Masuk
+                        <a href="{{ route('login') }}" class="btn-masuk">
+                            <i class="bi bi-box-arrow-in-right"></i>
+                            <span>Masuk</span>
                         </a>
                     @endauth
 
-                    {{-- THEME CONTROLS --}}
-                    <div class="d-flex align-items-center gap-1.5 ms-2 ps-2 border-start">
-                        <button class="btn btn-light border p-1.5 rounded-circle shadow-sm" type="button" onclick="GuruKuuTheme.toggleTheme()" title="Mode Gelap / Terang">
-                            <i class="bi bi-moon-stars-fill gk-theme-icon" style="font-size: 0.95rem;"></i>
-                        </button>
-                    </div>
                 </div>
             </div>
         </div>
@@ -284,55 +407,105 @@
 
     <footer class="footer-custom">
         <div class="container">
-            <div class="row align-items-start">
-                <div class="col-lg-7 mb-4">
-                    <div class="footer-title d-flex align-items-center gap-2">
-                        @if($logo = \App\Models\Setting::get('site_logo'))
-                            <img src="{{ $logo }}" alt="Logo" style="height: 32px; object-fit: contain;">
+            <div class="row g-4 align-items-start">
+                {{-- KOLOM 1: BRANDING & DESKRIPSI --}}
+                <div class="col-lg-5 col-md-6 mb-4 mb-lg-0">
+                    <div class="footer-brand-title d-flex align-items-center gap-2">
+                        @if(!empty($siteLogo))
+                            <img src="{{ $siteLogo }}" alt="{{ $siteTitle ?? 'GuruKuu' }}" style="height: 38px; max-width: 45px; object-fit: contain;">
+                        @else
+                            <i class="bi bi-mortarboard-fill fs-3" style="color: {{ $siteTitleColor1 ?? '#003366' }};"></i>
                         @endif
-                        <span>{{ \App\Models\Setting::get('site_title', 'GuruKuu') }}</span>
+                        <span class="fs-4 fw-bold">
+                            <span style="color: {{ $siteTitleColor1 ?? '#003366' }} !important;">{{ $siteTitlePart1 ?? 'Guru' }}</span><span style="color: {{ $siteTitleColor2 ?? '#FFC107' }} !important;">{{ $siteTitlePart2 ?? 'Kuu' }}</span>
+                        </span>
                     </div>
-                    <p class="text-muted mb-0" style="font-size: 0.9rem; max-width: 500px;">
-                        {{ \App\Models\Setting::get('footer_about', 'Sistem Manajemen Penilaian Guru Berbasis Siswa untuk SMK N 1 Bangsri.') }}
+                    <p class="text-white-50 mb-0" style="font-size: 0.9rem; line-height: 1.65; max-width: 420px;">
+                        {{ \App\Models\Setting::get('footer_about', 'Sistem Informasi Evaluasi dan Apresiasi Kinerja Pendidik berbasis siswa yang transparan, objektif, dan terpercaya bagi kemajuan pendidikan SMK Negeri 1 Bangsri.') }}
                     </p>
                 </div>
-                <div class="col-lg-5 mb-4 text-start text-lg-end">
-                    <div class="footer-label">LEGAL & BANTUAN</div>
-                    <div class="d-flex flex-column flex-sm-row gap-2 gap-sm-3 justify-content-start justify-content-lg-end align-items-start align-items-sm-center">
-                        <a href="{{ route('legal.privacy') }}" class="footer-link mb-0">Kebijakan Privasi</a>
-                        <span class="text-muted d-none d-sm-inline">•</span>
-                        <a href="{{ route('legal.terms') }}" class="footer-link mb-0">Syarat & Ketentuan</a>
-                        <span class="text-muted d-none d-sm-inline">•</span>
-                        <a href="{{ route('kontak.guest.page') }}" class="footer-link mb-0">Hubungi Admin Operator Sekolah</a>
+
+                {{-- KOLOM 2: LAYANAN & LEGAL --}}
+                <div class="col-lg-3 col-md-6 mb-4 mb-lg-0">
+                    <div class="footer-col-title">LAYANAN</div>
+                    <ul class="footer-links-list">
+                        <li>
+                            <a href="{{ route('legal.privacy') }}" class="footer-nav-link">
+                                <i class="bi bi-chevron-right arrow-icon"></i>
+                                <span>Kebijakan Privasi</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route('legal.terms') }}" class="footer-nav-link">
+                                <i class="bi bi-chevron-right arrow-icon"></i>
+                                <span>Syarat & Ketentuan</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route('kontak.guest.page') }}" class="footer-nav-link">
+                                <i class="bi bi-chevron-right arrow-icon"></i>
+                                <span>Hubungi Admin</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                {{-- KOLOM 3: KONTAK --}}
+                <div class="col-lg-4 col-md-12">
+                    <div class="footer-col-title">KONTAK</div>
+                    <div class="footer-contact-item">
+                        <i class="bi bi-geo-alt-fill"></i>
+                        <span>Jl. KH. Achmad Fauzan No.17, Krasak, Bangsri, Kab. Jepara, Jawa Tengah 59453</span>
+                    </div>
+                    <div class="footer-contact-item">
+                        <i class="bi bi-instagram"></i>
+                        <a href="https://instagram.com/smkn1bangsri" target="_blank" class="footer-nav-link text-white-50">
+                            <span>@smkn1bangsri</span>
+                        </a>
+                    </div>
+                    <div class="footer-contact-item">
+                        <i class="bi bi-envelope-fill"></i>
+                        <a href="mailto:smkn1bangsri@yahoo.co.id" class="footer-nav-link text-white-50">
+                            <span>smkn1bangsri@yahoo.co.id</span>
+                        </a>
                     </div>
                 </div>
             </div>
-            <hr class="border-secondary my-4">
-            <div class="row">
-                <div class="col-12 text-center">
+
+            {{-- BOTTOM BAR (CENTERED COPYRIGHT) --}}
+            <div class="footer-bottom-bar text-center justify-content-center">
+                <div class="text-white-50 small mb-0 w-100 text-center">
                     @php
                         $rawCopyright = \App\Models\Setting::get('footer_copyright', 'Hak Cipta Dilindungi.');
                         if (str_contains($rawCopyright, '©') || str_contains($rawCopyright, '&copy;')) {
                             $finalCopyright = $rawCopyright;
                         } else {
-                            $finalCopyright = '&copy; ' . date('Y') . ' ' . \App\Models\Setting::get('site_title', 'GuruKuu') . '. ' . $rawCopyright;
+                            $finalCopyright = '&copy; ' . date('Y') . ' ' . \App\Models\Setting::get('site_title', 'GuruKuu') . ' - SMK Negeri 1 Bangsri. ' . $rawCopyright;
                         }
                     @endphp
-                    <p class="text-muted mb-0" style="font-size: 0.85rem;">
-                        {!! $finalCopyright !!}
-                    </p>
+                    {!! $finalCopyright !!}
                 </div>
             </div>
         </div>
     </footer>
 
+    {{-- FLOATING BACK TO TOP BUTTON --}}
+    <button type="button" id="btnBackToTop" class="btn-floating-top" title="Kembali ke atas" aria-label="Kembali ke atas">
+        <i class="bi bi-arrow-up"></i>
+    </button>
+
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof AOS !== 'undefined') {
+                AOS.init({ duration: 800, once: true });
+            }
+        });
+    </script>
     
     <script>
-        AOS.init({ duration: 800, once: true });
-
         document.addEventListener('DOMContentLoaded', function() {
             const navLinks = document.querySelectorAll('.nav-link-custom');
             const navbar = document.querySelector('.navbar-custom');
@@ -430,9 +603,23 @@
                     }
                 });
             });
+
+            // Floating Back-to-Top button listener
+            const btnTop = document.getElementById('btnBackToTop');
+            if (btnTop) {
+                window.addEventListener('scroll', function() {
+                    if (window.scrollY > 300) {
+                        btnTop.classList.add('show');
+                    } else {
+                        btnTop.classList.remove('show');
+                    }
+                });
+                btnTop.addEventListener('click', function() {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                });
+            }
         });
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="{{ asset('js/gurukuu-modal.js') }}"></script>
     @stack('scripts')

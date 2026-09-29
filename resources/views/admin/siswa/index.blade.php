@@ -220,7 +220,7 @@
                                 <input class="form-check-input ms-1 me-2" type="radio" name="deactivation_type" value="permanen" id="deactTypePermanen" checked onchange="toggleSiswaDeactDuration()">
                                 <label class="form-check-label fw-semibold text-danger small" for="deactTypePermanen">
                                     <i class="bi bi-slash-circle me-1"></i> Nonaktifkan Permanen
-                                    <span class="d-block text-muted fw-normal" style="font-size: 0.73rem;">Akun dinonaktifkan tanpa batas waktu. Siswa wajib menghubungi Admin Operator Sekolah untuk membuka akun.</span>
+                                    <span class="d-block text-muted fw-normal" style="font-size: 0.73rem;">Akun dinonaktifkan tanpa batas waktu. Siswa wajib menghubungi Admin untuk membuka akun.</span>
                                 </label>
                             </div>
 
@@ -251,7 +251,7 @@
 
                     <div class="mb-2">
                         <label class="form-label small fw-bold text-dark">Alasan Penonaktifan Akun:</label>
-                        <textarea name="deactivated_reason" class="form-control rounded-3" rows="2" required placeholder="Contoh: Terdeteksi mengirimkan ulasan berulang dengan bahasa tidak pantas / melanggar tata tertib.">Akun dinonaktifkan oleh Admin Operator Sekolah karena pelanggaran tata tertib ulasan.</textarea>
+                        <textarea name="deactivated_reason" class="form-control rounded-3" rows="2" required placeholder="Contoh: Terdeteksi mengirimkan ulasan berulang dengan bahasa tidak pantas / melanggar tata tertib.">Akun dinonaktifkan oleh Admin karena pelanggaran tata tertib ulasan.</textarea>
                         <div class="form-text small text-muted" style="font-size: 0.72rem;">Alasan ini akan ditampilkan di portal saat siswa mencoba login.</div>
                     </div>
                 </div>
