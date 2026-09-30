@@ -182,7 +182,7 @@
                                 </span>
                             </div>
                             <div class="position-relative d-inline-block mb-2 mt-1">
-                                <img src="{{ $g1->photo_url }}" class="rounded-circle shadow gk-podium-avatar-1" style="width: 72px; height: 72px; object-fit: cover;">
+                                <img src="{{ $g1->photo_url }}" class="rounded-circle shadow gk-podium-avatar-1" style="width: 72px; height: 72px; min-width: 72px; min-height: 72px; aspect-ratio: 1 / 1; object-fit: cover; flex-shrink: 0;">
                             </div>
                             <h5 class="fw-bold mb-1 gk-podium-nama" title="{{ $g1->nama }}">{{ $g1->nama }}</h5>
                             <small class="d-block mb-2.5 gk-podium-jurusan font-mono fw-semibold" style="font-size: 0.75rem;">{{ strtoupper($g1->jurusan?->nama_jurusan ?? 'UMUM') }}</small>
@@ -217,7 +217,7 @@
                                 </span>
                             </div>
                             <div class="position-relative d-inline-block mb-1 mb-md-2">
-                                <img src="{{ $g2->photo_url }}" class="rounded-circle shadow-sm gk-podium-avatar-2" style="width: 58px; height: 58px; object-fit: cover;">
+                                <img src="{{ $g2->photo_url }}" class="rounded-circle shadow-sm gk-podium-avatar-2" style="width: 58px; height: 58px; min-width: 58px; min-height: 58px; aspect-ratio: 1 / 1; object-fit: cover; flex-shrink: 0;">
                             </div>
                             <h6 class="fw-bold mb-0.5 text-truncate gk-podium-nama" title="{{ $g2->nama }}" style="font-size: 0.85rem;">{{ $g2->nama }}</h6>
                             <small class="d-block mb-2 text-truncate font-mono gk-podium-jurusan" style="font-size: 0.68rem;">{{ strtoupper($g2->jurusan?->nama_jurusan ?? 'UMUM') }}</small>
@@ -244,7 +244,7 @@
                                 </span>
                             </div>
                             <div class="position-relative d-inline-block mb-1 mb-md-2">
-                                <img src="{{ $g1->photo_url }}" class="rounded-circle shadow gk-podium-avatar-1" style="width: 66px; height: 66px; object-fit: cover;">
+                                <img src="{{ $g1->photo_url }}" class="rounded-circle shadow gk-podium-avatar-1" style="width: 66px; height: 66px; min-width: 66px; min-height: 66px; aspect-ratio: 1 / 1; object-fit: cover; flex-shrink: 0;">
                             </div>
                             <h6 class="fw-bold mb-0.5 text-truncate gk-podium-nama" title="{{ $g1->nama }}" style="font-size: 0.88rem;">{{ $g1->nama }}</h6>
                             <small class="d-block mb-2 text-truncate font-mono gk-podium-jurusan" style="font-size: 0.68rem;">{{ strtoupper($g1->jurusan?->nama_jurusan ?? 'UMUM') }}</small>
@@ -281,7 +281,7 @@
                                 </span>
                             </div>
                             <div class="position-relative d-inline-block mb-1 mb-md-2">
-                                <img src="{{ $g2->photo_url }}" class="rounded-circle shadow-sm gk-podium-avatar-2" style="width: 54px; height: 54px; object-fit: cover;">
+                                <img src="{{ $g2->photo_url }}" class="rounded-circle shadow-sm gk-podium-avatar-2" style="width: 54px; height: 54px; min-width: 54px; min-height: 54px; aspect-ratio: 1 / 1; object-fit: cover; flex-shrink: 0;">
                             </div>
                             <h6 class="fw-bold mb-0.5 text-truncate gk-podium-nama" title="{{ $g2->nama }}" style="font-size: 0.82rem;">{{ $g2->nama }}</h6>
                             <small class="d-block mb-1.5 text-truncate font-mono gk-podium-jurusan" style="font-size: 0.65rem;">{{ strtoupper($g2->jurusan?->nama_jurusan ?? 'UMUM') }}</small>
@@ -310,7 +310,7 @@
                                 </span>
                             </div>
                             <div class="position-relative d-inline-block mb-1 mb-md-2">
-                                <img src="{{ $g1->photo_url }}" class="rounded-circle shadow gk-podium-avatar-1" style="width: 64px; height: 64px; object-fit: cover;">
+                                <img src="{{ $g1->photo_url }}" class="rounded-circle shadow gk-podium-avatar-1" style="width: 64px; height: 64px; min-width: 64px; min-height: 64px; aspect-ratio: 1 / 1; object-fit: cover; flex-shrink: 0;">
                             </div>
                             <h6 class="fw-bold mb-0.5 text-truncate gk-podium-nama" title="{{ $g1->nama }}" style="font-size: 0.88rem;">{{ $g1->nama }}</h6>
                             <small class="d-block mb-1.5 text-truncate font-mono gk-podium-jurusan" style="font-size: 0.68rem;">{{ strtoupper($g1->jurusan?->nama_jurusan ?? 'UMUM') }}</small>
@@ -339,7 +339,7 @@
                                 </span>
                             </div>
                             <div class="position-relative d-inline-block mb-1 mb-md-2">
-                                <img src="{{ $g3->photo_url }}" class="rounded-circle shadow-sm gk-podium-avatar-3" style="width: 54px; height: 54px; object-fit: cover;">
+                                <img src="{{ $g3->photo_url }}" class="rounded-circle shadow-sm gk-podium-avatar-3" style="width: 54px; height: 54px; min-width: 54px; min-height: 54px; aspect-ratio: 1 / 1; object-fit: cover; flex-shrink: 0;">
                             </div>
                             <h6 class="fw-bold mb-0.5 text-truncate gk-podium-nama" title="{{ $g3->nama }}" style="font-size: 0.82rem;">{{ $g3->nama }}</h6>
                             <small class="d-block mb-1.5 text-truncate font-mono gk-podium-jurusan" style="font-size: 0.65rem;">{{ strtoupper($g3->jurusan?->nama_jurusan ?? 'UMUM') }}</small>
@@ -385,7 +385,7 @@
                             $rwBadge = $rwScore >= 80 ? 'bg-success' : ($rwScore >= 60 ? 'bg-info' : 'bg-warning');
                         @endphp
                         <div class="d-flex align-items-center gap-3 p-2.5 rounded-3 border" style="background: var(--bg-card); border-color: var(--border) !important;">
-                            <img src="{{ $riwayat->guru->photo_url }}" class="rounded-circle flex-shrink-0 shadow-sm" style="width: 42px; height: 42px; object-fit: cover; border: 2px solid var(--border);">
+                            <img src="{{ $riwayat->guru->photo_url }}" class="rounded-circle flex-shrink-0 shadow-sm" style="width: 42px; height: 42px; min-width: 42px; min-height: 42px; aspect-ratio: 1 / 1; object-fit: cover; border: 2px solid var(--border); flex-shrink: 0;">
                             <div class="flex-grow-1 overflow-hidden">
                                 <h6 class="fw-bold mb-0 text-truncate text-dark" style="font-size: 0.88rem;">{{ $riwayat->guru->nama }}</h6>
                                 <div class="d-flex align-items-center gap-2 mt-1">

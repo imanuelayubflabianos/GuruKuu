@@ -32,8 +32,8 @@
                         </div>
 
                         <div class="text-center mb-3">
-                            <img src="{{ $g->photo_url }}" alt="{{ $g->nama }}" class="rounded-circle shadow-sm" 
-                                 style="width: 90px; height: 90px; object-fit: cover; border: 3px solid var(--primary);"
+                            <img src="{{ $g->photo_url }}" alt="{{ $g->nama }}" class="rounded-circle shadow-sm flex-shrink-0" 
+                                 style="width: 90px; height: 90px; min-width: 90px; min-height: 90px; aspect-ratio: 1 / 1; object-fit: cover; border: 3px solid var(--primary); flex-shrink: 0;"
                                  onerror="this.src='https://ui-avatars.com/api/?name={{ urlencode($g->nama) }}&background=003366&color=fff'">
                         </div>
 

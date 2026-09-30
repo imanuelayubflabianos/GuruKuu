@@ -467,13 +467,13 @@
 </style>
 
 {{-- 1. HERO SECTION (id="home") - SLIDER DENGAN EFEK ANIMASI RINGAN DAN DINAMIS --}}
-<section id="home" class="p-0 position-relative overflow-hidden" style="min-height: 600px;">
+<section id="home" class="p-0 position-relative overflow-hidden" style="min-height: 600px; touch-action: pan-y;">
     {{-- Floating Ambient Glow Orbs --}}
     <div class="hero-ambient-orb" style="top: 15%; right: 12%; width: 280px; height: 280px; background: radial-gradient(circle, rgba(0, 168, 107, 0.45), transparent 70%);"></div>
     <div class="hero-ambient-orb" style="bottom: 12%; left: 8%; width: 340px; height: 340px; background: radial-gradient(circle, rgba(255, 193, 7, 0.38), transparent 70%); animation-delay: -4s;"></div>
 
     {{-- Background Carousel Slideshow --}}
-    <div id="heroBgSlider" class="carousel slide carousel-fade position-absolute w-100 h-100" data-bs-ride="carousel" data-bs-interval="4500" style="top: 0; left: 0; z-index: 1;">
+    <div id="heroBgSlider" class="carousel slide carousel-fade position-absolute w-100 h-100" data-bs-ride="carousel" data-bs-interval="4500" style="top: 0; left: 0; z-index: 1; touch-action: pan-y;">
         <div class="carousel-inner w-100 h-100">
             @foreach($heroImages as $idx => $img)
                 <div class="carousel-item {{ $idx === 0 ? 'active' : '' }} w-100 h-100">
@@ -577,6 +577,64 @@ document.addEventListener('DOMContentLoaded', function() {
         });
 
         updateHeroArrows(0);
+
+        // 🌟 GESTURE GESER DENGAN JARI (TOUCH MOBILE) & MOUSE DRAG (DESKTOP)
+        const heroSection = document.getElementById('home');
+        if (heroSection) {
+            let touchStartX = 0;
+            let touchStartY = 0;
+            let isMouseDown = false;
+            let mouseStartX = 0;
+            let mouseStartY = 0;
+            const threshold = 40; // minimal geser 40px
+
+            // Touch events untuk Mobile (swipe dengan jari)
+            heroSection.addEventListener('touchstart', function(e) {
+                if (e.touches && e.touches.length === 1) {
+                    touchStartX = e.touches[0].clientX;
+                    touchStartY = e.touches[0].clientY;
+                }
+            }, { passive: true });
+
+            heroSection.addEventListener('touchend', function(e) {
+                if (e.changedTouches && e.changedTouches.length === 1) {
+                    const diffX = e.changedTouches[0].clientX - touchStartX;
+                    const diffY = e.changedTouches[0].clientY - touchStartY;
+
+                    // Deteksi geser horizontal dominan (bukan scroll vertikal)
+                    if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > threshold) {
+                        if (diffX < 0) {
+                            carousel.next(); // Geser jari ke kiri -> Slide berikutnya
+                        } else {
+                            carousel.prev(); // Geser jari ke kanan -> Slide sebelumnya
+                        }
+                    }
+                }
+            }, { passive: true });
+
+            // Mouse drag untuk Desktop
+            heroSection.addEventListener('mousedown', function(e) {
+                if (e.target.closest('a, button, input, textarea')) return;
+                isMouseDown = true;
+                mouseStartX = e.clientX;
+                mouseStartY = e.clientY;
+            });
+
+            window.addEventListener('mouseup', function(e) {
+                if (!isMouseDown) return;
+                isMouseDown = false;
+                const diffX = e.clientX - mouseStartX;
+                const diffY = e.clientY - mouseStartY;
+
+                if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > threshold) {
+                    if (diffX < 0) {
+                        carousel.next();
+                    } else {
+                        carousel.prev();
+                    }
+                }
+            });
+        }
     }
 
     // FAQ Accordion Toggle (Buka & Tutup)
@@ -824,11 +882,27 @@ document.addEventListener('DOMContentLoaded', function() {
                 <div class="col-11 col-sm-8 col-md-4 order-2 order-md-1 podium-anim-item podium-rank-2 gk-podium-2">
                     <div class="gk-podium-card-revised p-3.5 p-md-4 text-center h-100 d-flex flex-column justify-content-between">
                         <div>
-                            <div class="mb-3">
+                            <div class="mb-1">
                                 <span class="badge rounded-pill px-3 py-1.5 fw-bold" style="background: #f1f5f9; color: #475569; font-size: 0.8rem;">
                                     #2nd
                                 </span>
                             </div>
+                            
+                            {{-- Badges di Bawah Rank (Always Rendered as Consistent Spacer) --}}
+                            <div class="gk-podium-badges-row">
+                                @foreach(($topList[1]->penghargaan ?? collect()) as $penghargaan)
+                                    @if($penghargaan->badge)
+                                        <span class="gk-badge-mini-icon" style="background: {{ $penghargaan->badge->warna }}18; color: {{ $penghargaan->badge->warna }}; border-color: {{ $penghargaan->badge->warna }}33;" data-bs-toggle="tooltip" title="{{ $penghargaan->badge->nama_badge }}: {{ $penghargaan->badge->deskripsi }}">
+                                            @if(str_starts_with($penghargaan->badge->icon, 'bi-'))
+                                                 <i class="bi {{ $penghargaan->badge->icon }}"></i>
+                                            @else
+                                                {{ $penghargaan->badge->icon }}
+                                            @endif
+                                        </span>
+                                    @endif
+                                @endforeach
+                            </div>
+
                             <div class="gk-avatar-clean-wrap mb-3" style="width: 96px; height: 96px;">
                                 <img src="{{ $topList[1]->photo_url }}" width="96" height="96" alt="{{ $topList[1]->nama }}">
                             </div>
@@ -861,26 +935,11 @@ document.addEventListener('DOMContentLoaded', function() {
                             <small class="text-muted font-mono d-block" style="font-size: 0.78rem;">{{ $topList[1]->total_penilaian }} ulasan</small>
                         </div>
 
-                        {{-- Row Badge Icons --}}
-                        <div class="d-flex align-items-center justify-content-end gap-1.5 pt-3 border-top mt-3" style="min-height: 42px;">
-                            @forelse($topList[1]->penghargaan as $penghargaan)
-                                @if($penghargaan->badge)
-                                    <span class="gk-badge-mini-icon" style="background: {{ $penghargaan->badge->warna }}18; color: {{ $penghargaan->badge->warna }}; border-color: {{ $penghargaan->badge->warna }}33;" data-bs-toggle="tooltip" title="{{ $penghargaan->badge->nama_badge }}: {{ $penghargaan->badge->deskripsi }}">
-                                        @if(str_starts_with($penghargaan->badge->icon, 'bi-'))
-                                             <i class="bi {{ $penghargaan->badge->icon }}"></i>
-                                        @else
-                                            {{ $penghargaan->badge->icon }}
-                                        @endif
-                                    </span>
-                                @endif
-                            @empty
-                                <span class="gk-badge-mini-icon" style="background: #f59e0b18; color: #d97706; border-color: #f59e0b33;" title="Guru Berprestasi">
-                                    <i class="bi bi-arrow-up"></i>
-                                </span>
-                                <span class="gk-badge-mini-icon" style="background: #10b98118; color: #059669; border-color: #10b98133;" title="Terverifikasi">
-                                    <i class="bi bi-check-lg"></i>
-                                </span>
-                            @endforelse
+                        {{-- Tombol Profil --}}
+                        <div class="mt-3">
+                            <a href="{{ route('landing.guru.detail', $topList[1]->id) }}" class="btn btn-sm btn-outline-primary gk-btn-podium-profile mb-2">
+                                <i class="bi bi-eye me-1"></i> Profil
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -891,11 +950,27 @@ document.addEventListener('DOMContentLoaded', function() {
                 <div class="col-11 col-sm-8 col-md-4 order-1 order-md-2 podium-anim-item podium-rank-1 gk-podium-1">
                     <div class="gk-podium-card-revised is-first p-4 p-md-5 text-center h-100 d-flex flex-column justify-content-between">
                         <div>
-                            <div class="mb-3">
+                            <div class="mb-1">
                                 <span class="badge rounded-pill px-4 py-1.5 fw-bold" style="background: #fef08a; color: #854d0e; font-size: 0.9rem;">
                                     #1st
                                 </span>
                             </div>
+
+                            {{-- Badges di Bawah Rank (Always Rendered as Consistent Spacer) --}}
+                            <div class="gk-podium-badges-row">
+                                @foreach(($topList[0]->penghargaan ?? collect()) as $penghargaan)
+                                    @if($penghargaan->badge)
+                                        <span class="gk-badge-mini-icon" style="background: {{ $penghargaan->badge->warna }}18; color: {{ $penghargaan->badge->warna }}; border-color: {{ $penghargaan->badge->warna }}33;" data-bs-toggle="tooltip" title="{{ $penghargaan->badge->nama_badge }}: {{ $penghargaan->badge->deskripsi }}">
+                                            @if(str_starts_with($penghargaan->badge->icon, 'bi-'))
+                                                 <i class="bi {{ $penghargaan->badge->icon }}"></i>
+                                            @else
+                                                {{ $penghargaan->badge->icon }}
+                                            @endif
+                                        </span>
+                                    @endif
+                                @endforeach
+                            </div>
+
                             <div class="gk-avatar-clean-wrap mb-3" style="width: 114px; height: 114px;">
                                 <img src="{{ $topList[0]->photo_url }}" width="114" height="114" alt="{{ $topList[0]->nama }}">
                             </div>
@@ -928,25 +1003,11 @@ document.addEventListener('DOMContentLoaded', function() {
                             <small class="text-muted font-mono d-block" style="font-size: 0.8rem;">{{ $topList[0]->total_penilaian }} ulasan</small>
                         </div>
 
-                        {{-- Row Badge Icons (Lengkap) --}}
-                        <div class="d-flex align-items-center justify-content-center justify-content-md-end gap-1.5 pt-3 border-top mt-3" style="min-height: 42px;">
-                            @forelse($topList[0]->penghargaan as $penghargaan)
-                                @if($penghargaan->badge)
-                                    <span class="gk-badge-mini-icon" style="background: {{ $penghargaan->badge->warna }}18; color: {{ $penghargaan->badge->warna }}; border-color: {{ $penghargaan->badge->warna }}33;" data-bs-toggle="tooltip" title="{{ $penghargaan->badge->nama_badge }}: {{ $penghargaan->badge->deskripsi }}">
-                                        @if(str_starts_with($penghargaan->badge->icon, 'bi-'))
-                                             <i class="bi {{ $penghargaan->badge->icon }}"></i>
-                                        @else
-                                            {{ $penghargaan->badge->icon }}
-                                        @endif
-                                    </span>
-                                @endif
-                            @empty
-                                <span class="gk-badge-mini-icon" style="background: #ec489918; color: #db2777; border-color: #ec489933;" title="Guru Terbaik">🏆</span>
-                                <span class="gk-badge-mini-icon" style="background: #06b6d418; color: #0891b2; border-color: #06b6d433;" title="Disiplin">📅</span>
-                                <span class="gk-badge-mini-icon" style="background: #10b98118; color: #059669; border-color: #10b98133;" title="Inspiratif">💡</span>
-                                <span class="gk-badge-mini-icon" style="background: #6366f118; color: #4f46e5; border-color: #6366f133;" title="Favorit">⭐</span>
-                                <span class="gk-badge-mini-icon" style="background: #f59e0b18; color: #d97706; border-color: #f59e0b33;" title="Komunikator">🤝</span>
-                            @endforelse
+                        {{-- Tombol Profil --}}
+                        <div class="mt-3">
+                            <a href="{{ route('landing.guru.detail', $topList[0]->id) }}" class="btn btn-sm btn-outline-primary gk-btn-podium-profile mb-2">
+                                <i class="bi bi-eye me-1"></i> Profil
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -957,11 +1018,27 @@ document.addEventListener('DOMContentLoaded', function() {
                 <div class="col-11 col-sm-8 col-md-4 order-3 order-md-3 podium-anim-item podium-rank-3 gk-podium-3">
                     <div class="gk-podium-card-revised p-3 p-md-3.5 text-center h-100 d-flex flex-column justify-content-between">
                         <div>
-                            <div class="mb-3">
+                            <div class="mb-1">
                                 <span class="badge rounded-pill px-2.5 py-1 fw-bold" style="background: #fed7aa; color: #9a3412; font-size: 0.75rem;">
                                     #3rd
                                 </span>
                             </div>
+
+                            {{-- Badges di Bawah Rank (Always Rendered as Consistent Spacer) --}}
+                            <div class="gk-podium-badges-row">
+                                @foreach(($topList[2]->penghargaan ?? collect()) as $penghargaan)
+                                    @if($penghargaan->badge)
+                                        <span class="gk-badge-mini-icon" style="background: {{ $penghargaan->badge->warna }}18; color: {{ $penghargaan->badge->warna }}; border-color: {{ $penghargaan->badge->warna }}33;" data-bs-toggle="tooltip" title="{{ $penghargaan->badge->nama_badge }}: {{ $penghargaan->badge->deskripsi }}">
+                                            @if(str_starts_with($penghargaan->badge->icon, 'bi-'))
+                                                 <i class="bi {{ $penghargaan->badge->icon }}"></i>
+                                            @else
+                                                {{ $penghargaan->badge->icon }}
+                                            @endif
+                                        </span>
+                                    @endif
+                                @endforeach
+                            </div>
+
                             <div class="gk-avatar-clean-wrap mb-3" style="width: 82px; height: 82px;">
                                 <img src="{{ $topList[2]->photo_url }}" width="82" height="82" alt="{{ $topList[2]->nama }}">
                             </div>
@@ -994,23 +1071,11 @@ document.addEventListener('DOMContentLoaded', function() {
                             <small class="text-muted font-mono d-block" style="font-size: 0.75rem;">{{ $topList[2]->total_penilaian }} ulasan</small>
                         </div>
 
-                        {{-- Row Badge Icons --}}
-                        <div class="d-flex align-items-center justify-content-end gap-1.5 pt-3 border-top mt-3" style="min-height: 42px;">
-                            @forelse($topList[2]->penghargaan as $penghargaan)
-                                @if($penghargaan->badge)
-                                    <span class="gk-badge-mini-icon" style="background: {{ $penghargaan->badge->warna }}18; color: {{ $penghargaan->badge->warna }}; border-color: {{ $penghargaan->badge->warna }}33;" data-bs-toggle="tooltip" title="{{ $penghargaan->badge->nama_badge }}: {{ $penghargaan->badge->deskripsi }}">
-                                        @if(str_starts_with($penghargaan->badge->icon, 'bi-'))
-                                            <i class="bi {{ $penghargaan->badge->icon }}"></i>
-                                        @else
-                                            {{ $penghargaan->badge->icon }}
-                                        @endif
-                                    </span>
-                                @endif
-                            @empty
-                                <span class="gk-badge-mini-icon" style="background: #f59e0b18; color: #d97706; border-color: #f59e0b33;" title="Guru Terfavorit">
-                                    <i class="bi bi-arrow-up"></i>
-                                </span>
-                            @endforelse
+                        {{-- Tombol Profil --}}
+                        <div class="mt-3">
+                            <a href="{{ route('landing.guru.detail', $topList[2]->id) }}" class="btn btn-sm btn-outline-primary gk-btn-podium-profile mb-2">
+                                <i class="bi bi-eye me-1"></i> Profil
+                            </a>
                         </div>
                     </div>
                 </div>

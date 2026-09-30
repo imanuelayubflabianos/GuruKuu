@@ -141,6 +141,7 @@ class LoginController extends Controller
             Auth::login($user, $request->boolean('remember'));
             $request->session()->regenerate();
             \App\Models\LoginHistory::recordLogin($user, $request);
+            $request->session()->flash('show_welcome_landing_popup', true);
 
             return redirect()->intended(route('siswa.dashboard'))
                 ->with('success', 'Selamat datang, ' . $user->name . '!');
@@ -202,6 +203,7 @@ class LoginController extends Controller
                 Auth::login($admin, $request->boolean('remember'));
                 $request->session()->regenerate();
                 \App\Models\LoginHistory::recordLogin($admin, $request);
+                $request->session()->flash('show_welcome_landing_popup', true);
 
                 return redirect()->intended(route('admin.dashboard'))
                     ->with('success', 'Selamat datang, Administrator!');
@@ -289,6 +291,7 @@ class LoginController extends Controller
             Auth::login($user, $request->boolean('remember'));
             $request->session()->regenerate();
             \App\Models\LoginHistory::recordLogin($user, $request);
+            $request->session()->flash('show_welcome_landing_popup', true);
 
             return redirect()->intended(route('guru.dashboard'))
                 ->with('success', 'Selamat datang, ' . $user->name . '!');

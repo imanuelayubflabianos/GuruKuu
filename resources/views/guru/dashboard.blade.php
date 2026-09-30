@@ -89,7 +89,7 @@
     <div class="row align-items-center">
         <div class="col-md-8">
             <div class="d-flex align-items-center">
-                <img src="{{ $guru->photo_url }}" alt="{{ $guru->nama }}" class="rounded-circle me-3 shadow-sm" style="width: 64px; height: 64px; object-fit: cover; border: 3px solid var(--border);" onerror="this.src='https://ui-avatars.com/api/?name={{ urlencode($guru->nama) }}&background=003366&color=fff'">
+                <img src="{{ $guru->photo_url }}" alt="{{ $guru->nama }}" class="rounded-circle me-3 shadow-sm flex-shrink-0" style="width: 64px; height: 64px; min-width: 64px; min-height: 64px; aspect-ratio: 1 / 1; object-fit: cover; border: 3px solid var(--border); flex-shrink: 0;" onerror="this.src='https://ui-avatars.com/api/?name={{ urlencode($guru->nama) }}&background=003366&color=fff'">
                 <div>
                     <h4 class="fw-bold mb-1 text-dark">{{ $guru->nama }}</h4>
                     <div class="text-muted small font-mono d-flex align-items-center gap-2 flex-wrap">

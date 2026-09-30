@@ -443,6 +443,18 @@
                     </button>
                 </form>
 
+                {{-- SSO SIPINTU BUTTON --}}
+                <div class="d-flex align-items-center my-3">
+                    <hr class="flex-grow-1 border-secondary opacity-25 m-0">
+                    <span class="px-2 text-muted small" style="font-size: 0.75rem;">ATAU SSO</span>
+                    <hr class="flex-grow-1 border-secondary opacity-25 m-0">
+                </div>
+
+                <a href="{{ route('login.sipintu') }}" class="btn btn-outline-light border w-100 py-2.5 d-flex align-items-center justify-content-center gap-2 text-dark shadow-xs" style="border-radius: 12px; font-size: 0.88rem; background: #f8fafc;">
+                    <img src="{{ asset('images/sipintu-logo.png') }}" alt="SiPintu" style="width: 20px; height: 20px; object-fit: contain;">
+                    <span class="fw-semibold text-dark">Masuk dengan Portal SiPintu</span>
+                </a>
+
                 {{-- BANTUAN KENDALA LOGIN & TOMBOL KEMBALI DI BAWAH HUBUNGI ADMIN --}}
                 <div class="text-center mt-3 pt-3 border-top" style="border-color: var(--border) !important;">
                     <span class="text-muted d-block small mb-1" style="font-size: 0.8rem;">Ada kendala masuk?</span>

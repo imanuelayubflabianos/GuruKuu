@@ -45,7 +45,7 @@
         .stat-card-label { font-size:0.85rem; color:var(--text-muted); text-transform:uppercase; font-weight:600; }
         .stat-card-value { font-size:2rem; font-weight:800; color:var(--text-dark); }
     </style>
-    <link href="{{ asset('css/gurukuu-theme.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/gurukuu-theme.css') }}?v={{ file_exists(public_path('css/gurukuu-theme.css')) ? filemtime(public_path('css/gurukuu-theme.css')) : time() }}" rel="stylesheet">
     @stack('styles')
     <script src="{{ asset('js/gurukuu-theme.js') }}"></script>
 </head>
@@ -264,6 +264,7 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="{{ asset('js/gurukuu-modal.js') }}"></script>
     <script src="{{ asset('js/admin-page-cache.js') }}"></script>
+    @include('components.welcome-landing-modal')
     @stack('scripts')
 </body>
 </html>

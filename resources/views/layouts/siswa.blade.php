@@ -81,7 +81,7 @@
             .main-content { margin-left: 0; }
         }
     </style>
-    <link href="{{ asset('css/gurukuu-theme.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/gurukuu-theme.css') }}?v={{ file_exists(public_path('css/gurukuu-theme.css')) ? filemtime(public_path('css/gurukuu-theme.css')) : time() }}" rel="stylesheet">
     <script src="{{ asset('js/gurukuu-theme.js') }}"></script>
 </head>
 <body>
@@ -294,6 +294,7 @@
             });
         </script>
     @endif
+    @include('components.welcome-landing-modal')
     @stack('scripts')
 </body>
 </html>

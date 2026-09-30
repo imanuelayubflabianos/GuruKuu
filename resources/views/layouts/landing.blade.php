@@ -17,7 +17,6 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
-    <link rel="stylesheet" href="{{ asset('css/gurukuu-theme.css') }}">
     <style>
         html { scroll-behavior: smooth; }
         :root {
@@ -335,7 +334,7 @@
             .section-padding { padding: 2.25rem 0; }
         }
     </style>
-    <link href="{{ asset('css/gurukuu-theme.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/gurukuu-theme.css') }}?v={{ file_exists(public_path('css/gurukuu-theme.css')) ? filemtime(public_path('css/gurukuu-theme.css')) : time() }}" rel="stylesheet">
     <script src="{{ asset('js/gurukuu-theme.js') }}"></script>
 </head>
 <body>

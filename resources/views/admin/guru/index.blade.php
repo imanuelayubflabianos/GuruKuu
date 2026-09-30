@@ -84,7 +84,7 @@
                     <td class="font-mono fw-bold text-primary">{{ $g->nip }}</td>
                     <td>
                         <div class="d-flex align-items-center gap-2">
-                            <img src="{{ $g->photo_url }}" class="rounded-circle border" style="width: 38px; height: 38px; object-fit: cover;">
+                            <img src="{{ $g->photo_url }}" class="rounded-circle border flex-shrink-0" style="width: 38px; height: 38px; min-width: 38px; min-height: 38px; aspect-ratio: 1 / 1; object-fit: cover; flex-shrink: 0;">
                             <div>
                                 <strong>{{ $g->nama }}</strong>
                                 @if($u && $u->warning_count > 0)

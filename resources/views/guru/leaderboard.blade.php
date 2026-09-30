@@ -2,13 +2,16 @@
 @section('title', 'Leaderboard Guru')
 
 @section('content')
-<div class="page-header">
-    <div class="page-label">PENCAPAIAN TERTINGGI</div>
-    <h1 class="page-title">Leaderboard Guru</h1>
-    <p class="page-subtitle">Peringkat guru terbaik berdasarkan penilaian dan ulasan objektif siswa.</p>
+<div class="text-center mb-4">
+    <h1 class="page-title fw-bold text-dark mb-1" style="font-size: 1.85rem;">Leaderboard Guru</h1>
+    <p class="text-muted mb-0" style="font-size: 0.95rem;">Peringkat guru terbaik berdasarkan penilaian dan ulasan objektif siswa.</p>
 </div>
 
 @include('components.leaderboard-filter')
+
+<div class="mb-3">
+    <div class="page-label">PENCAPAIAN TERTINGGI</div>
+</div>
 
 {{-- Podium Top 3 --}}
 @php
@@ -26,26 +29,24 @@
             <div class="col-12 col-sm-10 col-md-8 col-lg-5">
                 <div class="gk-podium-card-revised is-first p-4 p-md-5 text-center d-flex flex-column justify-content-between shadow position-relative">
                     <div>
-                        <div class="mb-3">
+                        <div class="mb-1">
                             <span class="badge rounded-pill px-4 py-1.5 fw-bold" style="background: #fef08a; color: #854d0e; font-size: 0.9rem;">
                                 #1st
                             </span>
+                        </div>
+                        <div class="gk-podium-badges-row">
+                            @foreach(($top1->penghargaan ?? []) as $penghargaan)
+                                @if($penghargaan->badge)
+                                    <span class="gk-badge-mini-icon" style="background: {{ $penghargaan->badge->warna }}18; color: {{ $penghargaan->badge->warna }}; border-color: {{ $penghargaan->badge->warna }}33;" data-bs-toggle="tooltip" title="{{ $penghargaan->badge->nama_badge }}: {{ $penghargaan->badge->deskripsi }}">
+                                        @if(str_starts_with($penghargaan->badge->icon, 'bi-'))<i class="bi {{ $penghargaan->badge->icon }}"></i>@else{{ $penghargaan->badge->icon }}@endif
+                                    </span>
+                                @endif
+                            @endforeach
                         </div>
                         <div class="gk-avatar-clean-wrap mb-3" style="width: 114px; height: 114px;">
                             <img src="{{ $top1->photo_url }}" width="114" height="114" alt="{{ $top1->nama }}">
                         </div>
                         <h4 class="fw-bold mb-1 text-dark" style="font-size: 1.25rem;" title="{{ $top1->nama }}">{{ $top1->nama }}</h4>
-                        @if(($top1->penghargaan ?? collect())->whereNotNull('badge')->isNotEmpty())
-                            <div class="d-flex align-items-center justify-content-center gap-1 flex-wrap my-1.5">
-                                @foreach($top1->penghargaan as $penghargaan)
-                                    @if($penghargaan->badge)
-                                        <span class="gk-badge-mini-icon" style="background: {{ $penghargaan->badge->warna }}18; color: {{ $penghargaan->badge->warna }}; border-color: {{ $penghargaan->badge->warna }}33;" data-bs-toggle="tooltip" title="{{ $penghargaan->badge->nama_badge }}: {{ $penghargaan->badge->deskripsi }}">
-                                            @if(str_starts_with($penghargaan->badge->icon, 'bi-'))<i class="bi {{ $penghargaan->badge->icon }}"></i>@else{{ $penghargaan->badge->icon }}@endif
-                                        </span>
-                                    @endif
-                                @endforeach
-                            </div>
-                        @endif
                         <div class="text-muted small mb-2">{{ strtoupper($top1->jurusan?->nama_jurusan ?? $top1->kategori_label ?? 'UMUM') }}</div>
                         <div class="text-warning mb-2" style="font-size: 1.1rem; letter-spacing: 2.5px;">
                             @php
@@ -71,8 +72,8 @@
                         <small class="text-muted font-mono d-block mb-3" style="font-size: 0.8rem;">{{ $top1->total_penilaian }} {{ $mode === 'partisipasi' ? 'siswa memilih' : 'ulasan' }}</small>
                     </div>
 
-                    <a href="{{ route('guru.detail', $top1->id) }}" class="gk-btn-podium-profile mb-2">
-                        <i class="bi bi-eye"></i> Profil
+                    <a href="{{ route('guru.detail', $top1->id) }}" class="btn btn-sm btn-outline-primary gk-btn-podium-profile mb-2">
+                        <i class="bi bi-eye me-1"></i> Profil
                     </a>
                 </div>
             </div>
@@ -88,26 +89,24 @@
             <div class="col-6 col-md-5">
                 <div class="gk-podium-card-revised p-3.5 p-md-4 text-center h-100 d-flex flex-column justify-content-between shadow-sm">
                     <div>
-                        <div class="mb-3">
+                        <div class="mb-1">
                             <span class="badge rounded-pill px-3 py-1.5 fw-bold" style="background: #f1f5f9; color: #475569; font-size: 0.8rem;">
                                 #2nd
                             </span>
+                        </div>
+                        <div class="gk-podium-badges-row">
+                            @foreach(($top2->penghargaan ?? []) as $penghargaan)
+                                @if($penghargaan->badge)
+                                    <span class="gk-badge-mini-icon" style="background: {{ $penghargaan->badge->warna }}18; color: {{ $penghargaan->badge->warna }}; border-color: {{ $penghargaan->badge->warna }}33;" data-bs-toggle="tooltip" title="{{ $penghargaan->badge->nama_badge }}: {{ $penghargaan->badge->deskripsi }}">
+                                        @if(str_starts_with($penghargaan->badge->icon, 'bi-'))<i class="bi {{ $penghargaan->badge->icon }}"></i>@else{{ $penghargaan->badge->icon }}@endif
+                                    </span>
+                                @endif
+                            @endforeach
                         </div>
                         <div class="gk-avatar-clean-wrap mb-3" style="width: 96px; height: 96px;">
                             <img src="{{ $top2->photo_url }}" width="96" height="96" alt="{{ $top2->nama }}">
                         </div>
                         <h5 class="fw-bold mb-1 text-dark" style="font-size: 1.05rem;" title="{{ $top2->nama }}">{{ $top2->nama }}</h5>
-                        @if(($top2->penghargaan ?? collect())->whereNotNull('badge')->isNotEmpty())
-                            <div class="d-flex align-items-center justify-content-center gap-1 flex-wrap my-1.5">
-                                @foreach($top2->penghargaan as $penghargaan)
-                                    @if($penghargaan->badge)
-                                        <span class="gk-badge-mini-icon" style="background: {{ $penghargaan->badge->warna }}18; color: {{ $penghargaan->badge->warna }}; border-color: {{ $penghargaan->badge->warna }}33;" data-bs-toggle="tooltip" title="{{ $penghargaan->badge->nama_badge }}: {{ $penghargaan->badge->deskripsi }}">
-                                            @if(str_starts_with($penghargaan->badge->icon, 'bi-'))<i class="bi {{ $penghargaan->badge->icon }}"></i>@else{{ $penghargaan->badge->icon }}@endif
-                                        </span>
-                                    @endif
-                                @endforeach
-                            </div>
-                        @endif
                         <div class="text-muted small mb-2">{{ strtoupper($top2->jurusan?->nama_jurusan ?? $top2->kategori_label ?? 'UMUM') }}</div>
                         <div class="text-warning mb-2" style="font-size: 0.95rem; letter-spacing: 2px;">
                             @php
@@ -132,8 +131,8 @@
                         </div>
                         <small class="text-muted font-mono d-block mb-3" style="font-size: 0.78rem;">{{ $top2->total_penilaian }} {{ $mode === 'partisipasi' ? 'siswa memilih' : 'ulasan' }}</small>
                     </div>
-                    <a href="{{ route('guru.detail', $top2->id) }}" class="gk-btn-podium-profile mb-2">
-                        <i class="bi bi-eye"></i> Profil
+                    <a href="{{ route('guru.detail', $top2->id) }}" class="btn btn-sm btn-outline-primary gk-btn-podium-profile mb-2">
+                        <i class="bi bi-eye me-1"></i> Profil
                     </a>
                 </div>
             </div>
@@ -142,26 +141,24 @@
             <div class="col-6 col-md-5">
                 <div class="gk-podium-card-revised is-first p-3.5 p-md-4 text-center h-100 d-flex flex-column justify-content-between shadow position-relative">
                     <div>
-                        <div class="mb-3">
+                        <div class="mb-1">
                             <span class="badge rounded-pill px-4 py-1.5 fw-bold" style="background: #fef08a; color: #854d0e; font-size: 0.9rem;">
                                 #1st
                             </span>
+                        </div>
+                        <div class="gk-podium-badges-row">
+                            @foreach(($top1->penghargaan ?? []) as $penghargaan)
+                                @if($penghargaan->badge)
+                                    <span class="gk-badge-mini-icon" style="background: {{ $penghargaan->badge->warna }}18; color: {{ $penghargaan->badge->warna }}; border-color: {{ $penghargaan->badge->warna }}33;" data-bs-toggle="tooltip" title="{{ $penghargaan->badge->nama_badge }}: {{ $penghargaan->badge->deskripsi }}">
+                                        @if(str_starts_with($penghargaan->badge->icon, 'bi-'))<i class="bi {{ $penghargaan->badge->icon }}"></i>@else{{ $penghargaan->badge->icon }}@endif
+                                    </span>
+                                @endif
+                            @endforeach
                         </div>
                         <div class="gk-avatar-clean-wrap mb-3" style="width: 114px; height: 114px;">
                             <img src="{{ $top1->photo_url }}" width="114" height="114" alt="{{ $top1->nama }}">
                         </div>
                         <h4 class="fw-bold mb-1 text-dark" style="font-size: 1.25rem;" title="{{ $top1->nama }}">{{ $top1->nama }}</h4>
-                        @if(($top1->penghargaan ?? collect())->whereNotNull('badge')->isNotEmpty())
-                            <div class="d-flex align-items-center justify-content-center gap-1 flex-wrap my-1.5">
-                                @foreach($top1->penghargaan as $penghargaan)
-                                    @if($penghargaan->badge)
-                                        <span class="gk-badge-mini-icon" style="background: {{ $penghargaan->badge->warna }}18; color: {{ $penghargaan->badge->warna }}; border-color: {{ $penghargaan->badge->warna }}33;" data-bs-toggle="tooltip" title="{{ $penghargaan->badge->nama_badge }}: {{ $penghargaan->badge->deskripsi }}">
-                                            @if(str_starts_with($penghargaan->badge->icon, 'bi-'))<i class="bi {{ $penghargaan->badge->icon }}"></i>@else{{ $penghargaan->badge->icon }}@endif
-                                        </span>
-                                    @endif
-                                @endforeach
-                            </div>
-                        @endif
                         <div class="text-muted small mb-2">{{ strtoupper($top1->jurusan?->nama_jurusan ?? $top1->kategori_label ?? 'UMUM') }}</div>
                         <div class="text-warning mb-2" style="font-size: 1.1rem; letter-spacing: 2.5px;">
                             @php
@@ -186,8 +183,8 @@
                         </div>
                         <small class="text-muted font-mono d-block mb-3" style="font-size: 0.8rem;">{{ $top1->total_penilaian }} {{ $mode === 'partisipasi' ? 'siswa memilih' : 'ulasan' }}</small>
                     </div>
-                    <a href="{{ route('guru.detail', $top1->id) }}" class="gk-btn-podium-profile mb-2">
-                        <i class="bi bi-eye"></i> Profil
+                    <a href="{{ route('guru.detail', $top1->id) }}" class="btn btn-sm btn-outline-primary gk-btn-podium-profile mb-2">
+                        <i class="bi bi-eye me-1"></i> Profil
                     </a>
                 </div>
             </div>
@@ -204,26 +201,24 @@
             <div class="col-12 col-md-4 order-2 order-md-1 gk-podium-col gk-podium-2">
                 <div class="gk-podium-card-revised p-3.5 p-md-4 text-center h-100 d-flex flex-column justify-content-between shadow-sm">
                     <div>
-                        <div class="mb-3">
+                        <div class="mb-1">
                             <span class="badge rounded-pill px-3 py-1.5 fw-bold" style="background: #f1f5f9; color: #475569; font-size: 0.8rem;">
                                 #2nd
                             </span>
+                        </div>
+                        <div class="gk-podium-badges-row">
+                            @foreach(($top2->penghargaan ?? []) as $penghargaan)
+                                @if($penghargaan->badge)
+                                    <span class="gk-badge-mini-icon" style="background: {{ $penghargaan->badge->warna }}18; color: {{ $penghargaan->badge->warna }}; border-color: {{ $penghargaan->badge->warna }}33;" data-bs-toggle="tooltip" title="{{ $penghargaan->badge->nama_badge }}: {{ $penghargaan->badge->deskripsi }}">
+                                        @if(str_starts_with($penghargaan->badge->icon, 'bi-'))<i class="bi {{ $penghargaan->badge->icon }}"></i>@else{{ $penghargaan->badge->icon }}@endif
+                                    </span>
+                                @endif
+                            @endforeach
                         </div>
                         <div class="gk-avatar-clean-wrap mb-3" style="width: 96px; height: 96px;">
                             <img src="{{ $top2->photo_url }}" width="96" height="96" alt="{{ $top2->nama }}">
                         </div>
                         <h5 class="fw-bold mb-1 text-dark" style="font-size: 1.05rem;" title="{{ $top2->nama }}">{{ $top2->nama }}</h5>
-                        @if(($top2->penghargaan ?? collect())->whereNotNull('badge')->isNotEmpty())
-                            <div class="d-flex align-items-center justify-content-center gap-1 flex-wrap my-1.5">
-                                @foreach($top2->penghargaan as $penghargaan)
-                                    @if($penghargaan->badge)
-                                        <span class="gk-badge-mini-icon" style="background: {{ $penghargaan->badge->warna }}18; color: {{ $penghargaan->badge->warna }}; border-color: {{ $penghargaan->badge->warna }}33;" data-bs-toggle="tooltip" title="{{ $penghargaan->badge->nama_badge }}: {{ $penghargaan->badge->deskripsi }}">
-                                            @if(str_starts_with($penghargaan->badge->icon, 'bi-'))<i class="bi {{ $penghargaan->badge->icon }}"></i>@else{{ $penghargaan->badge->icon }}@endif
-                                        </span>
-                                    @endif
-                                @endforeach
-                            </div>
-                        @endif
                         <div class="text-muted small mb-2">{{ strtoupper($top2->jurusan?->nama_jurusan ?? $top2->kategori_label ?? 'UMUM') }}</div>
                         <div class="text-warning mb-2" style="font-size: 0.95rem; letter-spacing: 2px;">
                             @php
@@ -248,8 +243,8 @@
                         </div>
                         <small class="text-muted font-mono d-block mb-3" style="font-size: 0.78rem;">{{ $top2->total_penilaian }} {{ $mode === 'partisipasi' ? 'siswa memilih' : 'ulasan' }}</small>
                     </div>
-                    <a href="{{ route('guru.detail', $top2->id) }}" class="gk-btn-podium-profile mb-2">
-                        <i class="bi bi-eye"></i> Profil
+                    <a href="{{ route('guru.detail', $top2->id) }}" class="btn btn-sm btn-outline-primary gk-btn-podium-profile mb-2">
+                        <i class="bi bi-eye me-1"></i> Profil
                     </a>
                 </div>
             </div>
@@ -258,26 +253,24 @@
             <div class="col-12 col-md-4 order-1 order-md-2 mb-3 mb-md-0 gk-podium-col gk-podium-1">
                 <div class="gk-podium-card-revised is-first p-4 p-md-5 text-center h-100 d-flex flex-column justify-content-between shadow position-relative">
                     <div>
-                        <div class="mb-3">
+                        <div class="mb-1">
                             <span class="badge rounded-pill px-4 py-1.5 fw-bold" style="background: #fef08a; color: #854d0e; font-size: 0.9rem;">
                                 #1st
                             </span>
+                        </div>
+                        <div class="gk-podium-badges-row">
+                            @foreach(($top1->penghargaan ?? []) as $penghargaan)
+                                @if($penghargaan->badge)
+                                    <span class="gk-badge-mini-icon" style="background: {{ $penghargaan->badge->warna }}18; color: {{ $penghargaan->badge->warna }}; border-color: {{ $penghargaan->badge->warna }}33;" data-bs-toggle="tooltip" title="{{ $penghargaan->badge->nama_badge }}: {{ $penghargaan->badge->deskripsi }}">
+                                        @if(str_starts_with($penghargaan->badge->icon, 'bi-'))<i class="bi {{ $penghargaan->badge->icon }}"></i>@else{{ $penghargaan->badge->icon }}@endif
+                                    </span>
+                                @endif
+                            @endforeach
                         </div>
                         <div class="gk-avatar-clean-wrap mb-3" style="width: 114px; height: 114px;">
                             <img src="{{ $top1->photo_url }}" width="114" height="114" alt="{{ $top1->nama }}">
                         </div>
                         <h4 class="fw-bold mb-1 text-dark" style="font-size: 1.25rem;" title="{{ $top1->nama }}">{{ $top1->nama }}</h4>
-                        @if(($top1->penghargaan ?? collect())->whereNotNull('badge')->isNotEmpty())
-                            <div class="d-flex align-items-center justify-content-center gap-1 flex-wrap my-1.5">
-                                @foreach($top1->penghargaan as $penghargaan)
-                                    @if($penghargaan->badge)
-                                        <span class="gk-badge-mini-icon" style="background: {{ $penghargaan->badge->warna }}18; color: {{ $penghargaan->badge->warna }}; border-color: {{ $penghargaan->badge->warna }}33;" data-bs-toggle="tooltip" title="{{ $penghargaan->badge->nama_badge }}: {{ $penghargaan->badge->deskripsi }}">
-                                            @if(str_starts_with($penghargaan->badge->icon, 'bi-'))<i class="bi {{ $penghargaan->badge->icon }}"></i>@else{{ $penghargaan->badge->icon }}@endif
-                                        </span>
-                                    @endif
-                                @endforeach
-                            </div>
-                        @endif
                         <div class="text-muted small mb-2">{{ strtoupper($top1->jurusan?->nama_jurusan ?? $top1->kategori_label ?? 'UMUM') }}</div>
                         <div class="text-warning mb-2" style="font-size: 1.1rem; letter-spacing: 2.5px;">
                             @php
@@ -302,8 +295,8 @@
                         </div>
                         <small class="text-muted font-mono d-block mb-3" style="font-size: 0.8rem;">{{ $top1->total_penilaian }} {{ $mode === 'partisipasi' ? 'siswa memilih' : 'ulasan' }}</small>
                     </div>
-                    <a href="{{ route('guru.detail', $top1->id) }}" class="gk-btn-podium-profile mb-2">
-                        <i class="bi bi-eye"></i> Profil
+                    <a href="{{ route('guru.detail', $top1->id) }}" class="btn btn-sm btn-outline-primary gk-btn-podium-profile mb-2">
+                        <i class="bi bi-eye me-1"></i> Profil
                     </a>
                 </div>
             </div>
@@ -312,26 +305,24 @@
             <div class="col-12 col-md-4 order-3 order-md-3 gk-podium-col gk-podium-3">
                 <div class="gk-podium-card-revised p-3 p-md-3.5 text-center h-100 d-flex flex-column justify-content-between shadow-sm">
                     <div>
-                        <div class="mb-3">
+                        <div class="mb-1">
                             <span class="badge rounded-pill px-2.5 py-1 fw-bold" style="background: #fed7aa; color: #9a3412; font-size: 0.75rem;">
                                 #3rd
                             </span>
+                        </div>
+                        <div class="gk-podium-badges-row">
+                            @foreach(($top3->penghargaan ?? []) as $penghargaan)
+                                @if($penghargaan->badge)
+                                    <span class="gk-badge-mini-icon" style="background: {{ $penghargaan->badge->warna }}18; color: {{ $penghargaan->badge->warna }}; border-color: {{ $penghargaan->badge->warna }}33;" data-bs-toggle="tooltip" title="{{ $penghargaan->badge->nama_badge }}: {{ $penghargaan->badge->deskripsi }}">
+                                        @if(str_starts_with($penghargaan->badge->icon, 'bi-'))<i class="bi {{ $penghargaan->badge->icon }}"></i>@else{{ $penghargaan->badge->icon }}@endif
+                                    </span>
+                                @endif
+                            @endforeach
                         </div>
                         <div class="gk-avatar-clean-wrap mb-3" style="width: 82px; height: 82px;">
                             <img src="{{ $top3->photo_url }}" width="82" height="82" alt="{{ $top3->nama }}">
                         </div>
                         <h5 class="fw-bold mb-1 text-dark" style="font-size: 0.95rem;" title="{{ $top3->nama }}">{{ $top3->nama }}</h5>
-                        @if(($top3->penghargaan ?? collect())->whereNotNull('badge')->isNotEmpty())
-                            <div class="d-flex align-items-center justify-content-center gap-1 flex-wrap my-1.5">
-                                @foreach($top3->penghargaan as $penghargaan)
-                                    @if($penghargaan->badge)
-                                        <span class="gk-badge-mini-icon" style="background: {{ $penghargaan->badge->warna }}18; color: {{ $penghargaan->badge->warna }}; border-color: {{ $penghargaan->badge->warna }}33;" data-bs-toggle="tooltip" title="{{ $penghargaan->badge->nama_badge }}: {{ $penghargaan->badge->deskripsi }}">
-                                            @if(str_starts_with($penghargaan->badge->icon, 'bi-'))<i class="bi {{ $penghargaan->badge->icon }}"></i>@else{{ $penghargaan->badge->icon }}@endif
-                                        </span>
-                                    @endif
-                                @endforeach
-                            </div>
-                        @endif
                         <div class="text-muted small mb-2">{{ strtoupper($top3->jurusan?->nama_jurusan ?? $top3->kategori_label ?? 'UMUM') }}</div>
                         <div class="text-warning mb-2" style="font-size: 0.85rem; letter-spacing: 1.5px;">
                             @php
@@ -356,8 +347,8 @@
                         </div>
                         <small class="text-muted font-mono d-block mb-3" style="font-size: 0.75rem;">{{ $top3->total_penilaian }} {{ $mode === 'partisipasi' ? 'siswa memilih' : 'ulasan' }}</small>
                     </div>
-                    <a href="{{ route('guru.detail', $top3->id) }}" class="gk-btn-podium-profile mb-2">
-                        <i class="bi bi-eye"></i> Profil
+                    <a href="{{ route('guru.detail', $top3->id) }}" class="btn btn-sm btn-outline-primary gk-btn-podium-profile mb-2">
+                        <i class="bi bi-eye me-1"></i> Profil
                     </a>
                 </div>
             </div>
@@ -399,7 +390,7 @@
                     </td>
                     <td class="align-middle">
                         <div class="d-flex align-items-center">
-                            <img src="{{ $g->photo_url }}" class="rounded-circle me-3" width="44" height="44" style="object-fit: cover;">
+                            <img src="{{ $g->photo_url }}" class="rounded-circle me-3 flex-shrink-0" width="44" height="44" style="width: 44px; height: 44px; min-width: 44px; min-height: 44px; aspect-ratio: 1 / 1; object-fit: cover; flex-shrink: 0;">
                             <div>
                                 <div class="fw-bold text-dark lh-sm">
                                     {{ $g->nama }}

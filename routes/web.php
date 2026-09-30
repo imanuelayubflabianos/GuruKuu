@@ -52,7 +52,8 @@ Route::get('/syarat-ketentuan', function () { return view('legal.terms'); })->na
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [LoginController::class, 'login'])->name('login.post');
 
-// SSO SiPintu OAuth Callback
+// SSO SiPintu OAuth Routes
+Route::get('/login/sipintu', [OAuthController::class, 'redirectToSiPintu'])->name('login.sipintu');
 Route::get('/oauth/callback', [OAuthController::class, 'callback'])->name('oauth.callback');
 
 // KONTAK GUEST

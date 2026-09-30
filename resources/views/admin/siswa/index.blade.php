@@ -89,7 +89,7 @@
                     <td class="font-mono fw-bold">{{ $s->nis }}</td>
                     <td>
                         <div class="d-flex align-items-center gap-2">
-                            <img src="{{ $s->photo_url }}" class="rounded-circle" style="width: 36px; height: 36px; object-fit: cover;">
+                            <img src="{{ $s->photo_url }}" class="rounded-circle flex-shrink-0" style="width: 36px; height: 36px; min-width: 36px; min-height: 36px; aspect-ratio: 1 / 1; object-fit: cover; flex-shrink: 0;">
                             <div>
                                 <strong>{{ $s->name }}</strong>
                                 <br><small class="text-muted">{{ $s->email }}</small>

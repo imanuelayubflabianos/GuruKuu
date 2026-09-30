@@ -190,26 +190,100 @@ window.onSelectKelasChange = function(select) {
     margin: 0 auto 0.75rem !important;
     box-shadow: 0 8px 20px -3px rgba(15, 23, 42, 0.12) !important;
     border: none !important;
+    overflow: hidden !important;
+    aspect-ratio: 1 / 1 !important;
+    flex-shrink: 0 !important;
 }
 .gk-avatar-red-wrap img,
 .gk-avatar-clean-wrap img {
+    width: 100% !important;
+    height: 100% !important;
+    max-width: 100% !important;
+    max-height: 100% !important;
+    aspect-ratio: 1 / 1 !important;
     object-fit: cover !important;
+    object-position: center top !important;
     border-radius: 50% !important;
     border: 3px solid #ffffff !important;
     box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.08) !important;
+    flex-shrink: 0 !important;
+    display: block !important;
+}
+
+/* ANTI-GEPENG (SQUISH PROTECTION) UNTUK SEMUA FOTO GURU DI TABEL & KARTU */
+.table img.rounded-circle,
+.table-custom img.rounded-circle,
+img.rounded-circle {
+    aspect-ratio: 1 / 1 !important;
+    object-fit: cover !important;
+    object-position: center top !important;
+    flex-shrink: 0 !important;
+}
+
+/* UNIFIED PODIUM PROFILE BUTTON (TOP 1, 2, 3 - PANJANG KOTAK BORDER RADIUS KECIL) */
+.gk-btn-podium-profile {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 0.45rem !important;
+    width: 100% !important;
+    max-width: 280px !important;
+    padding: 0.5rem 1.25rem !important;
+    font-size: 0.86rem !important;
+    font-weight: 600 !important;
+    background-color: #f8fafc !important;
+    color: var(--primary, #003366) !important;
+    border: 1.5px solid #003366 !important;
+    border-radius: 8px !important;
+    text-decoration: none !important;
+    box-shadow: 0 2px 6px rgba(0, 51, 102, 0.08) !important;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    cursor: pointer !important;
+    line-height: 1.4 !important;
+    margin: 0.65rem auto 0.25rem !important;
+}
+.gk-btn-podium-profile:hover {
+    background-color: var(--primary, #003366) !important;
+    color: #ffffff !important;
+    border-color: var(--primary, #003366) !important;
+    box-shadow: 0 4px 12px rgba(0, 51, 102, 0.2) !important;
+    transform: translateY(-2px) !important;
+}
+.gk-btn-podium-profile:hover i {
+    color: #ffffff !important;
+}
+
+[data-bs-theme="dark"] .gk-btn-podium-profile,
+[data-theme="dark"] .gk-btn-podium-profile,
+.dark-theme .gk-btn-podium-profile {
+    background-color: #1e293b !important;
+    color: #38bdf8 !important;
+    border-color: #38bdf8 !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3) !important;
+}
+[data-bs-theme="dark"] .gk-btn-podium-profile:hover,
+[data-theme="dark"] .gk-btn-podium-profile:hover,
+.dark-theme .gk-btn-podium-profile:hover {
+    background-color: #38bdf8 !important;
+    color: #0f172a !important;
+}
+[data-bs-theme="dark"] .gk-btn-podium-profile:hover i,
+[data-theme="dark"] .gk-btn-podium-profile:hover i,
+.dark-theme .gk-btn-podium-profile:hover i {
+    color: #0f172a !important;
 }
 .gk-badge-mini-icon {
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
-    width: 14px !important;
-    height: 14px !important;
-    min-width: 14px !important;
-    border-radius: 3px !important;
-    font-size: 0.55rem !important;
+    width: 22px !important;
+    height: 22px !important;
+    min-width: 22px !important;
+    border-radius: 6px !important;
+    font-size: 0.72rem !important;
     line-height: 1 !important;
-    border: 0.8px solid rgba(0, 0, 0, 0.08) !important;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04) !important;
+    border: 1px solid rgba(0, 0, 0, 0.1) !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06) !important;
     transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease !important;
     text-decoration: none !important;
     cursor: pointer !important;
@@ -217,14 +291,38 @@ window.onSelectKelasChange = function(select) {
     padding: 0 !important;
 }
 .gk-badge-mini-icon i {
-    font-size: 0.52rem !important;
+    font-size: 0.72rem !important;
     line-height: 1 !important;
 }
 .gk-badge-mini-icon:hover {
-    transform: translateY(-1px) scale(1.4) !important;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15) !important;
+    transform: translateY(-2px) scale(1.25) !important;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.18) !important;
     z-index: 5 !important;
 }
+
+.table .gk-badge-mini-icon,
+.table-custom .gk-badge-mini-icon {
+    width: 16px !important;
+    height: 16px !important;
+    min-width: 16px !important;
+    border-radius: 4px !important;
+    font-size: 0.6rem !important;
+}
+.table .gk-badge-mini-icon i,
+.table-custom .gk-badge-mini-icon i {
+    font-size: 0.58rem !important;
+}
+
+.gk-podium-badges-row {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 6px !important;
+    flex-wrap: wrap !important;
+    margin: 0.4rem auto 0.75rem !important;
+    min-height: 26px !important;
+}
+
 .gk-progress-pill {
     background: #0f172a !important;
     border-radius: 50px !important;

@@ -78,7 +78,7 @@
             .main-content { margin-left: 0; }
         }
     </style>
-    <link href="{{ asset('css/gurukuu-theme.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/gurukuu-theme.css') }}?v={{ file_exists(public_path('css/gurukuu-theme.css')) ? filemtime(public_path('css/gurukuu-theme.css')) : time() }}" rel="stylesheet">
     <script src="{{ asset('js/gurukuu-theme.js') }}"></script>
 </head>
 <body>
@@ -214,6 +214,7 @@
     <script src="https://cdn.datatables.net/1.13.8/js/dataTables.bootstrap5.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="{{ asset('js/gurukuu-modal.js') }}"></script>
+    @include('components.welcome-landing-modal')
     @stack('scripts')
 </body>
 </html>

@@ -102,7 +102,7 @@
                     <td class="font-mono" style="font-size: 0.85rem;">{{ $s->nis }}</td>
                     <td>
                         <div class="d-flex align-items-center">
-                            <img src="{{ $s->photo_url }}" class="rounded-circle me-2" width="36" height="36" style="object-fit: cover;">
+                            <img src="{{ $s->photo_url }}" class="rounded-circle me-2 flex-shrink-0" width="36" height="36" style="width: 36px; height: 36px; min-width: 36px; min-height: 36px; aspect-ratio: 1 / 1; object-fit: cover; flex-shrink: 0;">
                             <div>
                                 <div class="fw-bold">{{ $s->name }}</div>
                                 <small class="text-muted">{{ $s->jurusan?->nama_jurusan ?? '-' }}</small>

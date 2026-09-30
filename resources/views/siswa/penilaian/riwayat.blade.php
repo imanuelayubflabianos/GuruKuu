@@ -29,7 +29,7 @@
                 <tr>
                     <td>
                         <div class="d-flex align-items-center">
-                            <img src="{{ $r->guru->photo_url }}" class="rounded-circle me-3" width="48" height="48" style="object-fit: cover;">
+                            <img src="{{ $r->guru->photo_url }}" class="rounded-circle me-3 flex-shrink-0" width="48" height="48" style="width: 48px; height: 48px; min-width: 48px; min-height: 48px; aspect-ratio: 1 / 1; object-fit: cover; flex-shrink: 0;">
                             <div>
                                 <strong>{{ $r->guru->nama }}</strong>
                                 <div class="font-mono" style="font-size: 0.7rem; color: var(--text-muted); letter-spacing: 1px;">

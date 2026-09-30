@@ -172,6 +172,9 @@ class OAuthController extends Controller
 
         Log::info("SSO SiPintu berhasil untuk user ID: {$user->id}, Role: {$user->role}, NIS/NIP: {$user->nis}");
 
+        // Tandai agar muncul pop-up konfirmasi beranda/dashboard
+        $request->session()->flash('show_welcome_landing_popup', true);
+
         // 11. Redirect ke dashboard yang sesuai (mencegah redirect loop)
         if ($user->role === 'admin') {
             return redirect()->route('admin.dashboard')->with('success', 'Selamat datang, Administrator! (Masuk via SiPintu)');
@@ -180,5 +183,20 @@ class OAuthController extends Controller
         }
 
         return redirect()->route('siswa.dashboard')->with('success', 'Selamat datang, ' . $user->name . '! (Masuk via SiPintu)');
+    }
+
+    /**
+     * Redirect pengguna ke SiPintu OAuth Authorization Server
+     * GET /login/sipintu
+     */
+    public function redirectToSiPintu()
+    {
+        $baseUrl = rtrim(config('services.sipintu.base_url', 'https://sipintu.smkn1bangsri.sch.id'), '/');
+        $clientId = config('services.sipintu.client_id');
+        $redirectUri = urlencode($this->siPintu->getRedirectUri());
+
+        $authUrl = "{$baseUrl}/oauth/authorize?client_id={$clientId}&redirect_uri={$redirectUri}&response_type=code&scope=";
+
+        return redirect()->away($authUrl);
     }
 }

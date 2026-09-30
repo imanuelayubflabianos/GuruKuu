@@ -24,7 +24,7 @@
             </form>
 
             <div class="d-flex align-items-center gap-3 mb-3">
-                <img src="{{ $item->guru->photo_url }}" class="rounded-circle" style="width: 60px; height: 60px; object-fit: cover;">
+                <img src="{{ $item->guru->photo_url }}" class="rounded-circle flex-shrink-0" style="width: 60px; height: 60px; min-width: 60px; min-height: 60px; aspect-ratio: 1 / 1; object-fit: cover; flex-shrink: 0;">
                 <div>
                     <h6 class="fw-bold mb-1">{{ $item->guru->nama }}</h6>
                     <span class="badge bg-secondary small">{{ $item->guru->kategori }}</span>
