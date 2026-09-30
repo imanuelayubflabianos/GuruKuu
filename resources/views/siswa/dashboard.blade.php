@@ -191,8 +191,9 @@
                                     <span class="fw-bold text-dark">Skor Evaluasi Siswa</span>
                                     <span class="fw-bold gk-podium-score fs-6">{{ round(($g1->rata_rata_nilai / 5) * 100) }}%</span>
                                 </div>
-                                <div class="progress" style="height: 6px; border-radius: 4px; background: rgba(217, 119, 6, 0.2);">
-                                    <div class="progress-bar rounded-pill" style="width: {{ round(($g1->rata_rata_nilai / 5) * 100) }}%; background: #d97706;"></div>
+                                <div class="progress" style="height: 6px; border-radius: 4px; background: #e2e8f0;">
+                                    @php $p1 = round(($g1->rata_rata_nilai / 5) * 100); @endphp
+                                    <div class="progress-bar rounded-pill {{ $p1 >= 75 ? 'gk-bar-blue-high' : ($p1 >= 50 ? 'gk-bar-blue-mid' : 'gk-bar-blue-low') }}" style="width: {{ $p1 }}%;"></div>
                                 </div>
                             </div>
                             <a href="{{ route('siswa.guru.show', $g1) }}" class="btn btn-primary-custom w-100 rounded-pill py-2 fw-semibold" style="font-size: 0.82rem; background: #003366;">
@@ -225,8 +226,9 @@
                                     <span class="text-muted">Skor</span>
                                     <span class="fw-bold gk-podium-score">{{ round(($g2->rata_rata_nilai / 5) * 100) }}%</span>
                                 </div>
-                                <div class="progress" style="height: 5px; border-radius: 4px; background: rgba(100, 116, 139, 0.2);">
-                                    <div class="progress-bar rounded-pill" style="width: {{ round(($g2->rata_rata_nilai / 5) * 100) }}%; background: #64748b;"></div>
+                                <div class="progress" style="height: 5px; border-radius: 4px; background: #e2e8f0;">
+                                    @php $p2 = round(($g2->rata_rata_nilai / 5) * 100); @endphp
+                                    <div class="progress-bar rounded-pill {{ $p2 >= 75 ? 'gk-bar-blue-high' : ($p2 >= 50 ? 'gk-bar-blue-mid' : 'gk-bar-blue-low') }}" style="width: {{ $p2 }}%;"></div>
                                 </div>
                             </div>
                             <a href="{{ route('siswa.guru.show', $g2) }}" class="btn btn-sm btn-outline-custom w-100 rounded-pill py-1.5" style="font-size: 0.75rem;">
@@ -251,8 +253,9 @@
                                     <span class="text-dark fw-bold">Skor</span>
                                     <span class="fw-bold gk-podium-score">{{ round(($g1->rata_rata_nilai / 5) * 100) }}%</span>
                                 </div>
-                                <div class="progress" style="height: 5px; border-radius: 4px; background: rgba(217, 119, 6, 0.2);">
-                                    <div class="progress-bar rounded-pill" style="width: {{ round(($g1->rata_rata_nilai / 5) * 100) }}%; background: #d97706;"></div>
+                                <div class="progress" style="height: 5px; border-radius: 4px; background: #e2e8f0;">
+                                    @php $p1 = round(($g1->rata_rata_nilai / 5) * 100); @endphp
+                                    <div class="progress-bar rounded-pill {{ $p1 >= 75 ? 'gk-bar-blue-high' : ($p1 >= 50 ? 'gk-bar-blue-mid' : 'gk-bar-blue-low') }}" style="width: {{ $p1 }}%;"></div>
                                 </div>
                             </div>
                             <a href="{{ route('siswa.guru.show', $g1) }}" class="btn btn-sm btn-primary-custom w-100 rounded-pill py-1.5 fw-bold" style="font-size: 0.75rem; background: #003366;">
@@ -287,8 +290,9 @@
                                     <span class="text-muted">Skor</span>
                                     <span class="fw-bold gk-podium-score">{{ round(($g2->rata_rata_nilai / 5) * 100) }}%</span>
                                 </div>
-                                <div class="progress" style="height: 4px; border-radius: 4px; background: rgba(100, 116, 139, 0.2);">
-                                    <div class="progress-bar rounded-pill" style="width: {{ round(($g2->rata_rata_nilai / 5) * 100) }}%; background: #64748b;"></div>
+                                <div class="progress" style="height: 4px; border-radius: 4px; background: #e2e8f0;">
+                                    @php $p2 = round(($g2->rata_rata_nilai / 5) * 100); @endphp
+                                    <div class="progress-bar rounded-pill {{ $p2 >= 75 ? 'gk-bar-blue-high' : ($p2 >= 50 ? 'gk-bar-blue-mid' : 'gk-bar-blue-low') }}" style="width: {{ $p2 }}%;"></div>
                                 </div>
                             </div>
                             <a href="{{ route('siswa.guru.show', $g2) }}" class="btn btn-sm btn-outline-custom btn-podium w-100 rounded-pill py-1" style="font-size: 0.72rem;">
@@ -315,8 +319,9 @@
                                     <span class="text-dark fw-bold">Skor</span>
                                     <span class="fw-bold gk-podium-score">{{ round(($g1->rata_rata_nilai / 5) * 100) }}%</span>
                                 </div>
-                                <div class="progress" style="height: 5px; border-radius: 4px; background: rgba(217, 119, 6, 0.2);">
-                                    <div class="progress-bar rounded-pill" style="width: {{ round(($g1->rata_rata_nilai / 5) * 100) }}%; background: #d97706;"></div>
+                                <div class="progress" style="height: 5px; border-radius: 4px; background: #e2e8f0;">
+                                    @php $p1 = round(($g1->rata_rata_nilai / 5) * 100); @endphp
+                                    <div class="progress-bar rounded-pill {{ $p1 >= 75 ? 'gk-bar-blue-high' : ($p1 >= 50 ? 'gk-bar-blue-mid' : 'gk-bar-blue-low') }}" style="width: {{ $p1 }}%;"></div>
                                 </div>
                             </div>
                             <a href="{{ route('siswa.guru.show', $g1) }}" class="btn btn-sm btn-primary-custom btn-podium w-100 rounded-pill py-1 fw-bold" style="font-size: 0.75rem; background: #003366;">
@@ -343,8 +348,9 @@
                                     <span class="text-muted">Skor</span>
                                     <span class="fw-bold gk-podium-score">{{ round(($g3->rata_rata_nilai / 5) * 100) }}%</span>
                                 </div>
-                                <div class="progress" style="height: 4px; border-radius: 4px; background: rgba(217, 119, 6, 0.2);">
-                                    <div class="progress-bar rounded-pill" style="width: {{ round(($g3->rata_rata_nilai / 5) * 100) }}%; background: #ea580c;"></div>
+                                <div class="progress" style="height: 4px; border-radius: 4px; background: #e2e8f0;">
+                                    @php $p3 = round(($g3->rata_rata_nilai / 5) * 100); @endphp
+                                    <div class="progress-bar rounded-pill {{ $p3 >= 75 ? 'gk-bar-blue-high' : ($p3 >= 50 ? 'gk-bar-blue-mid' : 'gk-bar-blue-low') }}" style="width: {{ $p3 }}%;"></div>
                                 </div>
                             </div>
                             <a href="{{ route('siswa.guru.show', $g3) }}" class="btn btn-sm btn-outline-custom btn-podium w-100 rounded-pill py-1" style="font-size: 0.72rem;">

@@ -73,8 +73,8 @@
                     </form>
 
                     <div class="text-center mt-4 pt-3 border-top">
-                        <a href="{{ url()->previous() }}" class="text-muted text-decoration-none" style="font-size: 0.85rem;">
-                            <i class="bi bi-arrow-left me-1"></i> Kembali
+                        <a href="{{ url()->previous() }}" class="gk-btn-back">
+                            <i class="bi bi-arrow-left"></i> Kembali
                         </a>
                     </div>
                 </div>

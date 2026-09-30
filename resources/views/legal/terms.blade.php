@@ -35,7 +35,7 @@
                     @endif
                 </div>
                 <div class="text-center mt-4">
-                    <a href="{{ route('landing.index') }}" class="btn btn-outline-custom rounded-pill px-4 py-2 fw-semibold d-inline-flex align-items-center gap-2">
+                    <a href="{{ route('landing.index') }}" class="gk-btn-back">
                         <i class="bi bi-arrow-left"></i> Kembali ke Beranda
                     </a>
                 </div>

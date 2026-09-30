@@ -28,7 +28,7 @@
         .auth-hero-side {
             height: 100vh;
             max-height: 100vh;
-            padding: 2rem 3rem !important;
+            padding: 2.75rem 3rem 2rem !important;
             overflow: hidden !important;
         }
         .auth-form-side {
@@ -187,19 +187,19 @@
     .hero-feature-item {
         display: flex;
         align-items: flex-start;
-        gap: 0.85rem;
-        margin-bottom: 0.95rem;
+        gap: 0.8rem;
+        margin-bottom: 0.65rem;
     }
     .hero-feature-icon {
-        width: 38px;
-        height: 38px;
-        border-radius: 10px;
+        width: 36px;
+        height: 36px;
+        border-radius: 9px;
         background: rgba(255, 255, 255, 0.12);
         backdrop-filter: blur(8px);
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 1.1rem;
+        font-size: 1rem;
         color: #f59e0b;
         flex-shrink: 0;
         border: 1px solid rgba(255, 255, 255, 0.2);
@@ -245,25 +245,25 @@
             <div class="auth-hero-glow-2"></div>
 
             {{-- HEADER BRANDING --}}
-            <div class="position-relative mb-4" style="z-index: 2;">
-                <div class="d-inline-flex align-items-center gap-2 px-3 py-1.5 rounded-pill mb-3" style="background: rgba(255, 255, 255, 0.15); border: 1px solid rgba(255, 255, 255, 0.25); backdrop-filter: blur(10px);">
-                    <i class="bi bi-patch-check-fill text-warning"></i>
-                    <span class="small fw-bold letter-spacing-1 text-white">{{ \App\Models\Setting::get('about_label', 'SMK NEGERI 1 BANGSRI • JUARA') }}</span>
-                </div>
-                <div class="d-inline-flex align-items-center gap-3 p-2.5 px-3.5 rounded-4" style="background: rgba(255, 255, 255, 0.22); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.4); box-shadow: 0 8px 24px -4px rgba(0, 34, 68, 0.12);">
+            <div class="position-relative mb-4 d-flex flex-column align-items-start gap-2.5 pt-2" style="z-index: 2;">
+                <div class="d-flex align-items-center gap-3">
                     @if(!empty($siteLogo))
                         <img src="{{ $siteLogo }}" alt="{{ $siteTitle ?? 'GuruKuu' }}" style="height: 44px; max-width: 140px; object-fit: contain;">
                     @else
                         <div class="rounded-circle bg-white p-2 d-flex align-items-center justify-content-center shadow-sm" style="width: 44px; height: 44px;">
-                            <i class="bi bi-mortarboard-fill fs-4" style="color: #003366;"></i>
+                            <i class="bi bi-mortarboard-fill fs-4" style="color: {{ $siteTitleColor1 ?? '#003366' }};"></i>
                         </div>
                     @endif
                     <div>
                         <h2 class="fw-bold mb-0 font-mono tracking-tight" style="font-size: 1.85rem; line-height: 1.15;">
-                            <span style="color: {{ $siteTitleColor1 ?? '#003366' }} !important; text-shadow: 0 1px 2px rgba(255,255,255,0.6);">{{ $siteTitlePart1 ?? 'Guru' }}</span><span style="color: {{ $siteTitleColor2 ?? '#FFC107' }} !important; text-shadow: 0 1px 2px rgba(0,0,0,0.15);">{{ $siteTitlePart2 ?? 'Kuu' }}</span>
+                            <span style="color: {{ $siteTitleColor1 ?? '#003366' }} !important;">{{ $siteTitlePart1 ?? 'Guru' }}</span><span style="color: {{ $siteTitleColor2 ?? '#FFC107' }} !important;">{{ $siteTitlePart2 ?? 'Kuu' }}</span>
                         </h2>
-                        <span class="fw-bold" style="font-size: 0.8rem; color: #002244 !important; opacity: 0.85;">{{ $schoolName ?? 'SMK Negeri 1 Bangsri' }}</span>
                     </div>
+                </div>
+
+                <div class="d-inline-flex align-items-center gap-2 px-3 py-1.5 rounded-pill" style="background: rgba(255, 255, 255, 0.15); border: 1px solid rgba(255, 255, 255, 0.25); backdrop-filter: blur(10px);">
+                    <i class="bi bi-patch-check-fill text-warning"></i>
+                    <span class="small fw-bold letter-spacing-1 text-white">{{ \App\Models\Setting::get('about_label', 'SMK NEGERI 1 BANGSRI • JUARA') }}</span>
                 </div>
             </div>
 
@@ -276,34 +276,59 @@
                     {{ \App\Models\Setting::get('about_subtitle', 'Platform evaluasi terintegrasi untuk SMK yang membangun jembatan komunikasi positif antara siswa, guru, dan manajemen sekolah.') }}
                 </p>
 
-                <div class="mt-3">
+                <div class="mt-2.5">
+                    {{-- 1. VISI KAMI --}}
+                    <div class="hero-feature-item">
+                        <div class="hero-feature-icon">
+                            <i class="bi bi-bullseye"></i>
+                        </div>
+                        <div>
+                            <h6 class="fw-bold text-white mb-0.5" style="font-size: 0.92rem;">Visi Kami</h6>
+                            <small class="text-white-50" style="font-size: 0.8rem; line-height: 1.4; display: block;">{{ \App\Models\Setting::get('visi_text', 'Menjadi standar nasional evaluasi pengajaran berbasis data untuk ekosistem pendidikan yang responsif & berkelanjutan.') }}</small>
+                        </div>
+                    </div>
+
+                    {{-- 2. MISI KAMI --}}
+                    <div class="hero-feature-item">
+                        <div class="hero-feature-icon">
+                            <i class="bi bi-file-earmark-check"></i>
+                        </div>
+                        <div>
+                            <h6 class="fw-bold text-white mb-0.5" style="font-size: 0.92rem;">Misi Kami</h6>
+                            <small class="text-white-50" style="font-size: 0.8rem; line-height: 1.4; display: block;">{{ \App\Models\Setting::get('misi_summary', 'Saluran aspirasi aman bagi siswa, analitik valid bagi sekolah, & evaluasi objektif bagi pendidik.') }}</small>
+                        </div>
+                    </div>
+
+                    {{-- 3. ANONIMITAS --}}
                     <div class="hero-feature-item">
                         <div class="hero-feature-icon">
                             <i class="bi bi-shield-check"></i>
                         </div>
                         <div>
-                            <h6 class="fw-bold text-white mb-0.5" style="font-size: 0.95rem;">{{ \App\Models\Setting::get('feature1_title', 'Anonimitas & Kerahasiaan') }}</h6>
-                            <small class="text-white-50" style="font-size: 0.82rem;">{{ \App\Models\Setting::get('feature1_desc', 'Identitas siswa aman dengan enkripsi tanpa rasa khawatir untuk menyampaikan masukan objektif.') }}</small>
+                            <h6 class="fw-bold text-white mb-0.5" style="font-size: 0.92rem;">{{ \App\Models\Setting::get('feature1_title', 'Anonimitas') }}</h6>
+                            <small class="text-white-50" style="font-size: 0.8rem; line-height: 1.4; display: block;">{{ \App\Models\Setting::get('feature1_desc', 'Identitas siswa aman dengan enkripsi tanpa tekanan.') }}</small>
                         </div>
                     </div>
 
+                    {{-- 4. BERBASIS DATA --}}
                     <div class="hero-feature-item">
                         <div class="hero-feature-icon">
                             <i class="bi bi-graph-up-arrow"></i>
                         </div>
                         <div>
-                            <h6 class="fw-bold text-white mb-0.5" style="font-size: 0.95rem;">{{ \App\Models\Setting::get('feature2_title', 'Evaluasi Berbasis Data') }}</h6>
-                            <small class="text-white-50" style="font-size: 0.82rem;">{{ \App\Models\Setting::get('feature2_desc', 'Data statistik valid dan terukur untuk setiap apresiasi dan kinerja guru.') }}</small>
+                            <h6 class="fw-bold text-white mb-0.5" style="font-size: 0.92rem;">{{ \App\Models\Setting::get('feature2_title', 'Berbasis Data') }}</h6>
+                            <small class="text-white-50" style="font-size: 0.8rem; line-height: 1.4; display: block;">{{ \App\Models\Setting::get('feature2_desc', 'Data statistik valid & terukur untuk setiap apresiasi.') }}</small>
                         </div>
                     </div>
 
+                    {{-- 5. KOLABORATIF --}}
                     <div class="hero-feature-item mb-0">
                         <div class="hero-feature-icon">
                             <i class="bi bi-people-fill"></i>
                         </div>
                         <div>
-                            <h6 class="fw-bold text-white mb-0.5" style="font-size: 0.95rem;">{{ \App\Models\Setting::get('feature3_title', 'Kolaboratif & Terintegrasi') }}</h6>
-                            <small class="text-white-50" style="font-size: 0.82rem;">{{ \App\Models\Setting::get('feature3_desc', 'Membangun komunikasi positif antara siswa, guru, dan sekolah dengan gateway data terpercaya.') }}</small>
+                            <h6 class="fw-bold text-white mb-0.5" style="font-size: 0.92rem;">{{ \App\Models\Setting::get('feature3_title', 'Kolaboratif') }}</h6>
+                            <small class="text-white-50" style="font-size: 0.8rem; line-height: 1.4; display: block;">{{ \App\Models\Setting::get('feature3_desc', 'Membangun komunikasi positif siswa, guru, & sekolah.') }}</small>
                         </div>
                     </div>
                 </div>
@@ -330,11 +355,7 @@
             <div class="auth-form-container">
                 {{-- MOBILE TOP HEADER --}}
                 <div class="text-center d-lg-none mb-3">
-                    <div class="d-inline-flex align-items-center gap-1.5 px-3 py-1 rounded-pill mb-2" style="background: rgba(0, 51, 102, 0.08); border: 1px solid var(--border);">
-                        <i class="bi bi-patch-check-fill text-warning small"></i>
-                        <span class="font-mono small fw-bold text-primary" style="font-size: 0.72rem;">SMKN 1 BANGSRI • JUARA</span>
-                    </div>
-                    <div class="d-flex align-items-center justify-content-center gap-2 mb-1">
+                    <div class="d-flex align-items-center justify-content-center gap-2 mb-2">
                         @if(!empty($siteLogo))
                             <img src="{{ $siteLogo }}" alt="{{ $siteTitle ?? 'GuruKuu' }}" style="height: 36px; max-width: 120px; object-fit: contain;">
                         @else
@@ -343,6 +364,10 @@
                         <h3 class="fw-bold mb-0 font-mono">
                             <span style="color: {{ $siteTitleColor1 ?? '#003366' }} !important;">{{ $siteTitlePart1 ?? 'Guru' }}</span><span style="color: {{ $siteTitleColor2 ?? '#FFC107' }} !important;">{{ $siteTitlePart2 ?? 'Kuu' }}</span>
                         </h3>
+                    </div>
+                    <div class="d-inline-flex align-items-center gap-1.5 px-3 py-1 rounded-pill mb-1" style="background: rgba(0, 51, 102, 0.08); border: 1px solid var(--border);">
+                        <i class="bi bi-patch-check-fill text-warning small"></i>
+                        <span class="font-mono small fw-bold text-primary" style="font-size: 0.72rem;">{{ \App\Models\Setting::get('about_label', 'SMK NEGERI 1 BANGSRI • JUARA') }}</span>
                     </div>
                 </div>
 
@@ -428,7 +453,7 @@
 
                     {{-- TOMBOL KEMBALI DI BAWAH HUBUNGI ADMIN DENGAN CONTAINER & JARAK LEGA --}}
                     <div class="mt-3 pt-1">
-                        <a href="{{ route('landing.index') }}" class="btn-back-container">
+                        <a href="{{ route('landing.index') }}" class="gk-btn-back">
                             <i class="bi bi-arrow-left"></i>
                             <span>Kembali ke Beranda</span>
                         </a>

@@ -43,8 +43,8 @@
         {{-- BREADCRUMB & HEADER --}}
         <div class="page-header mb-4">
             <div>
-                <a href="{{ url()->previous() != url()->current() ? url()->previous() : route('landing.index') . '#guru' }}" class="btn btn-outline-secondary btn-sm mb-2.5">
-                    <i class="bi bi-arrow-left me-1"></i> Kembali
+                <a href="{{ url()->previous() != url()->current() ? url()->previous() : route('landing.index') . '#guru' }}" class="gk-btn-back mb-3">
+                    <i class="bi bi-arrow-left"></i> Kembali
                 </a>
                 <h1 class="page-title mt-1">{{ $guru->nama }}</h1>
                 <p class="page-subtitle mb-0 mt-1">
@@ -76,9 +76,8 @@
                         <div class="d-flex flex-wrap justify-content-center gap-1.5 mb-3">
                             @foreach($guru->penghargaan as $p)
                                 @if($p->badge)
-                                    <span class="badge rounded-pill border py-1.5 px-2.5 d-inline-flex align-items-center gap-1.5" style="background: {{ $p->badge->warna }}15; color: {{ $p->badge->warna }}; border-color: {{ $p->badge->warna }}33 !important; font-size: 0.75rem;" title="{{ $p->badge->deskripsi }}">
+                                    <span class="gk-badge-mini-icon" style="background: {{ $p->badge->warna }}18; color: {{ $p->badge->warna }}; border-color: {{ $p->badge->warna }}33; width: 34px; height: 34px; font-size: 1.05rem;" data-bs-toggle="tooltip" data-bs-placement="top" title="{{ $p->badge->nama_badge }}: {{ $p->badge->deskripsi }}">
                                         @if(str_starts_with($p->badge->icon, 'bi-'))<i class="bi {{ $p->badge->icon }}"></i>@else{{ $p->badge->icon }}@endif
-                                        <span>{{ $p->badge->nama_badge }}</span>
                                     </span>
                                 @endif
                             @endforeach
@@ -131,8 +130,8 @@
                                     <small class="fw-bold text-dark">{{ $label }}</small>
                                     <small class="text-primary fw-bold font-mono">{{ $valPct }}%</small>
                                 </div>
-                                <div class="progress" style="height: 8px; border-radius: 10px; background-color: #e9ecef;">
-                                    <div class="progress-bar rounded-pill" style="width: {{ $valPct }}%; background: var(--primary);"></div>
+                                <div class="progress" style="height: 8px; border-radius: 10px; background-color: #e2e8f0;">
+                                    <div class="progress-bar rounded-pill {{ $valPct >= 75 ? 'gk-bar-blue-high' : ($valPct >= 50 ? 'gk-bar-blue-mid' : 'gk-bar-blue-low') }}" style="width: {{ $valPct }}%;"></div>
                                 </div>
                             </div>
                             @endforeach

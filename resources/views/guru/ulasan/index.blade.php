@@ -9,8 +9,8 @@
         <p class="page-subtitle">Daftar lengkap kritik, saran, dan evaluasi pengajaran dari siswa. Anda dapat menanggapi ulasan secara profesional.</p>
     </div>
     <div class="d-flex gap-2">
-        <a href="{{ route('guru.dashboard') }}" class="btn btn-outline-custom">
-            <i class="bi bi-arrow-left me-1"></i> Kembali ke Dashboard
+        <a href="{{ route('guru.dashboard') }}" class="gk-btn-back">
+            <i class="bi bi-arrow-left"></i> Kembali ke Dashboard
         </a>
     </div>
 </div>

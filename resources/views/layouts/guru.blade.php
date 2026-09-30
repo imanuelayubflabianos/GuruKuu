@@ -5,11 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Dashboard') - {{ $siteTitle ?? 'GuruKuu' }} Guru</title>
-    @if(!empty($siteLogo))
-        <link rel="icon" href="{{ $siteLogo }}">
-    @else
-        <link rel="icon" href="{{ asset('favicon.ico') }}">
-    @endif
+    <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
+    <link rel="icon" type="image/png" sizes="48x48" href="{{ asset('favicon-48x48.png') }}">
+    <link rel="icon" type="image/png" sizes="96x96" href="{{ asset('favicon-96x96.png') }}">
+    <link rel="icon" type="image/png" sizes="192x192" href="{{ asset('favicon-192x192.png') }}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('apple-touch-icon.png') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
@@ -109,7 +109,7 @@
             @include('components.user-notif-dropdown')
 
             {{-- BERANDA PUBLIK MOBILE --}}
-            <a href="{{ url('/') }}" target="_blank" class="btn btn-light border p-1.5 rounded-circle shadow-sm" title="Buka Beranda Publik">
+            <a href="{{ url('/') }}" target="_blank" class="btn btn-light border p-1.5 rounded-circle shadow-sm" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Kembali ke Beranda Publik" aria-label="Kembali ke Beranda Publik">
                 <i class="bi bi-globe2 text-primary" style="font-size: 1rem;"></i>
             </a>
         </div>
@@ -158,12 +158,12 @@
             </div>
             <div class="d-flex align-items-center gap-2">
                 {{-- PORTAL SIPINTU (KEMBALI KE SIPINTU) --}}
-                <a href="{{ config('services.sipintu.base_url', 'https://sipintu.smkn1bangsri.sch.id') }}" target="_blank" class="btn btn-light border p-2 rounded-circle shadow-sm d-flex align-items-center justify-content-center" title="Portal SiPintu" style="width: 40px; height: 40px;">
+                <a href="{{ config('services.sipintu.base_url', 'https://sipintu.smkn1bangsri.sch.id') }}" target="_blank" class="btn btn-light border p-2 rounded-circle shadow-sm d-flex align-items-center justify-content-center" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Portal SiPintu" style="width: 40px; height: 40px;">
                     <img src="{{ asset('images/sipintu-logo.png') }}" alt="SiPintu" style="width: 22px; height: 22px; object-fit: contain;">
                 </a>
 
                 {{-- BERANDA PUBLIK ICON BUTTON (TOPBAR) --}}
-                <a href="{{ url('/') }}" target="_blank" class="btn btn-light border p-2 rounded-circle shadow-sm" title="Buka Beranda Publik">
+                <a href="{{ url('/') }}" target="_blank" class="btn btn-light border p-2 rounded-circle shadow-sm" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Kembali ke Beranda Publik" aria-label="Kembali ke Beranda Publik">
                     <i class="bi bi-globe2 text-primary fs-5"></i>
                 </a>
 

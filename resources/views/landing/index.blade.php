@@ -94,69 +94,201 @@
     transform: translateY(-3px);
     box-shadow: 0 14px 30px -4px rgba(0, 0, 0, 0.35);
 }
-/* Smooth Public Dashboard Interactive Transitions & Refined Aesthetics */
-.stat-card-modern, .teacher-card, .tutorial-card, .gk-vm-card, .gk-feature-card, .card-custom, .gk-clean-card {
-    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease;
+
+/* 🌟 HERO ENTRANCE TRANSITIONS */
+@keyframes heroBadgeEntrance {
+    0% { opacity: 0; transform: translateY(-30px) scale(0.9); }
+    100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes heroTextSlideUp {
+    0% { opacity: 0; transform: translateY(35px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+.hero-anim-badge {
+    animation: heroBadgeEntrance 0.85s cubic-bezier(0.16, 1, 0.3, 1) 0.15s both;
+}
+.hero-anim-title {
+    animation: heroTextSlideUp 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.3s both;
+}
+.hero-anim-subtitle {
+    animation: heroTextSlideUp 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.45s both;
+}
+.hero-anim-cta {
+    animation: heroTextSlideUp 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.6s both;
+}
+
+/* 🌟 STAT CARDS SCROLL ENTRANCE */
+.stat-card-modern {
+    opacity: 0;
+    transform: translateY(35px);
+    transition: opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1), transform 0.75s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s ease;
+}
+.stat-card-modern.is-visible {
+    opacity: 1;
+    transform: translateY(0);
 }
 .stat-card-modern:hover {
     transform: translateY(-6px);
 }
 
-/* REFINED PODIUM CARDS & SHADOWS */
+/* 🌟 SEQUENTIAL LEADERBOARD PODIUM ENTRANCE (#1 DULU, LALU #2, LALU #3) */
+.podium-anim-item {
+    opacity: 0;
+    transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.85s cubic-bezier(0.34, 1.3, 0.64, 1);
+    will-change: transform, opacity;
+}
+.podium-anim-item.podium-rank-1 {
+    transform: scale(0.82) translateY(55px);
+}
+.podium-anim-item.podium-rank-2 {
+    transform: translateX(-55px) translateY(35px);
+}
+.podium-anim-item.podium-rank-3 {
+    transform: translateX(55px) translateY(35px);
+}
+@media (min-width: 768px) {
+    .podium-anim-item.podium-rank-1.is-revealed,
+    .podium-anim-item.podium-rank-2.is-revealed,
+    .podium-anim-item.podium-rank-3.is-revealed {
+        opacity: 1 !important;
+        transform: none !important;
+    }
+    .podium-anim-item.podium-rank-1 {
+        z-index: 10;
+    }
+    .podium-anim-item.podium-rank-2 {
+        z-index: 5;
+    }
+    .podium-anim-item.podium-rank-3 {
+        z-index: 2;
+    }
+
+    .podium-rank-1 .gk-podium-card-revised {
+        min-height: 480px !important;
+        box-shadow: 0 20px 45px -8px rgba(15, 23, 42, 0.16), 0 8px 18px -4px rgba(15, 23, 42, 0.08) !important;
+        border: none !important;
+    }
+    .podium-rank-2 .gk-podium-card-revised {
+        min-height: 440px !important;
+        box-shadow: 0 14px 32px -6px rgba(15, 23, 42, 0.11), 0 6px 14px -3px rgba(15, 23, 42, 0.05) !important;
+        border: none !important;
+    }
+    .podium-rank-3 .gk-podium-card-revised {
+        min-height: 410px !important;
+        box-shadow: 0 10px 25px -4px rgba(15, 23, 42, 0.08), 0 4px 10px -2px rgba(15, 23, 42, 0.04) !important;
+        border: none !important;
+    }
+
+    .podium-rank-1:hover .gk-podium-card-revised {
+        transform: translateY(-6px);
+        box-shadow: 0 25px 50px -8px rgba(15, 23, 42, 0.2) !important;
+    }
+    .podium-rank-2:hover .gk-podium-card-revised {
+        transform: translateY(-5px);
+        box-shadow: 0 18px 38px -6px rgba(15, 23, 42, 0.15) !important;
+    }
+    .podium-rank-3:hover .gk-podium-card-revised {
+        transform: translateY(-5px);
+        box-shadow: 0 16px 32px -6px rgba(15, 23, 42, 0.12) !important;
+    }
+}
+@media (max-width: 767.98px) {
+    .podium-anim-item.is-revealed {
+        opacity: 1 !important;
+        transform: none !important;
+    }
+}
+.gk-progress-pill-fill {
+    transition: width 1.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+/* 🌟 GENERAL CARDS SCROLL REVEAL */
+.gk-scroll-reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1), transform 0.75s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.gk-scroll-reveal.is-revealed {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Smooth Public Dashboard Interactive Transitions & Refined Aesthetics */
+.teacher-card, .tutorial-card, .gk-vm-card, .gk-feature-card, .card-custom, .gk-clean-card {
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease;
+}
+
+/* REFINED PODIUM CARDS & SHADOWS (BACK SHADOW JELAS & BORDER BERSIH TANPA GLOW) */
 .gk-clean-card {
     background: #ffffff;
-    border-radius: 24px;
-    border: 1px solid #f1f5f9;
-    box-shadow: 0 10px 30px -8px rgba(0, 0, 0, 0.05), 0 4px 10px -2px rgba(0, 0, 0, 0.02);
+    border-radius: 22px;
+    border: 1px solid rgba(15, 23, 42, 0.08) !important;
+    box-shadow: 0 10px 25px -4px rgba(15, 23, 42, 0.08), 0 4px 10px -2px rgba(15, 23, 42, 0.04) !important;
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease;
 }
 .gk-clean-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 20px 38px -10px rgba(0, 0, 0, 0.08), 0 8px 16px -4px rgba(0, 0, 0, 0.03);
+    box-shadow: 0 20px 35px -6px rgba(15, 23, 42, 0.12), 0 8px 16px -3px rgba(15, 23, 42, 0.06) !important;
+    border-color: rgba(15, 23, 42, 0.14) !important;
 }
 .gk-podium-card-revised {
     background: #ffffff;
-    border-radius: 24px;
-    border: 1px solid #f1f5f9;
-    box-shadow: 0 10px 28px -6px rgba(0, 0, 0, 0.06), 0 4px 10px -2px rgba(0, 0, 0, 0.02);
+    border-radius: 22px;
+    border: none !important;
+    box-shadow: 0 10px 25px -4px rgba(15, 23, 42, 0.08), 0 4px 10px -2px rgba(15, 23, 42, 0.04) !important;
     position: relative;
     transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .gk-podium-card-revised:hover {
     transform: translateY(-6px);
-    box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.09), 0 8px 16px -4px rgba(0, 0, 0, 0.03);
+    box-shadow: 0 20px 35px -6px rgba(15, 23, 42, 0.12), 0 8px 16px -3px rgba(15, 23, 42, 0.06) !important;
+    border: none !important;
 }
 .gk-podium-card-revised.is-first {
-    border-radius: 28px;
-    box-shadow: 0 18px 38px -8px rgba(0, 0, 0, 0.08), 0 6px 14px -3px rgba(0, 0, 0, 0.03);
+    border-radius: 26px;
+    border: none !important;
+    box-shadow: 0 16px 36px -6px rgba(15, 23, 42, 0.11), 0 6px 14px -3px rgba(15, 23, 42, 0.05) !important;
     z-index: 2;
 }
-.gk-avatar-red-wrap {
-    display: inline-block;
-    border-radius: 50%;
-    background: #dc2626;
-    padding: 3px;
-    box-shadow: 0 6px 16px -3px rgba(220, 38, 38, 0.35);
+.gk-avatar-red-wrap,
+.gk-avatar-clean-wrap {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 50% !important;
+    background: transparent !important;
+    padding: 0 !important;
+    box-shadow: 0 8px 20px -3px rgba(15, 23, 42, 0.12) !important;
+    border: none !important;
 }
-.gk-avatar-red-wrap img {
-    border-radius: 50%;
-    object-fit: cover;
-    display: block;
+.gk-avatar-red-wrap img,
+.gk-avatar-clean-wrap img {
+    border-radius: 50% !important;
+    object-fit: cover !important;
+    display: block !important;
+    border: 3px solid #ffffff !important;
+    box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.08) !important;
 }
 .gk-badge-mini-icon {
-    width: 26px;
-    height: 26px;
-    border-radius: 6px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.8rem;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
-    border: 1px solid rgba(0,0,0,0.08);
-    transition: transform 0.2s;
+    width: 14px !important;
+    height: 14px !important;
+    min-width: 14px !important;
+    border-radius: 3px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 0.55rem !important;
+    line-height: 1 !important;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.04) !important;
+    border: 0.8px solid rgba(0,0,0,0.08) !important;
+    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease !important;
     cursor: default;
+    padding: 0 !important;
 }
 .gk-badge-mini-icon:hover {
-    transform: translateY(-2px) scale(1.12);
+    transform: translateY(-1px) scale(1.4) !important;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15) !important;
+    z-index: 5 !important;
 }
 .gk-step-roman {
     width: 58px;
@@ -170,6 +302,95 @@
     align-items: center;
     justify-content: center;
     margin: 0 auto 1.25rem;
+}
+
+/* PANDUAN SLIDER / CAROUSEL */
+.gk-panduan-slider-wrapper {
+    position: relative;
+    max-width: 580px;
+    width: 100%;
+}
+.gk-panduan-viewport {
+    overflow: hidden;
+    position: relative;
+    padding: 14px 6px;
+    margin: -14px -6px;
+    cursor: grab;
+    touch-action: pan-y;
+    user-select: none;
+    -webkit-user-select: none;
+}
+.gk-panduan-viewport:active {
+    cursor: grabbing;
+}
+.gk-panduan-track {
+    display: flex;
+    transition: transform 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+    will-change: transform;
+}
+.gk-panduan-slide {
+    min-width: 100%;
+    width: 100%;
+    flex-shrink: 0;
+    padding: 0 8px;
+    box-sizing: border-box;
+}
+.gk-panduan-slide .gk-clean-card {
+    transition: transform 0.65s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.65s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.4s ease;
+    transform: scale(0.94);
+    opacity: 0.35;
+    pointer-events: none;
+}
+.gk-panduan-slide.is-active .gk-clean-card {
+    transform: scale(1);
+    opacity: 1;
+    pointer-events: auto;
+    box-shadow: 0 16px 36px -8px rgba(15, 23, 42, 0.12), 0 6px 16px -4px rgba(15, 23, 42, 0.05) !important;
+}
+.gk-panduan-nav-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: #ffffff;
+    border: 1.5px solid rgba(15, 23, 42, 0.1);
+    color: #1e293b;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.15rem;
+    box-shadow: 0 4px 14px rgba(15, 23, 42, 0.07);
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    outline: none;
+}
+.gk-panduan-nav-btn:hover {
+    background: #003366;
+    border-color: #003366;
+    color: #ffffff;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 51, 102, 0.25);
+}
+.gk-panduan-nav-btn:active {
+    transform: translateY(0) scale(0.94);
+}
+.gk-panduan-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 20px;
+    background: #cbd5e1;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    transition: all 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+    outline: none;
+}
+.gk-panduan-dot:hover {
+    background: #94a3b8;
+}
+.gk-panduan-dot.active {
+    width: 28px;
+    background: #003366;
+    border-radius: 20px;
 }
 .gk-pill-btn-dark {
     display: inline-flex;
@@ -191,10 +412,10 @@
     box-shadow: 0 12px 25px -4px rgba(0,0,0,0.45);
 }
 .gk-progress-pill {
-    background: #475569;
+    background: #0f172a !important;
     border-radius: 50px;
-    color: #ffffff;
-    font-weight: 700;
+    color: #ffffff !important;
+    font-weight: 800;
     font-size: 0.85rem;
     padding: 0.35rem 1rem;
     display: inline-block;
@@ -202,14 +423,39 @@
     text-align: center;
     position: relative;
     overflow: hidden;
+    box-shadow: 0 4px 14px rgba(15, 23, 42, 0.18);
 }
 .gk-progress-pill-fill {
     position: absolute;
     top: 0;
     left: 0;
     height: 100%;
-    background: rgba(255, 255, 255, 0.22);
     border-radius: 50px;
+    transition: width 1.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.gk-pill-rank-1,
+.gk-pill-rank-2,
+.gk-pill-rank-3 {
+    background: #0f172a !important;
+    border: 1px solid rgba(59, 130, 246, 0.4) !important;
+}
+.gk-progress-pill-fill {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    border-radius: 50px;
+    background: linear-gradient(90deg, #0284c7, #38bdf8) !important;
+    transition: width 1.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.gk-bar-blue-high {
+    background: linear-gradient(90deg, #003366, #2563eb) !important;
+}
+.gk-bar-blue-mid {
+    background: linear-gradient(90deg, #0284c7, #38bdf8) !important;
+}
+.gk-bar-blue-low {
+    background: linear-gradient(90deg, #38bdf8, #93c5fd) !important;
 }
 .accordion-button {
     transition: background-color 0.25s ease, color 0.25s ease, box-shadow 0.25s ease;
@@ -248,14 +494,14 @@
     {{-- Content Overlay --}}
     <div class="container position-relative" style="z-index: 2; padding: 160px 0 110px;">
         <div class="row">
-            <div class="col-lg-9 col-xl-8" data-aos="fade-right">
-                <div class="hero-glass-badge">
+            <div class="col-lg-9 col-xl-8">
+                <div class="hero-glass-badge hero-anim-badge">
                     <i class="bi bi-patch-check-fill text-warning"></i>
                     <span>{{ $heroBadge }}</span>
                 </div>
-                <h1 class="hero-title text-white">{{ $heroTitle }}</h1>
-                <p class="hero-subtitle text-white" style="color: rgba(255, 255, 255, 0.92) !important;">{{ $heroSubtitle }}</p>
-                <div class="d-flex flex-wrap gap-3 align-items-center">
+                <h1 class="hero-title text-white hero-anim-title">{{ $heroTitle }}</h1>
+                <p class="hero-subtitle text-white hero-anim-subtitle" style="color: rgba(255, 255, 255, 0.92) !important;">{{ $heroSubtitle }}</p>
+                <div class="d-flex flex-wrap gap-3 align-items-center hero-anim-cta">
                     <a href="{{ $heroCtaUrl }}" class="hero-btn hero-btn-primary">
                         <span>{{ $heroCtaText }}</span>
                         <i class="bi bi-arrow-right"></i>
@@ -355,6 +601,131 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
+
+    // 🌟 1. STATISTIK SCROLL ANIMATION & COUNT-UP COUNTER (0 KE DATA ASLI)
+    const statSection = document.getElementById('statistik');
+    const statCards = document.querySelectorAll('.stat-card-modern');
+    const counters = document.querySelectorAll('.stat-counter');
+    let statsAnimated = false;
+
+    function runCounters() {
+        if (statsAnimated) return;
+        statsAnimated = true;
+
+        statCards.forEach((card, idx) => {
+            setTimeout(() => {
+                card.classList.add('is-visible');
+            }, idx * 120);
+        });
+
+        counters.forEach(counter => {
+            const target = parseInt(counter.getAttribute('data-target'), 10) || 0;
+            if (target === 0) {
+                counter.textContent = '0';
+                return;
+            }
+            const duration = 1600;
+            const startTime = performance.now();
+
+            function updateCount(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                // Smooth ease-out cubic curve
+                const easeOut = 1 - Math.pow(1 - progress, 3);
+                const current = Math.floor(easeOut * target);
+                counter.textContent = current.toLocaleString('id-ID');
+
+                if (progress < 1) {
+                    requestAnimationFrame(updateCount);
+                } else {
+                    counter.textContent = target.toLocaleString('id-ID');
+                }
+            }
+            requestAnimationFrame(updateCount);
+        });
+    }
+
+    if (statSection && 'IntersectionObserver' in window) {
+        const statObserver = new IntersectionObserver((entries) => {
+            if (entries[0].isIntersecting) {
+                runCounters();
+                statObserver.disconnect();
+            }
+        }, { threshold: 0.2 });
+        statObserver.observe(statSection);
+    } else {
+        runCounters();
+    }
+
+    // 🌟 2. LEADERBOARD PODIUM BERURUTAN (#1 TOP 1 DULU, LALU #2, LALU #3)
+    const podiumRow = document.getElementById('leaderboardPodium');
+    let podiumAnimated = false;
+
+    function runPodiumAnimation() {
+        if (podiumAnimated || !podiumRow) return;
+        podiumAnimated = true;
+
+        const rank1 = podiumRow.querySelector('.podium-rank-1');
+        const rank2 = podiumRow.querySelector('.podium-rank-2');
+        const rank3 = podiumRow.querySelector('.podium-rank-3');
+
+        // Urutan 1: Top 1 (Pemenang Pertama di tengah) muncul pertama
+        setTimeout(() => {
+            if (rank1) {
+                rank1.classList.add('is-revealed');
+                const fill1 = rank1.querySelector('.gk-progress-pill-fill');
+                if (fill1) fill1.style.width = fill1.getAttribute('data-percentage') + '%';
+            }
+        }, 120);
+
+        // Urutan 2: Top 2 (Perak di kiri) muncul berikutnya
+        setTimeout(() => {
+            if (rank2) {
+                rank2.classList.add('is-revealed');
+                const fill2 = rank2.querySelector('.gk-progress-pill-fill');
+                if (fill2) fill2.style.width = fill2.getAttribute('data-percentage') + '%';
+            }
+        }, 600);
+
+        // Urutan 3: Top 3 (Perunggu di kanan) muncul terakhir
+        setTimeout(() => {
+            if (rank3) {
+                rank3.classList.add('is-revealed');
+                const fill3 = rank3.querySelector('.gk-progress-pill-fill');
+                if (fill3) fill3.style.width = fill3.getAttribute('data-percentage') + '%';
+            }
+        }, 1080);
+    }
+
+    if (podiumRow && 'IntersectionObserver' in window) {
+        const podiumObserver = new IntersectionObserver((entries) => {
+            if (entries[0].isIntersecting) {
+                runPodiumAnimation();
+                podiumObserver.disconnect();
+            }
+        }, { threshold: 0.15 });
+        podiumObserver.observe(podiumRow);
+    } else if (podiumRow) {
+        runPodiumAnimation();
+    }
+
+    // 🌟 3. SMOOTH SCROLL REVEAL PADA ELEMEN LAINNYA DI BERANDA
+    const revealTargets = document.querySelectorAll('.tutorial-card, .gk-clean-card, .gk-feature-card, .teacher-card, .accordion-item');
+    if ('IntersectionObserver' in window) {
+        const revealObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('is-revealed');
+                    revealObserver.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.12 });
+
+        revealTargets.forEach(el => {
+            el.classList.add('gk-scroll-reveal');
+            revealObserver.observe(el);
+        });
+    }
 });
 </script>
 @endpush
@@ -373,40 +744,40 @@ document.addEventListener('DOMContentLoaded', function() {
                     <div class="stat-icon" style="background: rgba(0,51,102,0.08); color: var(--primary);">
                         <i class="bi bi-person-badge-fill"></i>
                     </div>
-                    <div class="stat-number">{{ $totalGuru ?? 0 }}</div>
+                    <div class="stat-number stat-counter" data-target="{{ $totalGuru ?? 0 }}">0</div>
                     <div class="stat-label">Total Guru</div>
                     <div class="mt-2">
                         <span class="badge rounded-pill" style="background: rgba(0,51,102,0.08); color: var(--primary); font-size: 0.68rem; font-weight: 600;">Data Pendidik</span>
                     </div>
                 </div>
             </div>
-            <div class="col-6 col-md-3" data-aos="fade-up" data-aos-delay="200">
+            <div class="col-6 col-md-3">
                 <div class="stat-card-modern">
-                    <div class="stat-icon" style="background: rgba(0,168,107,0.08); color: var(--accent);">
+                    <div class="stat-icon" style="background: rgba(2, 132, 199, 0.1); color: #0284c7;">
                         <i class="bi bi-people-fill"></i>
                     </div>
-                    <div class="stat-number">{{ $totalSiswa ?? 0 }}</div>
+                    <div class="stat-number stat-counter" data-target="{{ $totalSiswa ?? 0 }}">0</div>
                     <div class="stat-label">Siswa Terdaftar</div>
                     <div class="mt-2">
-                        <span class="badge rounded-pill" style="background: rgba(0,168,107,0.1); color: var(--accent); font-size: 0.68rem; font-weight: 600;">Siswa Aktif</span>
+                        <span class="badge rounded-pill" style="background: rgba(2, 132, 199, 0.1); color: #0284c7; font-size: 0.68rem; font-weight: 600;">Siswa Aktif</span>
                     </div>
                 </div>
             </div>
-            <div class="col-6 col-md-3" data-aos="fade-up" data-aos-delay="300">
+            <div class="col-6 col-md-3">
                 <div class="stat-card-modern">
-                    <div class="stat-icon" style="background: rgba(245,158,11,0.12); color: #d97706;">
+                    <div class="stat-icon" style="background: rgba(245, 158, 11, 0.12); color: #d97706;">
                         <i class="bi bi-clipboard-check-fill"></i>
                     </div>
-                    <div class="stat-number">{{ $totalPenilaian ?? 0 }}</div>
+                    <div class="stat-number stat-counter" data-target="{{ $totalPenilaian ?? 0 }}">0</div>
                     <div class="stat-label">Total Penilaian</div>
                     <div class="mt-2">
-                        <span class="badge rounded-pill" style="background: rgba(245,158,11,0.12); color: #d97706; font-size: 0.68rem; font-weight: 600;">Ulasan Masuk</span>
+                        <span class="badge rounded-pill" style="background: rgba(245, 158, 11, 0.12); color: #d97706; font-size: 0.68rem; font-weight: 600;">Ulasan Masuk</span>
                     </div>
                 </div>
             </div>
             <div class="col-6 col-md-3" data-aos="fade-up" data-aos-delay="400">
                 <div class="stat-card-modern">
-                    <div class="stat-icon" style="background: rgba(99,102,241,0.1); color: #6366f1;">
+                    <div class="stat-icon" style="background: rgba(29, 78, 216, 0.1); color: #1d4ed8;">
                         <i class="bi bi-calendar-check-fill"></i>
                     </div>
                     @if(isset($periodeAktif) && $periodeAktif)
@@ -419,7 +790,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     @endif
                     <div class="stat-label">Periode Saat Ini</div>
                     <div class="mt-2">
-                        <span class="badge rounded-pill" style="background: rgba(99,102,241,0.1); color: #6366f1; font-size: 0.68rem; font-weight: 600;">Semester Aktif</span>
+                        <span class="badge rounded-pill" style="background: rgba(29, 78, 216, 0.1); color: #1d4ed8; font-size: 0.68rem; font-weight: 600;">Semester Aktif</span>
                     </div>
                 </div>
             </div>
@@ -446,36 +817,45 @@ document.addEventListener('DOMContentLoaded', function() {
             })->sortByDesc('rata_rata_nilai')->take(3)->values();
         @endphp
 
-        <div class="row g-3 g-lg-4 justify-content-center align-items-end mb-5 gk-podium-row">
+        <div class="row g-3 g-lg-4 justify-content-center align-items-end mb-5 gk-podium-row" id="leaderboardPodium">
             @if($topList->count() > 0)
-                {{-- #2 PERAK (KIRI) --}}
+                {{-- #2 PERAK (KIRI - NORMAL) --}}
                 @if($topList->count() > 1)
-                <div class="col-11 col-sm-8 col-md-4 order-2 order-md-1" data-aos="fade-right">
-                    <div class="gk-podium-card-revised p-4 text-center h-100 d-flex flex-column justify-content-between" style="min-height: 410px;">
+                <div class="col-11 col-sm-8 col-md-4 order-2 order-md-1 podium-anim-item podium-rank-2 gk-podium-2">
+                    <div class="gk-podium-card-revised p-3.5 p-md-4 text-center h-100 d-flex flex-column justify-content-between">
                         <div>
                             <div class="mb-3">
                                 <span class="badge rounded-pill px-3 py-1.5 fw-bold" style="background: #f1f5f9; color: #475569; font-size: 0.8rem;">
                                     #2nd
                                 </span>
                             </div>
-                            <div class="gk-avatar-red-wrap mb-3">
+                            <div class="gk-avatar-clean-wrap mb-3" style="width: 96px; height: 96px;">
                                 <img src="{{ $topList[1]->photo_url }}" width="96" height="96" alt="{{ $topList[1]->nama }}">
                             </div>
                             <h5 class="fw-bold mb-1 text-dark" style="font-size: 1.05rem;" title="{{ $topList[1]->nama }}">{{ $topList[1]->nama }}</h5>
                             
-                            {{-- Bintang --}}
+                            {{-- Bintang (Support 0.5 Setengah Bintang) --}}
                             <div class="text-warning mb-2" style="font-size: 0.95rem; letter-spacing: 2px;">
-                                @php $stars2 = round($topList[1]->persentase / 20); @endphp
+                                @php
+                                    $val2 = $topList[1]->persentase / 20;
+                                    $stars2 = round($val2 * 2) / 2;
+                                @endphp
                                 @for($i = 1; $i <= 5; $i++)
-                                    <i class="bi {{ $i <= $stars2 ? 'bi-star-fill' : 'bi-star text-muted opacity-25' }}"></i>
+                                    @if($stars2 >= $i)
+                                        <i class="bi bi-star-fill"></i>
+                                    @elseif($stars2 >= ($i - 0.5))
+                                        <i class="bi bi-star-half"></i>
+                                    @else
+                                        <i class="bi bi-star text-muted opacity-25"></i>
+                                    @endif
                                 @endfor
                             </div>
 
-                            {{-- Progress Pill --}}
+                            {{-- Progress Pill Normal --}}
                             <div class="mb-2">
-                                <div class="gk-progress-pill mx-auto" style="width: 140px; background: #64748b;">
-                                    <div class="gk-progress-pill-fill" style="width: {{ $topList[1]->persentase }}%;"></div>
-                                    <span class="position-relative" style="z-index: 2;">{{ $topList[1]->persentase }}%</span>
+                                <div class="gk-progress-pill gk-pill-rank-2 mx-auto" style="width: 140px; height: 32px; font-size: 0.84rem;">
+                                    <div class="gk-progress-pill-fill {{ $topList[1]->persentase >= 75 ? 'gk-bar-blue-high' : ($topList[1]->persentase >= 50 ? 'gk-bar-blue-mid' : 'gk-bar-blue-low') }}" style="width: 0%;" data-percentage="{{ $topList[1]->persentase }}"></div>
+                                    <span class="position-relative text-white" style="z-index: 2; text-shadow: 0 1px 2px rgba(0,0,0,0.6);">{{ $topList[1]->persentase }}%</span>
                                 </div>
                             </div>
                             <small class="text-muted font-mono d-block" style="font-size: 0.78rem;">{{ $topList[1]->total_penilaian }} ulasan</small>
@@ -487,7 +867,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 @if($penghargaan->badge)
                                     <span class="gk-badge-mini-icon" style="background: {{ $penghargaan->badge->warna }}18; color: {{ $penghargaan->badge->warna }}; border-color: {{ $penghargaan->badge->warna }}33;" data-bs-toggle="tooltip" title="{{ $penghargaan->badge->nama_badge }}: {{ $penghargaan->badge->deskripsi }}">
                                         @if(str_starts_with($penghargaan->badge->icon, 'bi-'))
-                                            <i class="bi {{ $penghargaan->badge->icon }}"></i>
+                                             <i class="bi {{ $penghargaan->badge->icon }}"></i>
                                         @else
                                             {{ $penghargaan->badge->icon }}
                                         @endif
@@ -506,34 +886,43 @@ document.addEventListener('DOMContentLoaded', function() {
                 </div>
                 @endif
 
-                {{-- #1 EMAS (TENGAH - LEBIH TINGGI) --}}
+                {{-- #1 EMAS (TENGAH - BESAR) --}}
                 @if($topList->count() > 0)
-                <div class="col-11 col-sm-8 col-md-4 order-1 order-md-2" data-aos="zoom-in">
-                    <div class="gk-podium-card-revised is-first p-4 p-md-5 text-center h-100 d-flex flex-column justify-content-between" style="min-height: 460px;">
+                <div class="col-11 col-sm-8 col-md-4 order-1 order-md-2 podium-anim-item podium-rank-1 gk-podium-1">
+                    <div class="gk-podium-card-revised is-first p-4 p-md-5 text-center h-100 d-flex flex-column justify-content-between">
                         <div>
                             <div class="mb-3">
                                 <span class="badge rounded-pill px-4 py-1.5 fw-bold" style="background: #fef08a; color: #854d0e; font-size: 0.9rem;">
                                     #1st
                                 </span>
                             </div>
-                            <div class="gk-avatar-red-wrap mb-3" style="padding: 4px;">
-                                <img src="{{ $topList[0]->photo_url }}" width="124" height="124" alt="{{ $topList[0]->nama }}">
+                            <div class="gk-avatar-clean-wrap mb-3" style="width: 114px; height: 114px;">
+                                <img src="{{ $topList[0]->photo_url }}" width="114" height="114" alt="{{ $topList[0]->nama }}">
                             </div>
                             <h4 class="fw-bold mb-1 text-dark" style="font-size: 1.25rem;" title="{{ $topList[0]->nama }}">{{ $topList[0]->nama }}</h4>
                             
-                            {{-- Bintang --}}
+                            {{-- Bintang (Support 0.5 Setengah Bintang) --}}
                             <div class="text-warning mb-2" style="font-size: 1.1rem; letter-spacing: 2.5px;">
-                                @php $stars1 = round($topList[0]->persentase / 20); @endphp
+                                @php
+                                    $val1 = $topList[0]->persentase / 20;
+                                    $stars1 = round($val1 * 2) / 2;
+                                @endphp
                                 @for($i = 1; $i <= 5; $i++)
-                                    <i class="bi {{ $i <= $stars1 ? 'bi-star-fill' : 'bi-star text-muted opacity-25' }}"></i>
+                                    @if($stars1 >= $i)
+                                        <i class="bi bi-star-fill"></i>
+                                    @elseif($stars1 >= ($i - 0.5))
+                                        <i class="bi bi-star-half"></i>
+                                    @else
+                                        <i class="bi bi-star text-muted opacity-25"></i>
+                                    @endif
                                 @endfor
                             </div>
 
-                            {{-- Progress Pill --}}
+                            {{-- Progress Pill Besar --}}
                             <div class="mb-2">
-                                <div class="gk-progress-pill mx-auto" style="width: 155px; background: #334155;">
-                                    <div class="gk-progress-pill-fill" style="width: {{ $topList[0]->persentase }}%;"></div>
-                                    <span class="position-relative" style="z-index: 2;">{{ $topList[0]->persentase }}%</span>
+                                <div class="gk-progress-pill gk-pill-rank-1 mx-auto" style="width: 156px; height: 35px; font-size: 0.92rem;">
+                                    <div class="gk-progress-pill-fill {{ $topList[0]->persentase >= 75 ? 'gk-bar-blue-high' : ($topList[0]->persentase >= 50 ? 'gk-bar-blue-mid' : 'gk-bar-blue-low') }}" style="width: 0%;" data-percentage="{{ $topList[0]->persentase }}"></div>
+                                    <span class="position-relative text-white" style="z-index: 2; text-shadow: 0 1px 2px rgba(0,0,0,0.6);">{{ $topList[0]->persentase }}%</span>
                                 </div>
                             </div>
                             <small class="text-muted font-mono d-block" style="font-size: 0.8rem;">{{ $topList[0]->total_penilaian }} ulasan</small>
@@ -545,7 +934,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 @if($penghargaan->badge)
                                     <span class="gk-badge-mini-icon" style="background: {{ $penghargaan->badge->warna }}18; color: {{ $penghargaan->badge->warna }}; border-color: {{ $penghargaan->badge->warna }}33;" data-bs-toggle="tooltip" title="{{ $penghargaan->badge->nama_badge }}: {{ $penghargaan->badge->deskripsi }}">
                                         @if(str_starts_with($penghargaan->badge->icon, 'bi-'))
-                                            <i class="bi {{ $penghargaan->badge->icon }}"></i>
+                                             <i class="bi {{ $penghargaan->badge->icon }}"></i>
                                         @else
                                             {{ $penghargaan->badge->icon }}
                                         @endif
@@ -563,37 +952,46 @@ document.addEventListener('DOMContentLoaded', function() {
                 </div>
                 @endif
 
-                {{-- #3 PERUNGGU (KANAN) --}}
+                {{-- #3 PERUNGGU (KANAN - KECIL) --}}
                 @if($topList->count() > 2)
-                <div class="col-11 col-sm-8 col-md-4 order-3 order-md-3" data-aos="fade-left">
-                    <div class="gk-podium-card-revised p-4 text-center h-100 d-flex flex-column justify-content-between" style="min-height: 410px;">
+                <div class="col-11 col-sm-8 col-md-4 order-3 order-md-3 podium-anim-item podium-rank-3 gk-podium-3">
+                    <div class="gk-podium-card-revised p-3 p-md-3.5 text-center h-100 d-flex flex-column justify-content-between">
                         <div>
                             <div class="mb-3">
-                                <span class="badge rounded-pill px-3 py-1.5 fw-bold" style="background: #fed7aa; color: #9a3412; font-size: 0.8rem;">
+                                <span class="badge rounded-pill px-2.5 py-1 fw-bold" style="background: #fed7aa; color: #9a3412; font-size: 0.75rem;">
                                     #3rd
                                 </span>
                             </div>
-                            <div class="gk-avatar-red-wrap mb-3">
-                                <img src="{{ $topList[2]->photo_url }}" width="96" height="96" alt="{{ $topList[2]->nama }}">
+                            <div class="gk-avatar-clean-wrap mb-3" style="width: 82px; height: 82px;">
+                                <img src="{{ $topList[2]->photo_url }}" width="82" height="82" alt="{{ $topList[2]->nama }}">
                             </div>
-                            <h5 class="fw-bold mb-1 text-dark" style="font-size: 1.05rem;" title="{{ $topList[2]->nama }}">{{ $topList[2]->nama }}</h5>
+                            <h5 class="fw-bold mb-1 text-dark" style="font-size: 0.95rem;" title="{{ $topList[2]->nama }}">{{ $topList[2]->nama }}</h5>
                             
-                            {{-- Bintang --}}
-                            <div class="text-warning mb-2" style="font-size: 0.95rem; letter-spacing: 2px;">
-                                @php $stars3 = round($topList[2]->persentase / 20); @endphp
+                            {{-- Bintang (Support 0.5 Setengah Bintang) --}}
+                            <div class="text-warning mb-2" style="font-size: 0.85rem; letter-spacing: 1.5px;">
+                                @php
+                                    $val3 = $topList[2]->persentase / 20;
+                                    $stars3 = round($val3 * 2) / 2;
+                                @endphp
                                 @for($i = 1; $i <= 5; $i++)
-                                    <i class="bi {{ $i <= $stars3 ? 'bi-star-fill' : 'bi-star text-muted opacity-25' }}"></i>
+                                    @if($stars3 >= $i)
+                                        <i class="bi bi-star-fill"></i>
+                                    @elseif($stars3 >= ($i - 0.5))
+                                        <i class="bi bi-star-half"></i>
+                                    @else
+                                        <i class="bi bi-star text-muted opacity-25"></i>
+                                    @endif
                                 @endfor
                             </div>
 
-                            {{-- Progress Pill --}}
+                            {{-- Progress Pill Kecil --}}
                             <div class="mb-2">
-                                <div class="gk-progress-pill mx-auto" style="width: 140px; background: #94a3b8;">
-                                    <div class="gk-progress-pill-fill" style="width: {{ $topList[2]->persentase }}%;"></div>
-                                    <span class="position-relative" style="z-index: 2;">{{ $topList[2]->persentase }}%</span>
+                                <div class="gk-progress-pill gk-pill-rank-3 mx-auto" style="width: 124px; height: 28px; font-size: 0.78rem;">
+                                    <div class="gk-progress-pill-fill {{ $topList[2]->persentase >= 75 ? 'gk-bar-blue-high' : ($topList[2]->persentase >= 50 ? 'gk-bar-blue-mid' : 'gk-bar-blue-low') }}" style="width: 0%;" data-percentage="{{ $topList[2]->persentase }}"></div>
+                                    <span class="position-relative text-white" style="z-index: 2; text-shadow: 0 1px 2px rgba(0,0,0,0.6);">{{ $topList[2]->persentase }}%</span>
                                 </div>
                             </div>
-                            <small class="text-muted font-mono d-block" style="font-size: 0.78rem;">{{ $topList[2]->total_penilaian }} ulasan</small>
+                            <small class="text-muted font-mono d-block" style="font-size: 0.75rem;">{{ $topList[2]->total_penilaian }} ulasan</small>
                         </div>
 
                         {{-- Row Badge Icons --}}
@@ -634,56 +1032,99 @@ document.addEventListener('DOMContentLoaded', function() {
 {{-- 4. PANDUAN / CARA PENILAIAN (id="panduan") --}}
 <section id="panduan" class="section-padding" style="background: #ffffff; padding: 5rem 0;">
     <div class="container">
-        <div class="text-center mb-5" data-aos="fade-up">
-            <div class="small fw-semibold text-muted mb-1" style="font-size: 0.85rem;">{{ \App\Models\Setting::get('panduan_label', 'Panduan Penggunaan') }}</div>
-            <h2 class="fw-bold mb-2 text-dark" style="font-size: clamp(1.6rem, 3.5vw, 2.2rem);">{{ \App\Models\Setting::get('panduan_title', 'Bagaimana Cara Memberi Penilaian?') }}</h2>
-            <p class="text-muted mb-0" style="font-size: 0.95rem;">{{ \App\Models\Setting::get('panduan_subtitle', '3 Langkah Mudah untuk Memberi Ulasan') }}</p>
+        <div class="text-center mb-4 mb-md-5" data-aos="fade-up">
+            <div class="small fw-semibold text-muted mb-1" style="font-size: 0.85rem; letter-spacing: 0.8px; text-transform: uppercase;">
+                {{ \App\Models\Setting::get('panduan_label', 'PANDUAN PENGGUNAAN') }}
+            </div>
+            <h2 class="fw-bold mb-2 text-dark" style="font-size: clamp(1.6rem, 3.5vw, 2.2rem);">
+                {{ \App\Models\Setting::get('panduan_title', 'Bagaimana Cara Memberi Penilaian?') }}
+            </h2>
+            <p class="text-muted mb-0" style="font-size: 0.95rem;">
+                {{ \App\Models\Setting::get('panduan_subtitle', 'Hanya butuh 3 langkah mudah untuk berkontribusi bagi sekolahmu') }}
+            </p>
         </div>
-        <div class="row g-3 g-md-4 justify-content-center">
-            <div class="col-md-4" data-aos="fade-up" data-aos-delay="100">
-                <div class="gk-clean-card p-4 p-md-5 text-center h-100 d-flex flex-column justify-content-between" style="min-height: 270px;">
-                    <div>
-                        <div class="mb-4">
-                            <span class="badge rounded-pill px-3 py-1.5 fw-bold text-uppercase" style="background: #f1f5f9; color: #475569; font-size: 0.72rem; letter-spacing: 0.5px;">
-                                {{ \App\Models\Setting::get('panduan_step1_title', 'LOGIN') }}
-                            </span>
+
+        {{-- SLIDER PANDUAN LANGKAH 1, 2, 3 (CAROUSEL WITH AUTOPLAY, TOUCH SWIPE & CENTER CONTROLS) --}}
+        <div class="gk-panduan-slider-wrapper mx-auto" data-aos="fade-up" data-aos-delay="100">
+            <div class="gk-panduan-viewport" id="panduanViewport">
+                <div class="gk-panduan-track" id="panduanTrack">
+                    {{-- LANGKAH 1 --}}
+                    <div class="gk-panduan-slide is-active" data-slide="0">
+                        <div class="gk-clean-card p-4 p-md-5 text-center h-100 d-flex flex-column justify-content-between" style="min-height: 280px;">
+                            <div>
+                                <div class="d-flex align-items-center justify-content-center gap-2 mb-4">
+                                    <span class="badge rounded-pill px-3 py-1.5 fw-bold text-uppercase" style="background: #f1f5f9; color: #475569; font-size: 0.72rem; letter-spacing: 0.5px;">
+                                        {{ \App\Models\Setting::get('panduan_step1_title', 'LOGIN NIS') }}
+                                    </span>
+                                    <span class="badge rounded-pill px-2.5 py-1 text-muted fw-semibold" style="background: #f8fafc; font-size: 0.7rem; font-family: monospace;">
+                                        01 / 03
+                                    </span>
+                                </div>
+                                <div class="gk-step-roman">I</div>
+                                <p class="text-dark fw-semibold mb-0" style="font-size: 1rem; line-height: 1.6;">
+                                    {{ \App\Models\Setting::get('panduan_step1_desc', 'Masuk dengan akun NIS & tanggal lahir resmi terverifikasi.') }}
+                                </p>
+                            </div>
                         </div>
-                        <div class="gk-step-roman">I</div>
-                        <p class="text-dark fw-semibold mb-0" style="font-size: 0.96rem; line-height: 1.55;">
-                            {{ \App\Models\Setting::get('panduan_step1_desc', 'Masuk dengan akun NIS & tanggal lahir resmi terverifikasi.') }}
-                        </p>
+                    </div>
+
+                    {{-- LANGKAH 2 --}}
+                    <div class="gk-panduan-slide" data-slide="1">
+                        <div class="gk-clean-card p-4 p-md-5 text-center h-100 d-flex flex-column justify-content-between" style="min-height: 280px;">
+                            <div>
+                                <div class="d-flex align-items-center justify-content-center gap-2 mb-4">
+                                    <span class="badge rounded-pill px-3 py-1.5 fw-bold text-uppercase" style="background: #f1f5f9; color: #475569; font-size: 0.72rem; letter-spacing: 0.5px;">
+                                        {{ \App\Models\Setting::get('panduan_step2_title', 'BERI NILAI') }}
+                                    </span>
+                                    <span class="badge rounded-pill px-2.5 py-1 text-muted fw-semibold" style="background: #f8fafc; font-size: 0.7rem; font-family: monospace;">
+                                        02 / 03
+                                    </span>
+                                </div>
+                                <div class="gk-step-roman">II</div>
+                                <p class="text-dark fw-semibold mb-0" style="font-size: 1rem; line-height: 1.6;">
+                                    {{ \App\Models\Setting::get('panduan_step2_desc', 'Pilih guru Normada/Produktif, beri nilai (1-5) pada 5 kriteria.') }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- LANGKAH 3 --}}
+                    <div class="gk-panduan-slide" data-slide="2">
+                        <div class="gk-clean-card p-4 p-md-5 text-center h-100 d-flex flex-column justify-content-between" style="min-height: 280px;">
+                            <div>
+                                <div class="d-flex align-items-center justify-content-center gap-2 mb-4">
+                                    <span class="badge rounded-pill px-3 py-1.5 fw-bold text-uppercase" style="background: #f1f5f9; color: #475569; font-size: 0.72rem; letter-spacing: 0.5px;">
+                                        {{ \App\Models\Setting::get('panduan_step3_title', 'KIRIM ANONIM') }}
+                                    </span>
+                                    <span class="badge rounded-pill px-2.5 py-1 text-muted fw-semibold" style="background: #f8fafc; font-size: 0.7rem; font-family: monospace;">
+                                        03 / 03
+                                    </span>
+                                </div>
+                                <div class="gk-step-roman">III</div>
+                                <p class="text-dark fw-semibold mb-0" style="font-size: 1rem; line-height: 1.6;">
+                                    {{ \App\Models\Setting::get('panduan_step3_desc', 'Data tersimpan aman & anonim untuk perbaikan pengajaran.') }}
+                                </p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="col-md-4" data-aos="fade-up" data-aos-delay="200">
-                <div class="gk-clean-card p-4 p-md-5 text-center h-100 d-flex flex-column justify-content-between" style="min-height: 270px;">
-                    <div>
-                        <div class="mb-4">
-                            <span class="badge rounded-pill px-3 py-1.5 fw-bold text-uppercase" style="background: #f1f5f9; color: #475569; font-size: 0.72rem; letter-spacing: 0.5px;">
-                                {{ \App\Models\Setting::get('panduan_step2_title', 'BERI NILAI') }}
-                            </span>
-                        </div>
-                        <div class="gk-step-roman">II</div>
-                        <p class="text-dark fw-semibold mb-0" style="font-size: 0.96rem; line-height: 1.55;">
-                            {{ \App\Models\Setting::get('panduan_step2_desc', 'Pilih guru Normada/Produktif, beri nilai (1-5) pada 5 kriteria.') }}
-                        </p>
-                    </div>
+
+            {{-- TOMBOL PANAH & INDIKATOR DOTS CENTER DI BAWAH PANDUAN --}}
+            <div class="d-flex align-items-center justify-content-center gap-3 mt-4 pt-1">
+                <button type="button" class="gk-panduan-nav-btn" id="panduanPrevBtn" aria-label="Langkah Sebelumnya" title="Sebelumnya">
+                    <i class="bi bi-chevron-left"></i>
+                </button>
+
+                <div class="d-flex align-items-center gap-2" id="panduanDots">
+                    <button type="button" class="gk-panduan-dot active" data-index="0" aria-label="Langkah 1"></button>
+                    <button type="button" class="gk-panduan-dot" data-index="1" aria-label="Langkah 2"></button>
+                    <button type="button" class="gk-panduan-dot" data-index="2" aria-label="Langkah 3"></button>
                 </div>
-            </div>
-            <div class="col-md-4" data-aos="fade-up" data-aos-delay="300">
-                <div class="gk-clean-card p-4 p-md-5 text-center h-100 d-flex flex-column justify-content-between" style="min-height: 270px;">
-                    <div>
-                        <div class="mb-4">
-                            <span class="badge rounded-pill px-3 py-1.5 fw-bold text-uppercase" style="background: #f1f5f9; color: #475569; font-size: 0.72rem; letter-spacing: 0.5px;">
-                                {{ \App\Models\Setting::get('panduan_step3_title', 'KIRIM ULASAN') }}
-                            </span>
-                        </div>
-                        <div class="gk-step-roman">III</div>
-                        <p class="text-dark fw-semibold mb-0" style="font-size: 0.96rem; line-height: 1.55;">
-                            {{ \App\Models\Setting::get('panduan_step3_desc', 'Data tersimpan aman & anonim untuk perbaikan pengajaran.') }}
-                        </p>
-                    </div>
-                </div>
+
+                <button type="button" class="gk-panduan-nav-btn" id="panduanNextBtn" aria-label="Langkah Selanjutnya" title="Selanjutnya">
+                    <i class="bi bi-chevron-right"></i>
+                </button>
             </div>
         </div>
     </div>
@@ -693,28 +1134,30 @@ document.addEventListener('DOMContentLoaded', function() {
 <section id="tentang" class="section-padding" style="background: var(--bg-light, #f8fafc); padding: 5rem 0;">
     <div class="container">
         <div class="text-center mb-5" data-aos="fade-up">
-            <div class="small fw-bold text-primary mb-1" style="font-size: 0.85rem;">{{ \App\Models\Setting::get('about_label', 'Tentang kami') }}</div>
+            <div class="small fw-semibold text-muted mb-1" style="font-size: 0.85rem; letter-spacing: 0.8px; text-transform: uppercase;">{{ \App\Models\Setting::get('about_label', 'Tentang kami') }}</div>
             <h2 class="fw-bold mb-2 text-dark" style="font-size: clamp(1.6rem, 3.5vw, 2.2rem);">{{ \App\Models\Setting::get('about_title', 'Mengapa GuruKuu – SMK Negeri 1 Bangsri Ada?') }}</h2>
             <p class="text-muted" style="max-width: 680px; margin: 0 auto; font-size: 0.95rem; text-wrap: balance;">
                 {{ \App\Models\Setting::get('about_subtitle', 'Platform evaluasi terintegrasi untuk SMK yang membangun jembatan komunikasi positif antara siswa, guru, dan management sekolah.') }}
             </p>
         </div>
 
-        {{-- 2 KARTU UTAMA: VISI & MISI (MONOKROM ELEGAN, RAPI TANPA KEBANYAKAN WARNA) --}}
-        <div class="row g-3 g-md-4 mb-4">
-            <div class="col-md-6" data-aos="fade-right">
-                <div class="gk-clean-card p-4 p-md-5 h-100">
+        {{-- 2-COLUMN LAYOUT: VISI & MISI DI KIRI POL, FITUR DI SAMPING KANANNYA --}}
+        <div class="row g-4 align-items-stretch">
+            {{-- SISI KIRI POL: VISI & MISI KAMI --}}
+            <div class="col-lg-6 d-flex flex-column gap-4" data-aos="fade-right">
+                {{-- VISI KAMI --}}
+                <div class="gk-clean-card p-4 p-md-5 flex-grow-1">
                     <div class="d-flex align-items-center gap-3 mb-3">
                         <i class="bi bi-bullseye fs-3 text-dark"></i>
                         <h5 class="fw-bold mb-0 text-dark" style="letter-spacing: 0.5px; font-size: 1.15rem;">VISI KAMI</h5>
                     </div>
-                    <p class="text-secondary mb-0" style="line-height: 1.65; font-size: 0.92rem;">
+                    <p class="text-secondary mb-0" style="line-height: 1.7; font-size: 0.94rem;">
                         {{ \App\Models\Setting::get('visi_text', 'Menjadi standar nasional dalam evaluasi pengajaran berbasis data untuk menciptakan ekosistem pendidikan yang responsif, transparan, dan berkelanjutan di seluruh SMK Indonesia.') }}
                     </p>
                 </div>
-            </div>
-            <div class="col-md-6" data-aos="fade-left">
-                <div class="gk-clean-card p-4 p-md-5 h-100">
+
+                {{-- MISI KAMI --}}
+                <div class="gk-clean-card p-4 p-md-5 flex-grow-1">
                     <div class="d-flex align-items-center gap-3 mb-3">
                         <i class="bi bi-file-earmark-check fs-3 text-dark"></i>
                         <h5 class="fw-bold mb-0 text-dark" style="letter-spacing: 0.5px; font-size: 1.15rem;">MISI KAMI</h5>
@@ -723,46 +1166,42 @@ document.addEventListener('DOMContentLoaded', function() {
                         $misiRaw = \App\Models\Setting::get('misi_text', "Memberikan saluran aspirasi yang aman dan anonim bagi siswa.\nMenyediakan data analitik yang dapat ditindaklanjuti oleh manajemen sekolah.\nMendorong pengembangan profesional guru secara berkelanjutan.");
                         $misiList = array_filter(array_map('trim', explode("\n", $misiRaw)));
                     @endphp
-                    <ul class="text-secondary mb-0 ps-3" style="line-height: 1.7; font-size: 0.92rem;">
+                    <ul class="text-secondary mb-0 ps-3" style="line-height: 1.7; font-size: 0.94rem;">
                         @foreach($misiList as $misiItem)
                             <li>{{ ltrim($misiItem, '-*• ') }}</li>
                         @endforeach
                     </ul>
                 </div>
             </div>
-        </div>
 
-        {{-- 3 KARTU FITUR BAWAH: ANONIMITAS, BERBASIS DATA, KOLABORATIF --}}
-        <div class="row g-3 g-md-4">
-            <div class="col-md-4" data-aos="fade-up" data-aos-delay="100">
-                <div class="gk-clean-card p-4 p-md-4 h-100">
+            {{-- SISI KANAN: FITUR UTAMA (ANONIMITAS, BERBASIS DATA, KOLABORATIF) --}}
+            <div class="col-lg-6 d-flex flex-column gap-3" data-aos="fade-left">
+                <div class="gk-clean-card p-4 flex-grow-1 d-flex flex-column justify-content-center">
                     <div class="d-flex align-items-center gap-2.5 mb-2">
                         <i class="bi bi-shield-check fs-3 text-dark"></i>
                         <h6 class="fw-bold mb-0 text-dark" style="font-size: 1.05rem;">{{ \App\Models\Setting::get('feature1_title', 'Anonimitas') }}</h6>
                     </div>
-                    <p class="text-secondary mb-0 small" style="line-height: 1.5; font-size: 0.85rem;">
+                    <p class="text-secondary mb-0 small" style="line-height: 1.55; font-size: 0.88rem;">
                         {{ \App\Models\Setting::get('feature1_desc', 'Identitas siswa aman dengan enkripsi tanpa tekanan.') }}
                     </p>
                 </div>
-            </div>
-            <div class="col-md-4" data-aos="fade-up" data-aos-delay="200">
-                <div class="gk-clean-card p-4 p-md-4 h-100">
+
+                <div class="gk-clean-card p-4 flex-grow-1 d-flex flex-column justify-content-center">
                     <div class="d-flex align-items-center gap-2.5 mb-2">
                         <i class="bi bi-journal-text fs-3 text-dark"></i>
                         <h6 class="fw-bold mb-0 text-dark" style="font-size: 1.05rem;">{{ \App\Models\Setting::get('feature2_title', 'Berbasis Data') }}</h6>
                     </div>
-                    <p class="text-secondary mb-0 small" style="line-height: 1.5; font-size: 0.85rem;">
+                    <p class="text-secondary mb-0 small" style="line-height: 1.55; font-size: 0.88rem;">
                         {{ \App\Models\Setting::get('feature2_desc', 'Data statistik valid & terukur untuk setiap apresiasi.') }}
                     </p>
                 </div>
-            </div>
-            <div class="col-md-4" data-aos="fade-up" data-aos-delay="300">
-                <div class="gk-clean-card p-4 p-md-4 h-100">
+
+                <div class="gk-clean-card p-4 flex-grow-1 d-flex flex-column justify-content-center">
                     <div class="d-flex align-items-center gap-2.5 mb-2">
                         <i class="bi bi-people fs-3 text-dark"></i>
                         <h6 class="fw-bold mb-0 text-dark" style="font-size: 1.05rem;">{{ \App\Models\Setting::get('feature3_title', 'Kolaboratif') }}</h6>
                     </div>
-                    <p class="text-secondary mb-0 small" style="line-height: 1.5; font-size: 0.85rem;">
+                    <p class="text-secondary mb-0 small" style="line-height: 1.55; font-size: 0.88rem;">
                         {{ \App\Models\Setting::get('feature3_desc', 'Membangun komunikasi positif siswa, guru, & sekolah.') }}
                     </p>
                 </div>
@@ -808,3 +1247,221 @@ document.addEventListener('DOMContentLoaded', function() {
 </section>
 @endif
 @endsection
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const track = document.getElementById('panduanTrack');
+    const viewport = document.getElementById('panduanViewport');
+    const prevBtn = document.getElementById('panduanPrevBtn');
+    const nextBtn = document.getElementById('panduanNextBtn');
+    const dots = document.querySelectorAll('#panduanDots .gk-panduan-dot');
+    const slides = document.querySelectorAll('.gk-panduan-slide');
+
+    if (!track || !viewport || slides.length === 0) return;
+
+    let currentIndex = 0;
+    const totalSlides = slides.length;
+    let autoplayTimer = null;
+    const AUTOPLAY_DELAY = 3600; // 3.6 detik jeda waktu
+
+    function updateSlide(animate = true) {
+        if (!animate) {
+            track.style.transition = 'none';
+        } else {
+            track.style.transition = 'transform 0.65s cubic-bezier(0.22, 1, 0.36, 1)';
+        }
+
+        track.style.transform = `translateX(-${currentIndex * 100}%)`;
+
+        slides.forEach((slide, idx) => {
+            if (idx === currentIndex) {
+                slide.classList.add('is-active');
+            } else {
+                slide.classList.remove('is-active');
+            }
+        });
+
+        dots.forEach((dot, idx) => {
+            dot.classList.toggle('active', idx === currentIndex);
+        });
+    }
+
+    function nextSlide() {
+        currentIndex = (currentIndex + 1) % totalSlides;
+        updateSlide(true);
+    }
+
+    function prevSlide() {
+        currentIndex = (currentIndex - 1 + totalSlides) % totalSlides;
+        updateSlide(true);
+    }
+
+    function goToSlide(index) {
+        if (index < 0 || index >= totalSlides) return;
+        currentIndex = index;
+        updateSlide(true);
+    }
+
+    function startAutoplay() {
+        stopAutoplay();
+        autoplayTimer = setInterval(nextSlide, AUTOPLAY_DELAY);
+    }
+
+    function stopAutoplay() {
+        if (autoplayTimer) {
+            clearInterval(autoplayTimer);
+            autoplayTimer = null;
+        }
+    }
+
+    function resetAutoplay() {
+        stopAutoplay();
+        startAutoplay();
+    }
+
+    // Button controls
+    if (nextBtn) {
+        nextBtn.addEventListener('click', function () {
+            nextSlide();
+            resetAutoplay();
+        });
+    }
+
+    if (prevBtn) {
+        prevBtn.addEventListener('click', function () {
+            prevSlide();
+            resetAutoplay();
+        });
+    }
+
+    // Dots indicator clicks
+    dots.forEach((dot) => {
+        dot.addEventListener('click', function () {
+            const idx = parseInt(this.getAttribute('data-index'), 10);
+            goToSlide(idx);
+            resetAutoplay();
+        });
+    });
+
+    // Pause autoplay on mouse hover (desktop)
+    viewport.addEventListener('mouseenter', stopAutoplay);
+    viewport.addEventListener('mouseleave', startAutoplay);
+
+    // Touch / Swipe Support for Mobile (geser dengan jari)
+    let startX = 0;
+    let startY = 0;
+    let currentX = 0;
+    let isSwiping = false;
+    let hasDeterminedDirection = false;
+    let isHorizontal = false;
+
+    viewport.addEventListener('touchstart', function (e) {
+        if (e.touches.length !== 1) return;
+        startX = e.touches[0].clientX;
+        startY = e.touches[0].clientY;
+        currentX = startX;
+        isSwiping = true;
+        hasDeterminedDirection = false;
+        isHorizontal = false;
+        stopAutoplay();
+    }, { passive: true });
+
+    viewport.addEventListener('touchmove', function (e) {
+        if (!isSwiping || e.touches.length !== 1) return;
+        currentX = e.touches[0].clientX;
+        const currentY = e.touches[0].clientY;
+        const diffX = currentX - startX;
+        const diffY = currentY - startY;
+
+        if (!hasDeterminedDirection) {
+            if (Math.abs(diffX) > 7 || Math.abs(diffY) > 7) {
+                hasDeterminedDirection = true;
+                isHorizontal = Math.abs(diffX) > Math.abs(diffY);
+            }
+        }
+
+        if (isHorizontal) {
+            const vpWidth = viewport.offsetWidth || 300;
+            const dragPercent = (diffX / vpWidth) * 100;
+            const currentTranslate = -currentIndex * 100;
+            track.style.transition = 'none';
+            track.style.transform = `translateX(${currentTranslate + dragPercent}%)`;
+        }
+    }, { passive: true });
+
+    viewport.addEventListener('touchend', function () {
+        if (!isSwiping) return;
+        isSwiping = false;
+        const diffX = currentX - startX;
+
+        track.style.transition = 'transform 0.65s cubic-bezier(0.22, 1, 0.36, 1)';
+
+        if (isHorizontal && Math.abs(diffX) > 40) {
+            if (diffX < 0) {
+                nextSlide();
+            } else {
+                prevSlide();
+            }
+        } else {
+            updateSlide(true);
+        }
+        startAutoplay();
+    });
+
+    // Mouse drag support for desktop
+    let isMouseDown = false;
+    let mouseStartX = 0;
+    let mouseCurrentX = 0;
+
+    viewport.addEventListener('mousedown', function (e) {
+        if (e.button !== 0) return;
+        isMouseDown = true;
+        mouseStartX = e.clientX;
+        mouseCurrentX = mouseStartX;
+        stopAutoplay();
+    });
+
+    window.addEventListener('mousemove', function (e) {
+        if (!isMouseDown) return;
+        mouseCurrentX = e.clientX;
+        const diffX = mouseCurrentX - mouseStartX;
+        const vpWidth = viewport.offsetWidth || 300;
+        const dragPercent = (diffX / vpWidth) * 100;
+        const currentTranslate = -currentIndex * 100;
+        track.style.transition = 'none';
+        track.style.transform = `translateX(${currentTranslate + dragPercent}%)`;
+    });
+
+    window.addEventListener('mouseup', function () {
+        if (!isMouseDown) return;
+        isMouseDown = false;
+        const diffX = mouseCurrentX - mouseStartX;
+        track.style.transition = 'transform 0.65s cubic-bezier(0.22, 1, 0.36, 1)';
+        if (Math.abs(diffX) > 45) {
+            if (diffX < 0) {
+                nextSlide();
+            } else {
+                prevSlide();
+            }
+        } else {
+            updateSlide(true);
+        }
+        startAutoplay();
+    });
+
+    // Pause when tab is hidden
+    document.addEventListener('visibilitychange', function () {
+        if (document.hidden) {
+            stopAutoplay();
+        } else {
+            startAutoplay();
+        }
+    });
+
+    // Initialize
+    updateSlide(false);
+    startAutoplay();
+});
+</script>
+@endpush

@@ -8,7 +8,9 @@
         <h1 class="page-title">Detail Siswa</h1>
         <p class="page-subtitle">Informasi lengkap akun, kelas, penilaian, dan log pelanggaran siswa.</p>
     </div>
-    <a href="{{ route('admin.siswa.index') }}" class="btn btn-outline-custom"><i class="bi bi-arrow-left me-1"></i>Kembali</a>
+    <a href="{{ route('admin.siswa.index') }}" class="gk-btn-back">
+        <i class="bi bi-arrow-left"></i> Kembali
+    </a>
 </div>
 
 <div class="row g-4 mb-4">

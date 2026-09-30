@@ -8,8 +8,8 @@
         <h1 class="page-title">Beri Penilaian Guru</h1>
         <p class="page-subtitle">Suarakan aspirasi dan evaluasi objektif Anda demi peningkatan kualitas belajar mengajar.</p>
     </div>
-    <a href="{{ route('siswa.guru.index') }}" class="btn btn-outline-custom">
-        <i class="bi bi-arrow-left me-1"></i> Kembali ke Daftar Guru
+    <a href="{{ route('siswa.guru.index') }}" class="gk-btn-back">
+        <i class="bi bi-arrow-left"></i> Kembali ke Daftar Guru
     </a>
 </div>
 
@@ -121,9 +121,9 @@
 
                             {{-- STAR RATING INTERFACE --}}
                             <div class="d-flex justify-content-between align-items-center pt-2 border-top">
-                                <div class="star-rating" data-field="{{ $key }}">
+                                <div class="star-rating" data-field="{{ $key }}" style="touch-action: pan-y; -webkit-user-select: none; user-select: none; cursor: pointer; display: inline-flex; align-items: center;">
                                     @for($i = 1; $i <= 5; $i++)
-                                        <i class="bi bi-star-fill star" data-value="{{ $i }}" style="font-size: 1.6rem; cursor: pointer; color: #cbd5e1; margin-right: 3px; transition: transform 0.15s, color 0.15s;"></i>
+                                        <i class="bi bi-star-fill star" data-value="{{ $i }}" style="font-size: 1.65rem; cursor: pointer; color: #cbd5e1; margin-right: 4px; transition: transform 0.12s, color 0.12s; display: inline-block;"></i>
                                     @endfor
                                     <input type="hidden" name="{{ $key }}" class="rating-input" id="input-{{ $key }}" value="0" required>
                                 </div>
@@ -246,13 +246,32 @@ document.addEventListener('DOMContentLoaded', function() {
     const ratingContainers = document.querySelectorAll('.star-rating');
 
     ratingContainers.forEach(container => {
-        const stars = container.querySelectorAll('.star');
+        const stars = Array.from(container.querySelectorAll('.star'));
         const input = container.querySelector('.rating-input');
         const fieldName = container.dataset.field;
         const badge = document.getElementById('sentiment-' + fieldName);
         const card = document.getElementById('card-' + fieldName);
 
-        // Mouse hover preview
+        function setRating(val, haptic = false) {
+            val = Math.max(1, Math.min(5, val));
+            input.value = val;
+            paintStars(stars, val, '#FFC107');
+            if (badge && sentiments[val]) {
+                badge.innerText = sentiments[val].text;
+                badge.style.color = sentiments[val].color;
+                badge.style.background = sentiments[val].bg;
+            }
+            if (card) {
+                card.style.borderColor = '#93c5fd';
+                card.style.background = '#ffffff';
+            }
+            if (haptic && 'vibrate' in navigator) {
+                try { navigator.vibrate(15); } catch(e) {}
+            }
+            updateOverallScore();
+        }
+
+        // Desktop mouse hover preview
         stars.forEach(star => {
             star.addEventListener('mouseenter', function() {
                 const val = parseInt(this.dataset.value);
@@ -282,20 +301,61 @@ document.addEventListener('DOMContentLoaded', function() {
             // Click to lock in value
             star.addEventListener('click', function() {
                 const val = parseInt(this.dataset.value);
-                input.value = val;
-                paintStars(stars, val, '#FFC107');
-                if (badge) {
-                    badge.innerText = sentiments[val].text;
-                    badge.style.color = sentiments[val].color;
-                    badge.style.background = sentiments[val].bg;
-                }
-                if (card) {
-                    card.style.borderColor = '#93c5fd';
-                    card.style.background = '#ffffff';
-                }
-                updateOverallScore();
+                setRating(val, true);
             });
         });
+
+        // Mobile touch & drag gesture support
+        let isTouching = false;
+        let lastVal = 0;
+
+        function getValFromTouch(touch) {
+            const touchX = touch.clientX;
+            let chosen = 1;
+            for (let i = 0; i < stars.length; i++) {
+                const sRect = stars[i].getBoundingClientRect();
+                // When finger touches or passes the left border of star
+                if (touchX >= sRect.left - 6) {
+                    chosen = i + 1;
+                }
+            }
+            return chosen;
+        }
+
+        container.addEventListener('touchstart', function(e) {
+            if (e.touches.length !== 1) return;
+            isTouching = true;
+            const touch = e.touches[0];
+            const val = getValFromTouch(touch);
+            lastVal = val;
+            setRating(val, true);
+        }, { passive: true });
+
+        container.addEventListener('touchmove', function(e) {
+            if (!isTouching || e.touches.length !== 1) return;
+            const touch = e.touches[0];
+            const cRect = container.getBoundingClientRect();
+            // Allow vertical threshold of 60px above and below stars
+            if (touch.clientY < cRect.top - 60 || touch.clientY > cRect.bottom + 60) {
+                return;
+            }
+            const val = getValFromTouch(touch);
+            if (val !== lastVal) {
+                lastVal = val;
+                setRating(val, true);
+            }
+        }, { passive: true });
+
+        const endTouchHandler = function() {
+            if (!isTouching) return;
+            isTouching = false;
+            if (lastVal > 0) {
+                setRating(lastVal, false);
+            }
+        };
+
+        container.addEventListener('touchend', endTouchHandler);
+        container.addEventListener('touchcancel', endTouchHandler);
     });
 
     function paintStars(stars, value, color) {

@@ -8,8 +8,8 @@
         <h1 class="page-title">Edit Jurusan</h1>
         <p class="page-subtitle">Perbarui data jurusan dan unggah foto/logo keahlian.</p>
     </div>
-    <a href="{{ route('admin.jurusan.index') }}" class="btn btn-outline-custom">
-        <i class="bi bi-arrow-left me-1"></i> Kembali ke Daftar
+    <a href="{{ route('admin.jurusan.index') }}" class="gk-btn-back">
+        <i class="bi bi-arrow-left"></i> Kembali ke Daftar
     </a>
 </div>
 

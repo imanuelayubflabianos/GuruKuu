@@ -4,11 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', $siteTitle ?? 'GuruKuu') - {{ $siteTitle ?? 'GuruKuu' }}</title>
-    @if(!empty($siteLogo))
-        <link rel="icon" href="{{ $siteLogo }}">
-    @else
-        <link rel="icon" href="{{ asset('favicon.ico') }}">
-    @endif
+    <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
+    <link rel="icon" type="image/png" sizes="48x48" href="{{ asset('favicon-48x48.png') }}">
+    <link rel="icon" type="image/png" sizes="96x96" href="{{ asset('favicon-96x96.png') }}">
+    <link rel="icon" type="image/png" sizes="192x192" href="{{ asset('favicon-192x192.png') }}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('apple-touch-icon.png') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
@@ -17,6 +17,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ asset('css/gurukuu-theme.css') }}">
     <style>
         html { scroll-behavior: smooth; }
         :root {
@@ -140,22 +141,20 @@
 
         .stats-section { padding: 5.5rem 0; background: var(--bg-light); }
         .stat-card-modern {
-            background: var(--bg-card);
-            border-radius: 18px;
+            background: var(--bg-card, #ffffff);
+            border-radius: 20px;
             padding: 2rem 1.5rem;
             text-align: center;
-            border: 1px solid var(--border);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(15, 23, 42, 0.07);
+            box-shadow: 0 10px 25px -4px rgba(15, 23, 42, 0.08), 0 4px 10px -2px rgba(15, 23, 42, 0.04);
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             height: 100%;
             position: relative;
         }
         .stat-card-modern:hover {
             transform: translateY(-6px);
-            box-shadow: 0 16px 32px rgba(0, 51, 102, 0.09);
-            border-color: rgba(0, 51, 102, 0.25);
+            box-shadow: 0 20px 35px -6px rgba(15, 23, 42, 0.12), 0 8px 16px -3px rgba(15, 23, 42, 0.06);
+            border-color: rgba(15, 23, 42, 0.12);
         }
         .stat-icon {
             width: 64px;
@@ -306,7 +305,7 @@
             font-size: 1.25rem;
             z-index: 1045;
             cursor: pointer;
-            box-shadow: 0 6px 20px rgba(220, 38, 38, 0.4);
+            box-shadow: 0 6px 20px rgba(38, 153, 220, 0.4);
             opacity: 0;
             visibility: hidden;
             transform: translateY(20px);
@@ -318,10 +317,10 @@
             transform: translateY(0);
         }
         .btn-floating-top:hover {
-            background: #b91c1c;
+            background: #1c60b9ff;
             color: #ffffff;
             transform: translateY(-4px);
-            box-shadow: 0 10px 25px rgba(220, 38, 38, 0.55);
+            box-shadow: 0 10px 25px rgba(38, 169, 220, 0.55);
         }
 
         .btn-primary-custom { background: var(--primary); color: white; padding: 0.75rem 1.5rem; border-radius: 8px; font-weight: 600; border: none; text-decoration: none; display: inline-block; }
@@ -342,25 +341,16 @@
 <body>
     <nav class="navbar navbar-expand-lg navbar-custom fixed-top">
         <div class="container">
-            <div class="d-flex align-items-center gap-2">
-                <a class="navbar-brand navbar-brand-custom d-flex align-items-center gap-2 m-0" href="{{ route('landing.index') }}">
-                    @if(!empty($siteLogo))
-                        <img src="{{ $siteLogo }}" alt="{{ $siteTitle ?? 'GuruKuu' }}" style="height: 36px; max-width: 45px; object-fit: contain;">
-                    @else
-                        <i class="bi bi-mortarboard-fill fs-3" style="color: {{ $siteTitleColor1 ?? '#003366' }};"></i>
-                    @endif
-                    <span class="fs-4 fw-bold">
-                        <span style="color: {{ $siteTitleColor1 ?? '#003366' }} !important;">{{ $siteTitlePart1 ?? 'Guru' }}</span><span style="color: {{ $siteTitleColor2 ?? '#FFC107' }} !important;">{{ $siteTitlePart2 ?? 'Kuu' }}</span>
-                    </span>
-                </a>
-                <a href="{{ config('services.sipintu.base_url', 'https://sipintu.smkn1bangsri.sch.id') }}" 
-                   target="_blank" rel="noopener noreferrer"
-                   class="btn btn-light border p-1 rounded-circle shadow-sm d-flex align-items-center justify-content-center"
-                   style="width: 36px; height: 36px;"
-                   title="Portal SiPintu">
-                    <img src="{{ asset('images/sipintu-logo.png') }}" alt="SiPintu" style="height: 22px; width: 22px; object-fit: contain;">
-                </a>
-            </div>
+            <a class="navbar-brand navbar-brand-custom d-flex align-items-center gap-2 m-0" href="{{ route('landing.index') }}">
+                @if(!empty($siteLogo))
+                    <img src="{{ $siteLogo }}" alt="{{ $siteTitle ?? 'GuruKuu' }}" style="height: 36px; max-width: 45px; object-fit: contain;">
+                @else
+                    <i class="bi bi-mortarboard-fill fs-3" style="color: {{ $siteTitleColor1 ?? '#003366' }};"></i>
+                @endif
+                <span class="fs-4 fw-bold">
+                    <span style="color: {{ $siteTitleColor1 ?? '#003366' }} !important;">{{ $siteTitlePart1 ?? 'Guru' }}</span><span style="color: {{ $siteTitleColor2 ?? '#FFC107' }} !important;">{{ $siteTitlePart2 ?? 'Kuu' }}</span>
+                </span>
+            </a>
             <button class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navMenu"><span class="navbar-toggler-icon"></span></button>
             <div class="collapse navbar-collapse" id="navMenu">
                 <div class="nav-menu-center">
@@ -369,7 +359,14 @@
                     <a class="nav-link nav-link-custom" data-nav-target="panduan" href="{{ route('landing.index') }}#panduan">Panduan</a>
                     <a class="nav-link nav-link-custom" data-nav-target="tentang" href="{{ route('landing.index') }}#tentang">Tentang</a>
                 </div>
-                <div class="nav-actions">
+                <div class="nav-actions d-flex align-items-center gap-2">
+                    <a href="{{ config('services.sipintu.base_url', 'https://sipintu.smkn1bangsri.sch.id') }}" 
+                       target="_blank" rel="noopener noreferrer"
+                       class="btn btn-light border p-1 rounded-circle shadow-sm d-flex align-items-center justify-content-center"
+                       style="width: 38px; height: 38px;"
+                       title="Portal SiPintu">
+                        <img src="{{ asset('images/sipintu-logo.png') }}" alt="SiPintu" style="height: 22px; width: 22px; object-fit: contain;">
+                    </a>
                     @auth
                         @php
                             $userRole = Auth::user()->role;
@@ -391,8 +388,6 @@
                             <i class="bi bi-speedometer2 me-1"></i> {{ $dashboardLabel }}
                         </a>
                         
-                        <form action="{{ route('logout') }}" method="POST" class="d-inline">
-                            @csrf
                         <form action="{{ route('logout') }}" method="POST" class="d-inline" data-confirm="Apakah Anda yakin ingin keluar dari sistem?" data-confirm-title="Konfirmasi Logout" data-confirm-btn="Ya, Logout" data-confirm-type="danger">
                             @csrf
                             <button type="submit" class="btn-logout">
@@ -406,7 +401,6 @@
                             <span>Masuk</span>
                         </a>
                     @endauth
-
                 </div>
             </div>
         </div>

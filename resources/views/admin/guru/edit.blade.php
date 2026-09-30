@@ -8,7 +8,9 @@
         <h1 class="page-title">Edit Guru</h1>
         <p class="page-subtitle">Perbarui data guru: {{ $guru->nama }}</p>
     </div>
-    <a href="{{ route('admin.guru.index') }}" class="btn btn-outline-custom"><i class="bi bi-arrow-left me-1"></i> Kembali</a>
+    <a href="{{ route('admin.guru.index') }}" class="gk-btn-back">
+        <i class="bi bi-arrow-left"></i> Kembali
+    </a>
 </div>
 
 <div class="row justify-content-center">

@@ -95,9 +95,8 @@
         <h1 class="page-title fs-4 mb-0">Percakapan dengan {{ $senderName }}</h1>
     </div>
     <div>
-        <a href="{{ route('admin.kontak.index') }}" class="btn btn-outline-custom btn-sm d-inline-flex align-items-center gap-1.5">
-            <i class="bi bi-arrow-left"></i>
-            <span>Kembali ke Daftar Pesan</span>
+        <a href="{{ route('admin.kontak.index') }}" class="gk-btn-back">
+            <i class="bi bi-arrow-left"></i> Kembali ke Daftar Pesan
         </a>
     </div>
 </div>

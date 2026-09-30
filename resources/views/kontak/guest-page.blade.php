@@ -8,7 +8,7 @@
             <div class="col-lg-9 col-xl-8">
                 
                 <div class="mb-3">
-                    <a href="{{ route('landing.index') }}" class="btn btn-outline-custom btn-sm rounded-pill px-3 py-1.5 fw-semibold d-inline-flex align-items-center gap-1.5">
+                    <a href="{{ route('landing.index') }}" class="gk-btn-back">
                         <i class="bi bi-arrow-left"></i> Kembali ke Beranda
                     </a>
                 </div>

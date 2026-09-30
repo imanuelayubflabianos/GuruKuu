@@ -8,9 +8,9 @@
         <h1 class="page-title">{{ $jurusan->nama_jurusan }} ({{ $jurusan->kode_jurusan }})</h1>
         <p class="page-subtitle mb-0">Rincian master jurusan, data rombel kelas, serta daftar seluruh siswa yang terdaftar.</p>
     </div>
-    <div class="d-flex gap-2">
-        <a href="{{ route('admin.jurusan.index') }}" class="btn btn-outline-custom">
-            <i class="bi bi-arrow-left me-1"></i> Kembali ke Data Jurusan
+    <div class="d-flex align-items-center gap-2">
+        <a href="{{ route('admin.jurusan.index') }}" class="gk-btn-back">
+            <i class="bi bi-arrow-left"></i> Kembali ke Data Jurusan
         </a>
         <a href="{{ route('admin.jurusan.edit', $jurusan) }}" class="btn btn-primary-custom">
             <i class="bi bi-pencil me-1"></i> Edit Jurusan

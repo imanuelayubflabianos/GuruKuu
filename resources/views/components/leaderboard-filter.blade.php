@@ -63,8 +63,6 @@
         <i class="bi bi-door-open-fill text-primary"></i>
         <span>Menampilkan guru yang mengajar <strong>Kelas {{ $kelasList->firstWhere('id', $kelasId)?->label_singkat }}</strong> berdasarkan persentase partisipasi siswa di kelas tersebut.</span>
     @else
-        <i class="bi bi-trophy-fill text-warning"></i>
-        <span>Menampilkan seluruh guru sekolah berdasarkan rating kepuasan evaluasi tertinggi.</span>
     @endif
 </div>
 
@@ -109,73 +107,179 @@ window.onSelectKelasChange = function(select) {
 <style>
 .gk-podium-card-revised {
     background: #ffffff;
-    border: 1px solid #e2e8f0;
-    border-radius: 20px;
-    box-shadow: 0 10px 28px -6px rgba(0, 0, 0, 0.06);
-    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    border: none !important;
+    border-radius: 22px;
+    box-shadow: 0 10px 25px -4px rgba(15, 23, 42, 0.08), 0 4px 10px -2px rgba(15, 23, 42, 0.04);
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .gk-podium-card-revised:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 16px 36px -8px rgba(0, 0, 0, 0.1);
+    transform: translateY(-5px);
+    box-shadow: 0 20px 35px -6px rgba(15, 23, 42, 0.12), 0 8px 16px -3px rgba(15, 23, 42, 0.06);
 }
 .gk-podium-card-revised.is-first {
-    border: 2px solid rgba(217, 119, 6, 0.28) !important;
-    box-shadow: 0 16px 36px -8px rgba(217, 119, 6, 0.16) !important;
+    border: none !important;
+    box-shadow: 0 20px 45px -8px rgba(15, 23, 42, 0.16), 0 8px 18px -4px rgba(15, 23, 42, 0.08) !important;
 }
-.gk-avatar-red-wrap {
-    width: 104px;
-    height: 104px;
-    border-radius: 50%;
-    background: #ef4444;
-    padding: 3px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto 0.75rem;
-    box-shadow: 0 6px 16px -3px rgba(239, 68, 68, 0.35);
+
+/* 🌟 TAMPILAN PODIUM BERTINGKAT (DASAR BAWAH SEJAJAR, TINGGI KE ATAS BERTINGKAT) */
+@media (min-width: 768px) {
+    .gk-podium-row {
+        display: flex !important;
+        align-items: flex-end !important;
+    }
+    .gk-podium-col.gk-podium-1,
+    .gk-podium-1 {
+        z-index: 10;
+        transform: none;
+    }
+    .gk-podium-col.gk-podium-2,
+    .gk-podium-2 {
+        z-index: 5;
+        transform: none;
+    }
+    .gk-podium-col.gk-podium-3,
+    .gk-podium-3 {
+        z-index: 2;
+        transform: none;
+    }
+
+    .gk-podium-col.gk-podium-1:hover .gk-podium-card-revised {
+        transform: translateY(-6px);
+        box-shadow: 0 25px 50px -8px rgba(15, 23, 42, 0.2) !important;
+    }
+    .gk-podium-col.gk-podium-2:hover .gk-podium-card-revised {
+        transform: translateY(-5px);
+        box-shadow: 0 18px 38px -6px rgba(15, 23, 42, 0.15) !important;
+    }
+    .gk-podium-col.gk-podium-3:hover .gk-podium-card-revised {
+        transform: translateY(-5px);
+        box-shadow: 0 16px 32px -6px rgba(15, 23, 42, 0.12) !important;
+    }
+
+    .gk-podium-1 .gk-podium-card-revised {
+        min-height: 480px !important;
+        border: none !important;
+        box-shadow: 0 20px 45px -8px rgba(15, 23, 42, 0.16), 0 8px 18px -4px rgba(15, 23, 42, 0.08) !important;
+    }
+    .gk-podium-2 .gk-podium-card-revised {
+        min-height: 440px !important;
+        border: none !important;
+        box-shadow: 0 14px 32px -6px rgba(15, 23, 42, 0.11), 0 6px 14px -3px rgba(15, 23, 42, 0.05) !important;
+    }
+    .gk-podium-3 .gk-podium-card-revised {
+        min-height: 410px !important;
+        border: none !important;
+        box-shadow: 0 10px 25px -4px rgba(15, 23, 42, 0.08), 0 4px 10px -2px rgba(15, 23, 42, 0.04) !important;
+    }
 }
-.gk-avatar-red-wrap img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: 50%;
+@media (max-width: 767.98px) {
+    .gk-podium-col.gk-podium-1,
+    .gk-podium-col.gk-podium-2,
+    .gk-podium-col.gk-podium-3 {
+        transform: none !important;
+    }
+}
+.gk-avatar-red-wrap,
+.gk-avatar-clean-wrap {
+    border-radius: 50% !important;
+    background: transparent !important;
+    padding: 0 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    margin: 0 auto 0.75rem !important;
+    box-shadow: 0 8px 20px -3px rgba(15, 23, 42, 0.12) !important;
+    border: none !important;
+}
+.gk-avatar-red-wrap img,
+.gk-avatar-clean-wrap img {
+    object-fit: cover !important;
+    border-radius: 50% !important;
+    border: 3px solid #ffffff !important;
+    box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.08) !important;
 }
 .gk-badge-mini-icon {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 28px;
-    height: 28px;
-    border-radius: 6px;
-    font-size: 0.8rem;
-    font-weight: 700;
-    border: 1px solid;
-    transition: transform 0.15s ease;
-    text-decoration: none;
-    line-height: 1;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 14px !important;
+    height: 14px !important;
+    min-width: 14px !important;
+    border-radius: 3px !important;
+    font-size: 0.55rem !important;
+    line-height: 1 !important;
+    border: 0.8px solid rgba(0, 0, 0, 0.08) !important;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04) !important;
+    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease !important;
+    text-decoration: none !important;
+    cursor: pointer !important;
+    vertical-align: middle !important;
+    padding: 0 !important;
+}
+.gk-badge-mini-icon i {
+    font-size: 0.52rem !important;
+    line-height: 1 !important;
 }
 .gk-badge-mini-icon:hover {
-    transform: scale(1.15);
+    transform: translateY(-1px) scale(1.4) !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15) !important;
+    z-index: 5 !important;
 }
 .gk-progress-pill {
-    background: #475569;
-    border-radius: 50px;
-    color: #ffffff;
-    font-weight: 700;
-    font-size: 0.85rem;
-    padding: 0.35rem 1rem;
-    display: inline-block;
-    min-width: 130px;
-    text-align: center;
-    position: relative;
-    overflow: hidden;
+    background: #0f172a !important;
+    border-radius: 50px !important;
+    color: #ffffff !important;
+    font-weight: 700 !important;
+    font-size: 0.75rem !important;
+    padding: 0 0.6rem !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    min-width: 120px !important;
+    max-width: 100% !important;
+    height: 23px !important;
+    line-height: 23px !important;
+    text-align: center !important;
+    position: relative !important;
+    overflow: hidden !important;
+    box-shadow: 0 2px 6px rgba(15, 23, 42, 0.12) !important;
 }
 .gk-progress-pill-fill {
     position: absolute;
     top: 0;
     left: 0;
     height: 100%;
-    background: rgba(255, 255, 255, 0.25);
     border-radius: 50px;
+    background: linear-gradient(90deg, #0284c7, #38bdf8);
+    transition: width 1.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.gk-pill-rank-1,
+.gk-pill-rank-2,
+.gk-pill-rank-3 {
+    background: #0f172a !important;
+    border: 1px solid rgba(59, 130, 246, 0.4) !important;
+}
+.gk-table-progress-wrap {
+    background: #e2e8f0 !important;
+    border: 1px solid rgba(15, 23, 42, 0.08) !important;
+    border-radius: 99px !important;
+    height: 8px !important;
+    overflow: hidden;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.06);
+}
+.gk-table-progress-fill {
+    height: 100%;
+    border-radius: 99px;
+    background: linear-gradient(90deg, #0284c7, #38bdf8) !important;
+    transition: width 0.8s ease;
+}
+.gk-bar-blue-high {
+    background: linear-gradient(90deg, #003366, #2563eb) !important;
+}
+.gk-bar-blue-mid {
+    background: linear-gradient(90deg, #0284c7, #38bdf8) !important;
+}
+.gk-bar-blue-low {
+    background: linear-gradient(90deg, #38bdf8, #93c5fd) !important;
 }
 </style>

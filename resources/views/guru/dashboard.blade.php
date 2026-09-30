@@ -39,8 +39,8 @@
                     <span class="text-muted small d-none d-sm-inline">/5</span>
                 </div>
             </div>
-            <div class="progress mt-2" style="height: 5px; border-radius: 10px;">
-                <div class="progress-bar bg-warning rounded-pill" style="width: {{ $pctKepuasan }}%;"></div>
+            <div class="progress mt-2" style="height: 5px; border-radius: 10px; background: #e2e8f0;">
+                <div class="progress-bar rounded-pill {{ $pctKepuasan >= 75 ? 'gk-bar-blue-high' : ($pctKepuasan >= 50 ? 'gk-bar-blue-mid' : 'gk-bar-blue-low') }}" style="width: {{ $pctKepuasan }}%;"></div>
             </div>
         </div>
     </div>
@@ -150,8 +150,8 @@
                                 <span class="fw-bold text-primary">{{ $revPct }}%</span>
                                 <span class="text-muted">({{ $review->total_nilai }}/25)</span>
                             </div>
-                            <div class="progress" style="height: 5px; border-radius: 10px;">
-                                <div class="progress-bar bg-primary rounded-pill" style="width: {{ $revPct }}%;"></div>
+                            <div class="progress" style="height: 5px; border-radius: 10px; background: #e2e8f0;">
+                                <div class="progress-bar rounded-pill {{ $revPct >= 75 ? 'gk-bar-blue-high' : ($revPct >= 50 ? 'gk-bar-blue-mid' : 'gk-bar-blue-low') }}" style="width: {{ $revPct }}%;"></div>
                             </div>
                         </div>
 

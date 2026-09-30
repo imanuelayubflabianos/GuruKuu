@@ -4,8 +4,8 @@
 @section('content')
 <div class="page-header mb-4">
     <div>
-        <a href="{{ route('guru.leaderboard') }}" class="btn btn-outline-custom btn-sm mb-2.5">
-            <i class="bi bi-arrow-left me-1"></i> Kembali ke Leaderboard
+        <a href="{{ route('guru.leaderboard') }}" class="gk-btn-back mb-3">
+            <i class="bi bi-arrow-left"></i> Kembali ke Leaderboard
         </a>
         <h1 class="page-title mt-1">{{ $guru->nama }}</h1>
         <p class="page-subtitle mb-0">
@@ -73,8 +73,8 @@
                         <small class="fw-bold text-dark">{{ $label }}</small>
                         <small class="text-primary fw-bold font-mono">{{ $valPct }}%</small>
                     </div>
-                    <div class="progress" style="height: 8px; border-radius: 10px; background-color: #e9ecef;">
-                        <div class="progress-bar rounded-pill" style="width: {{ $valPct }}%; background: var(--primary);"></div>
+                    <div class="progress" style="height: 8px; border-radius: 10px; background-color: #e2e8f0;">
+                        <div class="progress-bar rounded-pill {{ $valPct >= 75 ? 'gk-bar-blue-high' : ($valPct >= 50 ? 'gk-bar-blue-mid' : 'gk-bar-blue-low') }}" style="width: {{ $valPct }}%;"></div>
                     </div>
                 </div>
                 @endforeach

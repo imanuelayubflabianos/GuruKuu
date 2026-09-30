@@ -8,7 +8,7 @@
         <h1 class="page-title">Tambah Guru</h1>
         <p class="page-subtitle">Tambahkan data guru baru ke dalam sistem.</p>
     </div>
-    <a href="{{ route('admin.guru.index') }}" class="btn btn-outline-custom"><i class="bi bi-arrow-left me-1"></i> Kembali</a>
+    <a href="{{ route('admin.guru.index') }}" class="gk-btn-back"><i class="bi bi-arrow-left"></i> Kembali</a>
 </div>
 
 <div class="row justify-content-center">

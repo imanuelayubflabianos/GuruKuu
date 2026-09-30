@@ -39,11 +39,28 @@
 
                         <h5 class="fw-bold text-center mb-3" style="color: var(--text-dark);">{{ $g->nama }}</h5>
 
+                        @php
+                            $valGrid = $persen / 20;
+                            $starsGrid = round($valGrid * 2) / 2;
+                        @endphp
                         {{-- Rating Summary Bar Persen --}}
                         <div class="p-3 rounded mb-3" style="background: var(--bg-light); border: 1px solid var(--border);">
                             <div class="d-flex justify-content-between align-items-center mb-1">
                                 <small class="text-muted font-mono fw-semibold" style="font-size: 0.72rem;">RATING KEPUASAN</small>
-                                <span class="fw-bold text-primary font-mono" style="font-size: 0.9rem;">{{ $persen }}% <span class="text-warning" aria-label="{{ round($persen / 20) }} dari 5 bintang">@for($star = 1; $star <= 5; $star++){{ $star <= round($persen / 20) ? '★' : '☆' }}@endfor</span></span>
+                                <span class="fw-bold text-primary font-mono d-flex align-items-center gap-1.5" style="font-size: 0.9rem;">
+                                    {{ $persen }}%
+                                    <span class="text-warning" style="font-size: 0.78rem;">
+                                        @for($i = 1; $i <= 5; $i++)
+                                            @if($starsGrid >= $i)
+                                                <i class="bi bi-star-fill"></i>
+                                            @elseif($starsGrid >= ($i - 0.5))
+                                                <i class="bi bi-star-half"></i>
+                                            @else
+                                                <i class="bi bi-star text-muted opacity-25"></i>
+                                            @endif
+                                        @endfor
+                                    </span>
+                                </span>
                             </div>
                             <div class="progress" style="height: 7px; background-color: #e2e8f0; border-radius: 10px;">
                                 <div class="progress-bar bg-primary rounded-pill" role="progressbar" style="width: {{ $persen }}%;" aria-valuenow="{{ $persen }}" aria-valuemin="0" aria-valuemax="100"></div>

@@ -539,7 +539,7 @@ html.dark-theme body {
    giant vertical scrolling on mobile phones
    =================================================== */
 .gk-podium-row {
-    align-items: flex-end;
+    align-items: flex-end !important;
 }
 
 .gk-podium-card {
@@ -551,10 +551,37 @@ html.dark-theme body {
     transform: translateY(-3px);
 }
 
+@media (min-width: 768px) {
+    .gk-podium-col.gk-podium-1,
+    .gk-podium-1 {
+        z-index: 5;
+        transform: none;
+    }
+    .gk-podium-col.gk-podium-2,
+    .gk-podium-2 {
+        z-index: 3;
+        transform: none;
+    }
+    .gk-podium-col.gk-podium-3,
+    .gk-podium-3 {
+        z-index: 1;
+        transform: none;
+    }
+    .gk-podium-1 .gk-podium-gold {
+        min-height: 290px;
+    }
+    .gk-podium-2 .gk-podium-silver {
+        min-height: 260px;
+    }
+    .gk-podium-3 .gk-podium-bronze {
+        min-height: 235px;
+    }
+}
+
 /* Full container color podiums */
 .gk-podium-gold {
     background: linear-gradient(145deg, #fffbeb 0%, #fef3c7 45%, #fde68a 100%) !important;
-    border: 1.5px solid rgba(245, 158, 11, 0.45) !important;
+    border: none !important;
     box-shadow: 0 14px 34px rgba(245, 158, 11, 0.22) !important;
 }
 .gk-podium-gold .gk-podium-nama,
@@ -581,7 +608,7 @@ html.dark-theme body {
 
 .gk-podium-silver {
     background: linear-gradient(145deg, #f8fafc 0%, #f1f5f9 50%, #e2e8f0 100%) !important;
-    border: 1.5px solid rgba(148, 163, 184, 0.5) !important;
+    border: none !important;
     box-shadow: 0 8px 24px rgba(100, 116, 139, 0.12) !important;
 }
 .gk-podium-silver .gk-podium-nama,
@@ -608,7 +635,7 @@ html.dark-theme body {
 
 .gk-podium-bronze {
     background: linear-gradient(145deg, #fff7ed 0%, #ffedd5 50%, #fed7aa 100%) !important;
-    border: 1.5px solid rgba(217, 119, 6, 0.4) !important;
+    border: none !important;
     box-shadow: 0 8px 24px rgba(217, 119, 6, 0.14) !important;
 }
 .gk-podium-bronze .gk-podium-nama,
@@ -1022,4 +1049,250 @@ body:not(.role-admin) .stat-card-modern:hover {
     border-radius: 10px;
     background-color: #f59e0b;
 }
+
+.gk-badge-mini-icon {
+    width: 14px !important;
+    height: 14px !important;
+    min-width: 14px !important;
+    border-radius: 3px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 0.55rem !important;
+    line-height: 1 !important;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04) !important;
+    border: 0.8px solid rgba(0, 0, 0, 0.08) !important;
+    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease !important;
+    cursor: pointer !important;
+    vertical-align: middle !important;
+    padding: 0 !important;
+}
+.gk-badge-mini-icon i {
+    font-size: 0.52rem !important;
+    line-height: 1 !important;
+}
+.gk-badge-mini-icon:hover {
+    transform: translateY(-1px) scale(1.4) !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15) !important;
+    z-index: 5 !important;
+}
+
+.gk-badges-wrap {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 3px !important;
+    margin: 2px 0 !important;
+    line-height: 1 !important;
+}
+
+/* UNIFIED PODIUM PROFILE BUTTON (TOP 1, 2, 3 - PUTIH BORDER BIRU TEKS BIRU, SUDUT LEMBUT / 8px) */
+.gk-btn-podium-profile {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 0.4rem !important;
+    width: 100% !important;
+    padding: 0.48rem 1rem !important;
+    font-size: 0.85rem !important;
+    font-weight: 600 !important;
+    background-color: #ffffff !important;
+    color: var(--primary, #003366) !important;
+    border: 1.5px solid #93c5fd !important;
+    border-radius: 8px !important;
+    text-decoration: none !important;
+    box-shadow: 0 2px 6px rgba(0, 51, 102, 0.06) !important;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    cursor: pointer !important;
+    line-height: 1.4 !important;
+}
+
+.gk-btn-podium-profile:hover {
+    background-color: #f0f7ff !important;
+    color: var(--primary, #003366) !important;
+    border-color: var(--primary, #003366) !important;
+    box-shadow: 0 4px 12px rgba(0, 51, 102, 0.12) !important;
+    transform: translateY(-2px) !important;
+}
+
+.gk-btn-podium-profile i {
+    font-size: 0.92rem !important;
+    color: var(--primary, #003366) !important;
+    transition: transform 0.2s ease !important;
+}
+
+.gk-btn-podium-profile:hover i {
+    transform: scale(1.1) !important;
+}
+
+[data-bs-theme="dark"] .gk-btn-podium-profile,
+[data-theme="dark"] .gk-btn-podium-profile,
+.dark-theme .gk-btn-podium-profile {
+    background-color: #1e293b !important;
+    color: #38bdf8 !important;
+    border-color: rgba(56, 189, 248, 0.35) !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3) !important;
+}
+
+[data-bs-theme="dark"] .gk-btn-podium-profile:hover,
+[data-theme="dark"] .gk-btn-podium-profile:hover,
+.dark-theme .gk-btn-podium-profile:hover {
+    background-color: rgba(56, 189, 248, 0.12) !important;
+    border-color: #38bdf8 !important;
+    color: #38bdf8 !important;
+}
+
+[data-bs-theme="dark"] .gk-btn-podium-profile i,
+[data-theme="dark"] .gk-btn-podium-profile i,
+.dark-theme .gk-btn-podium-profile i {
+    color: #38bdf8 !important;
+}
+
+
+/* BLUE SPECTRUM PERCENTAGE BARS (SEMUA BIRU, TINGGI=PEKAT, RENDAH=MUDA) */
+.gk-bar-blue-high {
+    background: linear-gradient(90deg, #003366, #2563eb) !important;
+}
+.gk-bar-blue-mid {
+    background: linear-gradient(90deg, #0284c7, #38bdf8) !important;
+}
+.gk-bar-blue-low {
+    background: linear-gradient(90deg, #38bdf8, #93c5fd) !important;
+}
+
+/* COMPACT PODIUM PROGRESS PILL */
+.gk-progress-pill {
+    background: #0f172a !important;
+    border-radius: 50px !important;
+    color: #ffffff !important;
+    font-weight: 700 !important;
+    font-size: 0.75rem !important;
+    padding: 0 0.6rem !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    min-width: 120px !important;
+    max-width: 100% !important;
+    height: 23px !important;
+    line-height: 23px !important;
+    text-align: center !important;
+    position: relative !important;
+    overflow: hidden !important;
+    box-shadow: 0 2px 6px rgba(15, 23, 42, 0.12) !important;
+}
+
+.gk-progress-pill-fill {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    border-radius: 50px;
+    background: linear-gradient(90deg, #0284c7, #38bdf8);
+    transition: width 1.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.gk-table-progress-fill {
+    height: 100%;
+    border-radius: 99px;
+    background: linear-gradient(90deg, #0284c7, #38bdf8);
+    transition: width 0.8s ease;
+}
+
+/* TABLE VERTICAL ALIGNMENT & RANKING BADGE */
+.table-custom tbody tr td,
+.table tbody tr td,
+.table-custom thead tr th,
+.table thead tr th,
+.table > :not(caption) > * > * {
+    vertical-align: middle !important;
+}
+
+.gk-rank-badge {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    min-width: 32px !important;
+    height: 26px !important;
+    padding: 0 6px !important;
+    border-radius: 6px !important;
+    font-size: 0.78rem !important;
+    font-weight: 700 !important;
+    background: var(--bg-light, #f1f5f9) !important;
+    color: var(--text-dark, #0f172a) !important;
+    border: 1px solid var(--border, #e2e8f0) !important;
+    margin: 0 auto !important;
+    line-height: 1 !important;
+}
+
+.gk-rank-medal {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    min-width: 32px !important;
+    height: 26px !important;
+    font-size: 1.25rem !important;
+    line-height: 1 !important;
+    margin: 0 auto !important;
+}
+
+/* UNIFIED GLOBAL BACK BUTTON (KONSISTEN SEMUA HALAMAN) */
+.gk-btn-back {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+    background: #ffffff !important;
+    color: #1e293b !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 50px !important;
+    padding: 0.45rem 1.05rem !important;
+    font-size: 0.85rem !important;
+    font-weight: 600 !important;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08) !important;
+    text-decoration: none !important;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    cursor: pointer !important;
+    line-height: 1.4 !important;
+}
+
+.gk-btn-back:hover {
+    background: #f8fafc !important;
+    color: #003366 !important;
+    border-color: #cbd5e1 !important;
+    transform: translateX(-3px) !important;
+    box-shadow: 0 4px 14px rgba(15, 23, 42, 0.12) !important;
+}
+
+.gk-btn-back i {
+    font-size: 0.95rem !important;
+    transition: transform 0.2s ease !important;
+    color: #003366 !important;
+}
+
+.gk-btn-back:hover i {
+    transform: translateX(-2px) !important;
+}
+
+/* Dark mode support for back button */
+[data-bs-theme="dark"] .gk-btn-back,
+[data-theme="dark"] .gk-btn-back,
+.dark-theme .gk-btn-back {
+    background: #1e293b !important;
+    color: #f1f5f9 !important;
+    border-color: #334155 !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25) !important;
+}
+
+[data-bs-theme="dark"] .gk-btn-back:hover,
+[data-theme="dark"] .gk-btn-back:hover,
+.dark-theme .gk-btn-back:hover {
+    background: #334155 !important;
+    color: #38bdf8 !important;
+    border-color: #475569 !important;
+}
+
+[data-bs-theme="dark"] .gk-btn-back i,
+[data-theme="dark"] .gk-btn-back i,
+.dark-theme .gk-btn-back i {
+    color: #38bdf8 !important;
+}
+
 
