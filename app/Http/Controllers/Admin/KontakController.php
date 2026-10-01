@@ -19,7 +19,7 @@ class KontakController extends Controller
 
     public function reply(Request $request, Kontak $kontak)
     {
-        $request->validate(['balasan' => 'required|string|max:100'], ['balasan.max' => 'Balasan administrator melebihi batas maksimal 100 karakter.']);
+        $request->validate(['balasan' => 'required|string|max:255'], ['balasan.max' => 'Balasan administrator melebihi batas maksimal 255 karakter.']);
 
         if (ProfanityFilterService::containsLink($request->balasan)) {
             return back()->withInput()->with('error', 'Balasan tidak boleh mengandung tautan / link URL luar demi keamanan.');
@@ -35,7 +35,7 @@ class KontakController extends Controller
 
     public function editReply(Request $request, Kontak $kontak)
     {
-        $request->validate(['balasan' => 'required|string|max:100'], ['balasan.max' => 'Balasan administrator melebihi batas maksimal 100 karakter.']);
+        $request->validate(['balasan' => 'required|string|max:255'], ['balasan.max' => 'Balasan administrator melebihi batas maksimal 255 karakter.']);
 
         if (ProfanityFilterService::containsLink($request->balasan)) {
             return back()->withInput()->with('error', 'Balasan tidak boleh mengandung tautan / link URL luar demi keamanan.');
@@ -104,10 +104,10 @@ class KontakController extends Controller
     public function sendChatMessage(Request $request, string $identifier)
     {
         $request->validate([
-            'balasan' => 'required|string|min:2|max:100',
+            'balasan' => 'required|string|min:2|max:255',
         ], [
             'balasan.required' => 'Isi balasan tidak boleh kosong.',
-            'balasan.max' => 'Balasan melebihi batas maksimal 100 karakter.',
+            'balasan.max' => 'Balasan melebihi batas maksimal 255 karakter.',
         ]);
 
         if (ProfanityFilterService::containsLink($request->balasan)) {

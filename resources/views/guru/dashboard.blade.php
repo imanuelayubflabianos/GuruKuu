@@ -2,219 +2,374 @@
 @section('title', 'Dashboard Guru')
 
 @section('content')
-<div class="page-header d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+<style>
+    /* Styling Terpadu Tema GuruKuu (Biru Tua #003366 & Orange/Amber #f59e0b) */
+    .gk-dash-btn-primary {
+        background: #003366;
+        color: #ffffff !important;
+        border: 1px solid #003366;
+        padding: 0.45rem 1.1rem;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.82rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        text-decoration: none;
+        box-shadow: 0 2px 5px rgba(0, 51, 102, 0.15);
+        transition: all 0.2s ease-in-out;
+    }
+    .gk-dash-btn-primary:hover {
+        background: #002244;
+        border-color: #002244;
+        color: #ffffff !important;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 10px rgba(0, 51, 102, 0.25);
+    }
+
+    .gk-dash-btn-outline {
+        background: #ffffff;
+        color: #003366 !important;
+        border: 1px solid rgba(0, 51, 102, 0.2);
+        padding: 0.45rem 1.1rem;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.82rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        text-decoration: none;
+        transition: all 0.2s ease-in-out;
+    }
+    .gk-dash-btn-outline:hover {
+        background: rgba(0, 51, 102, 0.05);
+        border-color: #003366;
+        color: #003366 !important;
+        transform: translateY(-1px);
+    }
+
+    .gk-metric-card {
+        background: #ffffff;
+        border: 1px solid rgba(0, 51, 102, 0.1);
+        border-radius: 14px;
+        padding: 1.25rem 1.35rem;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .gk-metric-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 18px rgba(0, 51, 102, 0.06);
+    }
+
+    /* Notifikasi / Badge Ulasan Masuk */
+    .gk-notif-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        background: #f0f7ff;
+        border: 1px solid rgba(0, 51, 102, 0.15);
+        padding: 0.25rem 0.65rem;
+        border-radius: 50rem;
+        color: #003366;
+        font-weight: 600;
+        font-size: 0.75rem;
+    }
+    .gk-notif-counter {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: #003366;
+        color: #ffffff;
+        font-size: 0.7rem;
+        font-weight: 700;
+        min-width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        padding: 0 4px;
+    }
+
+    /* Kotak Kritik & Saran Sesuai Standar Tema (Kuning & Biru) */
+    .gk-box-kritik {
+        background: #fffbeb;
+        border-left: 3.5px solid #f59e0b;
+        border-radius: 8px;
+        padding: 0.65rem 0.85rem;
+        line-height: 1.5;
+    }
+    .gk-box-saran {
+        background: #f0f9ff;
+        border-left: 3.5px solid #0284c7;
+        border-radius: 8px;
+        padding: 0.65rem 0.85rem;
+        line-height: 1.5;
+    }
+
+    /* Scrollbar Halus untuk Feed Ulasan */
+    .gk-feed-scroll::-webkit-scrollbar {
+        width: 5px;
+    }
+    .gk-feed-scroll::-webkit-scrollbar-track {
+        background: #f8fafc;
+        border-radius: 10px;
+    }
+    .gk-feed-scroll::-webkit-scrollbar-thumb {
+        background: rgba(0, 51, 102, 0.15);
+        border-radius: 10px;
+    }
+    .gk-feed-scroll::-webkit-scrollbar-thumb:hover {
+        background: rgba(0, 51, 102, 0.3);
+    }
+
+    /* Paginasi Minimalis Tema GuruKuu */
+    .gk-dash-pagination nav {
+        display: flex;
+        justify-content: center;
+        width: 100%;
+    }
+    .gk-dash-pagination .pagination {
+        margin-bottom: 0;
+        gap: 3px;
+    }
+    .gk-dash-pagination .page-link {
+        padding: 0.2rem 0.55rem;
+        font-size: 0.72rem;
+        border-radius: 6px !important;
+        color: #003366;
+        border: 1px solid rgba(0, 51, 102, 0.15);
+        background: #ffffff;
+    }
+    .gk-dash-pagination .page-item.active .page-link {
+        background: #003366;
+        border-color: #003366;
+        color: #ffffff !important;
+        font-weight: 700;
+    }
+    .gk-dash-pagination .page-item.disabled .page-link {
+        opacity: 0.5;
+        background: #f8fafc;
+    }
+</style>
+
+{{-- PAGE HEADER DENGAN SELAMAT DATANG, NAMA GURU & EMOJI TANGAN 👋 --}}
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
     <div>
-        <div class="page-label">PORTAL GURU</div>
-        <h1 class="page-title">Selamat Datang, {{ $guru->nama }}! 👋</h1>
-        <p class="page-subtitle">Berikut ringkasan evaluasi kinerja dan aspirasi siswa pada periode {{ $periodeAktif->nama_periode ?? 'Aktif' }}.</p>
+        <div class="page-label text-uppercase" style="color: #003366; font-weight: 700; letter-spacing: 1.2px; font-size: 0.75rem;">PORTAL GURU</div>
+        <h1 class="page-title mb-1" style="color: #003366; font-weight: 800; font-size: 1.75rem;">Selamat Datang, {{ $guru->nama }}! 👋</h1>
+        <p class="text-muted mb-0 small">Berikut ringkasan evaluasi kinerja dan aspirasi siswa pada periode aktif: <strong class="text-dark">{{ $periodeAktif->nama_periode ?? 'Aktif' }}</strong>.</p>
     </div>
-    <div class="d-flex gap-2 flex-wrap">
-        <a href="{{ route('guru.leaderboard') }}" class="btn btn-outline-custom rounded-pill px-3 py-2 shadow-sm">
-            <i class="bi bi-trophy me-1 text-warning"></i> Lihat Leaderboard
-        </a>
-        <a href="{{ route('guru.ulasan') }}" class="btn btn-primary-custom rounded-pill px-3 py-2 shadow-sm">
-            <i class="bi bi-chat-square-quote me-1"></i> Kelola Ulasan Siswa
+    <div>
+        <a href="{{ route('guru.leaderboard') }}" class="gk-dash-btn-outline">
+            Lihat Leaderboard
         </a>
     </div>
 </div>
 
-{{-- STATISTIK UTAMA (FROSTED GLASS CARDS) --}}
-<div class="row g-2 g-md-4 mb-3 mb-md-4">
-    {{-- Rata-rata Nilai --}}
-    <div class="col-4 col-md-4">
-        <div class="card-glass p-2.5 p-md-4 h-100 d-flex flex-column justify-content-between">
-            <div>
-                <div class="d-flex align-items-center justify-content-between mb-2">
-                    <div class="rounded-3 d-flex align-items-center justify-content-center" style="width: 38px; height: 38px; background: rgba(245, 158, 11, 0.12); color: #d97706;">
-                        <i class="bi bi-award-fill fs-5"></i>
+{{-- LAYOUT 2 KOLOM PROPORSIONAL, SEIMBANG TINGGINYA & RAPI --}}
+<div class="row g-4 align-items-start">
+    {{-- KOLOM KIRI (7 Kolom): PERIODE AKTIF & STATISTIK EVALUASI --}}
+    <div class="col-lg-7">
+        <div class="d-flex flex-column gap-3">
+            {{-- STATUS PERIODE PEMBELAJARAN (POSISI DI ATAS STATISTIK EVALUASI) --}}
+            <div class="gk-metric-card" style="padding: 1rem 1.25rem;">
+                <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                    <div class="d-flex align-items-center gap-2.5">
+                        <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 36px; height: 36px; background: rgba(0, 51, 102, 0.08); color: #003366; font-size: 1rem; flex-shrink: 0;">
+                            <i class="bi bi-calendar2-check"></i>
+                        </div>
+                        <div>
+                            <div class="text-muted text-uppercase fw-semibold" style="font-size: 0.68rem; letter-spacing: 0.8px;">STATUS PERIODE PEMBELAJARAN</div>
+                            <div class="fw-bold text-dark" style="font-size: 0.95rem;">{{ $periodeAktif->nama_periode ?? 'Periode Aktif' }}</div>
+                        </div>
                     </div>
-                    @php $pctKepuasan = round((($guru->rata_rata_nilai ?? 0) / 5) * 100); @endphp
-                    <span class="badge rounded-pill d-none d-sm-inline" style="background: rgba(245, 158, 11, 0.12); color: #d97706; font-size: 0.72rem; font-weight: 600;">
-                        {{ $pctKepuasan }}%
-                    </span>
-                </div>
-                <div class="text-muted small font-mono" style="font-size: 0.62rem; letter-spacing: 0.5px;">RATA-RATA</div>
-                <div class="d-flex align-items-baseline gap-1 mt-0.5">
-                    <h3 class="fw-bold mb-0 text-dark" style="font-feature-settings: 'tnum'; font-size: 1.5rem;">{{ number_format($guru->rata_rata_nilai ?? 0, 2) }}</h3>
-                    <span class="text-muted small d-none d-sm-inline">/5</span>
-                </div>
-            </div>
-            <div class="progress mt-2" style="height: 5px; border-radius: 10px; background: #e2e8f0;">
-                <div class="progress-bar rounded-pill {{ $pctKepuasan >= 75 ? 'gk-bar-blue-high' : ($pctKepuasan >= 50 ? 'gk-bar-blue-mid' : 'gk-bar-blue-low') }}" style="width: {{ $pctKepuasan }}%;"></div>
-            </div>
-        </div>
-    </div>
-
-    {{-- Total Penilaian Siswa --}}
-    <div class="col-4 col-md-4">
-        <div class="card-glass p-2.5 p-md-4 h-100 d-flex flex-column justify-content-between">
-            <div>
-                <div class="d-flex align-items-center justify-content-between mb-2">
-                    <div class="rounded-3 d-flex align-items-center justify-content-center" style="width: 38px; height: 38px; background: rgba(0, 168, 107, 0.1); color: var(--accent);">
-                        <i class="bi bi-people-fill fs-5"></i>
-                    </div>
-                    <span class="badge rounded-pill d-none d-sm-inline" style="background: rgba(0, 168, 107, 0.1); color: var(--accent); font-size: 0.72rem; font-weight: 600;">
-                        Siswa
-                    </span>
-                </div>
-                <div class="text-muted small font-mono" style="font-size: 0.62rem; letter-spacing: 0.5px;">EVALUASI</div>
-                <div class="fw-bold text-dark mt-0.5" style="font-size: 1.5rem; font-feature-settings: 'tnum'; line-height: 1.1;">{{ $guru->total_penilaian ?? 0 }}</div>
-            </div>
-            <small class="text-muted font-mono d-none d-md-block mt-1" style="font-size: 0.72rem;">Siswa yang telah menilai</small>
-        </div>
-    </div>
-
-    {{-- Total Feedback Masuk --}}
-    <div class="col-4 col-md-4">
-        <div class="card-glass p-2.5 p-md-4 h-100 d-flex flex-column justify-content-between">
-            <div>
-                <div class="d-flex align-items-center justify-content-between mb-2">
-                    <div class="rounded-3 d-flex align-items-center justify-content-center" style="width: 38px; height: 38px; background: rgba(236, 72, 153, 0.1); color: #ec4899;">
-                        <i class="bi bi-chat-quote-fill fs-5"></i>
-                    </div>
-                    <span class="badge rounded-pill d-none d-sm-inline" style="background: rgba(236, 72, 153, 0.1); color: #ec4899; font-size: 0.72rem; font-weight: 600;">
-                        Saran
-                    </span>
-                </div>
-                <div class="text-muted small font-mono" style="font-size: 0.62rem; letter-spacing: 0.5px;">FEEDBACK</div>
-                <div class="fw-bold text-dark mt-0.5" style="font-size: 1.5rem; font-feature-settings: 'tnum'; line-height: 1.1;">{{ ($ulasanTerbaru ?? collect())->count() }}</div>
-            </div>
-            <small class="text-muted font-mono d-none d-md-block mt-1" style="font-size: 0.72rem;">Aspirasi & masukan</small>
-        </div>
-    </div>
-</div>
-
-{{-- DETAIL PROFIL GURU & INFORMASI AKUN (FROSTED GLASS PANEL) --}}
-<div class="card-glass p-4 mb-4">
-    <div class="row align-items-center">
-        <div class="col-md-8">
-            <div class="d-flex align-items-center">
-                <img src="{{ $guru->photo_url }}" alt="{{ $guru->nama }}" class="rounded-circle me-3 shadow-sm flex-shrink-0" style="width: 64px; height: 64px; min-width: 64px; min-height: 64px; aspect-ratio: 1 / 1; object-fit: cover; border: 3px solid var(--border); flex-shrink: 0;" onerror="this.src='https://ui-avatars.com/api/?name={{ urlencode($guru->nama) }}&background=003366&color=fff'">
-                <div>
-                    <h4 class="fw-bold mb-1 text-dark">{{ $guru->nama }}</h4>
-                    <div class="text-muted small font-mono d-flex align-items-center gap-2 flex-wrap">
-                        <span class="badge rounded-pill px-2.5 py-1" style="background: var(--bg-light); color: var(--primary); border: 1px solid var(--border);">
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="badge rounded-pill px-3 py-1.5" style="background: rgba(0, 51, 102, 0.08); color: #003366; font-size: 0.75rem; font-weight: 700; border: 1px solid rgba(0, 51, 102, 0.12);">
                             {{ strtoupper($guru->jurusan?->nama_jurusan ?? 'UMUM') }}
                         </span>
-                        <span>{{ $guru->kategori_label }}</span>
+                        <span class="badge rounded-pill px-3 py-1.5" style="background: rgba(245, 158, 11, 0.12); color: #b45309; font-size: 0.75rem; font-weight: 700; border: 1px solid rgba(245, 158, 11, 0.2);">
+                            {{ $guru->kategori_label }}
+                        </span>
                     </div>
                 </div>
             </div>
-        </div>
-        <div class="col-md-4 text-md-end mt-3 mt-md-0">
-            <a href="{{ route('guru.pengaturan') }}" class="btn btn-outline-custom rounded-pill px-3 py-1.5 shadow-sm">
-                <i class="bi bi-gear me-1"></i> Pengaturan Akun
-            </a>
-        </div>
-    </div>
-</div>
 
-{{-- SECTION FEEDBACK / ULASAN SISWA --}}
-<div class="card-glass p-4">
-    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
-        <div>
-            <h5 class="fw-bold mb-0 text-dark">
-                <i class="bi bi-chat-heart-fill me-2 text-danger"></i>Ulasan & Aspirasi Siswa Terbaru
-            </h5>
-            <small class="text-muted">Identitas siswa 100% rahasia & anonim demi objektivitas evaluasi.</small>
-        </div>
-        <div class="d-flex align-items-center gap-2">
-            <span class="badge rounded-pill px-3 py-1.5" style="background: rgba(0, 51, 102, 0.08); color: var(--primary); border: 1px solid var(--border);">
-                {{ ($ulasanTerbaru ?? collect())->count() }} Ulasan Masuk
-            </span>
-            <a href="{{ route('guru.ulasan') }}" class="btn btn-sm btn-primary-custom rounded-pill px-3 py-1.5">
-                <i class="bi bi-chat-square-quote me-1"></i> Kelola di Menu Ulasan
-            </a>
-        </div>
-    </div>
+            {{-- GRID KARTU METRIK: RATA-RATA & TOTAL EVALUASI --}}
+            <div class="row g-3">
+                {{-- Kartu 1: Rata-Rata Nilai --}}
+                <div class="col-12 col-sm-6">
+                    <div class="gk-metric-card h-100 d-flex flex-column justify-content-between">
+                        <div>
+                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                <span class="fw-bold text-uppercase" style="font-size: 0.72rem; letter-spacing: 0.8px; color: #b45309;">RATA-RATA EVALUASI</span>
+                                @php $pctKepuasan = round((($guru->rata_rata_nilai ?? 0) / 5) * 100); @endphp
+                                <span class="badge rounded-pill px-2.5 py-1" style="background: rgba(245, 158, 11, 0.12); color: #b45309; font-weight: 700; font-size: 0.75rem; border: 1px solid rgba(245, 158, 11, 0.2);">
+                                    {{ $pctKepuasan }}% Kepuasan
+                                </span>
+                            </div>
+                            <div class="d-flex align-items-baseline gap-1 mt-2">
+                                <h2 class="fw-bold mb-0 text-dark" style="font-feature-settings: 'tnum'; font-size: 2.1rem; line-height: 1;">{{ number_format($guru->rata_rata_nilai ?? 0, 2) }}</h2>
+                                <span class="text-muted fs-6">/ 5.0</span>
+                            </div>
+                        </div>
+                        <div class="mt-3 pt-1">
+                            <div class="progress" style="height: 6px; border-radius: 10px; background: #e2e8f0;">
+                                <div class="progress-bar rounded-pill" style="width: {{ $pctKepuasan }}%; background: linear-gradient(90deg, #f59e0b, #d97706);"></div>
+                            </div>
+                            <div class="text-muted small mt-1.5" style="font-size: 0.75rem;">Skor kumulatif penilaian siswa</div>
+                        </div>
+                    </div>
+                </div>
 
-    @if(!empty($ulasanTerbaru) && $ulasanTerbaru->isNotEmpty())
-        <div class="row g-3">
-            @foreach($ulasanTerbaru->take(4) as $review)
-            <div class="col-md-6">
-                <div class="p-3.5 rounded-3 border h-100 d-flex flex-column justify-content-between" style="background: var(--bg-card); border-color: var(--border) !important;">
+                {{-- Kartu 2: Total Penilaian Siswa --}}
+                <div class="col-12 col-sm-6">
+                    <div class="gk-metric-card h-100 d-flex flex-column justify-content-between">
+                        <div>
+                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                <span class="fw-bold text-uppercase" style="font-size: 0.72rem; letter-spacing: 0.8px; color: #003366;">TOTAL EVALUASI</span>
+                                <span class="badge rounded-pill px-2.5 py-1" style="background: rgba(0, 51, 102, 0.08); color: #003366; font-weight: 700; font-size: 0.75rem; border: 1px solid rgba(0, 51, 102, 0.12);">
+                                    Responden
+                                </span>
+                            </div>
+                            <div class="d-flex align-items-baseline gap-1 mt-2">
+                                <h2 class="fw-bold mb-0 text-dark" style="font-feature-settings: 'tnum'; font-size: 2.1rem; line-height: 1;">{{ $guru->total_penilaian ?? 0 }}</h2>
+                                <span class="text-muted fs-6">Siswa</span>
+                            </div>
+                        </div>
+                        <div class="mt-3 pt-1">
+                            <div class="text-muted small" style="font-size: 0.78rem; line-height: 1.4;">
+                                Siswa yang telah selesai mengisi evaluasi pengajaran pada periode ini.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Kartu 3: Total Aspirasi & Masukan Tertulis --}}
+            <div class="gk-metric-card">
+                <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2">
                     <div>
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <span class="badge rounded-pill px-2.5 py-1" style="background: rgba(0, 51, 102, 0.06); color: var(--primary); font-size: 0.72rem; border: 1px solid var(--border);">
-                                <i class="bi bi-shield-lock-fill me-1 text-success"></i> Siswa (Anonim)
-                            </span>
-                            <small class="text-muted font-mono" style="font-size: 0.72rem;">
-                                {{ $review->created_at->format('d M Y, H:i') }}
-                            </small>
+                        <span class="fw-bold text-uppercase" style="font-size: 0.72rem; letter-spacing: 0.8px; color: #0284c7;">ASPIRASI & MASUKAN</span>
+                        <div class="d-flex align-items-baseline gap-2 mt-1">
+                            <h3 class="fw-bold mb-0 text-dark" style="font-size: 1.85rem; line-height: 1;">{{ $totalUlasanCount ?? ($ulasanTerbaru->total() ?? 0) }}</h3>
+                            <span class="text-muted small">Ulasan Masuk</span>
                         </div>
+                    </div>
+                    <span class="badge rounded-pill px-3 py-1.5" style="background: rgba(2, 132, 199, 0.1); color: #0284c7; font-weight: 700; font-size: 0.75rem; border: 1px solid rgba(2, 132, 199, 0.2);">
+                        Kritik & Saran Tertulis
+                    </span>
+                </div>
+                <p class="text-muted small mb-0 mt-2" style="font-size: 0.8rem; line-height: 1.5;">
+                    Ulasan siswa disampaikan secara 100% anonim dan objektif demi menjaga kenyamanan proses refleksi serta peningkatan kualitas pengajaran Anda.
+                </p>
+            </div>
+        </div>
+    </div>
 
-                        {{-- Rating Persen & Bar --}}
-                        @php $revPct = round(($review->rata_rata_evaluasi / 5) * 100); @endphp
-                        <div class="mb-2" style="max-width: 220px;">
-                            <div class="d-flex justify-content-between align-items-center mb-1 font-mono" style="font-size: 0.75rem;">
-                                <span class="fw-bold text-primary">{{ $revPct }}%</span>
-                                <span class="text-muted">({{ $review->total_nilai }}/25)</span>
-                            </div>
-                            <div class="progress" style="height: 5px; border-radius: 10px; background: #e2e8f0;">
-                                <div class="progress-bar rounded-pill {{ $revPct >= 75 ? 'gk-bar-blue-high' : ($revPct >= 50 ? 'gk-bar-blue-mid' : 'gk-bar-blue-low') }}" style="width: {{ $revPct }}%;"></div>
-                            </div>
-                        </div>
+    {{-- KOLOM KANAN (5 Kolom): FEED ULASAN SISWA (RINGKAS, TINGGI SEIMBANG DENGAN KIRI, DAPAT DI-SCROLL & DIPAGINASI) --}}
+    <div class="col-lg-5">
+        <div class="gk-metric-card d-flex flex-column" style="padding: 1.25rem;">
+            {{-- Header Feed Ulasan --}}
+            <div class="d-flex justify-content-between align-items-center mb-3 pb-2.5 border-bottom flex-wrap gap-2">
+                <div>
+                    <h6 class="fw-bold mb-0 text-dark" style="color: #003366 !important; font-size: 1rem;">
+                        Ulasan Siswa
+                    </h6>
+                    <small class="text-muted" style="font-size: 0.72rem;">Feed aspirasi tegak & anonim</small>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                    <div class="gk-notif-pill">
+                        <span class="gk-notif-counter">{{ $totalUlasanCount ?? ($ulasanTerbaru->total() ?? 0) }}</span>
+                        <span>Masuk</span>
+                    </div>
+                    <a href="{{ route('guru.ulasan') }}" class="gk-dash-btn-primary">
+                        Kelola
+                    </a>
+                </div>
+            </div>
 
-                        @if($review->is_censored)
-                            <div class="mb-2 p-2.5 rounded-3 border text-muted fst-italic small" style="background: var(--bg-light); border-color: var(--border) !important;">
-                                <i class="bi bi-shield-exclamation text-warning me-1"></i> Ulasan ini disembunyikan oleh Administrator sekolah.
-                            </div>
-                        @else
-                            @if($review->kritik)
-                                <div class="mb-2">
-                                    <small class="text-danger fw-bold d-block mb-1 font-mono" style="font-size: 0.7rem;"><i class="bi bi-chat-left-dots me-1"></i>KRITIK / CATATAN:</small>
-                                    <p class="mb-0 small text-dark p-2 rounded-3 border" style="background: rgba(220, 53, 69, 0.04); border-color: rgba(220, 53, 69, 0.2) !important;">{{ Str::limit($review->kritik, 120) }}</p>
-                                </div>
-                            @endif
-
-                            @if($review->saran)
-                                <div class="mb-2">
-                                    <small class="text-success fw-bold d-block mb-1 font-mono" style="font-size: 0.7rem;"><i class="bi bi-lightbulb me-1"></i>SARAN & HARAPAN:</small>
-                                    <p class="mb-0 small text-dark p-2 rounded-3 border" style="background: rgba(25, 135, 84, 0.04); border-color: rgba(25, 135, 84, 0.2) !important;">{{ Str::limit($review->saran, 120) }}</p>
-                                </div>
-                            @endif
-                        @endif
-
-                        @if($review->balasans && $review->balasans->count() > 0)
-                            <div class="mt-2 p-2.5 rounded-3 border-start border-3 border-primary shadow-xs" style="background: var(--bg-light);">
-                                <small class="text-primary fw-bold d-block mb-1" style="font-size: 0.72rem;"><i class="bi bi-chat-left-dots-fill me-1"></i>Diskusi Terkini ({{ $review->balasans->count() }} balasan):</small>
-                                <p class="mb-0 small text-muted font-italic">{{ Str::limit($review->balasans->last()->pesan, 80) }}</p>
-                            </div>
-                        @elseif($review->balasan_guru)
-                            <div class="mt-2 p-2.5 rounded-3 border-start border-3 border-success shadow-sm" style="background: var(--bg-light);">
-                                <small class="text-success fw-bold d-block mb-1" style="font-size: 0.72rem;"><i class="bi bi-reply-fill me-1"></i>Telah Anda Balas:</small>
-                                <p class="mb-0 small text-muted font-italic">{{ Str::limit($review->balasan_guru, 80) }}</p>
-                            </div>
-                        @endif
+            {{-- Feed List Scrollable Berdiri: Tinggi disesuaikan (380px) agar seimbang dengan kolom kiri --}}
+            <div class="gk-feed-scroll flex-grow-1 overflow-y-auto pe-1" style="max-height: 380px;">
+                @forelse($ulasanTerbaru as $review)
+                <div class="p-3 mb-3 rounded-3 border bg-white" style="border-color: rgba(0, 51, 102, 0.1) !important; box-shadow: 0 1px 4px rgba(0, 51, 102, 0.04);">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="badge rounded-pill px-2.5 py-1" style="background: rgba(0, 51, 102, 0.06); color: #003366; font-size: 0.72rem; border: 1px solid rgba(0, 51, 102, 0.12); font-weight: 600;">
+                            Siswa (Anonim)
+                        </span>
+                        <small class="text-muted font-mono" style="font-size: 0.7rem;">
+                            {{ $review->created_at->format('d M Y, H:i') }}
+                        </small>
                     </div>
 
-                    <div class="mt-3 pt-2 border-top d-flex justify-content-between align-items-center" style="border-color: var(--border) !important;">
-                        @if(($review->balasans && $review->balasans->count() > 0) || $review->balasan_guru)
-                            <span class="badge rounded-pill px-2 py-1" style="background: rgba(25, 135, 84, 0.1); color: #198754; font-size: 0.72rem;"><i class="bi bi-check-lg me-1"></i>Ada Diskusi</span>
-                        @else
-                            <span class="badge rounded-pill px-2 py-1" style="background: rgba(245, 158, 11, 0.12); color: #d97706; font-size: 0.72rem;"><i class="bi bi-hourglass-split me-1"></i>Belum Dibalas</span>
+                    {{-- Rating Persen & Bar dengan Gradient Sesuai Standar Leaderboard --}}
+                    @php $revPct = round(($review->rata_rata_evaluasi / 5) * 100); @endphp
+                    <div class="mb-2.5">
+                        <div class="d-flex justify-content-between align-items-center mb-1 font-mono" style="font-size: 0.74rem;">
+                            <span class="fw-bold" style="color: #003366;">{{ $revPct }}%</span>
+                            <span class="text-muted">({{ number_format($review->total_nilai, 2) }}/25)</span>
+                        </div>
+                        <div class="progress" style="height: 6px; border-radius: 10px; background: #e2e8f0;">
+                            <div class="progress-bar rounded-pill {{ $revPct >= 75 ? 'gk-bar-blue-high' : ($revPct >= 50 ? 'gk-bar-blue-mid' : 'gk-bar-blue-low') }}" style="width: {{ $revPct }}%;"></div>
+                        </div>
+                    </div>
+
+                    @if($review->is_censored)
+                        <div class="mb-2 p-2.5 rounded-3 border text-muted fst-italic small" style="background: #f8fafc; font-size: 0.78rem;">
+                            Ulasan ini disembunyikan oleh Administrator sekolah.
+                        </div>
+                    @else
+                        {{-- KRITIK: Latar Kuning Lembut, Border Kiri Kuning/Amber --}}
+                        @if($review->kritik)
+                            <div class="gk-box-kritik mb-2" style="font-size: 0.8rem;">
+                                <div style="color: #b45309; font-weight: 700; font-size: 0.72rem; letter-spacing: 0.5px; margin-bottom: 2px;">Kritik Membangun:</div>
+                                <span class="text-dark">{{ $review->kritik }}</span>
+                            </div>
                         @endif
-                        <a href="{{ route('guru.ulasan') }}" class="btn btn-sm btn-outline-primary rounded-pill py-0.5 px-2.5" style="font-size: 0.78rem;">
-                            Buka Diskusi <i class="bi bi-arrow-right ms-1"></i>
+
+                        {{-- SARAN: Latar Biru Lembut, Border Kiri Biru --}}
+                        @if($review->saran)
+                            <div class="gk-box-saran mb-2" style="font-size: 0.8rem;">
+                                <div style="color: #0284c7; font-weight: 700; font-size: 0.72rem; letter-spacing: 0.5px; margin-bottom: 2px;">Saran Perbaikan:</div>
+                                <span class="text-dark">{{ $review->saran }}</span>
+                            </div>
+                        @endif
+                    @endif
+
+                    @if($review->balasans && $review->balasans->count() > 0)
+                        <div class="mt-2.5 p-2 rounded-2 border-start border-3" style="background: #f8fafc; border-color: #003366 !important; font-size: 0.76rem;">
+                            <div class="fw-bold mb-0.5" style="color: #003366 !important; font-size: 0.72rem;">Diskusi Terkini ({{ $review->balasans->count() }} balasan):</div>
+                            <p class="mb-0 text-muted fst-italic">{{ Str::limit($review->balasans->last()->pesan, 75) }}</p>
+                        </div>
+                    @elseif($review->balasan_guru)
+                        <div class="mt-2.5 p-2 rounded-2 border-start border-3" style="background: #f8fafc; border-color: #f59e0b !important; font-size: 0.76rem;">
+                            <div class="fw-bold mb-0.5" style="color: #b45309 !important; font-size: 0.72rem;">Telah Anda Balas:</div>
+                            <p class="mb-0 text-muted fst-italic">{{ Str::limit($review->balasan_guru, 75) }}</p>
+                        </div>
+                    @endif
+
+                    <div class="mt-3 pt-2 border-top d-flex justify-content-between align-items-center">
+                        @if(($review->balasans && $review->balasans->count() > 0) || $review->balasan_guru)
+                            <span class="badge rounded-pill px-2.5 py-1" style="background: rgba(0, 51, 102, 0.08); color: #003366; font-size: 0.72rem; font-weight: 600;">Ada Diskusi</span>
+                        @else
+                            <span class="badge rounded-pill px-2.5 py-1" style="background: rgba(245, 158, 11, 0.12); color: #b45309; font-size: 0.72rem; font-weight: 600;">Belum Dibalas</span>
+                        @endif
+                        <a href="{{ route('guru.ulasan') }}" class="btn btn-sm btn-outline-secondary rounded-pill py-0.5 px-3" style="font-size: 0.75rem; border-color: rgba(0, 51, 102, 0.25); color: #003366; font-weight: 600;">
+                            Buka Diskusi
                         </a>
                     </div>
                 </div>
+                @empty
+                <div class="text-center py-4 text-muted">
+                    <p class="small mb-0">Belum ada ulasan kritik dan saran masuk untuk periode ini.</p>
+                </div>
+                @endforelse
             </div>
-            @endforeach
-        </div>
 
-        @if($ulasanTerbaru->count() > 4)
-            <div class="text-center mt-3 pt-2">
-                <a href="{{ route('guru.ulasan') }}" class="btn btn-outline-custom rounded-pill btn-sm px-4">
-                    Lihat Seluruh {{ $ulasanTerbaru->count() }} Ulasan Siswa <i class="bi bi-arrow-right ms-1"></i>
-                </a>
-            </div>
-        @endif
-    @else
-        <div class="text-center py-5 text-muted">
-            <i class="bi bi-chat-square-text fs-1 d-block mb-2 text-secondary opacity-50"></i>
-            Belum ada ulasan atau kritik dan saran yang masuk dari siswa untuk periode ini.
+            {{-- PAGINASI FEED ULASAN (MENCEGAH LOAD SEMUA DATA & MENJAGA PERFORMA SERVER) --}}
+            @if(method_exists($ulasanTerbaru, 'hasPages') && $ulasanTerbaru->hasPages())
+                <div class="pt-2 mt-2 border-top gk-dash-pagination">
+                    {{ $ulasanTerbaru->links('pagination::bootstrap-5') }}
+                </div>
+            @endif
         </div>
-    @endif
+    </div>
 </div>
 @endsection

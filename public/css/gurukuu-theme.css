@@ -7,7 +7,10 @@
 /* ===================================================
    1. COLOR TOKENS & SYSTEM VARIABLES
    =================================================== */
-:root {
+:root,
+html,
+body {
+    color-scheme: light !important;
     --primary: #003366;
     --primary-light: #004d99;
     --primary-subtle: #e0edff;
@@ -1415,3 +1418,36 @@ img.rounded-circle,
 
 
 
+
+/* ===================================================
+   NOTIFICATION BELL & BADGE ENGINE (Kuning & Biru)
+   =================================================== */
+.gk-bell-icon {
+    transition: all 0.25s ease-in-out !important;
+}
+.gk-bell-icon.has-unread,
+.gk-bell-icon.is-active {
+    color: #f59e0b !important;
+    opacity: 1 !important;
+    filter: drop-shadow(0 2px 4px rgba(245, 158, 11, 0.45)) !important;
+}
+.gk-bell-icon.no-unread,
+.gk-bell-icon.is-muted {
+    color: #eab308 !important;
+    opacity: 0.38 !important;
+    filter: none !important;
+}
+
+/* Badge Notifikasi Biru - Bukan Merah */
+.gk-notif-badge {
+    background-color: #003366 !important;
+    color: #ffffff !important;
+    border: 1.5px solid #ffffff !important;
+    font-size: 0.65rem !important;
+    font-weight: 700 !important;
+    line-height: 1 !important;
+}
+[data-theme="dark"] .gk-notif-badge {
+    background-color: #0284c7 !important;
+    border-color: #0f172a !important;
+}

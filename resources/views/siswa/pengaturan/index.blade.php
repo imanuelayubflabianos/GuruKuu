@@ -225,16 +225,16 @@
                             @csrf
                             <div class="d-flex justify-content-between align-items-center mb-1">
                                 <label class="form-label small fw-bold mb-0 text-muted">KIRIM PESAN BANTUAN</label>
-                                <span class="font-mono text-muted small" id="siswaChatCounter" style="font-size: 0.72rem;">0 / 100</span>
+                                <span class="font-mono text-muted small" id="siswaChatCounter" style="font-size: 0.72rem;">0 / 255</span>
                             </div>
                             <div class="d-flex gap-2 align-items-end mb-1">
-                                <textarea name="pesan" id="siswaChatInput" maxlength="100" class="form-control" rows="2" placeholder="Tulis pesan atau kendala Anda di sini (maks. 100 karakter)..." required style="border-radius: 12px; resize: none; border: 2px solid var(--border);" onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='var(--border)'">{{ old('pesan') }}</textarea>
+                                <textarea name="pesan" id="siswaChatInput" maxlength="255" class="form-control" rows="2" placeholder="Tulis pesan atau kendala Anda di sini (maks. 255 karakter)..." required style="border-radius: 12px; resize: none; border: 2px solid var(--border);" onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='var(--border)'">{{ old('pesan') }}</textarea>
                                 <button type="submit" class="btn btn-primary-custom d-flex align-items-center justify-content-center" style="height: 48px; width: 48px; border-radius: 12px; padding: 0;" title="Kirim Pesan">
                                     <i class="bi bi-send-fill fs-5"></i>
                                 </button>
                             </div>
                             <div class="form-text text-danger fw-bold d-none mb-2" id="siswaChatLimitWarn">
-                                <i class="bi bi-exclamation-triangle-fill me-1"></i>Anda telah mencapai batas maksimal 100 karakter!
+                                <i class="bi bi-exclamation-triangle-fill me-1"></i>Anda telah mencapai batas maksimal 255 karakter!
                             </div>
 
                             {{-- KOTAK VERIFIKASI --}}
@@ -302,8 +302,8 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <textarea name="pesan" id="editTextareaSiswa" class="form-control" rows="3" maxlength="100" required style="border-radius: 12px; border: 2px solid var(--border);"></textarea>
-                    <div class="form-text small text-muted">Maksimal 100 karakter.</div>
+                    <textarea name="pesan" id="editTextareaSiswa" class="form-control" rows="3" maxlength="255" required style="border-radius: 12px; border: 2px solid var(--border);"></textarea>
+                    <div class="form-text small text-muted">Maksimal 255 karakter.</div>
                 </div>
                 <div class="modal-footer border-0 pt-0">
                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" style="border-radius: 8px;">Batal</button>
@@ -340,8 +340,8 @@
         const warn = document.getElementById('siswaChatLimitWarn');
         if (!el || !counter) return;
         const len = el.value.length;
-        counter.innerText = `${len} / 100`;
-        if (len >= 100) {
+        counter.innerText = `${len} / 255`;
+        if (len >= 255) {
             counter.classList.add('text-danger', 'fw-bold');
             if (warn) warn.classList.remove('d-none');
         } else {

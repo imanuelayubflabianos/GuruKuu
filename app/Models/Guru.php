@@ -89,37 +89,151 @@ class Guru extends Model
         });
     }
 
+    public const MIN_PENILAIAN_LEADERBOARD = 5;
+
     public static function leaderboardFor(string $mode = 'rating', ?int $kelasId = null, ?int $periodeId = null)
     {
+        // Pastikan periode aktif jika tidak dispesifikasi
+        if (!$periodeId) {
+            $periodeAktif = Periode::where('status', 'aktif')->first();
+            $periodeId = $periodeAktif?->id;
+        }
+
         $query = self::with(['jurusan', 'penghargaan.badge']);
 
         if ($mode === 'partisipasi') {
             if (!$kelasId) return collect();
+            // Hanya guru yang terdaftar mengajar di kelas ini sesuai relasi resmi di database
             $query->whereHas('kelas', fn ($kelas) => $kelas->whereKey($kelasId));
-        } else {
-            $query->withRatings();
-            if ($kelasId) {
-                $query->whereHas('kelas', fn ($kelas) => $kelas->whereKey($kelasId));
+
+            $kelas = Kelas::find($kelasId);
+            $totalSiswa = $kelas?->jumlah_siswa ?: ($kelas?->siswa()->count() ?: 0);
+
+            // Ambil penilaian siswa unik (1 siswa tidak dihitung ganda untuk guru yang sama)
+            $penilaians = Penilaian::where('class_id', $kelasId)
+                ->when($periodeId, fn ($penilaian) => $penilaian->where('periode_id', $periodeId))
+                ->latest()
+                ->get()
+                ->unique(fn ($p) => $p->guru_id . '_' . $p->siswa_id);
+
+            $gurus = $query->get()->map(function ($guru) use ($penilaians, $totalSiswa) {
+                $guruPenilaians = $penilaians->where('guru_id', $guru->id);
+                $jumlahMemilih = $guruPenilaians->count();
+
+                $persentase = $totalSiswa > 0 ? round(($jumlahMemilih / $totalSiswa) * 100, 1) : 0;
+                $rataRata = $jumlahMemilih > 0 ? round($guruPenilaians->avg('total_nilai') / 5, 2) : 0.0;
+
+                $guru->setAttribute('total_penilaian', $jumlahMemilih);
+                $guru->setAttribute('rata_rata_nilai', $rataRata);
+                $guru->setAttribute('persentase_kepuasan', round(($rataRata / 5) * 100));
+                $guru->setAttribute('partisipasi_persen', $persentase);
+                $guru->setAttribute('is_eligible_leaderboard', $jumlahMemilih >= self::MIN_PENILAIAN_LEADERBOARD);
+
+                return $guru;
+            });
+
+            // Bagi 2 grup: Memenuhi syarat (>= 10) & Belum memenuhi syarat (< 10)
+            $eligible = $gurus->filter(fn ($g) => $g->is_eligible_leaderboard)
+                ->sort(function ($a, $b) {
+                    if ($b->partisipasi_persen != $a->partisipasi_persen) {
+                        return $b->partisipasi_persen <=> $a->partisipasi_persen;
+                    }
+                    if ($b->total_penilaian != $a->total_penilaian) {
+                        return $b->total_penilaian <=> $a->total_penilaian;
+                    }
+                    return strcmp($a->nama, $b->nama);
+                })->values();
+
+            $notEligible = $gurus->filter(fn ($g) => !$g->is_eligible_leaderboard)
+                ->sort(function ($a, $b) {
+                    if ($b->partisipasi_persen != $a->partisipasi_persen) {
+                        return $b->partisipasi_persen <=> $a->partisipasi_persen;
+                    }
+                    if ($b->total_penilaian != $a->total_penilaian) {
+                        return $b->total_penilaian <=> $a->total_penilaian;
+                    }
+                    return strcmp($a->nama, $b->nama);
+                })->values();
+
+            $rank = 1;
+            foreach ($eligible as $guru) {
+                $guru->setAttribute('leaderboard_rank', $rank++);
             }
-            return $query->orderByDesc('rata_rata_nilai')->orderByDesc('total_penilaian')->get();
+            foreach ($notEligible as $guru) {
+                $guru->setAttribute('leaderboard_rank', null);
+            }
+
+            return $eligible->concat($notEligible);
         }
 
-        $kelas = Kelas::find($kelasId);
-        $totalSiswa = $kelas?->jumlah_siswa ?: $kelas?->siswa()->count();
-        $counts = Penilaian::where('class_id', $kelasId)
-            ->when($periodeId, fn ($penilaian) => $penilaian->where('periode_id', $periodeId))
-            ->selectRaw('guru_id, COUNT(DISTINCT siswa_id) as jumlah_memilih')
-            ->groupBy('guru_id')
-            ->pluck('jumlah_memilih', 'guru_id');
+        // Mode Semua Guru (Rating Kepuasan)
+        // Ambil penilaian periode aktif, pastikan 1 siswa tidak dihitung ganda untuk guru yang sama
+        $penilaians = Penilaian::when($periodeId, fn ($q) => $q->where('periode_id', $periodeId))
+            ->latest()
+            ->get()
+            ->unique(fn ($p) => $p->guru_id . '_' . $p->siswa_id);
 
-        return $query->get()->map(function ($guru) use ($counts, $totalSiswa) {
-            $jumlahMemilih = (int) ($counts[$guru->id] ?? 0);
-            $persentase = $totalSiswa > 0 ? round(($jumlahMemilih / $totalSiswa) * 100, 1) : 0;
-            $guru->setAttribute('total_penilaian', $jumlahMemilih);
-            $guru->setAttribute('rata_rata_nilai', $persentase / 20);
-            $guru->setAttribute('partisipasi_persen', $persentase);
+        $penilaianByGuru = $penilaians->groupBy('guru_id');
+
+        $gurus = $query->get()->map(function ($guru) use ($penilaianByGuru) {
+            $guruPenilaians = $penilaianByGuru->get($guru->id, collect());
+            $totalPenilaian = $guruPenilaians->count();
+
+            if ($totalPenilaian > 0) {
+                $rataRata = round($guruPenilaians->avg('total_nilai') / 5, 2);
+                $persentaseKepuasan = round(($rataRata / 5) * 100);
+            } else {
+                $rataRata = 0.0;
+                $persentaseKepuasan = 0;
+            }
+
+            $guru->setAttribute('total_penilaian', $totalPenilaian);
+            $guru->setAttribute('rata_rata_nilai', $rataRata);
+            $guru->setAttribute('persentase_kepuasan', $persentaseKepuasan);
+            $guru->setAttribute('is_eligible_leaderboard', $totalPenilaian >= self::MIN_PENILAIAN_LEADERBOARD);
+
             return $guru;
-        })->sortByDesc('partisipasi_persen')->values();
+        });
+
+        // Hanya tampilkan guru yang memiliki setidaknya 1 penilaian pada periode ini
+        $gurusWithData = $gurus->filter(fn ($g) => $g->total_penilaian > 0);
+
+        // Group 1: Memenuhi syarat ranking (minimal 10 penilaian)
+        // Aturan urut: Rata-rata Nilai DESC -> Tie-breaker: Total Penilaian DESC -> Tie-breaker: Nama ASC
+        $eligible = $gurusWithData->filter(fn ($g) => $g->is_eligible_leaderboard)
+            ->sort(function ($a, $b) {
+                if ($b->rata_rata_nilai != $a->rata_rata_nilai) {
+                    return $b->rata_rata_nilai <=> $a->rata_rata_nilai;
+                }
+                if ($b->total_penilaian != $a->total_penilaian) {
+                    return $b->total_penilaian <=> $a->total_penilaian;
+                }
+                return strcmp($a->nama, $b->nama);
+            })->values();
+
+        // Group 2: Belum memenuhi syarat (< 10 penilaian)
+        // Nilai tetap dihitung & tampil di tabel, namun tidak mendapatkan nomor peringkat leaderboard
+        $notEligible = $gurusWithData->filter(fn ($g) => !$g->is_eligible_leaderboard)
+            ->sort(function ($a, $b) {
+                if ($b->rata_rata_nilai != $a->rata_rata_nilai) {
+                    return $b->rata_rata_nilai <=> $a->rata_rata_nilai;
+                }
+                if ($b->total_penilaian != $a->total_penilaian) {
+                    return $b->total_penilaian <=> $a->total_penilaian;
+                }
+                return strcmp($a->nama, $b->nama);
+            })->values();
+
+        // Berikan nomor peringkat hanya untuk guru yang eligible
+        $rank = 1;
+        foreach ($eligible as $guru) {
+            $guru->setAttribute('leaderboard_rank', $rank++);
+        }
+        foreach ($notEligible as $guru) {
+            $guru->setAttribute('leaderboard_rank', null);
+        }
+
+        return $eligible->concat($notEligible);
     }
 
     // ==================== ACCESSOR & HELPER ====================
@@ -153,8 +267,8 @@ class Guru extends Model
             ->take(2)
             ->implode('');
         
-        $colors = ['003366', '00A86B', 'FFC107', '6366f1', 'ec4899'];
-        $color = $colors[$this->id % count($colors)];
+        // Warna tema default Guru: Biru Tua (#003366)
+        $color = '003366';
         
         return "https://ui-avatars.com/api/?name={$initials}&background={$color}&color=fff&size=200&bold=true";
     }
@@ -236,7 +350,7 @@ class Guru extends Model
             $query->where('periode_id', $periodeId);
         }
 
-        $penilaian = $query->get();
+        $penilaian = $query->latest()->get()->unique('siswa_id');
         if ($penilaian->isEmpty()) {
             $this->update(['rata_rata_nilai' => 0, 'total_penilaian' => 0]);
             return;

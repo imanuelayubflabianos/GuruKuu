@@ -16,14 +16,7 @@ class LeaderboardExport implements FromCollection, WithHeadings, WithMapping, Wi
     public function collection()
     {
         $periodeAktif = Periode::where('status', 'aktif')->first();
-        
-        $query = Guru::with('jurusan')
-            ->withRatings()
-            ->orderBy('rata_rata_nilai', 'desc')
-            ->orderBy('total_penilaian', 'desc')
-            ->get();
-
-        return $query;
+        return Guru::leaderboardFor('rating', null, $periodeAktif?->id);
     }
 
     public function headings(): array
@@ -36,24 +29,24 @@ class LeaderboardExport implements FromCollection, WithHeadings, WithMapping, Wi
             'Kepuasan (%)',
             'Rata-rata Skor (Skala 5)',
             'Total Ulasan Siswa',
-            'Status Mengajar',
+            'Status Leaderboard',
         ];
     }
 
     public function map($guru): array
     {
-        $this->no++;
         $persen = round(($guru->rata_rata_nilai / 5) * 100);
+        $rankText = $guru->leaderboard_rank ? '#' . $guru->leaderboard_rank : 'Belum cukup data (<' . \App\Models\Guru::MIN_PENILAIAN_LEADERBOARD . ' penilaian)';
 
         return [
-            $this->no,
+            $rankText,
             "'" . $guru->nip,
             $guru->nama,
             $guru->jurusan?->nama_jurusan ?? 'Umum / Terbuka',
             $persen . '%',
             number_format($guru->rata_rata_nilai, 2),
-            $guru->total_penilaian,
-            'Aktif',
+            $guru->total_penilaian . ' penilaian',
+            $guru->leaderboard_rank ? 'Masuk Leaderboard' : 'Belum Cukup Data',
         ];
     }
 

@@ -42,10 +42,10 @@ class PengaturanController extends Controller
         }
 
         $request->validate([
-            'bio'   => 'nullable|string|max:100',
+            'bio'   => 'nullable|string|max:255',
             'photo' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
         ], [
-            'bio.max' => 'Deskripsi diri maksimal 100 karakter.',
+            'bio.max' => 'Deskripsi diri maksimal 255 karakter.',
         ]);
 
         $defaultBio = 'Guru pengajar di SMK Negeri 1 Bangsri yang berdedikasi membimbing generasi muda.';
@@ -79,11 +79,11 @@ class PengaturanController extends Controller
     public function kirimPesanAdmin(Request $request)
     {
         $request->validate([
-            'pesan'   => 'required|string|min:3|max:100',
+            'pesan'   => 'required|string|min:3|max:255',
             'captcha' => 'required|numeric',
         ], [
             'pesan.required'   => 'Pesan tidak boleh kosong.',
-            'pesan.max'        => 'Pesan Anda melebihi batas maksimal 100 karakter.',
+            'pesan.max'        => 'Pesan Anda melebihi batas maksimal 255 karakter.',
             'captcha.required' => 'Verifikasi wajib diisi.',
             'captcha.numeric'  => 'Jawaban verifikasi harus berupa angka.',
         ]);
@@ -125,8 +125,8 @@ class PengaturanController extends Controller
             return back()->with('error', 'Akses ditolak.');
         }
 
-        $request->validate(['pesan' => 'required|string|min:3|max:100'], [
-            'pesan.max' => 'Pesan Anda melebihi batas maksimal 100 karakter.'
+        $request->validate(['pesan' => 'required|string|min:3|max:255'], [
+            'pesan.max' => 'Pesan Anda melebihi batas maksimal 255 karakter.'
         ]);
 
         $pesanTeks = trim($request->pesan);

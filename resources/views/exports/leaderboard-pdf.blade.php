@@ -46,10 +46,11 @@
             @php $pct = round(($g->rata_rata_nilai / 5) * 100); @endphp
             <tr>
                 <td class="text-center">
-                    @if($index === 0) <span class="badge badge-rank1">#1</span>
-                    @elseif($index === 1) <span class="badge badge-rank2">#2</span>
-                    @elseif($index === 2) <span class="badge badge-rank3">#3</span>
-                    @else #{{ $index + 1 }}
+                    @if($g->leaderboard_rank === 1) <span class="badge badge-rank1">#1</span>
+                    @elseif($g->leaderboard_rank === 2) <span class="badge badge-rank2">#2</span>
+                    @elseif($g->leaderboard_rank === 3) <span class="badge badge-rank3">#3</span>
+                    @elseif($g->leaderboard_rank) #{{ $g->leaderboard_rank }}
+                    @else <span style="color: #64748b; font-size: 8px;">Belum cukup data ({{ $g->total_penilaian }}/5)</span>
                     @endif
                 </td>
                 <td>{{ $g->nip }}</td>
@@ -57,7 +58,7 @@
                 <td>{{ $g->jurusan?->nama_jurusan ?? 'Umum' }}</td>
                 <td class="text-center" style="font-weight: bold; color: #003366;">{{ $pct }}%</td>
                 <td class="text-center">{{ number_format($g->rata_rata_nilai, 2) }}/5</td>
-                <td class="text-center">{{ $g->total_penilaian }} ulasan</td>
+                <td class="text-center">{{ $g->total_penilaian }} penilaian</td>
             </tr>
             @empty
             <tr>

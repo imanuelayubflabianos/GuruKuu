@@ -7,47 +7,22 @@
 (function() {
     'use strict';
 
-    // 1. Initial Fast-Boot: Follow System Theme (Dark / Light) Automatically
-    function getSystemTheme() {
-        try {
-            if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-                return 'dark';
-            }
-        } catch (e) {}
-        return 'light';
+    // 1. Mode Terang Permanen (Dark Mode Dihapus Sepenuhnya Sesuai Permintaan)
+    function applyTheme() {
+        document.documentElement.setAttribute('data-theme', 'light');
+        document.documentElement.setAttribute('data-bs-theme', 'light');
+        document.documentElement.classList.remove('dark-theme');
+        document.documentElement.style.colorScheme = 'light';
     }
 
-    function applyTheme(theme) {
-        document.documentElement.setAttribute('data-theme', theme);
-        document.documentElement.setAttribute('data-bs-theme', theme);
-        if (theme === 'dark') {
-            document.documentElement.classList.add('dark-theme');
-        } else {
-            document.documentElement.classList.remove('dark-theme');
-        }
-    }
-
-    // Always follow device/system mode & clean up manual override
-    try { localStorage.removeItem('gk_theme'); } catch (e) {}
-    const initialTheme = getSystemTheme();
-    applyTheme(initialTheme);
-
-    // Listen for OS/device dark mode changes in real-time
+    // Bersihkan seluruh pengaturan mode gelap lokal
     try {
-        const darkMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-        const onThemeChange = function(e) {
-            const nextTheme = e.matches ? 'dark' : 'light';
-            applyTheme(nextTheme);
-            if (window.GuruKuuTheme && window.GuruKuuTheme.updateIcons) {
-                window.GuruKuuTheme.updateIcons();
-            }
-        };
-        if (darkMediaQuery.addEventListener) {
-            darkMediaQuery.addEventListener('change', onThemeChange);
-        } else if (darkMediaQuery.addListener) {
-            darkMediaQuery.addListener(onThemeChange);
-        }
+        localStorage.removeItem('gk_theme');
+        localStorage.removeItem('theme');
     } catch (e) {}
+
+    // Terapkan langsung ke HTML
+    applyTheme();
 
     const savedAnim = localStorage.getItem('gk_anim') ?? '1';
     const savedBlur = localStorage.getItem('gk_blur') ?? '1';
@@ -60,32 +35,22 @@
     if (savedCompact === '1') document.documentElement.classList.add('compact-mode');
 
     window.GuruKuuTheme = {
-        getSystemTheme: getSystemTheme,
+        getSystemTheme: function() { return 'light'; },
         applyTheme: applyTheme,
 
-        // Legacy compatibility
+        // No-op kompatibilitas: Selalu tetap light mode
         toggleTheme: function() {
-            const current = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
-            const next = current === 'dark' ? 'light' : 'dark';
-            applyTheme(next);
-            this.updateIcons();
+            applyTheme();
         },
 
-        setTheme: function(theme) {
-            applyTheme(theme);
-            this.updateIcons();
+        setTheme: function() {
+            applyTheme();
         },
 
         updateIcons: function() {
-            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            // Sembunyikan atau netralkan ikon tema jika ada
             document.querySelectorAll('.gk-theme-icon').forEach(icon => {
-                if (isDark) {
-                    icon.className = 'bi bi-sun-fill gk-theme-icon';
-                    icon.style.color = '#fbbf24';
-                } else {
-                    icon.className = 'bi bi-moon-stars-fill gk-theme-icon';
-                    icon.style.color = '#475569';
-                }
+                icon.style.display = 'none';
             });
         },
 

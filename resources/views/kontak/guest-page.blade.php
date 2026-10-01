@@ -146,16 +146,16 @@
                             <div class="p-3">
                                 <div class="d-flex justify-content-between align-items-center mb-1">
                                     <label class="form-label small fw-bold mb-0 text-muted">KIRIM PESAN BANTUAN</label>
-                                    <span class="font-mono text-muted small" id="guestChatCounter" style="font-size: 0.72rem;">0 / 100</span>
+                                    <span class="font-mono text-muted small" id="guestChatCounter" style="font-size: 0.72rem;">0 / 255</span>
                                 </div>
                                 <div class="d-flex gap-2 align-items-end mb-1">
-                                    <textarea name="pesan" id="guestChatInput" maxlength="100" class="form-control" rows="2" placeholder="Jelaskan masalah Anda secara jelas (maks. 100 karakter)..." required style="border-radius: 12px; resize: none; border: 2px solid var(--border); transition: all 0.25s;" onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='var(--border)'">{{ old('pesan') }}</textarea>
+                                    <textarea name="pesan" id="guestChatInput" maxlength="255" class="form-control" rows="2" placeholder="Jelaskan masalah Anda secara jelas (maks. 255 karakter)..." required style="border-radius: 12px; resize: none; border: 2px solid var(--border); transition: all 0.25s;" onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='var(--border)'">{{ old('pesan') }}</textarea>
                                     <button type="submit" class="btn btn-primary-custom d-flex align-items-center justify-content-center" style="height: 46px; width: 46px; border-radius: 12px; padding: 0; flex-shrink: 0;" title="Kirim Pesan">
                                         <i class="bi bi-send-fill fs-5"></i>
                                     </button>
                                 </div>
                                 <div class="form-text text-danger fw-bold d-none mb-2" id="guestChatLimitWarn">
-                                    <i class="bi bi-exclamation-triangle-fill me-1"></i>Anda telah mencapai batas maksimal 100 karakter!
+                                    <i class="bi bi-exclamation-triangle-fill me-1"></i>Anda telah mencapai batas maksimal 255 karakter!
                                 </div>
 
                                 <div class="p-2 rounded" style="background: var(--bg-light); border: 1px dashed var(--border);">
@@ -197,8 +197,8 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <textarea name="pesan" id="editGuestTextarea" maxlength="100" class="form-control" rows="3" required style="border-radius: 12px; border: 2px solid var(--border);"></textarea>
-                    <div class="form-text small text-muted">Maksimal 100 karakter.</div>
+                    <textarea name="pesan" id="editGuestTextarea" maxlength="255" class="form-control" rows="3" required style="border-radius: 12px; border: 2px solid var(--border);"></textarea>
+                    <div class="form-text small text-muted">Maksimal 255 karakter.</div>
                 </div>
                 <div class="modal-footer border-0 pt-0">
                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" style="border-radius: 8px;">Batal</button>
@@ -219,8 +219,8 @@
         const warn = document.getElementById('guestChatLimitWarn');
         if (!el || !counter) return;
         const len = el.value.length;
-        counter.innerText = `${len} / 100`;
-        if (len >= 100) {
+        counter.innerText = `${len} / 255`;
+        if (len >= 255) {
             counter.classList.add('text-danger', 'fw-bold');
             if (warn) warn.classList.remove('d-none');
         } else {

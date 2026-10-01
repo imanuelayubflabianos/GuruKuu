@@ -108,8 +108,8 @@ class User extends Authenticatable
             ->take(2)
             ->implode('');
 
-        $colors = ['003366', '00A86B', 'FFC107', '6366f1', 'ec4899'];
-        $color = $colors[$this->id % count($colors)];
+        // Warna tema default: Guru biru tua (#003366), Siswa biru muda (#0284c7)
+        $color = ($this->role === 'guru') ? '003366' : '0284c7';
 
         return "https://ui-avatars.com/api/?name={$initials}&background={$color}&color=fff&size=200&bold=true";
     }

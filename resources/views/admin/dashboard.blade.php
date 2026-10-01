@@ -113,7 +113,7 @@
                 </div>
                 @forelse($feedbacks as $feedback)
                     @php $fbText = $feedback->kritik ?: $feedback->saran; @endphp
-                    <a href="{{ route('admin.kritik-saran.index') }}" class="dashboard-list-item" title="{{ $fbText }}">
+                    <a href="{{ route('admin.kritik-saran.index') }}" class="dashboard-list-item">
                         <span class="dashboard-rank"><i class="bi bi-chat-dots"></i></span>
                         <div class="flex-grow-1 min-w-0" style="min-width: 0; overflow: hidden;">
                             <div class="small text-truncate text-dark fw-medium" style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ $fbText }}</div>

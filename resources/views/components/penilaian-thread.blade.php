@@ -115,13 +115,13 @@
                                   rows="2"
                                   class="form-control form-control-sm border-0 bg-light rounded-3 px-3 py-2 thread-reply-input"
                                   style="resize: none; font-size: 0.82rem;"
-                                  placeholder="{{ $replyPlaceholder }} (maks. 100 karakter)"
-                                  maxlength="100"
+                                  placeholder="{{ $replyPlaceholder }} (maks. 255 karakter)"
+                                  maxlength="255"
                                   oninput="updateThreadCounter(this)"
                                   required></textarea>
 
                         <div class="thread-limit-warn text-danger small fw-bold mt-1" style="display: none; font-size: 0.72rem;">
-                            <i class="bi bi-exclamation-circle-fill me-1"></i> Anda telah mencapai batas maksimal 100 karakter!
+                            <i class="bi bi-exclamation-circle-fill me-1"></i> Anda telah mencapai batas maksimal 255 karakter!
                         </div>
 
                         <div class="d-flex align-items-center justify-content-between mt-1.5 pt-1">
@@ -133,7 +133,7 @@
                                         <i class="bi bi-pen me-0.5"></i> Balas sebagai {{ $senderBadge }}
                                     @endif
                                 </span>
-                                <span class="badge bg-light text-muted border thread-counter py-0.5 px-1.5" style="font-size: 0.68rem;">0 / 100</span>
+                                <span class="badge bg-light text-muted border thread-counter py-0.5 px-1.5" style="font-size: 0.68rem;">0 / 255</span>
                             </span>
 
                             <button type="submit" class="btn btn-primary-custom btn-sm px-3 py-1 rounded-pill fw-semibold shadow-xs d-inline-flex align-items-center gap-1" style="font-size: 0.78rem;">
@@ -157,8 +157,8 @@ function updateThreadCounter(el) {
     const counter = parent.querySelector('.thread-counter');
     const warn = parent.querySelector('.thread-limit-warn');
     const len = el.value.length;
-    if (counter) counter.textContent = `${len} / 100`;
-    if (warn) warn.style.display = len >= 100 ? 'block' : 'none';
+    if (counter) counter.textContent = `${len} / 255`;
+    if (warn) warn.style.display = len >= 255 ? 'block' : 'none';
 }
 </script>
 @endpush

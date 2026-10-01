@@ -194,12 +194,12 @@
                             <label class="form-label font-mono small fw-bold text-danger mb-0">
                                 <i class="bi bi-chat-dots me-1"></i>KRITIK / MASUKAN SANTUN
                             </label>
-                            <span class="font-mono text-muted small" id="kritikCounter" style="font-size: 0.72rem;">0 / 100</span>
+                            <span class="font-mono text-muted small" id="kritikCounter" style="font-size: 0.72rem;">0 / 255</span>
                         </div>
-                        <textarea name="kritik" id="kritikInput" class="form-control" rows="3" maxlength="100" placeholder="Sampaikan masukan perbaikan secara sopan, objektif, dan konstruktif..." style="border-radius: 8px;">{{ old('kritik') }}</textarea>
-                        <div class="form-text small text-muted">Maksimal 100 karakter. Sampaikan masukan secara santun.</div>
+                        <textarea name="kritik" id="kritikInput" class="form-control" rows="3" maxlength="255" placeholder="Sampaikan masukan perbaikan secara sopan, objektif, dan konstruktif..." style="border-radius: 8px;">{{ old('kritik') }}</textarea>
+                        <div class="form-text small text-muted">Maksimal 255 karakter. Sampaikan masukan secara santun.</div>
                         <div class="form-text text-danger fw-bold d-none" id="kritikLimitWarn">
-                            <i class="bi bi-exclamation-triangle-fill me-1"></i>Anda telah mencapai batas maksimal 100 karakter!
+                            <i class="bi bi-exclamation-triangle-fill me-1"></i>Anda telah mencapai batas maksimal 255 karakter!
                         </div>
                     </div>
                     <div class="col-md-6">
@@ -207,12 +207,12 @@
                             <label class="form-label font-mono small fw-bold text-success mb-0">
                                 <i class="bi bi-lightbulb me-1"></i>SARAN & HARAPAN PERBAIKAN
                             </label>
-                            <span class="font-mono text-muted small" id="saranCounter" style="font-size: 0.72rem;">0 / 100</span>
+                            <span class="font-mono text-muted small" id="saranCounter" style="font-size: 0.72rem;">0 / 255</span>
                         </div>
-                        <textarea name="saran" id="saranInput" class="form-control" rows="3" maxlength="100" placeholder="Sampaikan ide, harapan, atau apresiasi Anda untuk guru tercinta..." style="border-radius: 8px;">{{ old('saran') }}</textarea>
-                        <div class="form-text small text-muted">Maksimal 100 karakter. Saran yang baik membantu guru berinovasi.</div>
+                        <textarea name="saran" id="saranInput" class="form-control" rows="3" maxlength="255" placeholder="Sampaikan ide, harapan, atau apresiasi Anda untuk guru tercinta..." style="border-radius: 8px;">{{ old('saran') }}</textarea>
+                        <div class="form-text small text-muted">Maksimal 255 karakter. Saran yang baik membantu guru berinovasi.</div>
                         <div class="form-text text-danger fw-bold d-none" id="saranLimitWarn">
-                            <i class="bi bi-exclamation-triangle-fill me-1"></i>Anda telah mencapai batas maksimal 100 karakter!
+                            <i class="bi bi-exclamation-triangle-fill me-1"></i>Anda telah mencapai batas maksimal 255 karakter!
                         </div>
                     </div>
                 </div>
@@ -438,8 +438,8 @@ document.addEventListener('DOMContentLoaded', function() {
     function updateCounters() {
         if (kritikInput && kritikCounter) {
             const len = kritikInput.value.length;
-            kritikCounter.innerText = `${len} / 100`;
-            if (len >= 100) {
+            kritikCounter.innerText = `${len} / 255`;
+            if (len >= 255) {
                 kritikCounter.classList.add('text-danger', 'fw-bold');
                 if (kritikLimitWarn) kritikLimitWarn.classList.remove('d-none');
             } else {
@@ -449,8 +449,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         if (saranInput && saranCounter) {
             const len = saranInput.value.length;
-            saranCounter.innerText = `${len} / 100`;
-            if (len >= 100) {
+            saranCounter.innerText = `${len} / 255`;
+            if (len >= 255) {
                 saranCounter.classList.add('text-danger', 'fw-bold');
                 if (saranLimitWarn) saranLimitWarn.classList.remove('d-none');
             } else {
@@ -491,17 +491,17 @@ document.addEventListener('DOMContentLoaded', function() {
                 curVal = curVal.replace(textToAdd, '').replace(/\s+/g, ' ').trim();
                 target.value = curVal;
             } else {
-                // Check 100 limit
+                // Check 255 limit
                 const newLength = curVal ? (curVal.length + 1 + textToAdd.length) : textToAdd.length;
-                if (newLength > 100) {
+                if (newLength > 255) {
                     if (typeof Swal !== 'undefined') {
                         Swal.fire({
                             title: 'Batas Karakter Tercapai',
-                            text: 'Pesan masukan/saran Anda melebihi batas maksimal 100 karakter.',
+                            text: 'Pesan masukan/saran Anda melebihi batas maksimal 255 karakter.',
                             icon: 'warning'
                         });
                     } else {
-                        alert('Pesan masukan/saran Anda melebihi batas maksimal 100 karakter.');
+                        alert('Pesan masukan/saran Anda melebihi batas maksimal 255 karakter.');
                     }
                     return;
                 }

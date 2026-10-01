@@ -45,11 +45,11 @@ class PenilaianBalasanController extends Controller
         }
 
         $validated = $request->validate([
-            'pesan' => 'required|string|min:2|max:100',
+            'pesan' => 'required|string|min:2|max:255',
             'parent_id' => 'nullable|exists:penilaian_balasans,id',
         ], [
             'pesan.required' => 'Isi balasan tidak boleh kosong.',
-            'pesan.max' => 'Panjang balasan melebihi batas maksimal 100 karakter.',
+            'pesan.max' => 'Panjang balasan melebihi batas maksimal 255 karakter.',
         ]);
 
         // 🛡️ KEAMANAN: Cegah link/URL sembarangan

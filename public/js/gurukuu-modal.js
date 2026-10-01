@@ -180,39 +180,43 @@
      * Automatically initializes Bootstrap Tooltip on badges, buttons, and icons
      * Supports PC mouse hover and Mobile touch/hold.
      */
+    /**
+     * Tooltips khusus untuk tombol atau elemen ikon tanpa teks
+     * Hanya aktif pada elemen yang benar-benar memerlukan penjelasan ikon
+     */
     function initUniversalTooltips() {
         if (typeof bootstrap === 'undefined' || !bootstrap.Tooltip) return;
 
-        const targets = document.querySelectorAll('[data-bs-toggle="tooltip"], .gk-badge-mini-icon, [title]:not([data-bs-toggle="modal"]):not([data-bs-toggle="dropdown"]):not([data-bs-toggle="collapse"])');
+        // Hanya cari elemen dengan data-bs-toggle="tooltip"
+        const targets = document.querySelectorAll('[data-bs-toggle="tooltip"]');
 
         targets.forEach(function (el) {
+            // Jangan pasang tooltip jika elemen adalah profil, card, atau memiliki teks deskripsi panjang
+            if (el.closest('.sidebar-profile') || el.classList.contains('sidebar-profile')) {
+                el.removeAttribute('title');
+                el.removeAttribute('data-bs-toggle');
+                return;
+            }
+
             const rawTitle = el.getAttribute('title') || el.getAttribute('data-bs-title') || el.getAttribute('data-bs-original-title');
             if (!rawTitle || rawTitle.trim() === '') return;
 
-            if (!el.hasAttribute('data-bs-toggle')) {
-                el.setAttribute('data-bs-toggle', 'tooltip');
+            // Jika elemen sudah punya teks deskriptif terlihat selain ikon, tidak perlu tooltip
+            const clone = el.cloneNode(true);
+            const icons = clone.querySelectorAll('i, svg, img');
+            icons.forEach(function(i) { i.remove(); });
+            const visibleText = clone.textContent.trim();
+            if (visibleText.length > 3 && !el.hasAttribute('data-force-tooltip')) {
+                el.removeAttribute('title');
+                el.removeAttribute('data-bs-toggle');
+                return;
             }
 
             try {
-                const instance = bootstrap.Tooltip.getOrCreateInstance(el, {
-                    trigger: 'hover focus click',
-                    delay: { show: 60, hide: 150 }
+                bootstrap.Tooltip.getOrCreateInstance(el, {
+                    trigger: 'hover focus',
+                    delay: { show: 150, hide: 100 }
                 });
-
-                // Touch support for mobile: tapping or holding displays tooltip, hides when touch ends or after delay
-                let touchTimer = null;
-                el.addEventListener('touchstart', function () {
-                    touchTimer = setTimeout(function () {
-                        instance.show();
-                    }, 120);
-                }, { passive: true });
-
-                el.addEventListener('touchend', function () {
-                    if (touchTimer) clearTimeout(touchTimer);
-                    setTimeout(function () {
-                        instance.hide();
-                    }, 2400);
-                }, { passive: true });
             } catch (e) {
                 // Ignore initialization error
             }

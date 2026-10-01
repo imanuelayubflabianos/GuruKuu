@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" data-theme="light" data-bs-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -81,13 +81,11 @@
             {{-- NOTIFIKASI GABUNGAN MOBILE (PELANGGARAN & CHAT) --}}
             @php $totalNotif = ($unreadPelanggaranCount ?? 0) + ($unreadChatCount ?? 0); @endphp
             <div class="dropdown">
-                <button class="btn btn-light border position-relative p-1.5 rounded-circle shadow-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="Pusat Notifikasi">
-                    <i class="bi bi-bell-fill {{ $totalNotif > 0 ? 'text-danger' : 'text-secondary' }}" style="font-size: 1rem;"></i>
-                    @if($totalNotif > 0)
-                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger border border-light" style="font-size: 0.6rem; padding: 0.2em 0.45em;">
-                            {{ $totalNotif }}
-                        </span>
-                    @endif
+                <button class="btn btn-light border position-relative p-1.5 rounded-circle shadow-sm" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false" title="Pusat Notifikasi">
+                    <i class="bi bi-bell-fill gk-bell-icon {{ $totalNotif > 0 ? 'has-unread' : 'no-unread' }} admin-bell-icon" style="font-size: 1rem;"></i>
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill gk-notif-badge admin-notif-badge" id="adminNotifBadgeMobile" style="font-size: 0.6rem; padding: 0.2em 0.45em; {{ $totalNotif > 0 ? '' : 'display: none !important;' }}">
+                        <span class="admin-notif-count">{{ $totalNotif }}</span>
+                    </span>
                 </button>
                 <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 p-0" style="width: 320px; max-width: 90vw;">
                     @include('components.admin-notif-dropdown', ['prefix' => 'mobile'])
@@ -204,14 +202,12 @@
                 {{-- NOTIFIKASI GABUNGAN DESKTOP (PELANGGARAN & CHAT) --}}
                 @php $totalNotif = ($unreadPelanggaranCount ?? 0) + ($unreadChatCount ?? 0); @endphp
                 <div class="dropdown">
-                    <button class="btn btn-light position-relative p-2 rounded-circle border shadow-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="Pusat Notifikasi">
-                        <i class="bi bi-bell-fill {{ $totalNotif > 0 ? 'text-danger' : 'text-secondary' }} fs-5"></i>
-                        @if($totalNotif > 0)
-                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger border border-light" style="font-size: 0.65rem;">
-                                {{ $totalNotif }}
-                                <span class="visually-hidden">notifikasi belum dibaca</span>
-                            </span>
-                        @endif
+                    <button class="btn btn-light position-relative p-2 rounded-circle border shadow-sm" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false" title="Pusat Notifikasi">
+                        <i class="bi bi-bell-fill gk-bell-icon {{ $totalNotif > 0 ? 'has-unread' : 'no-unread' }} fs-5 admin-bell-icon"></i>
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill gk-notif-badge admin-notif-badge" id="adminNotifBadgeDesktop" style="font-size: 0.65rem; {{ $totalNotif > 0 ? '' : 'display: none !important;' }}">
+                            <span class="admin-notif-count">{{ $totalNotif }}</span>
+                            <span class="visually-hidden">notifikasi belum dibaca</span>
+                        </span>
                     </button>
                     <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 p-0" style="width: 380px; max-width: 92vw;">
                         @include('components.admin-notif-dropdown', ['prefix' => 'desktop'])
@@ -221,8 +217,15 @@
                 {{-- USER BADGE DROPDOWN --}}
                 <div class="dropdown border-start ps-3">
                     <button class="btn btn-light d-flex align-items-center gap-2 p-1.5 px-2.5 rounded-pill border shadow-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center shadow-sm" style="width: 28px; height: 28px;">
-                            <i class="bi bi-headset" style="font-size: 0.95rem;"></i>
+                        @php
+                            $adminInitials = collect(explode(' ', auth()->user()->name ?? 'Admin'))
+                                ->filter()
+                                ->map(fn($w) => strtoupper(substr($w, 0, 1)))
+                                ->take(2)
+                                ->implode('');
+                        @endphp
+                        <div class="rounded-circle text-white d-flex align-items-center justify-content-center fw-bold shadow-sm" style="width: 28px; height: 28px; background: #003366; font-size: 0.75rem;">
+                            {{ $adminInitials ?: 'A' }}
                         </div>
                         <span class="d-none d-sm-inline small fw-bold text-dark">{{ auth()->user()->name ?? 'Admin' }}</span>
                         <i class="bi bi-chevron-down text-muted small"></i>

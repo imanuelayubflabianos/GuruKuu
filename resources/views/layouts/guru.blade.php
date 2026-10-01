@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" data-theme="light" data-bs-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -48,7 +48,8 @@
         .sidebar::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.12); border-radius: 4px; }
         .sidebar-brand { font-weight: 800; font-size: 1.3rem; margin-bottom: 0.25rem; text-decoration: none; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
         .sidebar-subtitle { font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; color: var(--text-muted); letter-spacing: 1.5px; margin-bottom: 1.25rem; flex-shrink: 0; }
-        .sidebar-profile { display: flex; align-items: center; padding: 0.85rem; background: var(--bg-light); border-radius: 12px; margin-bottom: 1.25rem; flex-shrink: 0; }
+        .sidebar-profile { display: flex; align-items: center; padding: 0.85rem; background: var(--bg-light); border-radius: 12px; margin-bottom: 1.25rem; flex-shrink: 0; cursor: pointer; transition: all 0.2s ease-in-out; text-decoration: none !important; color: inherit !important; border: 1px solid transparent; }
+        .sidebar-profile:hover { background: #e9ecef; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0, 51, 102, 0.08); border-color: rgba(0, 51, 102, 0.12); color: #003366 !important; }
         .sidebar-profile img { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; margin-right: 0.75rem; }
         .sidebar-profile-name { font-weight: 700; font-size: 0.9rem; }
         .sidebar-profile-role { font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; color: var(--text-muted); letter-spacing: 1px; }
@@ -85,7 +86,7 @@
     {{-- MOBILE HEADER BAR (KHUSUS HP) --}}
     <header class="gk-mobile-header shadow-sm">
         <div class="d-flex align-items-center gap-2">
-            <button class="btn btn-light border p-1 px-2.5 rounded-3" type="button" onclick="GuruKuuTheme.toggleSidebar()" aria-label="Buka Menu">
+            <button class="btn btn-light border p-1 px-2.5 rounded-3" type="button" onclick="GuruKuuTheme.toggleSidebar()" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Menu Sidebar" aria-label="Buka Menu">
                 <i class="bi bi-list fs-4"></i>
             </button>
             <a href="{{ route('guru.dashboard') }}" class="text-decoration-none d-flex align-items-center gap-2" style="font-size: 1.1rem;">
@@ -101,7 +102,7 @@
         </div>
         <div class="d-flex align-items-center gap-2">
             {{-- PORTAL SIPINTU MOBILE --}}
-            <a href="{{ config('services.sipintu.base_url', 'https://sipintu.smkn1bangsri.sch.id') }}" class="btn btn-light border p-1 rounded-circle shadow-sm d-flex align-items-center justify-content-center" title="Kembali ke Portal SiPintu" style="width: 32px; height: 32px;">
+            <a href="{{ config('services.sipintu.base_url', 'https://sipintu.smkn1bangsri.sch.id') }}" class="btn btn-light border p-1 rounded-circle shadow-sm d-flex align-items-center justify-content-center" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Portal SiPintu" style="width: 32px; height: 32px;">
                 <img src="{{ asset('images/sipintu-logo.png') }}" alt="SiPintu" style="width: 18px; height: 18px; object-fit: contain;">
             </a>
 
@@ -133,10 +134,23 @@
         </div>
         <div class="sidebar-subtitle">SMK NEGERI 1 BANGSRI • GURU</div>
         
-        <a href="{{ route('guru.pengaturan') }}" class="sidebar-profile text-decoration-none text-dark" title="Buka Pengaturan Akun">
-            <img src="{{ auth()->user()->photo_url }}" alt="avatar" onerror="this.src='https://ui-avatars.com/api/?name={{ urlencode(auth()->user()->name) }}&background=003366&color=fff'">
+        @php
+            $guruInitials = collect(explode(' ', auth()->user()->name))
+                ->filter()
+                ->map(fn($w) => strtoupper(substr($w, 0, 1)))
+                ->take(2)
+                ->implode('');
+        @endphp
+        <a href="{{ route('guru.pengaturan') }}" class="sidebar-profile">
+            @if(auth()->user()->photo)
+                <img src="{{ auth()->user()->photo_url }}" alt="{{ auth()->user()->name }}" class="rounded-circle me-3 shadow-sm" style="width: 44px; height: 44px; object-fit: cover;">
+            @else
+                <div class="rounded-circle text-white d-flex align-items-center justify-content-center me-3 fw-bold shadow-sm" style="width: 44px; height: 44px; min-width: 44px; min-height: 44px; background: #003366; font-size: 1rem; flex-shrink: 0; letter-spacing: 0.5px;">
+                    {{ $guruInitials ?: 'G' }}
+                </div>
+            @endif
             <div class="overflow-hidden">
-                <div class="sidebar-profile-name text-truncate" title="{{ auth()->user()->name }}">{{ auth()->user()->name }}</div>
+                <div class="sidebar-profile-name text-truncate">{{ auth()->user()->name }}</div>
                 <div class="sidebar-profile-role text-truncate">NIP: {{ auth()->user()->nis ?? '-' }}</div>
             </div>
         </a>
@@ -173,8 +187,8 @@
                 {{-- USER BADGE DROPDOWN (PERSIS SEPERTI ADMIN) --}}
                 <div class="dropdown border-start ps-3 ms-2">
                     <button class="btn btn-light d-flex align-items-center gap-2 p-1.5 px-2.5 rounded-pill border shadow-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center fw-bold" style="width: 28px; height: 28px; font-size: 0.8rem;">
-                            {{ strtoupper(substr(auth()->user()->name ?? 'G', 0, 1)) }}
+                        <div class="rounded-circle text-white d-flex align-items-center justify-content-center fw-bold" style="width: 28px; height: 28px; background: #003366; font-size: 0.75rem;">
+                            {{ $guruInitials ?: 'G' }}
                         </div>
                         <span class="d-none d-sm-inline small fw-bold text-dark">{{ auth()->user()->name ?? 'Guru' }}</span>
                         <i class="bi bi-chevron-down text-muted small"></i>

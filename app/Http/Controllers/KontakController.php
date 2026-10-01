@@ -46,8 +46,8 @@ class KontakController extends Controller
         }
 
         $request->validate(
-            ['pesan' => 'required|min:5|max:100', 'captcha' => 'required|numeric'],
-            ['pesan.max' => 'Pesan Anda melebihi batas maksimal 100 karakter.']
+            ['pesan' => 'required|min:5|max:255', 'captcha' => 'required|numeric'],
+            ['pesan.max' => 'Pesan Anda melebihi batas maksimal 255 karakter.']
         );
         if ($request->captcha != session('captcha_answer')) return back()->withErrors(['captcha' => 'Jawaban salah.'])->withInput();
 
@@ -94,8 +94,8 @@ class KontakController extends Controller
             return back()->with('error', 'Akses ditolak.');
         }
         $request->validate(
-            ['pesan' => 'required|min:5|max:100'],
-            ['pesan.max' => 'Pesan Anda melebihi batas maksimal 100 karakter.']
+            ['pesan' => 'required|min:5|max:255'],
+            ['pesan.max' => 'Pesan Anda melebihi batas maksimal 255 karakter.']
         );
 
         $pesanBaru = strip_tags(trim($request->pesan));
@@ -144,8 +144,8 @@ class KontakController extends Controller
         }
 
         $request->validate(
-            ['pesan' => 'required|min:3|max:100', 'captcha' => 'required|numeric'],
-            ['pesan.max' => 'Pesan Anda melebihi batas maksimal 100 karakter.']
+            ['pesan' => 'required|min:3|max:255', 'captcha' => 'required|numeric'],
+            ['pesan.max' => 'Pesan Anda melebihi batas maksimal 255 karakter.']
         );
         if ($request->captcha != session('siswa_chat_captcha')) {
             return back()->withErrors(['captcha' => 'Jawaban verifikasi matematika salah.'])->withInput();
@@ -192,8 +192,8 @@ class KontakController extends Controller
     {
         if ($kontak->identifier !== Auth::user()->nis) return back()->with('error', 'Akses ditolak.');
         $request->validate(
-            ['pesan' => 'required|min:3|max:100'],
-            ['pesan.max' => 'Pesan Anda melebihi batas maksimal 100 karakter.']
+            ['pesan' => 'required|min:3|max:255'],
+            ['pesan.max' => 'Pesan Anda melebihi batas maksimal 255 karakter.']
         );
         $pesanBaru = strip_tags(trim($request->pesan));
         if (\App\Services\ProfanityFilterService::containsLink($pesanBaru)) {

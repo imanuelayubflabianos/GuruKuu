@@ -26,8 +26,8 @@ class DashboardController extends Controller
 
         $periodeAktif = Periode::where('status', 'aktif')->first();
 
-        // Ambil ulasan & kritik saran dari siswa untuk guru ini (100% Anonim, tidak disensor)
-        $ulasanTerbaru = Penilaian::where('guru_id', $guru->id)
+        // Ambil ulasan & kritik saran dari siswa untuk guru ini (100% Anonim, tidak disensor) dengan paginasi efisien
+        $ulasanQuery = Penilaian::where('guru_id', $guru->id)
             ->where(function ($query) {
                 $query->where(function ($q) {
                     $q->whereNotNull('kritik')->whereRaw("TRIM(kritik) != ''");
@@ -38,13 +38,16 @@ class DashboardController extends Controller
             ->where(function ($query) {
                 $query->where('is_censored', false)->orWhereNull('is_censored');
             })
-            ->with(['periode'])
-            ->latest()
-            ->get();
+            ->with(['periode', 'balasans'])
+            ->latest();
+
+        $totalUlasanCount = (clone $ulasanQuery)->count();
+        $ulasanTerbaru = $ulasanQuery->paginate(3)->withQueryString();
 
         return view('guru.dashboard', compact(
             'guru',
             'ulasanTerbaru',
+            'totalUlasanCount',
             'periodeAktif'
         ));
     }
@@ -114,9 +117,9 @@ class DashboardController extends Controller
     public function replyPenilaian(Request $request, Penilaian $penilaian)
     {
         $request->validate([
-            'balasan_guru' => 'required|string|max:100',
+            'balasan_guru' => 'required|string|max:255',
         ], [
-            'balasan_guru.max' => 'Balasan Anda melebihi batas maksimal 100 karakter.',
+            'balasan_guru.max' => 'Balasan Anda melebihi batas maksimal 255 karakter.',
         ]);
 
         $user = Auth::user();

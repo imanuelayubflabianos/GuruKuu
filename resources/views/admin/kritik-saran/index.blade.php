@@ -533,9 +533,9 @@
                                     <div class="card-body p-3">
                                         <div class="row g-3">
                                             <div class="col-md-6">
-                                                <div class="p-3 rounded h-100" style="background: #fff5f5; border-left: 4px solid #ef4444;">
-                                                    <div class="text-danger fw-bold small mb-2 d-flex align-items-center gap-1">
-                                                        <i class="bi bi-chat-left-dots-fill"></i> KRITIK / MASUKAN:
+                                                <div class="p-3 rounded h-100" style="background: #fff8e1; border-left: 4px solid #ffc107;">
+                                                    <div class="text-warning-emphasis fw-bold small mb-2">
+                                                        Kritik Membangun:
                                                     </div>
                                                     <p class="mb-0 text-dark small" style="line-height: 1.6;">
                                                         {{ $f->kritik ?: 'Tidak ada kritik tertulis.' }}
@@ -543,9 +543,9 @@
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
-                                                <div class="p-3 rounded h-100" style="background: #f0fdf4; border-left: 4px solid #22c55e;">
-                                                    <div class="text-success fw-bold small mb-2 d-flex align-items-center gap-1">
-                                                        <i class="bi bi-lightbulb-fill"></i> SARAN / HARAPAN:
+                                                <div class="p-3 rounded h-100" style="background: #e1f5fe; border-left: 4px solid #0288d1;">
+                                                    <div class="text-primary fw-bold small mb-2">
+                                                        Saran Perbaikan:
                                                     </div>
                                                     <p class="mb-0 text-dark small" style="line-height: 1.6;">
                                                         {{ $f->saran ?: 'Tidak ada saran tertulis.' }}

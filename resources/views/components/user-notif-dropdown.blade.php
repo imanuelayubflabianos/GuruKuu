@@ -17,6 +17,7 @@
                 }
             }
             $notifs->push([
+                'id' => 'suspensi_' . $user->id,
                 'type' => 'danger',
                 'icon' => 'bi-slash-circle-fill text-danger',
                 'title' => 'Akun Dinonaktifkan (' . $durasiText . ')',
@@ -34,8 +35,9 @@
             ->get();
         foreach ($pelanggarans as $p) {
             $notifs->push([
+                'id' => 'pelanggaran_' . $p->id,
                 'type' => 'warning',
-                'icon' => 'bi-shield-exclamation text-danger',
+                'icon' => 'bi-shield-exclamation text-warning',
                 'title' => 'Peringatan Tata Tertib',
                 'desc' => $p->notifikasi_siswa ?: 'Ulasan Anda terdeteksi mengandung kata yang tidak sesuai etika sekolah.',
                 'time' => $p->created_at->diffForHumans(),
@@ -56,8 +58,9 @@
             $namaGuru = $gtr->penilaian?->guru?->nama ?? 'Guru';
             $guruId = $gtr->penilaian?->guru_id;
             $notifs->push([
+                'id' => 'guru_reply_' . $gtr->id,
                 'type' => 'primary',
-                'icon' => 'bi-chat-heart-fill text-primary',
+                'icon' => 'bi-chat-dots text-primary',
                 'title' => "Guru {$namaGuru} Membalas Ulasan",
                 'desc' => '"' . \Illuminate\Support\Str::limit($gtr->pesan, 65) . '"',
                 'time' => $gtr->created_at->diffForHumans(),
@@ -76,8 +79,9 @@
             if (!$guruThreadReplies->contains('penilaian_id', $dr->id)) {
                 $namaGuru = $dr->guru?->nama ?? 'Guru';
                 $notifs->push([
+                    'id' => 'direct_reply_' . $dr->id,
                     'type' => 'primary',
-                    'icon' => 'bi-reply-fill text-primary',
+                    'icon' => 'bi-reply text-primary',
                     'title' => "Guru {$namaGuru} Menanggapi Ulasan",
                     'desc' => '"' . \Illuminate\Support\Str::limit($dr->balasan_guru, 65) . '"',
                     'time' => $dr->updated_at->diffForHumans(),
@@ -89,8 +93,9 @@
         // 4. Status Periode Penilaian (Reset / Aktif Baru)
         if ($periode = \App\Models\Periode::where('status', 'aktif')->first()) {
             $notifs->push([
+                'id' => 'periode_' . $periode->id,
                 'type' => 'success',
-                'icon' => 'bi-arrow-clockwise text-success',
+                'icon' => 'bi-arrow-clockwise text-primary',
                 'title' => "Periode Baru: {$periode->nama_periode}",
                 'desc' => "Periode evaluasi {$periode->tahun_ajaran} (Semester {$periode->semester}) telah aktif/direset. Berikan evaluasi objektif!",
                 'time' => 'Periode Aktif',
@@ -107,8 +112,9 @@
             ->get() : collect();
         foreach ($repliedChats as $c) {
             $notifs->push([
+                'id' => 'kontak_' . $c->id,
                 'type' => 'info',
-                'icon' => 'bi-headset text-info',
+                'icon' => 'bi-headset text-primary',
                 'title' => 'Balasan dari Administrator',
                 'desc' => \Illuminate\Support\Str::limit($c->balasan, 65),
                 'time' => $c->updated_at->diffForHumans(),
@@ -121,8 +127,9 @@
         // 1. Status Periode Penilaian (Reset / Aktif Baru)
         if ($periode = \App\Models\Periode::where('status', 'aktif')->first()) {
             $notifs->push([
+                'id' => 'periode_' . $periode->id,
                 'type' => 'success',
-                'icon' => 'bi-arrow-clockwise text-success',
+                'icon' => 'bi-arrow-clockwise text-primary',
                 'title' => "Periode Penilaian: {$periode->nama_periode}",
                 'desc' => "Periode {$periode->tahun_ajaran} Semester {$periode->semester} berjalan aktif. Seluruh statistik & leaderboard telah disinkronkan ke periode ini.",
                 'time' => 'Periode Aktif',
@@ -142,9 +149,10 @@
                 ->get();
             foreach ($siswaReplies as $sr) {
                 $notifs->push([
+                    'id' => 'siswa_reply_' . $sr->id,
                     'type' => 'primary',
-                    'icon' => 'bi-chat-left-text-fill text-primary',
-                    'title' => 'Siswa Membalas Balasan Anda',
+                    'icon' => 'bi-chat-left-text text-primary',
+                    'title' => 'Siswa Membalas Tanggapan Anda',
                     'desc' => 'Tanggapan siswa: "' . \Illuminate\Support\Str::limit($sr->pesan, 65) . '"',
                     'time' => $sr->created_at->diffForHumans(),
                     'url' => route('guru.ulasan'),
@@ -162,8 +170,9 @@
             foreach ($recentReviews as $rev) {
                 $score = round(($rev->rata_rata_evaluasi / 5) * 100);
                 $notifs->push([
+                    'id' => 'guru_rev_' . $rev->id,
                     'type' => 'info',
-                    'icon' => 'bi-star-fill text-warning',
+                    'icon' => 'bi-star text-warning',
                     'title' => "Penilaian Siswa Baru ({$score}%)",
                     'desc' => $rev->kritik ?: ($rev->saran ?: 'Siswa memberikan penilaian performa pengajaran.'),
                     'time' => $rev->created_at->diffForHumans(),
@@ -181,8 +190,9 @@
             ->get() : collect();
         foreach ($repliedChats as $c) {
             $notifs->push([
+                'id' => 'guru_kontak_' . $c->id,
                 'type' => 'info',
-                'icon' => 'bi-headset text-info',
+                'icon' => 'bi-headset text-primary',
                 'title' => 'Balasan dari Administrator',
                 'desc' => \Illuminate\Support\Str::limit($c->balasan, 65),
                 'time' => $c->updated_at->diffForHumans(),
@@ -191,39 +201,48 @@
         }
     }
 
-    $unreadCount = $notifs->whereIn('type', ['danger', 'warning'])->count();
     $totalCount = $notifs->count();
 @endphp
 
-<div class="dropdown">
-    <button class="btn btn-light position-relative p-2 rounded-circle border shadow-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="Pusat Notifikasi">
-        <i class="bi bi-bell-fill {{ $unreadCount > 0 ? 'text-danger' : ($totalCount > 0 ? 'text-primary' : 'text-secondary') }} fs-5"></i>
-        @if($totalCount > 0)
-            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill {{ $unreadCount > 0 ? 'bg-danger' : 'bg-primary' }} border border-light" style="font-size: 0.65rem;">
-                {{ $totalCount }}
-                <span class="visually-hidden">notifikasi</span>
-            </span>
-        @endif
+<div class="dropdown" id="userNotifContainer_{{ auth()->id() }}">
+    <button class="btn btn-light position-relative p-2 rounded-circle border shadow-sm" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false" title="Pusat Notifikasi">
+        {{-- Ikon Lonceng: Kuning Pekat jika ada notif, Kuning Pudar jika 0 / sudah dicek --}}
+        <i class="bi bi-bell-fill gk-bell-icon {{ $totalCount > 0 ? 'has-unread' : 'no-unread' }} fs-5 user-bell-icon"></i>
+        
+        {{-- Badge Notifikasi: Biru (Bukan Merah) --}}
+        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill gk-notif-badge user-notif-badge" style="font-size: 0.65rem; {{ $totalCount > 0 ? '' : 'display: none !important;' }}">
+            <span class="user-notif-count">{{ $totalCount }}</span>
+            <span class="visually-hidden">notifikasi</span>
+        </span>
     </button>
     <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 p-0 mt-2" style="border-radius: 14px; width: 340px; max-width: 90vw; overflow: hidden; z-index: 1060;">
         <li class="p-3 bg-light border-bottom d-flex align-items-center justify-content-between">
             <span class="fw-bold small text-dark d-flex align-items-center gap-1.5">
-                <i class="bi bi-bell text-primary"></i> Notifikasi Akun
+                <i class="bi bi-bell-fill" style="color: #f59e0b;"></i> Notifikasi Akun
             </span>
-            @if($totalCount > 0)
-                <span class="badge {{ $unreadCount > 0 ? 'bg-danger' : 'bg-primary' }} rounded-pill" style="font-size: 0.7rem;">{{ $totalCount }} Notifikasi</span>
-            @endif
+            <div class="d-flex align-items-center gap-1">
+                <span class="badge gk-notif-badge rounded-pill user-header-badge" style="font-size: 0.7rem; {{ $totalCount > 0 ? '' : 'display: none !important;' }}">
+                    <span class="user-header-count">{{ $totalCount }}</span> Baru
+                </span>
+                <button type="button" class="btn btn-link p-0 text-muted small text-decoration-none ms-1 btn-clear-all-notifs" title="Tandai semua telah dibaca" style="font-size: 0.68rem;">
+                    Tandai Dibaca
+                </button>
+            </div>
         </li>
 
-        <div style="max-height: 320px; overflow-y: auto;">
+        <div class="user-notif-list" style="max-height: 320px; overflow-y: auto;">
             @forelse($notifs as $item)
-                <a href="{{ $item['url'] }}" class="dropdown-item p-3 border-bottom text-wrap d-flex align-items-start gap-2.5" style="white-space: normal; transition: background 0.15s;">
+                <a href="{{ $item['url'] }}" 
+                   data-notif-id="{{ $item['id'] }}" 
+                   class="dropdown-item p-3 border-bottom text-wrap d-flex align-items-start gap-2.5 user-notif-item" 
+                   style="white-space: normal; transition: background 0.15s;">
                     <div class="rounded-circle p-2 d-flex align-items-center justify-content-center bg-light border flex-shrink-0" style="width: 34px; height: 34px;">
                         <i class="bi {{ $item['icon'] }} fs-6"></i>
                     </div>
                     <div class="flex-grow-1" style="min-width: 0;">
                         <div class="d-flex align-items-center justify-content-between mb-0.5">
-                            <strong class="text-dark small d-block text-truncate" style="font-size: 0.82rem;">{{ $item['title'] }}</strong>
+                            <strong class="text-dark small d-block text-truncate notif-item-title" style="font-size: 0.82rem;">{{ $item['title'] }}</strong>
+                            <span class="badge bg-primary rounded-circle p-1 notif-unread-dot" style="display: none; width: 7px; height: 7px;"></span>
                         </div>
                         <p class="text-muted mb-1 small" style="font-size: 0.76rem; line-height: 1.35;">{{ $item['desc'] }}</p>
                         <small class="text-secondary font-mono d-block" style="font-size: 0.68rem;">{{ $item['time'] }}</small>
@@ -241,15 +260,125 @@
         @if($role === 'siswa')
             <li class="p-2 text-center bg-light border-top">
                 <a href="{{ route('siswa.riwayat') }}" class="small text-primary text-decoration-none fw-semibold" style="font-size: 0.75rem;">
-                    Buka Riwayat Penilaian <i class="bi bi-arrow-right"></i>
+                    Buka Riwayat Penilaian &rarr;
                 </a>
             </li>
         @elseif($role === 'guru')
             <li class="p-2 text-center bg-light border-top">
                 <a href="{{ route('guru.ulasan') }}" class="small text-primary text-decoration-none fw-semibold" style="font-size: 0.75rem;">
-                    Lihat Semua Ulasan <i class="bi bi-arrow-right"></i>
+                    Lihat Semua Ulasan &rarr;
                 </a>
             </li>
         @endif
     </ul>
 </div>
+
+<script>
+(function() {
+    const userId = "{{ auth()->id() ?? 'guest' }}";
+    const storageKey = 'gk_read_notifs_' + userId;
+
+    function getReadNotifs() {
+        try {
+            return JSON.parse(localStorage.getItem(storageKey) || '[]');
+        } catch(e) {
+            return [];
+        }
+    }
+
+    function saveReadNotifs(list) {
+        try {
+            localStorage.setItem(storageKey, JSON.stringify(list));
+        } catch(e) {}
+    }
+
+    function syncNotifUI() {
+        const readList = getReadNotifs();
+        const container = document.getElementById('userNotifContainer_' + userId);
+        if (!container) return;
+
+        const items = container.querySelectorAll('.user-notif-item');
+        let unreadCount = 0;
+
+        items.forEach(el => {
+            const id = el.getAttribute('data-notif-id');
+            const dot = el.querySelector('.notif-unread-dot');
+            if (id && readList.includes(id)) {
+                el.style.opacity = '0.65';
+                el.classList.add('bg-light-subtle');
+                if (dot) dot.style.display = 'none';
+            } else {
+                unreadCount++;
+                el.style.opacity = '1';
+                el.classList.remove('bg-light-subtle');
+                if (dot) dot.style.display = 'inline-block';
+            }
+        });
+
+        // Update semua icon lonceng user
+        const bells = document.querySelectorAll('.user-bell-icon');
+        const badges = document.querySelectorAll('.user-notif-badge');
+        const counts = document.querySelectorAll('.user-notif-count');
+        const headerCounts = document.querySelectorAll('.user-header-count');
+        const headerBadges = document.querySelectorAll('.user-header-badge');
+
+        counts.forEach(c => c.textContent = unreadCount);
+        headerCounts.forEach(c => c.textContent = unreadCount);
+
+        if (unreadCount > 0) {
+            bells.forEach(b => {
+                b.classList.remove('no-unread');
+                b.classList.add('has-unread');
+            });
+            badges.forEach(b => b.style.setProperty('display', 'inline-block', 'important'));
+            headerBadges.forEach(b => b.style.setProperty('display', 'inline-block', 'important'));
+        } else {
+            bells.forEach(b => {
+                b.classList.remove('has-unread');
+                b.classList.add('no-unread');
+            });
+            badges.forEach(b => b.style.setProperty('display', 'none', 'important'));
+            headerBadges.forEach(b => b.style.setProperty('display', 'none', 'important'));
+        }
+    }
+
+    // Event click per notif item
+    document.addEventListener('click', function(e) {
+        const item = e.target.closest('.user-notif-item');
+        if (item) {
+            const id = item.getAttribute('data-notif-id');
+            if (id) {
+                const readList = getReadNotifs();
+                if (!readList.includes(id)) {
+                    readList.push(id);
+                    saveReadNotifs(readList);
+                }
+                syncNotifUI();
+            }
+        }
+
+        const clearBtn = e.target.closest('.btn-clear-all-notifs');
+        if (clearBtn) {
+            e.preventDefault();
+            e.stopPropagation();
+            const items = document.querySelectorAll('.user-notif-item');
+            const readList = getReadNotifs();
+            items.forEach(el => {
+                const id = el.getAttribute('data-notif-id');
+                if (id && !readList.includes(id)) {
+                    readList.push(id);
+                }
+            });
+            saveReadNotifs(readList);
+            syncNotifUI();
+        }
+    });
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', syncNotifUI);
+    } else {
+        syncNotifUI();
+    }
+})();
+</script>
+

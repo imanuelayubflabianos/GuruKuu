@@ -32,11 +32,11 @@ class PengaturanController extends Controller
     public function kirimPesanAdmin(Request $request)
     {
         $request->validate([
-            'pesan'   => 'required|string|min:3|max:100',
+            'pesan'   => 'required|string|min:3|max:255',
             'captcha' => 'required|numeric',
         ], [
             'pesan.required'   => 'Pesan tidak boleh kosong.',
-            'pesan.max'        => 'Pesan Anda melebihi batas maksimal 100 karakter.',
+            'pesan.max'        => 'Pesan Anda melebihi batas maksimal 255 karakter.',
             'captcha.required' => 'Verifikasi wajib diisi.',
             'captcha.numeric'  => 'Jawaban verifikasi harus berupa angka.',
         ]);

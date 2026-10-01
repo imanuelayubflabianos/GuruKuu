@@ -13,13 +13,26 @@
     <div class="page-label">PENCAPAIAN TERTINGGI</div>
 </div>
 
-{{-- Podium Top 3 --}}
+{{-- Podium Top 3 (Hanya Guru yang Memenuhi Syarat Minimal 5 Penilaian) --}}
 @php
     $list = $leaderboard ?? collect();
-    $top1 = $list->get(0);
-    $top2 = $list->get(1);
-    $top3 = $list->get(2);
+    $eligibleList = $list->filter(fn($g) => !empty($g->leaderboard_rank))->values();
+    $top1 = $eligibleList->get(0);
+    $top2 = $eligibleList->get(1);
+    $top3 = $eligibleList->get(2);
 @endphp
+
+@if(!$top1)
+    <div class="card-custom p-4 mb-4 text-center border shadow-xs" style="background: rgba(0, 51, 102, 0.03); border-color: rgba(0, 51, 102, 0.1) !important; border-radius: 14px;">
+        <div class="rounded-circle d-inline-flex align-items-center justify-content-center mb-2" style="width: 42px; height: 42px; background: rgba(0, 51, 102, 0.08); color: #003366;">
+            <i class="bi bi-info-circle fs-5"></i>
+        </div>
+        <h6 class="fw-bold text-dark mb-1">Belum Ada Guru di Ranking Podium</h6>
+        <p class="text-muted small mb-0" style="max-width: 580px; margin: 0 auto; line-height: 1.5;">
+            Sesuai ketentuan, guru harus memiliki <strong>minimal 5 penilaian</strong> dari siswa untuk dapat masuk dalam peringkat leaderboard. Seluruh nilai guru tetap tercatat dan dapat dilihat pada tabel di bawah.
+        </p>
+    </div>
+@endif
 
 @if($top1)
     @if(!$top2)
@@ -382,10 +395,14 @@
                 @endphp
                 <tr class="align-middle {{ $isSelf ? 'table-primary' : '' }}">
                     <td class="text-center align-middle">
-                        @if($index === 0) <span class="gk-rank-medal">🥇</span>
-                        @elseif($index === 1) <span class="gk-rank-medal">🥈</span>
-                        @elseif($index === 2) <span class="gk-rank-medal">🥉</span>
-                        @else <span class="gk-rank-badge font-mono">#{{ $index + 1 }}</span>
+                        @if($g->leaderboard_rank === 1) <span class="gk-rank-medal">🥇</span>
+                        @elseif($g->leaderboard_rank === 2) <span class="gk-rank-medal">🥈</span>
+                        @elseif($g->leaderboard_rank === 3) <span class="gk-rank-medal">🥉</span>
+                        @elseif($g->leaderboard_rank) <span class="gk-rank-badge font-mono">#{{ $g->leaderboard_rank }}</span>
+                        @else
+                            <span class="badge rounded-pill px-2.5 py-1 text-muted" style="background: rgba(0, 51, 102, 0.05); border: 1px solid rgba(0, 51, 102, 0.12); font-size: 0.7rem; font-weight: 600;" data-bs-toggle="tooltip" title="Belum cukup data untuk masuk peringkat leaderboard (minimal 5 penilaian)">
+                                Belum cukup data ({{ $g->total_penilaian }}/5)
+                            </span>
                         @endif
                     </td>
                     <td class="align-middle">
@@ -420,7 +437,9 @@
                             $starsTable = round($valTable * 2) / 2;
                         @endphp
                         <div class="d-flex justify-content-between align-items-center mb-1">
-                            <span class="fw-bold font-mono text-dark" style="font-size: 0.85rem;">{{ $pct }}%</span>
+                            <span class="fw-bold font-mono text-dark" style="font-size: 0.85rem;">
+                                {{ $pct }}% <span class="text-muted fw-normal" style="font-size: 0.78rem;">· {{ number_format($g->rata_rata_nilai, 1) }}</span>
+                            </span>
                             <span class="text-warning small" style="font-size: 0.78rem;">
                                 @for($i = 1; $i <= 5; $i++)
                                     @if($starsTable >= $i)
@@ -437,7 +456,9 @@
                             <div class="gk-table-progress-fill {{ $pct >= 75 ? 'gk-bar-blue-high' : ($pct >= 50 ? 'gk-bar-blue-mid' : 'gk-bar-blue-low') }}" style="width: {{ $pct }}%;"></div>
                         </div>
                     </td>
-                    <td class="text-center font-mono align-middle">{{ $g->total_penilaian }}</td>
+                    <td class="text-center font-mono align-middle" style="font-size: 0.82rem;">
+                        <strong>{{ $g->total_penilaian }}</strong> <span class="text-muted small">{{ $mode === 'partisipasi' ? 'siswa' : 'penilaian' }}</span>
+                    </td>
                     <td class="text-center align-middle">
                         <a href="{{ route('guru.detail', $g->id) }}" class="btn btn-sm btn-outline-primary" style="border-radius: 6px; font-size: 0.82rem; font-weight: 600; padding: 0.35rem 0.8rem;">
                             <i class="bi bi-eye me-1"></i> Profil

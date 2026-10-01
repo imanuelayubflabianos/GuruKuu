@@ -168,9 +168,9 @@
             @else
                 <div class="row g-3 mb-3">
                     <div class="col-md-6">
-                        <div class="p-3 rounded h-100" style="background: #fff5f5; border-left: 4px solid #ef4444;">
-                            <strong class="text-danger small d-flex align-items-center gap-1 mb-1">
-                                <i class="bi bi-chat-left-dots-fill"></i> Kritik / Catatan Siswa:
+                        <div class="p-3 rounded h-100" style="background: #fff8e1; border-left: 4px solid #ffc107;">
+                            <strong class="text-warning-emphasis small mb-1 d-block">
+                                Kritik Membangun:
                             </strong>
                             <p class="mb-0 text-dark small" style="line-height: 1.6;">
                                 {{ $review->kritik ?: 'Tidak ada kritik tertulis.' }}
@@ -178,9 +178,9 @@
                         </div>
                     </div>
                     <div class="col-md-6">
-                        <div class="p-3 rounded h-100" style="background: #f0fdf4; border-left: 4px solid #22c55e;">
-                            <strong class="text-success small d-flex align-items-center gap-1 mb-1">
-                                <i class="bi bi-lightbulb-fill"></i> Saran & Harapan Siswa:
+                        <div class="p-3 rounded h-100" style="background: #e1f5fe; border-left: 4px solid #0288d1;">
+                            <strong class="text-primary small mb-1 d-block">
+                                Saran Perbaikan:
                             </strong>
                             <p class="mb-0 text-dark small" style="line-height: 1.6;">
                                 {{ $review->saran ?: 'Tidak ada saran tertulis.' }}

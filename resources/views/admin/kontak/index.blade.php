@@ -117,11 +117,11 @@
                     <div class="mb-2">
                         <div class="d-flex justify-content-between align-items-center mb-1">
                             <label class="form-label small fw-bold text-dark mb-0">Tulis Tanggapan / Jawaban Administrator:</label>
-                            <span id="modalBalasCounter" class="badge bg-light text-muted border small">0 / 100</span>
+                            <span id="modalBalasCounter" class="badge bg-light text-muted border small">0 / 255</span>
                         </div>
-                        <textarea name="balasan" id="modalBalasTextarea" class="form-control" rows="3" maxlength="100" required placeholder="Tuliskan solusi atau jawaban resmi... (maks. 100 karakter)"></textarea>
+                        <textarea name="balasan" id="modalBalasTextarea" class="form-control" rows="3" maxlength="255" required placeholder="Tuliskan solusi atau jawaban resmi... (maks. 255 karakter)"></textarea>
                         <div id="modalBalasWarn" class="text-danger small mt-1 fw-bold" style="display: none;">
-                            <i class="bi bi-exclamation-circle-fill me-1"></i> Anda telah mencapai batas maksimal 100 karakter!
+                            <i class="bi bi-exclamation-circle-fill me-1"></i> Anda telah mencapai batas maksimal 255 karakter!
                         </div>
                     </div>
                 </div>
@@ -162,8 +162,8 @@ const modalBalasWarn = document.getElementById('modalBalasWarn');
 if (modalBalasTextarea) {
     modalBalasTextarea.addEventListener('input', function() {
         const len = this.value.length;
-        if (modalBalasCounter) modalBalasCounter.textContent = `${len} / 100`;
-        if (modalBalasWarn) modalBalasWarn.style.display = len >= 100 ? 'block' : 'none';
+        if (modalBalasCounter) modalBalasCounter.textContent = `${len} / 255`;
+        if (modalBalasWarn) modalBalasWarn.style.display = len >= 255 ? 'block' : 'none';
     });
 }
 
@@ -178,8 +178,8 @@ function openReplyModal(k) {
     
     const val = k.balasan || '';
     modalBalasTextarea.value = val;
-    if (modalBalasCounter) modalBalasCounter.textContent = `${val.length} / 100`;
-    if (modalBalasWarn) modalBalasWarn.style.display = val.length >= 100 ? 'block' : 'none';
+    if (modalBalasCounter) modalBalasCounter.textContent = `${val.length} / 255`;
+    if (modalBalasWarn) modalBalasWarn.style.display = val.length >= 255 ? 'block' : 'none';
 
     const btnHapus = document.getElementById('btnHapusBalasan');
     if (k.balasan) {

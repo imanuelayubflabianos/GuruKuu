@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" data-theme="light" data-bs-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -88,7 +88,7 @@
     {{-- MOBILE HEADER BAR (KHUSUS HP) --}}
     <header class="gk-mobile-header shadow-sm">
         <div class="d-flex align-items-center gap-2">
-            <button class="btn btn-light border p-1 px-2.5 rounded-3" type="button" onclick="GuruKuuTheme.toggleSidebar()" aria-label="Buka Menu">
+            <button class="btn btn-light border p-1 px-2.5 rounded-3" type="button" onclick="GuruKuuTheme.toggleSidebar()" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Menu Sidebar" aria-label="Buka Menu">
                 <i class="bi bi-list fs-4"></i>
             </button>
             <a href="{{ route('siswa.dashboard') }}" class="text-decoration-none d-flex align-items-center gap-2" style="font-size: 1.1rem;">
@@ -104,7 +104,7 @@
         </div>
         <div class="d-flex align-items-center gap-2">
             {{-- PORTAL SIPINTU MOBILE --}}
-            <a href="{{ config('services.sipintu.base_url', 'https://sipintu.smkn1bangsri.sch.id') }}" class="btn btn-light border p-1 rounded-circle shadow-sm d-flex align-items-center justify-content-center" title="Kembali ke Portal SiPintu" style="width: 32px; height: 32px;">
+            <a href="{{ config('services.sipintu.base_url', 'https://sipintu.smkn1bangsri.sch.id') }}" class="btn btn-light border p-1 rounded-circle shadow-sm d-flex align-items-center justify-content-center" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Portal SiPintu" style="width: 32px; height: 32px;">
                 <img src="{{ asset('images/sipintu-logo.png') }}" alt="SiPintu" style="width: 18px; height: 18px; object-fit: contain;">
             </a>
 
@@ -148,7 +148,7 @@
                 {{ $userInitials ?: 'S' }}
             </div>
             <div class="overflow-hidden">
-                <div class="sidebar-profile-name text-truncate" title="{{ auth()->user()->name }}">{{ auth()->user()->name }}</div>
+                <div class="sidebar-profile-name text-truncate">{{ auth()->user()->name }}</div>
                 <div class="sidebar-profile-role text-truncate">
                     @if(auth()->user()->role === 'admin' && session('login_as_siswa'))
                         ADMIN (Mode Siswa)

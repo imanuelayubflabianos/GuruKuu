@@ -26,12 +26,7 @@ class ExportController extends Controller
     public function leaderboardPdf()
     {
         $periodeAktif = Periode::where('status', 'aktif')->first();
-        $leaderboard = Guru::with('jurusan')
-            ->withRatings()
-            ->orderBy('rata_rata_nilai', 'desc')
-            ->orderBy('total_penilaian', 'desc')
-            ->get();
-
+        $leaderboard = Guru::leaderboardFor('rating', null, $periodeAktif?->id);
 
         $pdf = Pdf::loadView('exports.leaderboard-pdf', compact('leaderboard', 'periodeAktif'))
             ->setPaper('a4', 'portrait');
@@ -81,11 +76,7 @@ class ExportController extends Controller
         }
 
         $periodeAktif = Periode::where('status', 'aktif')->first();
-        $leaderboard = Guru::with('jurusan')
-            ->withRatings()
-            ->orderBy('rata_rata_nilai', 'desc')
-            ->orderBy('total_penilaian', 'desc')
-            ->get();
+        $leaderboard = Guru::leaderboardFor('rating', null, $periodeAktif?->id);
         $guru = Guru::with('jurusan')->orderBy('nama', 'asc')->get();
         $siswa = User::where('role', 'siswa')->with(['jurusan', 'kelas'])->orderBy('name', 'asc')->get();
 

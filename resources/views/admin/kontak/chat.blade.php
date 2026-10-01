@@ -197,16 +197,16 @@
                     <span class="small text-muted fw-bold font-mono" style="font-size: 0.75rem;">
                         <i class="bi bi-reply-fill text-primary"></i> Balas ke {{ $senderName }}:
                     </span>
-                    <span id="chatCharCounter" class="badge bg-light text-muted border font-mono" style="font-size: 0.72rem;">0 / 100</span>
+                    <span id="chatCharCounter" class="badge bg-light text-muted border font-mono" style="font-size: 0.72rem;">0 / 255</span>
                 </div>
                 <div class="d-flex gap-2 align-items-end">
                     <textarea name="balasan" 
                               id="chatInputText" 
                               class="form-control" 
                               rows="2" 
-                              maxlength="100" 
+                              maxlength="255" 
                               required 
-                              placeholder="Tuliskan jawaban administrator... (maks. 100 karakter, tanpa link luar)"
+                              placeholder="Tuliskan jawaban administrator... (maks. 255 karakter, tanpa link luar)"
                               style="resize: none; border-radius: 10px;"></textarea>
                     <button type="submit" class="btn btn-primary-custom px-4 py-2.5 rounded-3 d-inline-flex align-items-center gap-1.5 fw-semibold flex-shrink-0" style="height: fit-content;">
                         <span>Kirim</span>
@@ -214,7 +214,7 @@
                     </button>
                 </div>
                 <div id="charLimitWarning" class="text-danger small fw-bold" style="display: none; font-size: 0.72rem;">
-                    <i class="bi bi-exclamation-circle-fill me-1"></i> Batas maksimal 100 karakter telah tercapai!
+                    <i class="bi bi-exclamation-circle-fill me-1"></i> Batas maksimal 255 karakter telah tercapai!
                 </div>
             </div>
         </form>
@@ -236,8 +236,8 @@ document.addEventListener('DOMContentLoaded', function() {
     if (textInput) {
         textInput.addEventListener('input', function() {
             const len = this.value.length;
-            if (counter) counter.textContent = `${len} / 100`;
-            if (warning) warning.style.display = len >= 100 ? 'block' : 'none';
+            if (counter) counter.textContent = `${len} / 255`;
+            if (warning) warning.style.display = len >= 255 ? 'block' : 'none';
         });
 
         // Submit form with Ctrl+Enter or Cmd+Enter

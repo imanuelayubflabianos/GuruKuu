@@ -446,7 +446,7 @@
                 {{-- SSO SIPINTU BUTTON --}}
                 <div class="d-flex align-items-center my-3">
                     <hr class="flex-grow-1 border-secondary opacity-25 m-0">
-                    <span class="px-2 text-muted small" style="font-size: 0.75rem;">ATAU SSO</span>
+                    <span class="px-2 text-muted small" style="font-size: 0.75rem;">ATAU</span>
                     <hr class="flex-grow-1 border-secondary opacity-25 m-0">
                 </div>
 

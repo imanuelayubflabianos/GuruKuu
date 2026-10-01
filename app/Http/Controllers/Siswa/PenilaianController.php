@@ -44,11 +44,11 @@ class PenilaianController extends Controller
             'tanggung_jawab' => 'required|integer|min:1|max:5',
             'kreativitas' => 'required|integer|min:1|max:5',
             'keramahan' => 'required|integer|min:1|max:5',
-            'kritik' => 'nullable|string|max:100',
-            'saran' => 'nullable|string|max:100',
+            'kritik' => 'nullable|string|max:255',
+            'saran' => 'nullable|string|max:255',
         ], [
-            'kritik.max' => 'Kritik dan masukan Anda melebihi batas maksimal 100 karakter.',
-            'saran.max' => 'Saran dan harapan Anda melebihi batas maksimal 100 karakter.',
+            'kritik.max' => 'Kritik dan masukan Anda melebihi batas maksimal 255 karakter.',
+            'saran.max' => 'Saran dan harapan Anda melebihi batas maksimal 255 karakter.',
         ]);
 
         $user = auth()->user();
