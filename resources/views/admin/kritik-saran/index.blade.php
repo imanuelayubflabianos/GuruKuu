@@ -353,267 +353,6 @@
                         </div>
                     </td>
                 </tr>
-
-                {{-- MODAL POPUP RINCIAN EVALUASI & NILAI SISWA LENGKAP --}}
-                <div class="modal fade" id="modalDetailEvaluasi-{{ $f->id }}" tabindex="-1" aria-labelledby="modalLabel-{{ $f->id }}" aria-hidden="true">
-                    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-                        <div class="modal-content border-0 shadow-lg" style="border-radius: 16px; overflow: hidden;">
-                            <div class="modal-header border-bottom py-3 px-4" style="background: linear-gradient(135deg, #003366 0%, #004d99 100%); color: white;">
-                                <div>
-                                    <div class="d-flex align-items-center gap-2 mb-1">
-                                        <h5 class="modal-title fw-bold mb-0 text-white" id="modalLabel-{{ $f->id }}">
-                                            <i class="bi bi-card-checklist me-2 text-warning"></i>Rincian Evaluasi & Penilaian Siswa
-                                        </h5>
-                                        <span class="badge bg-warning text-dark font-mono" style="font-size: 0.7rem;">
-                                            ID #{{ $f->id }}
-                                        </span>
-                                    </div>
-                                    <div class="small opacity-75">
-                                        Diajukan pada: {{ $f->created_at->translatedFormat('l, d F Y - H:i') }} WIB &bull; Periode: {{ $f->periode?->nama_periode ?? '-' }}
-                                    </div>
-                                </div>
-                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                            </div>
-
-                            <div class="modal-body p-4 bg-light">
-                                {{-- INFORMASI GURU & SISWA --}}
-                                <div class="row g-3 mb-4">
-                                    {{-- KARTU GURU --}}
-                                    <div class="col-md-6">
-                                        <div class="p-3 bg-white rounded-3 border h-100 shadow-sm">
-                                            <div class="text-uppercase small font-mono fw-bold text-muted mb-2">
-                                                <i class="bi bi-person-badge-fill text-primary me-1"></i> Guru yang Dinilai
-                                            </div>
-                                            <div class="d-flex align-items-center gap-3">
-                                                <img src="{{ $f->guru->photo_url }}" class="rounded-circle border" style="width: 50px; height: 50px; object-fit: cover;">
-                                                <div>
-                                                    <div class="fw-bold text-dark fs-6">{{ $f->guru->nama }}</div>
-                                                    <div class="text-muted font-mono small">NIP: {{ $f->guru->nip }}</div>
-                                                    <div class="mt-1 d-flex gap-1">
-                                                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle" style="font-size: 0.68rem;">
-                                                            {{ strtoupper($f->guru->kategori) }}
-                                                        </span>
-                                                        @if($f->guru->jurusan)
-                                                            <span class="badge bg-light text-dark border" style="font-size: 0.68rem;">
-                                                                {{ $f->guru->jurusan->nama_jurusan }}
-                                                            </span>
-                                                        @endif
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    {{-- KARTU SISWA PENILAI --}}
-                                    <div class="col-md-6">
-                                        <div class="p-3 bg-white rounded-3 border h-100 shadow-sm">
-                                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                                <div class="text-uppercase small font-mono fw-bold text-muted">
-                                                    <i class="bi bi-mortarboard-fill text-success me-1"></i> Identitas Siswa Penilai
-                                                </div>
-                                                <span class="badge bg-secondary-subtle text-secondary border" style="font-size: 0.65rem;">
-                                                    <i class="bi bi-shield-lock-fill me-1"></i>Khusus Admin
-                                                </span>
-                                            </div>
-                                            @if($f->siswa)
-                                                <div class="fw-bold text-dark fs-6">{{ $f->siswa->name }}</div>
-                                                <div class="text-muted font-mono small">NIS: {{ $f->siswa->nis }} &bull; Kelas: {{ $f->kelas?->label_singkat ?? ($f->siswa->kelas?->label_singkat ?? '-') }}</div>
-                                                <div class="text-muted small mt-1" style="font-size: 0.75rem;">
-                                                    <i class="bi bi-info-circle me-1 text-primary"></i>Identitas dirahasiakan saat ulasan ditampilkan kepada Guru & publik.
-                                                </div>
-                                            @else
-                                                <div class="fw-bold text-dark fs-6">Siswa Anonim</div>
-                                                <div class="text-muted small">Akun siswa tidak terdata.</div>
-                                            @endif
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {{-- SKORBOARD UTAMA --}}
-                                <div class="p-3 mb-4 rounded-3 text-white shadow-sm" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);">
-                                    <div class="row align-items-center text-center text-md-start g-3">
-                                        <div class="col-md-7 border-end-md">
-                                            <span class="text-uppercase font-mono small text-warning fw-bold">Skor Rata-Rata & Bintang</span>
-                                            <div class="d-flex align-items-baseline justify-content-center justify-content-md-start gap-2 my-1">
-                                                <h1 class="display-5 fw-bold mb-0 text-white font-mono">{{ number_format($avgScore, 2) }}</h1>
-                                                <span class="text-white-50 fs-5 fw-normal">/ 5.00</span>
-                                            </div>
-                                            <div class="d-flex align-items-center justify-content-center justify-content-md-start gap-1 text-warning fs-5">
-                                                @for($i = 1; $i <= 5; $i++)
-                                                    <i class="bi bi-star-fill {{ $i <= $roundedStar ? 'text-warning' : 'text-secondary' }}"></i>
-                                                @endfor
-                                            </div>
-                                        </div>
-                                        <div class="col-md-5 text-center text-md-end">
-                                            <div class="font-mono text-white-50 small mb-1">Akumulasi 5 Aspek</div>
-                                            <div class="fs-4 fw-bold font-mono text-white mb-1">{{ $f->total_nilai }} <span class="text-white-50 fs-6">/ 25 Poin</span></div>
-                                            <div>
-                                                @if($f->total_nilai >= 22)
-                                                    <span class="badge px-3 py-1.5 fs-6 bg-success text-white">🤩 Luar Biasa ({{ $pctScore }}%)</span>
-                                                @elseif($f->total_nilai >= 18)
-                                                    <span class="badge px-3 py-1.5 fs-6 bg-primary text-white">😊 Sangat Baik ({{ $pctScore }}%)</span>
-                                                @elseif($f->total_nilai >= 14)
-                                                    <span class="badge px-3 py-1.5 fs-6 bg-info text-dark">🙂 Baik ({{ $pctScore }}%)</span>
-                                                @elseif($f->total_nilai >= 10)
-                                                    <span class="badge px-3 py-1.5 fs-6 bg-warning text-dark">😐 Cukup ({{ $pctScore }}%)</span>
-                                                @else
-                                                    <span class="badge px-3 py-1.5 fs-6 bg-danger text-white">😞 Perlu Ditingkatkan ({{ $pctScore }}%)</span>
-                                                @endif
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {{-- BREAKDOWN DETAIL 5 ASPEK KRITERIA --}}
-                                <div class="card border-0 rounded-3 shadow-sm mb-4">
-                                    <div class="card-header bg-white py-3 border-bottom">
-                                        <div class="d-flex justify-content-between align-items-center">
-                                            <h6 class="fw-bold mb-0 text-dark">
-                                                <i class="bi bi-sliders me-2 text-primary"></i>Rincian Nilai & Bintang per Aspek Pengajaran
-                                            </h6>
-                                            <span class="badge bg-light text-muted border font-mono">Skala Nilai 1 s/d 5</span>
-                                        </div>
-                                    </div>
-                                    <div class="card-body p-3">
-                                        @php
-                                            $detailAspek = [
-                                                'kedisiplinan'   => ['label' => 'Ketepatan Waktu', 'val' => $f->kedisiplinan, 'desc' => 'Guru masuk kelas tepat waktu dan memulai pembelajaran sesuai jadwal.', 'icon' => 'bi-clock-history', 'color' => '#0284c7'],
-                                                'tanggung_jawab' => ['label' => 'Kehadiran di Kelas', 'val' => $f->tanggung_jawab, 'desc' => 'Guru tetap berada di kelas selama proses pembelajaran dan tidak sering meninggalkan kelas tanpa alasan yang jelas.', 'icon' => 'bi-door-open-fill', 'color' => '#16a34a'],
-                                                'komunikasi'     => ['label' => 'Penyampaian Materi', 'val' => $f->komunikasi, 'desc' => 'Guru menyampaikan materi ajar dengan jelas, sistematis, dan mudah dipahami.', 'icon' => 'bi-book-half', 'color' => '#0d9488'],
-                                                'keramahan'      => ['label' => 'Interaksi dengan Siswa', 'val' => $f->keramahan, 'desc' => 'Guru berinteraksi dengan baik, memberikan kesempatan bertanya/berpendapat, dan merespons siswa dengan baik.', 'icon' => 'bi-people-fill', 'color' => '#e11d48'],
-                                                'kreativitas'    => ['label' => 'Keterlibatan & Suasana Belajar', 'val' => $f->kreativitas, 'desc' => 'Guru menciptakan pembelajaran yang menarik, melibatkan siswa secara aktif, dan membuat suasana belajar nyaman.', 'icon' => 'bi-stars', 'color' => '#d97706'],
-                                            ];
-                                        @endphp
-
-                                        <div class="row g-2">
-                                            @foreach($detailAspek as $aspKey => $dAsp)
-                                                @php
-                                                    $nilai = $dAsp['val'] ?? 0;
-                                                    $pct = round(($nilai / 5) * 100);
-                                                @endphp
-                                                <div class="col-12">
-                                                    <div class="p-3 rounded border bg-light d-flex align-items-center justify-content-between flex-wrap gap-2">
-                                                        <div class="d-flex align-items-center gap-3" style="max-width: 60%;">
-                                                            <div class="rounded-circle d-flex align-items-center justify-content-center text-white" style="width: 38px; height: 38px; background: {{ $dAsp['color'] }}; flex-shrink: 0;">
-                                                                <i class="bi {{ $dAsp['icon'] }} fs-5"></i>
-                                                            </div>
-                                                            <div>
-                                                                <div class="fw-bold text-dark">{{ $dAsp['label'] }}</div>
-                                                                <div class="text-muted small" style="font-size: 0.78rem;">{{ $dAsp['desc'] }}</div>
-                                                            </div>
-                                                        </div>
-                                                        <div class="d-flex align-items-center gap-3 ms-auto">
-                                                            <div class="text-warning fs-6">
-                                                                @for($s = 1; $s <= 5; $s++)
-                                                                    <i class="bi bi-star-fill {{ $s <= $nilai ? 'text-warning' : 'text-secondary-subtle' }}"></i>
-                                                                @endfor
-                                                            </div>
-                                                            <div class="text-end" style="min-width: 65px;">
-                                                                <span class="fs-5 fw-bold font-mono text-dark">{{ $nilai }}</span>
-                                                                <span class="text-muted font-mono small">/ 5</span>
-                                                            </div>
-                                                            <div class="progress" style="width: 70px; height: 8px;">
-                                                                <div class="progress-bar" style="width: {{ $pct }}%; background: {{ $dAsp['color'] }};"></div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            @endforeach
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {{-- ISI ULASAN KRITIK & SARAN --}}
-                                <div class="card border-0 rounded-3 shadow-sm">
-                                    <div class="card-header bg-white py-3 border-bottom">
-                                        <h6 class="fw-bold mb-0 text-dark">
-                                            <i class="bi bi-chat-square-text me-2 text-primary"></i>Ulasan Tertulis Siswa
-                                        </h6>
-                                    </div>
-                                    <div class="card-body p-3">
-                                        <div class="row g-3">
-                                            <div class="col-md-6">
-                                                <div class="p-3 rounded h-100" style="background: #fff8e1; border-left: 4px solid #ffc107;">
-                                                    <div class="text-warning-emphasis fw-bold small mb-2">
-                                                        Kritik Membangun:
-                                                    </div>
-                                                    <p class="mb-0 text-dark small" style="line-height: 1.6;">
-                                                        {{ $f->kritik ?: 'Tidak ada kritik tertulis.' }}
-                                                    </p>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <div class="p-3 rounded h-100" style="background: #e1f5fe; border-left: 4px solid #0288d1;">
-                                                    <div class="text-primary fw-bold small mb-2">
-                                                        Saran Perbaikan:
-                                                    </div>
-                                                    <p class="mb-0 text-dark small" style="line-height: 1.6;">
-                                                        {{ $f->saran ?: 'Tidak ada saran tertulis.' }}
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        @if($isCensored)
-                                            <div class="alert alert-warning mt-3 mb-0 py-2 small d-flex align-items-center gap-2">
-                                                <i class="bi bi-shield-exclamation fs-5 text-warning"></i>
-                                                <div>
-                                                    <strong>Status Ulasan: Disensor / Disembunyikan dari Publik.</strong><br>
-                                                    <span class="text-muted">{{ $f->censored_reason ?: 'Tidak memenuhi pedoman komunitas.' }}</span>
-                                                </div>
-                                            </div>
-                                        @endif
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="modal-footer bg-white border-top py-2.5 px-4 d-flex justify-content-between">
-                                <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">
-                                    <i class="bi bi-x-circle me-1"></i>Tutup
-                                </button>
-                                <div class="d-flex gap-1.5">
-                                    @if(!$isCensored)
-                                        <form action="{{ route('admin.kritik-saran.warn', $f->id) }}" method="POST" class="d-inline"
-                                              data-confirm="Beri peringatan kepada {{ $f->siswa ? $f->siswa->name : 'siswa ini' }} dan sensor ulasan?"
-                                              data-confirm-title="Beri Peringatan & Sensor"
-                                              data-confirm-btn="Beri Peringatan"
-                                              data-confirm-type="warning">
-                                            @csrf
-                                            <button type="submit" class="btn btn-warning btn-sm text-dark fw-semibold">
-                                                <i class="bi bi-shield-exclamation me-1"></i>Sensor & Peringatan
-                                            </button>
-                                        </form>
-                                    @else
-                                        <form action="{{ route('admin.kritik-saran.unwarn', $f->id) }}" method="POST" class="d-inline"
-                                              data-confirm="Batalkan sensor dan buka kembali ulasan ini?"
-                                              data-confirm-title="Batalkan Sensor"
-                                              data-confirm-btn="Buka Sensor"
-                                              data-confirm-type="question">
-                                            @csrf
-                                            <button type="submit" class="btn btn-success btn-sm fw-semibold">
-                                                <i class="bi bi-shield-check me-1"></i>Buka Sensor
-                                            </button>
-                                        </form>
-                                    @endif
-
-                                    <form action="{{ route('admin.kritik-saran.destroy', $f->id) }}" method="POST" class="d-inline"
-                                          data-confirm="Hapus permanen evaluasi & ulasan ini? Rating guru akan dihitung ulang."
-                                          data-confirm-title="Hapus Permanen"
-                                          data-confirm-btn="Hapus"
-                                          data-confirm-type="danger">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-danger btn-sm">
-                                            <i class="bi bi-trash me-1"></i>Hapus Permanen
-                                        </button>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                {{-- END MODAL --}}
-
                 @empty
                 <tr>
                     <td colspan="6" class="text-center py-5 text-muted">
@@ -630,4 +369,235 @@
         <div class="pt-3 mt-3 border-top d-flex justify-content-center">{{ $feedbacks->links() }}</div>
     @endif
 </div>
+
+{{-- MODAL DETAIL EVALUASI & PENILAIAN SISWA (DITEMPATKAN DI LUAR TABEL AGAR TIDAK KEDAP-KEDIP) --}}
+@foreach($feedbacks as $f)
+    @php
+        $mAvgScore = $f->total_nilai > 0 ? round($f->total_nilai / 5, 2) : 0;
+        $mPctScore = round(($mAvgScore / 5) * 100);
+        $mRoundedStar = round($mAvgScore);
+        $mAspekList = [
+            'Ketepatan Waktu' => [
+                'val' => $f->kedisiplinan,
+                'desc' => 'Guru masuk kelas tepat waktu dan memulai pembelajaran sesuai jadwal.',
+                'icon' => 'bi-clock-history',
+                'color' => '#0284c7',
+                'bg' => '#f0f9ff'
+            ],
+            'Kehadiran di Kelas' => [
+                'val' => $f->kehadiran,
+                'desc' => 'Guru tetap berada di kelas selama proses pembelajaran dan tidak sering meninggalkan kelas tanpa alasan yang jelas.',
+                'icon' => 'bi-door-open',
+                'color' => '#059669',
+                'bg' => '#ecfdf5'
+            ],
+            'Penyampaian Materi' => [
+                'val' => $f->kejelasan_materi,
+                'desc' => 'Guru menyampaikan materi ajar dengan jelas, sistematis, dan mudah dipahami.',
+                'icon' => 'bi-book-half',
+                'color' => '#0d9488',
+                'bg' => '#f0fdfa'
+            ],
+            'Interaksi dengan Siswa' => [
+                'val' => $f->keramahan,
+                'desc' => 'Guru ramah, komunikatif, bersahabat, dan memberi kesempatan siswa untuk bertanya atau berdiskusi.',
+                'icon' => 'bi-chat-heart',
+                'color' => '#e11d48',
+                'bg' => '#fff1f2'
+            ],
+            'Keterlibatan & Suasana Belajar' => [
+                'val' => $f->kreativitas,
+                'desc' => 'Guru menciptakan suasana kelas yang menyenangkan, aktif, dan tidak membosankan.',
+                'icon' => 'bi-stars',
+                'color' => '#d97706',
+                'bg' => '#fffbeb'
+            ],
+        ];
+    @endphp
+    <div class="modal fade" id="modalDetailEvaluasi-{{ $f->id }}" tabindex="-1" aria-labelledby="modalDetailLabel-{{ $f->id }}" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+            <div class="modal-content border-0 shadow-lg" style="border-radius: 16px; overflow: hidden;">
+                {{-- MODAL HEADER SESUAI TEMA GURUKUU --}}
+                <div class="modal-header text-white px-4 py-3" style="background: linear-gradient(135deg, #003366 0%, #004d99 100%);">
+                    <div>
+                        <div class="d-flex align-items-center gap-2 mb-1">
+                            <span class="badge" style="background: rgba(255,255,255,0.2); font-size: 0.72rem; letter-spacing: 0.5px;">EVALUASI SISWA</span>
+                            <h5 class="modal-title fw-bold text-white mb-0" id="modalDetailLabel-{{ $f->id }}" style="font-size: 1.1rem;">
+                                Rincian Evaluasi & Penilaian
+                            </h5>
+                        </div>
+                        <div class="text-white-50 small d-flex flex-wrap align-items-center gap-2" style="font-size: 0.78rem;">
+                            <span><i class="bi bi-calendar-event me-1"></i>{{ $f->created_at->isoFormat('dddd, D MMMM Y - HH:mm') }} WIB</span>
+                            @if($f->periode)
+                                <span>&bull;</span>
+                                <span><i class="bi bi-clock-history me-1"></i>Periode: {{ $f->periode->nama_periode }}</span>
+                            @endif
+                        </div>
+                    </div>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Tutup"></button>
+                </div>
+
+                {{-- MODAL BODY --}}
+                <div class="modal-body p-4" style="background: #f8fafc;">
+                    {{-- INFO GURU & SISWA DENGAN TEMA BERSIH --}}
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <div class="p-3 bg-white rounded-3 border h-100 shadow-sm">
+                                <small class="text-muted fw-bold d-block text-uppercase mb-2" style="font-size: 0.68rem; letter-spacing: 0.5px;">Guru yang Dinilai</small>
+                                <div class="d-flex align-items-center gap-2.5">
+                                    <img src="{{ $f->guru->photo_url }}" class="rounded-circle border" style="width: 44px; height: 44px; object-fit: cover;">
+                                    <div>
+                                        <div class="fw-bold text-dark" style="font-size: 0.95rem;">{{ $f->guru->nama }}</div>
+                                        <div class="text-muted font-mono" style="font-size: 0.75rem;">NIP: {{ $f->guru->nip }}</div>
+                                        <span class="badge mt-1" style="background: rgba(0,51,102,0.08); color: #003366; font-size: 0.7rem;">
+                                            {{ strtoupper($f->guru->kategori) }} {{ $f->guru->jurusan ? '&bull; ' . $f->guru->jurusan->nama_jurusan : '' }}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="p-3 bg-white rounded-3 border h-100 shadow-sm">
+                                <small class="text-muted fw-bold d-block text-uppercase mb-2" style="font-size: 0.68rem; letter-spacing: 0.5px;">Identitas Siswa (Khusus Admin)</small>
+                                @if($f->siswa)
+                                    <div class="fw-bold text-dark" style="font-size: 0.95rem;">{{ $f->siswa->name }}</div>
+                                    <div class="text-muted font-mono" style="font-size: 0.75rem;">NIS: {{ $f->siswa->nis }}</div>
+                                    <div class="d-flex align-items-center gap-1.5 mt-1.5">
+                                        <span class="badge bg-light text-dark border" style="font-size: 0.72rem;">
+                                            <i class="bi bi-mortarboard me-1 text-primary"></i>{{ $f->kelas?->label_singkat ?? ($f->siswa->kelas?->label_singkat ?? 'Kelas -') }}
+                                        </span>
+                                        <span class="badge bg-secondary-subtle text-secondary border" style="font-size: 0.68rem;">
+                                            <i class="bi bi-shield-lock-fill me-0.5"></i>Anonim Publik & Guru
+                                        </span>
+                                    </div>
+                                @else
+                                    <div class="fw-bold text-dark"><i class="bi bi-incognito me-1"></i>Siswa (Data Anonim)</div>
+                                    <small class="text-muted">Data Akun Siswa</small>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- RINGKASAN SKOR DENGAN TEMA TERANG GURUKUU --}}
+                    <div class="p-3.5 bg-white rounded-3 border shadow-sm mb-4" style="border-left: 4px solid #003366 !important;">
+                        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+                            <div>
+                                <div class="text-uppercase fw-bold text-muted mb-1" style="font-size: 0.72rem; letter-spacing: 0.5px;">Skor Rata-Rata & Bintang</div>
+                                <div class="d-flex align-items-baseline gap-2">
+                                    <span class="fw-extrabold font-mono" style="font-size: 2.2rem; line-height: 1; color: #003366;">{{ number_format($mAvgScore, 2) }}</span>
+                                    <span class="text-muted fw-semibold" style="font-size: 0.95rem;">/ 5.00</span>
+                                </div>
+                                <div class="d-flex text-warning mt-1.5" style="font-size: 1.15rem; gap: 3px;">
+                                    @for($i = 1; $i <= 5; $i++)
+                                        <i class="bi bi-star-fill {{ $i <= $mRoundedStar ? 'text-warning' : 'text-black-50 opacity-25' }}"></i>
+                                    @endfor
+                                </div>
+                            </div>
+                            <div class="text-md-end">
+                                <div class="text-muted small fw-semibold mb-1">Akumulasi 5 Aspek</div>
+                                <div class="fw-bold font-mono text-dark" style="font-size: 1.25rem;">
+                                    {{ $f->total_nilai }} <span class="text-muted fw-normal" style="font-size: 0.85rem;">/ 25 Poin</span>
+                                </div>
+                                <div class="mt-1">
+                                    @if($mPctScore >= 80)
+                                        <span class="badge bg-success-subtle text-success border border-success-subtle px-2.5 py-1" style="font-size: 0.8rem;">
+                                            <i class="bi bi-emoji-smile-fill me-1"></i>Sangat Baik ({{ $mPctScore }}%)
+                                        </span>
+                                    @elseif($mPctScore >= 60)
+                                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2.5 py-1" style="font-size: 0.8rem;">
+                                            <i class="bi bi-hand-thumbs-up-fill me-1"></i>Baik ({{ $mPctScore }}%)
+                                        </span>
+                                    @else
+                                        <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle px-2.5 py-1" style="font-size: 0.8rem;">
+                                            <i class="bi bi-exclamation-circle-fill me-1"></i>Cukup ({{ $mPctScore }}%)
+                                        </span>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- RINCIAN PER ASPEK PENGAJARAN --}}
+                    <div class="d-flex align-items-center justify-content-between mb-2.5">
+                        <h6 class="fw-bold text-dark mb-0" style="font-size: 0.95rem;">
+                            <i class="bi bi-sliders2-vertical text-primary me-1.5"></i>Rincian Nilai & Bintang per Aspek
+                        </h6>
+                        <span class="text-muted small">Skala Nilai 1 s/d 5</span>
+                    </div>
+
+                    <div class="d-flex flex-column gap-2.5 mb-4">
+                        @foreach($mAspekList as $aspekTitle => $asp)
+                            @php
+                                $val = $asp['val'] ?? 0;
+                                $pct = round(($val / 5) * 100);
+                            @endphp
+                            <div class="p-3 bg-white rounded-3 border shadow-sm">
+                                <div class="d-flex align-items-center justify-content-between mb-1.5">
+                                    <div class="d-flex align-items-center gap-2.5">
+                                        <div class="rounded-2 d-flex align-items-center justify-content-center" style="width: 34px; height: 34px; background: {{ $asp['bg'] }}; color: {{ $asp['color'] }}; font-size: 1.1rem;">
+                                            <i class="bi {{ $asp['icon'] }}"></i>
+                                        </div>
+                                        <div>
+                                            <div class="fw-bold text-dark" style="font-size: 0.88rem;">{{ $aspekTitle }}</div>
+                                            <div class="text-muted" style="font-size: 0.75rem; line-height: 1.3;">{{ $asp['desc'] }}</div>
+                                        </div>
+                                    </div>
+                                    <div class="text-end ps-3">
+                                        <div class="d-flex align-items-center justify-content-end gap-1.5">
+                                            <div class="d-flex text-warning" style="font-size: 0.85rem;">
+                                                @for($s = 1; $s <= 5; $s++)
+                                                    <i class="bi bi-star-fill {{ $s <= $val ? 'text-warning' : 'text-black-50 opacity-25' }}"></i>
+                                                @endfor
+                                            </div>
+                                            <span class="fw-bold font-mono text-dark ms-1" style="font-size: 0.95rem;">{{ $val }}</span>
+                                            <span class="text-muted small">/ 5</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="progress mt-2" style="height: 6px; background-color: #f1f5f9; border-radius: 999px;">
+                                    <div class="progress-bar rounded-pill" role="progressbar" style="width: {{ $pct }}%; background-color: {{ $asp['color'] }};" aria-valuenow="{{ $val }}" aria-valuemin="1" aria-valuemax="5"></div>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+
+                    {{-- ULASAN KRITIK & SARAN --}}
+                    <h6 class="fw-bold text-dark mb-2.5" style="font-size: 0.95rem;">
+                        <i class="bi bi-chat-quote-fill text-primary me-1.5"></i>Teks Kritik & Saran Siswa
+                    </h6>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="p-3 rounded-3 border h-100 shadow-sm" style="background: #fffafa; border-color: #fecdd3 !important;">
+                                <div class="text-danger fw-bold d-flex align-items-center gap-1.5 mb-2" style="font-size: 0.82rem;">
+                                    <i class="bi bi-chat-left-dots-fill"></i> Kritik Siswa:
+                                </div>
+                                <div class="text-dark" style="font-size: 0.85rem; line-height: 1.5;">
+                                    {{ $f->kritik ?: 'Tidak ada teks kritik yang disertakan.' }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="p-3 rounded-3 border h-100 shadow-sm" style="background: #f0fdf4; border-color: #bbf7d0 !important;">
+                                <div class="text-success fw-bold d-flex align-items-center gap-1.5 mb-2" style="font-size: 0.82rem;">
+                                    <i class="bi bi-lightbulb-fill"></i> Saran Siswa:
+                                </div>
+                                <div class="text-dark" style="font-size: 0.85rem; line-height: 1.5;">
+                                    {{ $f->saran ?: 'Tidak ada teks saran yang disertakan.' }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- MODAL FOOTER --}}
+                <div class="modal-footer bg-white border-top px-4 py-2.5">
+                    <button type="button" class="btn btn-secondary btn-sm px-3" data-bs-dismiss="modal">
+                        Tutup
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+@endforeach
 @endsection
+

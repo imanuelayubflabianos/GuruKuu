@@ -3,88 +3,54 @@
 
 @section('content')
 <style>
-    .chat-container {
-        display: flex;
-        flex-direction: column;
-        height: calc(100vh - 200px);
-        min-height: 480px;
-        background: #ffffff;
+    .chat-wrapper {
         border-radius: 16px;
-        border: 1px solid var(--border, #e2e8f0);
         overflow: hidden;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
     }
-    [data-theme="dark"] .chat-container {
-        background: #111a2e;
+    .chat-stream-box {
+        height: 55vh;
+        min-height: 420px;
+        overflow-y: auto;
+        background: #f8fafc;
+        border: 1px solid var(--border, #e2e8f0);
+        border-bottom: none;
+        border-radius: 16px 16px 0 0;
+        padding: 1.5rem;
+    }
+    [data-theme="dark"] .chat-stream-box {
+        background: #0b1329;
         border-color: rgba(255, 255, 255, 0.1);
     }
-    .chat-header {
-        padding: 1rem 1.5rem;
-        background: var(--bg-card, #ffffff);
-        border-bottom: 1px solid var(--border, #e2e8f0);
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        flex-wrap: wrap;
-        gap: 0.75rem;
+    .chat-footer-box {
+        background: #ffffff;
+        border: 1px solid var(--border, #e2e8f0);
+        border-radius: 0 0 16px 16px;
+        padding: 1rem 1.25rem;
     }
-    [data-theme="dark"] .chat-header {
+    [data-theme="dark"] .chat-footer-box {
         background: #152238;
         border-color: rgba(255, 255, 255, 0.1);
     }
-    .chat-messages {
-        flex: 1;
-        overflow-y: auto;
-        padding: 1.5rem;
-        background: var(--bg-light, #f8fafc);
-        display: flex;
-        flex-direction: column;
-        gap: 1.25rem;
+    .bubble-admin {
+        background: linear-gradient(135deg, var(--primary, #003366) 0%, #004d99 100%);
+        color: white;
+        padding: 0.85rem 1.15rem;
+        border-radius: 18px 18px 4px 18px;
+        max-width: 82%;
+        box-shadow: 0 4px 12px rgba(0, 51, 102, 0.18);
     }
-    [data-theme="dark"] .chat-messages {
-        background: #0b1329;
-    }
-    .chat-bubble-wrapper {
-        display: flex;
-        flex-direction: column;
-        max-width: 78%;
-    }
-    .chat-bubble-incoming {
-        align-self: flex-start;
-    }
-    .chat-bubble-incoming .bubble-body {
-        background: #ffffff;
+    .bubble-user {
+        background: white;
         color: var(--text-dark, #0f172a);
         border: 1px solid var(--border, #e2e8f0);
-        border-radius: 16px 16px 16px 4px;
         padding: 0.85rem 1.15rem;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+        border-radius: 18px 18px 18px 4px;
+        max-width: 82%;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
     }
-    [data-theme="dark"] .chat-bubble-incoming .bubble-body {
+    [data-theme="dark"] .bubble-user {
         background: #1e293b;
         color: #f1f5f9;
-        border-color: rgba(255, 255, 255, 0.1);
-    }
-    .chat-bubble-outgoing {
-        align-self: flex-end;
-    }
-    .chat-bubble-outgoing .bubble-body {
-        background: linear-gradient(135deg, var(--primary, #003366) 0%, #004d99 100%);
-        color: #ffffff;
-        border-radius: 16px 16px 4px 16px;
-        padding: 0.85rem 1.15rem;
-        box-shadow: 0 4px 12px rgba(0, 51, 102, 0.2);
-    }
-    [data-theme="dark"] .chat-bubble-outgoing .bubble-body {
-        background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
-    }
-    .chat-footer {
-        padding: 1rem 1.25rem;
-        background: var(--bg-card, #ffffff);
-        border-top: 1px solid var(--border, #e2e8f0);
-    }
-    [data-theme="dark"] .chat-footer {
-        background: #152238;
         border-color: rgba(255, 255, 255, 0.1);
     }
 </style>
@@ -117,104 +83,121 @@
     </div>
 @endif
 
-<div class="chat-container">
-    {{-- HEADER PERCAKAPAN --}}
-    <div class="chat-header">
-        <div class="d-flex align-items-center gap-3">
-            <div class="rounded-circle bg-primary-subtle text-primary fw-bold d-flex align-items-center justify-content-center" style="width: 44px; height: 44px; font-size: 1.1rem;">
-                {{ strtoupper(substr($senderName, 0, 1)) }}
-            </div>
-            <div>
-                <h6 class="fw-bold mb-0 text-dark">{{ $senderName }}</h6>
-                <div class="d-flex align-items-center gap-2 mt-0.5">
-                    <span class="badge bg-light text-secondary border font-mono" style="font-size: 0.72rem;">
-                        <i class="bi bi-shield-check text-success me-0.5"></i> {{ $roleLabel }}
-                    </span>
-                    @if($userObj && $userObj->nama_kelas)
-                        <span class="badge bg-light text-muted border font-mono" style="font-size: 0.72rem;">
-                            Kelas: {{ $userObj->nama_kelas }}
-                        </span>
-                    @endif
-                </div>
-            </div>
+{{-- HEADER CHAT IDENTIK DENGAN GAMBAR 4 / PUSAT BANTUAN --}}
+<div class="card-custom mb-3 overflow-hidden shadow-sm" style="border-radius: 14px; border: none;">
+    <div class="p-3 d-flex align-items-center gap-3" style="background: linear-gradient(135deg, var(--primary, #003366) 0%, #004d99 100%); color: white;">
+        <div class="d-flex align-items-center justify-content-center rounded-circle" style="width: 48px; height: 48px; background: rgba(255,255,255,0.2); backdrop-filter: blur(10px); flex-shrink: 0;">
+            <i class="bi bi-headset fs-4 text-white"></i>
         </div>
-        <div class="d-flex align-items-center gap-2 text-muted small font-mono">
-            <i class="bi bi-lock-fill text-success"></i>
-            <span>Pesan Terenkripsi Aman</span>
+        <div class="flex-grow-1">
+            <h6 class="fw-bold mb-0 text-white">{{ $senderName }}</h6>
+            <small style="opacity: 0.92;">
+                <i class="bi bi-circle-fill text-success me-1" style="font-size: 0.5rem;"></i>
+                Online • {{ $roleLabel }} {{ $userObj && $userObj->nama_kelas ? '• ' . $userObj->nama_kelas : '' }}
+            </small>
+        </div>
+        <div>
+            <span class="badge bg-light text-dark px-2.5 py-1.5 rounded-pill font-mono" style="font-size: 0.72rem;">
+                <i class="bi bi-shield-lock-fill me-1 text-success"></i> Terenkripsi
+            </span>
         </div>
     </div>
+</div>
 
-    {{-- STREAM PESAN (THREAD BUBBLES) --}}
-    <div class="chat-messages" id="chatMessagesStream">
+{{-- AREA PERCAKAPAN & FORM INPUT (IDENTIK DENGAN GAMBAR 4) --}}
+<div class="chat-wrapper shadow-sm">
+    {{-- AREA STREAM PESAN --}}
+    <div class="chat-stream-box" id="chatMessagesStream">
         @forelse($riwayat as $item)
-            {{-- PESAN DARI PENGGUNA (KIRI) --}}
-            <div class="chat-bubble-wrapper chat-bubble-incoming">
-                <div class="d-flex align-items-center gap-1.5 mb-1 px-1">
-                    <span class="small fw-bold text-dark font-mono" style="font-size: 0.75rem;">{{ $item->pengirim }}</span>
-                    <span class="text-muted font-mono" style="font-size: 0.7rem;">&bull; {{ $item->created_at->format('d M, H:i') }} WIB</span>
-                </div>
-                <div class="bubble-body">
-                    <p class="mb-0" style="line-height: 1.5; word-wrap: break-word;">
-                        @if($item->pesan === '[Pesan Dihapus]')
-                            <span class="fst-italic text-muted">[Pesan Dihapus]</span>
-                        @else
-                            {{ $item->pesan }}
-                        @endif
-                    </p>
+            {{-- PESAN PENGIRIM (SISWA / TAMU) --}}
+            <div class="d-flex justify-content-start mb-3">
+                <div class="d-flex align-items-start gap-2" style="max-width: 82%;">
+                    <div class="d-flex align-items-center justify-content-center rounded-circle flex-shrink-0" style="width: 36px; height: 36px; background: rgba(0, 51, 102, 0.1); color: var(--primary, #003366); font-weight: 700; font-size: 0.85rem;">
+                        {{ strtoupper(substr($senderName, 0, 1)) }}
+                    </div>
+                    <div>
+                        <div class="bubble-user">
+                            <div class="fw-bold mb-1" style="color: var(--primary, #003366); font-size: 0.78rem;">
+                                {{ $item->pengirim }}
+                            </div>
+                            @if($item->pesan === '[Pesan Dihapus]')
+                                <p class="mb-1 fst-italic text-muted small"><i class="bi bi-trash me-1"></i>[Pesan Dihapus]</p>
+                            @else
+                                <p class="mb-1" style="line-height: 1.5; word-wrap: break-word; font-size: 0.92rem;">
+                                    {{ $item->pesan }}
+                                </p>
+                            @endif
+                            <div class="text-end text-muted font-mono" style="font-size: 0.7rem;">
+                                {{ $item->created_at->format('H:i') }} WIB
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            {{-- BALASAN DARI ADMIN JIKA ADA (KANAN) --}}
-            @if($item->balasan)
-                <div class="chat-bubble-wrapper chat-bubble-outgoing">
-                    <div class="d-flex align-items-center justify-content-end gap-1.5 mb-1 px-1">
-                        <span class="badge bg-primary text-white font-mono" style="font-size: 0.68rem;">Administrator</span>
-                        <span class="text-muted font-mono" style="font-size: 0.7rem;">
-                            {{ $item->updated_at->format('d M, H:i') }} WIB
-                        </span>
-                    </div>
-                    <div class="bubble-body">
-                        <p class="mb-0" style="line-height: 1.5; word-wrap: break-word;">
+            {{-- JIKA SUDAH ADA BALASAN DARI ADMIN --}}
+            @if($item->is_replied && $item->balasan)
+                <div class="d-flex justify-content-end mb-3">
+                    <div class="bubble-admin">
+                        <div class="d-flex align-items-center justify-content-between gap-3 mb-1" style="font-size: 0.75rem; opacity: 0.9;">
+                            <span class="fw-bold"><i class="bi bi-patch-check-fill me-1 text-info"></i> Administrator</span>
+                            <span>{{ $item->updated_at->format('H:i') }} WIB</span>
+                        </div>
+                        <p class="mb-1" style="line-height: 1.5; word-wrap: break-word; font-size: 0.92rem;">
                             {{ $item->balasan }}
                         </p>
+                        <div class="text-end mt-1 d-flex justify-content-end align-items-center gap-1" style="font-size: 0.7rem; opacity: 0.9;">
+                            <i class="bi bi-check2-all" style="color: #38bdf8; font-weight: bold; font-size: 0.9rem;" title="Terkirim & Dilihat"></i>
+                        </div>
+                    </div>
+                </div>
+            @elseif(!$item->is_replied && $item->pesan !== '[Pesan Dihapus]')
+                <div class="d-flex justify-content-start mb-3 ms-5">
+                    <div class="rounded-pill px-3 py-1 small" style="background: #fef3c7; color: #92400e; font-size: 0.75rem; border: 1px solid #fde68a;">
+                        <i class="bi bi-hourglass-split me-1"></i> Menunggu balasan admin...
                     </div>
                 </div>
             @endif
         @empty
-            <div class="my-auto text-center text-muted py-5">
-                <i class="bi bi-chat-dots fs-1 d-block mb-2 opacity-50"></i>
-                <p>Belum ada pesan dalam riwayat percakapan ini.</p>
+            <div class="text-center py-5 text-muted">
+                <div class="d-inline-flex align-items-center justify-content-center rounded-circle mb-3" style="width: 72px; height: 72px; background: rgba(0,51,102,0.08);">
+                    <i class="bi bi-chat-square-text-fill fs-2" style="color: var(--primary, #003366);"></i>
+                </div>
+                <h6 class="fw-bold mb-1 text-dark">Belum Ada Pesan</h6>
+                <p class="small mb-0">Belum ada riwayat pesan percakapan ini.</p>
             </div>
         @endforelse
     </div>
 
-    {{-- INPUT KIRIM BALASAN CEPAT --}}
-    <div class="chat-footer">
-        <form action="{{ route('admin.kontak.chat.send', $identifier) }}" method="POST" class="m-0" id="chatReplyForm">
+    {{-- FORM KIRIM BALASAN (PERSIS GAMBAR 4 DENGAN COUNTER & TOMBOL SENDFILL) --}}
+    <div class="chat-footer-box">
+        <form action="{{ route('admin.kontak.chat.send', $identifier) }}" method="POST" id="chatReplyForm" class="m-0">
             @csrf
-            <div class="d-flex flex-column gap-2">
-                <div class="d-flex justify-content-between align-items-center">
-                    <span class="small text-muted fw-bold font-mono" style="font-size: 0.75rem;">
-                        <i class="bi bi-reply-fill text-primary"></i> Balas ke {{ $senderName }}:
-                    </span>
-                    <span id="chatCharCounter" class="badge bg-light text-muted border font-mono" style="font-size: 0.72rem;">0 / 255</span>
+            <div>
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                    <label class="form-label small fw-bold mb-0 text-muted" style="letter-spacing: 0.5px;">KIRIM BALASAN ADMINISTRATOR</label>
+                    <span class="font-mono text-muted small" id="chatCharCounter" style="font-size: 0.72rem;">0 / 255</span>
                 </div>
-                <div class="d-flex gap-2 align-items-end">
+                <div class="d-flex gap-2 align-items-end mb-1">
                     <textarea name="balasan" 
                               id="chatInputText" 
+                              maxlength="255" 
                               class="form-control" 
                               rows="2" 
-                              maxlength="255" 
+                              placeholder="Tuliskan jawaban administrator... (maks. 255 karakter)" 
                               required 
-                              placeholder="Tuliskan jawaban administrator... (maks. 255 karakter, tanpa link luar)"
-                              style="resize: none; border-radius: 10px;"></textarea>
-                    <button type="submit" class="btn btn-primary-custom px-4 py-2.5 rounded-3 d-inline-flex align-items-center gap-1.5 fw-semibold flex-shrink-0" style="height: fit-content;">
-                        <span>Kirim</span>
-                        <i class="bi bi-send-fill"></i>
+                              style="border-radius: 12px; resize: none; border: 2px solid var(--border, #e2e8f0); transition: all 0.25s;"
+                              onfocus="this.style.borderColor='var(--primary, #003366)'" 
+                              onblur="this.style.borderColor='var(--border, #e2e8f0)'">{{ old('balasan') }}</textarea>
+                    <button type="submit" 
+                            class="btn btn-primary-custom d-flex align-items-center justify-content-center" 
+                            style="height: 46px; width: 46px; border-radius: 12px; padding: 0; flex-shrink: 0;" 
+                            title="Kirim Balasan">
+                        <i class="bi bi-send-fill fs-5"></i>
                     </button>
                 </div>
-                <div id="charLimitWarning" class="text-danger small fw-bold" style="display: none; font-size: 0.72rem;">
-                    <i class="bi bi-exclamation-circle-fill me-1"></i> Batas maksimal 255 karakter telah tercapai!
+                <div id="charLimitWarning" class="form-text text-danger fw-bold d-none mb-0">
+                    <i class="bi bi-exclamation-triangle-fill me-1"></i> Anda telah mencapai batas maksimal 255 karakter!
                 </div>
             </div>
         </form>
@@ -237,7 +220,13 @@ document.addEventListener('DOMContentLoaded', function() {
         textInput.addEventListener('input', function() {
             const len = this.value.length;
             if (counter) counter.textContent = `${len} / 255`;
-            if (warning) warning.style.display = len >= 255 ? 'block' : 'none';
+            if (warning) {
+                if (len >= 255) {
+                    warning.classList.remove('d-none');
+                } else {
+                    warning.classList.add('d-none');
+                }
+            }
         });
 
         // Submit form with Ctrl+Enter or Cmd+Enter

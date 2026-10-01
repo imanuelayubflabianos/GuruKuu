@@ -62,4 +62,17 @@ class Kontak extends Model
             $this->attributes['balasan'] = $value;
         }
     }
+
+    public function getDisplayPengirimAttribute(): string
+    {
+        if ($this->is_siswa) {
+            return $this->pengirim;
+        }
+        if (!empty($this->pengirim) && str_starts_with($this->pengirim, 'Tamu #')) {
+            return $this->pengirim;
+        }
+        $cleanId = preg_replace('/[^a-zA-Z0-9]/', '', (string)$this->identifier);
+        $code = strtoupper(substr($cleanId, -4));
+        return 'Tamu #' . ($code ?: $this->id);
+    }
 }

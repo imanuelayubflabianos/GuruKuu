@@ -71,7 +71,7 @@
                     <a class="dropdown-item p-3 border-bottom text-wrap admin-notif-click" 
                        href="{{ route('admin.pelanggaran.index') }}"
                        data-pelanggaran-id="{{ $notif->id }}"
-                       data-read-url="{{ route('pelanggaran.read', $notif->id) }}">
+                       data-read-url="{{ route('admin.pelanggaran.read', $notif->id) }}">
                         <div class="d-flex align-items-start gap-2.5">
                             <span class="badge bg-primary text-white rounded-circle p-1.5 mt-0.5 flex-shrink-0">
                                 <i class="bi bi-exclamation-octagon"></i>
@@ -279,7 +279,7 @@
             syncAdminNotifUI();
 
             // Panggil read-all di server jika ada
-            fetch("{{ route('pelanggaran.read-all') }}", {
+            fetch("{{ route('admin.pelanggaran.read-all') }}", {
                 method: 'POST',
                 headers: {
                     'X-CSRF-TOKEN': '{{ csrf_token() }}',

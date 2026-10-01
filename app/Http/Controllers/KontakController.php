@@ -75,9 +75,13 @@ class KontakController extends Controller
             return back()->withInput()->with('error', $profanity['message']);
         }
         
+        $cleanId = preg_replace('/[^a-zA-Z0-9]/', '', (string)$deviceId);
+        $code = strtoupper(substr($cleanId, -4));
+        $namaTamu = 'Tamu #' . ($code ?: rand(1000, 9999));
+
         Kontak::create([
-            'pengirim' => 'Tamu', 
-            'identifier' => $this->getOrCreateDeviceId($request),
+            'pengirim' => $namaTamu, 
+            'identifier' => $deviceId,
             'pesan' => $pesanBersih, 
             'is_siswa' => false
         ]);
@@ -118,8 +122,29 @@ class KontakController extends Controller
         if ($kontak->identifier !== $deviceId || $kontak->is_siswa) {
             return back()->with('error', 'Akses ditolak.');
         }
-        $kontak->update(['pesan' => '[Pesan Dihapus]']);
-        return back()->with('success', 'Pesan Anda dihapus.');
+        // Hapus permanen tanpa menyisakan teks [Pesan Dihapus]
+        $kontak->delete();
+        return back()->with('success', 'Pesan Anda berhasil dihapus.');
+    }
+
+    public function streamGuest(Request $request)
+    {
+        $deviceId = $this->getOrCreateDeviceId($request);
+        $riwayat = Kontak::where('identifier', $deviceId)->where('is_siswa', false)->orderBy('created_at', 'asc')->get();
+        return response()->json([
+            'count' => $riwayat->count(),
+            'last_update' => $riwayat->max('updated_at')?->timestamp ?? 0,
+            'messages' => $riwayat->map(function($c) {
+                return [
+                    'id' => $c->id,
+                    'pesan' => $c->pesan,
+                    'balasan' => $c->balasan,
+                    'is_replied' => (bool)$c->is_replied,
+                    'time' => $c->created_at->format('H:i'),
+                    'reply_time' => $c->updated_at->format('H:i'),
+                ];
+            }),
+        ]);
     }
 
     // ==================== SISWA ====================
@@ -213,7 +238,28 @@ class KontakController extends Controller
     public function destroySiswaMessage(Kontak $kontak)
     {
         if ($kontak->identifier !== Auth::user()->nis) return back()->with('error', 'Akses ditolak.');
-        $kontak->update(['pesan' => '[Pesan Dihapus]']);
-        return back()->with('success', 'Pesan Anda dihapus.');
+        // Hapus permanen tanpa menyisakan teks [Pesan Dihapus]
+        $kontak->delete();
+        return back()->with('success', 'Pesan Anda berhasil dihapus.');
+    }
+
+    public function streamSiswa()
+    {
+        $user = Auth::user();
+        $pesan = Kontak::where('identifier', $user->nis)->where('is_siswa', true)->orderBy('created_at', 'asc')->get();
+        return response()->json([
+            'count' => $pesan->count(),
+            'last_update' => $pesan->max('updated_at')?->timestamp ?? 0,
+            'messages' => $pesan->map(function($c) {
+                return [
+                    'id' => $c->id,
+                    'pesan' => $c->pesan,
+                    'balasan' => $c->balasan,
+                    'is_replied' => (bool)$c->is_replied,
+                    'time' => $c->created_at->format('H:i'),
+                    'reply_time' => $c->updated_at->format('H:i'),
+                ];
+            }),
+        ]);
     }
 }

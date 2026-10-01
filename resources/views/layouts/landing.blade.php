@@ -295,7 +295,7 @@
             width: 48px;
             height: 48px;
             border-radius: 12px;
-            background: rgba(0, 78, 167, 1);
+            background: rgba(51, 51, 51, 1);
             color: #ffffffff;
             border: none;
             display: flex;
@@ -304,7 +304,7 @@
             font-size: 1.25rem;
             z-index: 1045;
             cursor: pointer;
-            box-shadow: 0 6px 20px rgba(38, 153, 220, 0.4);
+            box-shadow: 0 6px 20px rgba(63, 63, 63, 0.4);
             opacity: 0;
             visibility: hidden;
             transform: translateY(20px);
@@ -316,10 +316,10 @@
             transform: translateY(0);
         }
         .btn-floating-top:hover {
-            background: #1c60b9ff;
+            background: #818181ff;
             color: #ffffff;
             transform: translateY(-4px);
-            box-shadow: 0 10px 25px rgba(38, 169, 220, 0.55);
+            box-shadow: 0 10px 25px rgba(119, 119, 119, 0.55);
         }
 
         .btn-primary-custom { background: var(--primary); color: white; padding: 0.75rem 1.5rem; border-radius: 8px; font-weight: 600; border: none; text-decoration: none; display: inline-block; }
@@ -419,7 +419,7 @@
                             <i class="bi bi-mortarboard-fill fs-3" style="color: {{ $siteTitleColor1 ?? '#003366' }};"></i>
                         @endif
                         <span class="fs-4 fw-bold">
-                            <span style="color: {{ $siteTitleColor1 ?? '#003366' }} !important;">{{ $siteTitlePart1 ?? 'Guru' }}</span><span style="color: {{ $siteTitleColor2 ?? '#FFC107' }} !important;">{{ $siteTitlePart2 ?? 'Kuu' }}</span>
+                            <span style="color: {{ $siteTitleColor1 ?? '#ffffffff' }} !important;">{{ $siteTitlePart1 ?? 'Guru' }}</span><span style="color: {{ $siteTitleColor2 ?? '#FFC107' }} !important;">{{ $siteTitlePart2 ?? 'Kuu' }}</span>
                         </span>
                     </div>
                     <p class="text-white-50 mb-0" style="font-size: 0.9rem; line-height: 1.65; max-width: 420px;">

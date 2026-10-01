@@ -5,14 +5,13 @@ namespace App\Exports;
 use App\Models\Guru;
 use App\Models\Periode;
 use Maatwebsite\Excel\Concerns\FromCollection;
+use Maatwebsite\Excel\Concerns\WithColumnWidths;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\WithTitle;
 
-class LeaderboardExport implements FromCollection, WithHeadings, WithMapping, WithTitle
+class LeaderboardExport implements FromCollection, WithHeadings, WithMapping, WithTitle, WithColumnWidths
 {
-    protected $no = 0;
-
     public function collection()
     {
         $periodeAktif = Periode::where('status', 'aktif')->first();
@@ -22,21 +21,22 @@ class LeaderboardExport implements FromCollection, WithHeadings, WithMapping, Wi
     public function headings(): array
     {
         return [
-            'Ranking',
+            'Peringkat',
             'NIP',
             'Nama Guru',
             'Jurusan / Keahlian',
             'Kepuasan (%)',
-            'Rata-rata Skor (Skala 5)',
-            'Total Ulasan Siswa',
-            'Status Leaderboard',
+            'Rata-rata Skor',
+            'Total Penilaian',
         ];
     }
 
     public function map($guru): array
     {
         $persen = round(($guru->rata_rata_nilai / 5) * 100);
-        $rankText = $guru->leaderboard_rank ? '#' . $guru->leaderboard_rank : 'Belum cukup data (<' . \App\Models\Guru::MIN_PENILAIAN_LEADERBOARD . ' penilaian)';
+        $rankText = $guru->leaderboard_rank 
+            ? '#' . $guru->leaderboard_rank 
+            : 'Belum cukup data (' . $guru->total_penilaian . '/' . Guru::MIN_PENILAIAN_LEADERBOARD . ')';
 
         return [
             $rankText,
@@ -44,9 +44,21 @@ class LeaderboardExport implements FromCollection, WithHeadings, WithMapping, Wi
             $guru->nama,
             $guru->jurusan?->nama_jurusan ?? 'Umum / Terbuka',
             $persen . '%',
-            number_format($guru->rata_rata_nilai, 2),
-            $guru->total_penilaian . ' penilaian',
-            $guru->leaderboard_rank ? 'Masuk Leaderboard' : 'Belum Cukup Data',
+            number_format($guru->rata_rata_nilai, 2) . ' / 5.00',
+            $guru->total_penilaian . ' ulasan',
+        ];
+    }
+
+    public function columnWidths(): array
+    {
+        return [
+            'A' => 28,  // Peringkat (Belum cukup data (X/5) / #1)
+            'B' => 24,  // NIP
+            'C' => 35,  // Nama Guru
+            'D' => 28,  // Jurusan / Keahlian
+            'E' => 18,  // Kepuasan (%)
+            'F' => 20,  // Rata-rata Skor
+            'G' => 20,  // Total Penilaian
         ];
     }
 

@@ -29,7 +29,7 @@ class ExportController extends Controller
         $leaderboard = Guru::leaderboardFor('rating', null, $periodeAktif?->id);
 
         $pdf = Pdf::loadView('exports.leaderboard-pdf', compact('leaderboard', 'periodeAktif'))
-            ->setPaper('a4', 'portrait');
+            ->setPaper('a4', 'landscape');
 
         return $pdf->download('leaderboard_guru_' . date('Y-m-d_His') . '.pdf');
     }
@@ -44,7 +44,7 @@ class ExportController extends Controller
     {
         $guru = Guru::with('jurusan')->orderBy('nama', 'asc')->get();
         $pdf = Pdf::loadView('exports.guru-pdf', compact('guru'))
-            ->setPaper('a4', 'portrait');
+            ->setPaper('a4', 'landscape');
 
         return $pdf->download('data_guru_' . date('Y-m-d_His') . '.pdf');
     }
@@ -63,7 +63,7 @@ class ExportController extends Controller
             ->get();
 
         $pdf = Pdf::loadView('exports.siswa-pdf', compact('siswa'))
-            ->setPaper('a4', 'portrait');
+            ->setPaper('a4', 'landscape');
 
         return $pdf->download('data_siswa_' . date('Y-m-d_His') . '.pdf');
     }
@@ -96,13 +96,13 @@ class ExportController extends Controller
         \Illuminate\Support\Facades\Storage::disk('local')->delete(['temp_leaderboard.xlsx', 'temp_guru.xlsx', 'temp_siswa.xlsx']);
 
         // 2. Generate PDFs
-        $pdfLeaderboard = Pdf::loadView('exports.leaderboard-pdf', compact('leaderboard', 'periodeAktif'))->setPaper('a4', 'portrait');
+        $pdfLeaderboard = Pdf::loadView('exports.leaderboard-pdf', compact('leaderboard', 'periodeAktif'))->setPaper('a4', 'landscape');
         $pdfLeaderboard->save($tempDir . '/Leaderboard_Guru.pdf');
 
-        $pdfGuru = Pdf::loadView('exports.guru-pdf', compact('guru'))->setPaper('a4', 'portrait');
+        $pdfGuru = Pdf::loadView('exports.guru-pdf', compact('guru'))->setPaper('a4', 'landscape');
         $pdfGuru->save($tempDir . '/Data_Guru.pdf');
 
-        $pdfSiswa = Pdf::loadView('exports.siswa-pdf', compact('siswa'))->setPaper('a4', 'portrait');
+        $pdfSiswa = Pdf::loadView('exports.siswa-pdf', compact('siswa'))->setPaper('a4', 'landscape');
         $pdfSiswa->save($tempDir . '/Data_Siswa.pdf');
 
         // 3. Zip all files

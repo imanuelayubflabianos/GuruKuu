@@ -4,11 +4,12 @@ namespace App\Exports;
 
 use App\Models\User;
 use Maatwebsite\Excel\Concerns\FromCollection;
+use Maatwebsite\Excel\Concerns\WithColumnWidths;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\WithTitle;
 
-class SiswaExport implements FromCollection, WithHeadings, WithMapping, WithTitle
+class SiswaExport implements FromCollection, WithHeadings, WithMapping, WithTitle, WithColumnWidths
 {
     protected $no = 0;
 
@@ -54,6 +55,19 @@ class SiswaExport implements FromCollection, WithHeadings, WithMapping, WithTitl
             $siswa->jurusan?->nama_jurusan ?? '-',
             $siswa->tanggal_lahir ? $siswa->tanggal_lahir->format('d-m-Y') : '-',
             $siswa->is_active ? 'Aktif' : 'Nonaktif',
+        ];
+    }
+
+    public function columnWidths(): array
+    {
+        return [
+            'A' => 6,   // No
+            'B' => 18,  // NIS
+            'C' => 35,  // Nama Siswa
+            'D' => 20,  // Kelas
+            'E' => 28,  // Jurusan
+            'F' => 18,  // Tanggal Lahir
+            'G' => 16,  // Status Akun
         ];
     }
 

@@ -66,11 +66,6 @@
                         <a href="{{ route('admin.kontak.chat', $k->identifier) }}" class="btn btn-sm btn-outline-primary mb-1 me-1" title="Buka Ruang Chat">
                             <i class="bi bi-chat-dots-fill"></i> Chat
                         </a>
-                        <button type="button" class="btn btn-sm btn-primary-custom mb-1" 
-                                onclick='openReplyModal(@json($k))' 
-                                title="Balas / Edit Balasan">
-                            <i class="bi bi-reply"></i> {{ $k->balasan ? 'Edit' : 'Balas' }}
-                        </button>
                         <form action="{{ route('admin.kontak.destroy', $k) }}" method="POST" class="d-inline" onsubmit="return confirm('Hapus pesan ini secara permanen?')">
                             @csrf @method('DELETE')
                             <button class="btn btn-sm btn-outline-danger mb-1" title="Hapus Pesan"><i class="bi bi-trash"></i></button>
