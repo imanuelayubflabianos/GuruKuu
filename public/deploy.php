@@ -37,7 +37,7 @@ declare(strict_types=1);
  *   DEPLOY_NODE_VERSION=22                          # versi mayor Node untuk tombol "Pasang Node Lokal"
  *   DEPLOY_ALLOW_TERMINAL=false                     # aktifkan kotak perintah bebas (shell) di halaman web
  *   DEPLOY_ALLOW_FRESH=false                        # izinkan migrate:fresh (menghapus SEMUA tabel). Default MATI demi keamanan data
- *   DEPLOY_SSH_KEY=                                 # opsional: path private key SSH (deploy key GitHub)
+ *   DEPLOY_SSH_KEY=                                 # path private key SSH (Deploy Key GitHub) bila remote berbentuk git@github.com:...
  *
  * Tidak ada kunci bawaan: bila DEPLOY_KEY/DEPLOY_KEY_HASH kosong, halaman
  * web menolak semua akses.
@@ -239,13 +239,18 @@ final class Deployer
 
         $sshKey = Env::get('DEPLOY_SSH_KEY');
 
+        // known_hosts khusus deployer (user web sering tidak punya ~/.ssh yang bisa ditulis).
+        // accept-new: host baru (github.com) diterima sekali, lalu dikunci -> tanpa prompt.
+        $knownHosts = $this->root . '/storage/framework/deployer_known_hosts';
+        $sshOpts    = ' -o BatchMode=yes -o StrictHostKeyChecking=accept-new'
+            . ' -o UserKnownHostsFile=' . escapeshellarg($knownHosts);
+
         if ($sshKey !== '' && is_file($sshKey)) {
             $env['GIT_SSH_COMMAND'] =
                 'ssh -i ' . escapeshellarg($sshKey) .
-                ' -o IdentitiesOnly=yes' .
-                ' -o BatchMode=yes';
+                ' -o IdentitiesOnly=yes' . $sshOpts;
         } elseif (empty($env['GIT_SSH_COMMAND'])) {
-            $env['GIT_SSH_COMMAND'] = 'ssh -o BatchMode=yes';
+            $env['GIT_SSH_COMMAND'] = 'ssh' . $sshOpts;
         }
         if (empty($env['HOME'])) {
             $h = Env::get('DEPLOY_HOME') ?: $this->root . '/storage/framework/deployer_home';
@@ -333,6 +338,10 @@ final class Deployer
         }
         if ($code !== 0) {
             $this->log[] = "[gagal: exit code {$code}]";
+            if (stripos($out, 'Permission denied (publickey)') !== false) {
+                $this->log[] = '[PETUNJUK] Server belum punya kunci SSH untuk GitHub. Pasang Deploy Key lalu isi DEPLOY_SSH_KEY di .env '
+                    . '(atau ganti remote ke HTTPS + token). Pastikan file kunci dimiliki & bisa dibaca user web server (chmod 600).';
+            }
         }
         return [$out, $code];
     }
@@ -523,7 +532,19 @@ final class Deployer
             if ($c !== 0) {
                 return false;
             }
-            $this->git(['clean', '-fd', '-e', '.env', '-e', 'public/build', '-e', 'public/storage', '-e', 'public/uploads', '-e', 'storage']);
+            // Yang dilindungi dari `git clean`: .env, aset, upload, storage, dan file deployer ini sendiri
+            // (bila belum di-commit ke git, tanpa ini Force Sync akan menghapus deployer).
+            $keep = ['.env', 'public/build', 'public/storage', 'public/uploads', 'storage'];
+            $me   = str_replace('\\', '/', __FILE__);
+            $base = str_replace('\\', '/', $this->root) . '/';
+            if (str_starts_with($me, $base)) {
+                $keep[] = substr($me, strlen($base));
+            }
+            $clean = ['clean', '-fd'];
+            foreach ($keep as $k) {
+                array_push($clean, '-e', $k);
+            }
+            $this->git($clean);
         } else {
             [$cnt] = $this->gitOut(['rev-list', '--count', "HEAD..{$ref}"]);
             if ((int) $cnt === 0) {
@@ -1426,7 +1447,7 @@ td{padding:.55rem .8rem;border-bottom:1px solid rgba(255,255,255,.04)}
 
             <div class="card">
                 <div><div class="ct">💥 Force Sync</div>
-                <div class="cd">Samakan server persis dengan <code><?= e($cfg['remote'] . '/' . $cfg['branch']) ?></code>. Perubahan manual di server dibuang; <code>.env</code>, <code>storage</code> &amp; <code>public/uploads</code> aman.</div></div>
+                <div class="cd">Samakan server persis dengan <code><?= e($cfg['remote'] . '/' . $cfg['branch']) ?></code>. Perubahan manual di server dibuang; <code>.env</code>, <code>storage</code>, <code>public/uploads</code> &amp; file deployer ini aman.</div></div>
                 <form method="POST" action="" onsubmit="return confirm('Timpa SEMUA file server agar persis sama dengan GitHub (kecuali .env dan storage)?')">
                     <input type="hidden" name="_csrf" value="<?= e($csrf) ?>">
                     <input type="hidden" name="action" value="force_sync">
