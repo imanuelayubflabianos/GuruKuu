@@ -47,10 +47,14 @@ class KontakController extends Controller
 
     public function destroyReply(Kontak $kontak)
     {
-        $kontak->update([
-            'balasan' => null,
-            'is_replied' => false
-        ]);
+        if ($kontak->pesan === null) {
+            $kontak->delete();
+        } else {
+            $kontak->update([
+                'balasan' => null,
+                'is_replied' => false
+            ]);
+        }
         return back()->with('success', 'Balasan berhasil dihapus.');
     }
 
@@ -79,7 +83,7 @@ class KontakController extends Controller
             ->update(['is_read' => true]);
 
         $first = $riwayat->first();
-        $senderName = $first->pengirim;
+        $senderName = $first->display_pengirim;
         $roleLabel = 'Tamu / Pengguna';
         $userObj = null;
 
@@ -92,6 +96,11 @@ class KontakController extends Controller
             if ($guru) {
                 $senderName = $guru->nama;
                 $roleLabel = 'Guru (NIP: ' . ($guru->nip ?: '-') . ')';
+            } else {
+                $cleanId = preg_replace('/[^a-zA-Z0-9]/', '', (string)$identifier);
+                $code = strtoupper(substr($cleanId, -4));
+                $senderName = 'Tamu #' . ($code ?: $first->id);
+                $roleLabel = 'Tamu / Pengguna (#' . ($code ?: $first->id) . ')';
             }
         }
 
@@ -104,7 +113,7 @@ class KontakController extends Controller
     public function sendChatMessage(Request $request, string $identifier)
     {
         $request->validate([
-            'balasan' => 'required|string|min:2|max:255',
+            'balasan' => 'required|string|min:1|max:255',
         ], [
             'balasan.required' => 'Isi balasan tidak boleh kosong.',
             'balasan.max' => 'Balasan melebihi batas maksimal 255 karakter.',
@@ -114,20 +123,62 @@ class KontakController extends Controller
             return back()->withInput()->with('error', 'Balasan tidak boleh mengandung tautan / link URL luar demi keamanan.');
         }
 
-        // Cari pesan terbaru dari percakapan ini
-        $lastMessage = Kontak::where('identifier', $identifier)
+        // Cek apakah ada pesan user di percakapan ini yang belum dibalas
+        $unrepliedMessage = Kontak::where('identifier', $identifier)
+            ->where(function($q) {
+                $q->whereNull('balasan')->orWhere('is_replied', false);
+            })
+            ->whereNotNull('pesan')
             ->latest()
             ->first();
 
-        if ($lastMessage) {
-            $lastMessage->update([
+        if ($unrepliedMessage) {
+            $unrepliedMessage->update([
                 'balasan' => trim($request->balasan),
                 'is_replied' => true,
                 'is_read' => true,
+            ]);
+        } else {
+            // Semua pesan sebelumnya sudah dibalas atau admin chat beruntun:
+            // Buat record baru agar chat lama TIDAK TERTIMPA!
+            $prev = Kontak::where('identifier', $identifier)->latest()->first();
+            Kontak::create([
+                'pengirim' => $prev ? $prev->pengirim : 'Admin',
+                'identifier' => $identifier,
+                'pesan' => null,
+                'balasan' => trim($request->balasan),
+                'is_siswa' => $prev ? (bool)$prev->is_siswa : false,
+                'is_read' => true,
+                'is_replied' => true,
             ]);
         }
 
         return redirect()->route('admin.kontak.chat', $identifier)
             ->with('success', 'Balasan pesan berhasil terkirim kepada pengguna!');
+    }
+
+    /**
+     * 💬 Live polling stream chat untuk auto-refresh tanpa reload browser
+     */
+    public function stream(string $identifier)
+    {
+        $riwayat = Kontak::where('identifier', $identifier)
+            ->orderBy('created_at', 'asc')
+            ->get();
+
+        return response()->json([
+            'count' => $riwayat->count(),
+            'last_update' => $riwayat->max('updated_at')?->timestamp ?? 0,
+            'messages' => $riwayat->map(function($c) {
+                return [
+                    'id' => $c->id,
+                    'pesan' => $c->pesan,
+                    'balasan' => $c->balasan,
+                    'is_replied' => (bool)$c->is_replied,
+                    'time' => $c->created_at->format('H:i'),
+                    'reply_time' => $c->updated_at->format('H:i'),
+                ];
+            }),
+        ]);
     }
 }

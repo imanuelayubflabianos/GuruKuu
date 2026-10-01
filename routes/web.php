@@ -58,6 +58,7 @@ Route::get('/oauth/callback', [OAuthController::class, 'callback'])->name('oauth
 
 // KONTAK GUEST
 Route::get('/hubungi-admin', [KontakController::class, 'guestPage'])->name('kontak.guest.page');
+Route::get('/hubungi-admin/stream', [KontakController::class, 'streamGuest'])->name('kontak.guest.stream');
 Route::post('/hubungi-admin', [KontakController::class, 'storeGuest'])->name('kontak.guest.store');
 Route::put('/hubungi-admin/{kontak}', [KontakController::class, 'editGuest'])->name('kontak.guest.edit');
 Route::delete('/hubungi-admin/{kontak}/message', [KontakController::class, 'destroyGuestMessage'])->name('kontak.guest.destroy-message');
@@ -132,6 +133,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     
     Route::get('/kontak', [AdminKontakController::class, 'index'])->name('kontak.index');
     Route::get('/kontak/chat/{identifier}', [AdminKontakController::class, 'chat'])->name('kontak.chat');
+    Route::get('/kontak/chat/{identifier}/stream', [AdminKontakController::class, 'stream'])->name('kontak.chat.stream');
     Route::post('/kontak/chat/{identifier}', [AdminKontakController::class, 'sendChatMessage'])->name('kontak.chat.send');
     Route::post('/kontak/{kontak}/reply', [AdminKontakController::class, 'reply'])->name('kontak.reply');
     Route::put('/kontak/{kontak}/reply', [AdminKontakController::class, 'editReply'])->name('kontak.edit-reply');
@@ -183,6 +185,7 @@ Route::middleware(['auth', 'role:siswa'])->prefix('siswa')->name('siswa.')->grou
     Route::get('/profil', function() { return redirect()->route('siswa.pengaturan'); })->name('profil.index');
     
     Route::get('/kontak', function() { return redirect()->to(route('siswa.pengaturan') . '#tabChat'); })->name('kontak.index');
+    Route::get('/kontak/stream', [KontakController::class, 'streamSiswa'])->name('kontak.stream');
     Route::post('/kontak', [KontakController::class, 'storeSiswa'])->name('kontak.store');
     Route::put('/kontak/{kontak}', [KontakController::class, 'editSiswa'])->name('kontak.edit');
     Route::delete('/kontak/{kontak}', [KontakController::class, 'siswaDestroy'])->name('kontak.destroy');

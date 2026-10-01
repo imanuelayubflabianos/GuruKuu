@@ -38,6 +38,7 @@
         border-radius: 18px 18px 4px 18px;
         max-width: 82%;
         box-shadow: 0 4px 12px rgba(0, 51, 102, 0.18);
+        position: relative;
     }
     .bubble-user {
         background: white;
@@ -47,11 +48,25 @@
         border-radius: 18px 18px 18px 4px;
         max-width: 82%;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        position: relative;
     }
     [data-theme="dark"] .bubble-user {
         background: #1e293b;
         color: #f1f5f9;
         border-color: rgba(255, 255, 255, 0.1);
+    }
+    .chat-action-btn {
+        background: transparent;
+        border: none;
+        color: rgba(255, 255, 255, 0.8);
+        padding: 2px 5px;
+        font-size: 0.75rem;
+        border-radius: 4px;
+        transition: color 0.15s;
+    }
+    .chat-action-btn:hover {
+        color: #ffffff;
+        background: rgba(255, 255, 255, 0.15);
     }
 </style>
 
@@ -67,22 +82,6 @@
     </div>
 </div>
 
-@if(session('success'))
-    <div class="alert alert-success alert-dismissible fade show d-flex align-items-center gap-2 mb-3" role="alert">
-        <i class="bi bi-check-circle-fill fs-5"></i>
-        <div>{{ session('success') }}</div>
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    </div>
-@endif
-
-@if(session('error') || $errors->any())
-    <div class="alert alert-danger alert-dismissible fade show d-flex align-items-center gap-2 mb-3" role="alert">
-        <i class="bi bi-exclamation-octagon-fill fs-5"></i>
-        <div>{{ session('error') ?? $errors->first() }}</div>
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    </div>
-@endif
-
 {{-- HEADER CHAT IDENTIK DENGAN GAMBAR 4 / PUSAT BANTUAN --}}
 <div class="card-custom mb-3 overflow-hidden shadow-sm" style="border-radius: 14px; border: none;">
     <div class="p-3 d-flex align-items-center gap-3" style="background: linear-gradient(135deg, var(--primary, #003366) 0%, #004d99 100%); color: white;">
@@ -96,9 +95,12 @@
                 Online • {{ $roleLabel }} {{ $userObj && $userObj->nama_kelas ? '• ' . $userObj->nama_kelas : '' }}
             </small>
         </div>
-        <div>
+        <div class="d-flex align-items-center gap-2">
             <span class="badge bg-light text-dark px-2.5 py-1.5 rounded-pill font-mono" style="font-size: 0.72rem;">
                 <i class="bi bi-shield-lock-fill me-1 text-success"></i> Terenkripsi
+            </span>
+            <span class="badge bg-white-subtle text-white px-2 py-1 rounded-pill small" id="liveStatusBadge" style="font-size: 0.7rem; background: rgba(255,255,255,0.15);">
+                <i class="bi bi-broadcast text-info me-1"></i> Live
             </span>
         </div>
     </div>
@@ -110,48 +112,67 @@
     <div class="chat-stream-box" id="chatMessagesStream">
         @forelse($riwayat as $item)
             {{-- PESAN PENGIRIM (SISWA / TAMU) --}}
-            <div class="d-flex justify-content-start mb-3">
-                <div class="d-flex align-items-start gap-2" style="max-width: 82%;">
-                    <div class="d-flex align-items-center justify-content-center rounded-circle flex-shrink-0" style="width: 36px; height: 36px; background: rgba(0, 51, 102, 0.1); color: var(--primary, #003366); font-weight: 700; font-size: 0.85rem;">
-                        {{ strtoupper(substr($senderName, 0, 1)) }}
-                    </div>
-                    <div>
-                        <div class="bubble-user">
-                            <div class="fw-bold mb-1" style="color: var(--primary, #003366); font-size: 0.78rem;">
-                                {{ $item->pengirim }}
-                            </div>
-                            @if($item->pesan === '[Pesan Dihapus]')
-                                <p class="mb-1 fst-italic text-muted small"><i class="bi bi-trash me-1"></i>[Pesan Dihapus]</p>
-                            @else
+            @if($item->pesan)
+                <div class="d-flex justify-content-start mb-3">
+                    <div class="d-flex align-items-start gap-2" style="max-width: 82%;">
+                        <div class="d-flex align-items-center justify-content-center rounded-circle flex-shrink-0" style="width: 36px; height: 36px; background: rgba(0, 51, 102, 0.1); color: var(--primary, #003366); font-weight: 700; font-size: 0.85rem;">
+                            {{ strtoupper(substr($senderName, 0, 1)) }}
+                        </div>
+                        <div>
+                            <div class="bubble-user">
+                                <div class="d-flex justify-content-between align-items-center gap-2 mb-1">
+                                    <div class="fw-bold" style="color: var(--primary, #003366); font-size: 0.78rem;">
+                                        {{ $item->display_pengirim }}
+                                    </div>
+                                    <form action="{{ route('admin.kontak.destroy', $item) }}" method="POST" class="d-inline" onsubmit="return confirm('Hapus pesan ini secara permanen?')">
+                                        @csrf @method('DELETE')
+                                        <button type="submit" class="btn btn-sm p-0 text-muted border-0" title="Hapus Pesan Pengguna" style="font-size: 0.72rem;">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
                                 <p class="mb-1" style="line-height: 1.5; word-wrap: break-word; font-size: 0.92rem;">
                                     {{ $item->pesan }}
                                 </p>
-                            @endif
-                            <div class="text-end text-muted font-mono" style="font-size: 0.7rem;">
-                                {{ $item->created_at->format('H:i') }} WIB
+                                <div class="text-end text-muted font-mono" style="font-size: 0.7rem;">
+                                    {{ $item->created_at->format('H:i') }} WIB
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            @endif
 
-            {{-- JIKA SUDAH ADA BALASAN DARI ADMIN --}}
-            @if($item->is_replied && $item->balasan)
+            {{-- BALASAN DARI ADMIN --}}
+            @if($item->balasan)
                 <div class="d-flex justify-content-end mb-3">
                     <div class="bubble-admin">
                         <div class="d-flex align-items-center justify-content-between gap-3 mb-1" style="font-size: 0.75rem; opacity: 0.9;">
-                            <span class="fw-bold"><i class="bi bi-patch-check-fill me-1 text-info"></i> Administrator</span>
+                            <span class="fw-bold"><i class="bi bi-headset me-1 text-info"></i> Administrator</span>
                             <span>{{ $item->updated_at->format('H:i') }} WIB</span>
                         </div>
-                        <p class="mb-1" style="line-height: 1.5; word-wrap: break-word; font-size: 0.92rem;">
+                        <p class="mb-1" style="line-height: 1.5; word-wrap: break-word; font-size: 0.92rem;" id="balasan-text-{{ $item->id }}">
                             {{ $item->balasan }}
                         </p>
-                        <div class="text-end mt-1 d-flex justify-content-end align-items-center gap-1" style="font-size: 0.7rem; opacity: 0.9;">
+                        <div class="text-end mt-1 d-flex justify-content-end align-items-center gap-2" style="font-size: 0.7rem; opacity: 0.9;">
                             <i class="bi bi-check2-all" style="color: #38bdf8; font-weight: bold; font-size: 0.9rem;" title="Terkirim & Dilihat"></i>
+                            
+                            {{-- TOMBOL EDIT BALASAN ADMIN --}}
+                            <button type="button" class="chat-action-btn" onclick="openAdminEditReplyModal({{ $item->id }}, '{{ addslashes($item->balasan) }}')" title="Edit Balasan">
+                                <i class="bi bi-pencil-fill"></i>
+                            </button>
+
+                            {{-- TOMBOL HAPUS BALASAN ADMIN --}}
+                            <form action="{{ route('admin.kontak.destroy-reply', $item) }}" method="POST" class="d-inline" onsubmit="return confirm('Hapus balasan ini?')">
+                                @csrf @method('DELETE')
+                                <button type="submit" class="chat-action-btn" title="Hapus Balasan">
+                                    <i class="bi bi-trash-fill"></i>
+                                </button>
+                            </form>
                         </div>
                     </div>
                 </div>
-            @elseif(!$item->is_replied && $item->pesan !== '[Pesan Dihapus]')
+            @elseif(!$item->balasan && $item->pesan)
                 <div class="d-flex justify-content-start mb-3 ms-5">
                     <div class="rounded-pill px-3 py-1 small" style="background: #fef3c7; color: #92400e; font-size: 0.75rem; border: 1px solid #fde68a;">
                         <i class="bi bi-hourglass-split me-1"></i> Menunggu balasan admin...
@@ -204,8 +225,48 @@
     </div>
 </div>
 
+{{-- MODAL EDIT BALASAN ADMIN --}}
+<div class="modal fade" id="modalAdminEditReply" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 14px; overflow: hidden;">
+            <div class="modal-header text-white" style="background: linear-gradient(135deg, var(--primary, #003366) 0%, #004d99 100%);">
+                <h6 class="modal-title fw-bold mb-0">Edit Balasan Administrator</h6>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="formAdminEditReply" method="POST">
+                @csrf
+                @method('PUT')
+                <div class="modal-body p-3">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <label class="form-label small fw-bold text-muted mb-0">Teks Balasan:</label>
+                        <span id="modalEditCounter" class="badge bg-light text-muted border font-mono" style="font-size: 0.72rem;">0 / 255</span>
+                    </div>
+                    <textarea name="balasan" id="modalEditTextarea" class="form-control" rows="3" maxlength="255" required style="border-radius: 10px; resize: none;"></textarea>
+                </div>
+                <div class="modal-footer bg-light py-2">
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary-custom btn-sm px-3 fw-semibold">Simpan Perubahan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 @push('scripts')
 <script>
+let lastKnownUpdate = {{ $riwayat->max('updated_at')?->timestamp ?? 0 }};
+let lastCount = {{ $riwayat->count() }};
+const streamUrl = "{{ route('admin.kontak.chat.stream', $identifier) }}";
+
+function openAdminEditReplyModal(id, text) {
+    const form = document.getElementById('formAdminEditReply');
+    form.action = '/admin/kontak/' + id + '/reply';
+    const textarea = document.getElementById('modalEditTextarea');
+    textarea.value = text;
+    document.getElementById('modalEditCounter').textContent = `${text.length} / 255`;
+    new bootstrap.Modal(document.getElementById('modalAdminEditReply')).show();
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     const stream = document.getElementById('chatMessagesStream');
     if (stream) {
@@ -229,7 +290,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
 
-        // Submit form with Ctrl+Enter or Cmd+Enter
         textInput.addEventListener('keydown', function(e) {
             if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
                 e.preventDefault();
@@ -237,6 +297,26 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
+
+    const modalTextarea = document.getElementById('modalEditTextarea');
+    if (modalTextarea) {
+        modalTextarea.addEventListener('input', function() {
+            document.getElementById('modalEditCounter').textContent = `${this.value.length} / 255`;
+        });
+    }
+
+    // 🔄 Auto-polling live update tanpa refresh halaman (setiap 3.5 detik)
+    setInterval(function() {
+        fetch(streamUrl)
+            .then(res => res.json())
+            .then(data => {
+                if (data.count !== lastCount || data.last_update > lastKnownUpdate) {
+                    // Update terjadi: reload stream secara halus
+                    window.location.reload();
+                }
+            })
+            .catch(() => {});
+    }, 3500);
 });
 </script>
 @endpush

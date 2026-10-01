@@ -102,7 +102,7 @@
                                 <div class="d-flex justify-content-start mb-3">
                                     <div class="d-flex align-items-start gap-2" style="max-width: 82%;">
                                         <div class="d-flex align-items-center justify-content-center rounded-circle flex-shrink-0" style="width: 34px; height: 34px; background: var(--primary); color: white;">
-                                            <i class="bi bi-person-badge-fill" style="font-size: 0.85rem;"></i>
+                                            <i class="bi bi-headset" style="font-size: 0.95rem;"></i>
                                         </div>
                                         <div style="background: white; border: 1px solid var(--border); padding: 0.85rem 1.15rem; border-radius: 18px 18px 18px 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
                                             <div class="fw-bold mb-1" style="color: var(--primary); font-size: 0.78rem;">
@@ -242,6 +242,20 @@
         document.getElementById('editGuestTextarea').value = text;
         new bootstrap.Modal(document.getElementById('editGuestModal')).show();
     }
+
+    // 🔄 Auto-polling live update tanpa refresh halaman (setiap 3.5 detik)
+    let guestLastCount = {{ $riwayat->count() }};
+    let guestLastUpdate = {{ $riwayat->max('updated_at')?->timestamp ?? 0 }};
+    setInterval(function() {
+        fetch("{{ route('kontak.guest.stream') }}")
+            .then(res => res.json())
+            .then(data => {
+                if (data.count !== guestLastCount || data.last_update > guestLastUpdate) {
+                    window.location.reload();
+                }
+            })
+            .catch(() => {});
+    }, 3500);
 </script>
 @endpush
 @endsection

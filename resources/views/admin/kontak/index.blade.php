@@ -31,10 +31,10 @@
                 <tr>
                     <td>
                         <a href="{{ route('admin.kontak.chat', $k->identifier) }}" class="text-decoration-none text-dark fw-bold d-inline-flex align-items-center gap-1" title="Klik untuk membuka ruang chat">
-                            <span>{{ $k->pengirim }}</span>
+                            <span>{{ $k->display_pengirim }}</span>
                             <i class="bi bi-box-arrow-up-right text-primary small" style="font-size: 0.72rem;"></i>
                         </a>
-                        <br><small class="text-muted font-mono">{{ $k->is_siswa ? 'Siswa (NIS: ' . $k->identifier . ')' : 'Pengguna / Tamu' }}</small>
+                        <br><small class="text-muted font-mono">{{ $k->is_siswa ? 'Siswa (NIS: ' . $k->identifier . ')' : 'Pengguna / Tamu (' . (substr($k->display_pengirim, 6) ?: '-') . ')' }}</small>
                     </td>
                     <td style="max-width: 320px;">
                         @if($k->pesan === '[Pesan Dihapus]')
