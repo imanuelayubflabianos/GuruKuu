@@ -226,7 +226,13 @@
                                         Skor: {{ $fbScore }}%
                                     </span>
                                 </div>
-                                <small class="text-muted d-block font-mono" style="font-size: 0.72rem;">{{ $fb->created_at->diffForHumans() }}</small>
+                                <div class="d-flex align-items-center gap-2 mt-0.5">
+                                    <small class="text-muted font-mono" style="font-size: 0.72rem;">{{ $fb->created_at->diffForHumans() }}</small>
+                                    <button type="button" class="btn btn-sm btn-link text-muted p-0 text-decoration-none d-inline-flex align-items-center gap-1" onclick="openModalReportUlasan({{ $fb->id }})" title="Laporkan ulasan tidak pantas">
+                                        <i class="bi bi-flag text-danger" style="font-size: 0.7rem;"></i>
+                                        <span style="font-size: 0.7rem;">Laporkan</span>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                         <div style="min-width: 140px;">
@@ -374,4 +380,7 @@
         </div>
     </div>
 </section>
+
+@include('components.modal-report-ulasan')
+
 @endsection

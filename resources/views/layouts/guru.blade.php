@@ -222,6 +222,42 @@
         @yield('content')
     </main>
 
+    @if(auth()->check() && !auth()->user()->is_active)
+    <div style="position: fixed; inset: 0; z-index: 999999; background: rgba(15, 23, 42, 0.88); backdrop-filter: blur(6px); display: flex; align-items: center; justify-content: center; padding: 20px;">
+        <div class="card shadow-lg border-0 text-center p-4 p-md-5" style="max-width: 520px; width: 100%; border-radius: 20px; background: white;">
+            <div class="d-inline-flex align-items-center justify-content-center rounded-circle mb-3" style="width: 80px; height: 80px; background: #fee2e2; color: #dc2626; margin: 0 auto;">
+                <i class="bi bi-shield-x-fill" style="font-size: 2.8rem;"></i>
+            </div>
+            <h4 class="fw-bold text-dark mb-1">Akses Akun Dinonaktifkan</h4>
+            <p class="text-muted small mb-4">
+                @if(auth()->user()->deactivation_type === 'berkala' && auth()->user()->deactivated_until)
+                    Akun guru Anda dinonaktifkan sementara hingga <strong>{{ auth()->user()->deactivated_until->translatedFormat('d F Y H:i') }}</strong> ({{ auth()->user()->deactivated_until->diffForHumans() }}) oleh Admin Sekolah.
+                @else
+                    Akun guru Anda telah dinonaktifkan secara permanen oleh Admin Sekolah.
+                @endif
+            </p>
+
+            <div class="p-3 rounded mb-4 text-start border border-danger border-opacity-25" style="background: #fff5f5;">
+                <strong class="text-danger small d-block mb-1">
+                    <i class="bi bi-exclamation-triangle-fill me-1"></i>Alasan Penonaktifan:
+                </strong>
+                <p class="text-dark small mb-0 font-italic" style="line-height: 1.5;">
+                    "{{ auth()->user()->deactivated_reason ?: 'Akun Anda dinonaktifkan oleh Admin. Silakan hubungi Operator / Admin Sekolah untuk pengaktifan kembali.' }}"
+                </p>
+            </div>
+
+            <div class="d-flex flex-column gap-2">
+                <form action="{{ route('logout') }}" method="POST">
+                    @csrf
+                    <button type="submit" class="btn btn-outline-danger w-100 py-2">
+                        <i class="bi bi-box-arrow-right me-1"></i> Logout dari Akun
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    @endif
+
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>

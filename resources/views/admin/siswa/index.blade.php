@@ -40,12 +40,17 @@
     </div>
 </div>
 
-{{-- FILTER BERDASARKAN KELAS --}}
+{{-- FILTER BERDASARKAN KELAS, STATUS, & PENCARIAN --}}
 <div class="card-custom p-3 mb-4">
-    <form method="GET" action="{{ route('admin.siswa.index') }}" class="row g-3 align-items-end">
+    <form method="GET" action="{{ route('admin.siswa.index') }}" class="row g-2 align-items-center">
         <div class="col-md-4">
-            <label class="form-label small fw-bold text-muted">Filter Kelas</label>
-            <select name="kelas" class="form-select" style="border-radius: 8px;" onchange="this.form.submit()">
+            <div class="input-group">
+                <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-search"></i></span>
+                <input type="text" name="search" class="form-control border-start-0" placeholder="Cari nama atau NIS siswa..." value="{{ request('search') }}">
+            </div>
+        </div>
+        <div class="col-md-3">
+            <select name="kelas" class="form-select" onchange="this.form.submit()">
                 <option value="">Semua Kelas</option>
                 @foreach($kelasList as $k)
                     <option value="{{ $k->id }}" {{ request('kelas') == $k->id ? 'selected' : '' }}>
@@ -54,15 +59,22 @@
                 @endforeach
             </select>
         </div>
-        <div class="col-md-4">
-            <a href="{{ route('admin.siswa.index') }}" class="btn btn-outline-custom">
-                <i class="bi bi-arrow-counterclockwise me-1"></i> Reset Filter
-            </a>
+        <div class="col-md-2">
+            <select name="status" class="form-select" onchange="this.form.submit()">
+                <option value="">Semua Status</option>
+                <option value="aktif" {{ request('status') === 'aktif' ? 'selected' : '' }}>✅ Aktif</option>
+                <option value="nonaktif" {{ request('status') === 'nonaktif' ? 'selected' : '' }}>⛔ Dinonaktifkan</option>
+            </select>
         </div>
-        <div class="col-md-4 text-end">
-            <span class="badge bg-primary px-3 py-2">
-                Total: {{ $siswa->total() }} siswa
-            </span>
+        <div class="col-md-3 d-flex gap-2 justify-content-md-end">
+            <button type="submit" class="btn btn-primary-custom px-3">
+                <i class="bi bi-funnel me-1"></i> Filter
+            </button>
+            @if(request()->hasAny(['search', 'kelas', 'status']))
+                <a href="{{ route('admin.siswa.index') }}" class="btn btn-outline-custom" title="Reset Filter">
+                    <i class="bi bi-arrow-counterclockwise"></i>
+                </a>
+            @endif
         </div>
     </form>
 </div>
@@ -70,7 +82,7 @@
 <div class="card-custom">
     <div class="d-flex justify-content-between align-items-center px-3 px-md-4 py-3 border-bottom">
         <span class="small text-muted">Menampilkan {{ $siswa->firstItem() ?? 0 }}–{{ $siswa->lastItem() ?? 0 }} dari {{ $siswa->total() }} siswa</span>
-        <span class="badge bg-light text-dark border">20 per halaman</span>
+        <span class="badge bg-light text-dark border font-mono">Total: {{ $siswa->total() }} Siswa</span>
     </div>
     <div class="table-responsive">
         <table class="table table-custom mb-0">
@@ -117,10 +129,12 @@
                     </td>
                     <td>
                         @if($s->is_active)
-                            <span class="badge bg-success">Aktif</span>
+                            <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-2.5 py-1 fw-semibold">
+                                <i class="bi bi-check-circle-fill me-1"></i>Aktif
+                            </span>
                         @elseif($s->deactivation_type === 'berkala')
-                            <span class="badge bg-warning text-dark font-mono" style="font-size: 0.72rem;">
-                                <i class="bi bi-clock-history me-1"></i>Berkala s/d {{ $s->deactivated_until?->format('d/m/Y') }}
+                            <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle rounded-pill px-2.5 py-1 font-mono" style="font-size: 0.72rem;">
+                                <i class="bi bi-clock-history me-1"></i>Nonaktif s/d {{ $s->deactivated_until?->format('d/m/Y') }}
                             </span>
                             @if($s->deactivated_reason)
                                 <div class="text-danger small mt-1 font-italic" style="font-size: 0.72rem;" title="{{ $s->deactivated_reason }}">
@@ -128,8 +142,8 @@
                                 </div>
                             @endif
                         @else
-                            <span class="badge bg-danger font-mono" style="font-size: 0.72rem;">
-                                <i class="bi bi-slash-circle me-1"></i>Permanen
+                            <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill px-2.5 py-1 font-mono" style="font-size: 0.72rem;">
+                                <i class="bi bi-slash-circle me-1"></i>Dinonaktifkan
                             </span>
                             @if($s->deactivated_reason)
                                 <div class="text-danger small mt-1 font-italic" style="font-size: 0.72rem;" title="{{ $s->deactivated_reason }}">
@@ -139,43 +153,62 @@
                         @endif
                         
                         @if(isset($s->warning_count) && $s->warning_count > 0)
-                            <span class="badge bg-danger ms-1">
-                                <i class="bi bi-exclamation-triangle-fill"></i> {{ $s->warning_count }} Warning
+                            <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill px-2 py-0.5 ms-1">
+                                <i class="bi bi-exclamation-triangle-fill"></i> {{ $s->warning_count }}x Peringatan
                             </span>
                         @endif
                     </td>
 
                     <td class="text-center">
-                        <a href="{{ route('admin.siswa.show', $s) }}" class="btn btn-sm btn-outline-info mb-1" title="Lihat detail siswa">
-                            <i class="bi bi-eye"></i>
-                        </a>
-                        @if($s->is_active)
-                            <button type="button" class="btn btn-sm btn-outline-warning mb-1" onclick="openDeactivateModal('{{ $s->id }}', '{{ addslashes($s->name) }}')" title="Nonaktifkan Akun Siswa">
-                                <i class="bi bi-lock"></i>
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-light border shadow-xs rounded-circle d-inline-flex align-items-center justify-content-center" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="width: 32px; height: 32px;" title="Pilihan Aksi">
+                                <i class="bi bi-three-dots-vertical"></i>
                             </button>
-                        @else
-                            <form action="{{ route('admin.siswa.toggle', $s) }}" method="POST" class="d-inline"
-                                  data-confirm="Aktifkan kembali akun siswa {{ addslashes($s->name) }}?"
-                                  data-confirm-title="Aktifkan Akun Siswa"
-                                  data-confirm-btn="Aktifkan"
-                                  data-confirm-type="question">
-                                @csrf @method('PATCH')
-                                <button type="submit" class="btn btn-sm btn-outline-success mb-1" title="Aktifkan Akun">
-                                    <i class="bi bi-unlock"></i>
-                                </button>
-                            </form>
-                        @endif
-
-                        <form action="{{ route('admin.siswa.destroy', $s) }}" method="POST" class="d-inline"
-                              data-confirm="Yakin ingin menghapus siswa {{ addslashes($s->name) }} (NIS: {{ $s->nis }})? Data yang dihapus tidak dapat dipulihkan."
-                              data-confirm-title="Hapus Data Siswa"
-                              data-confirm-btn="Ya, Hapus"
-                              data-confirm-type="danger">
-                            @csrf @method('DELETE')
-                            <button class="btn btn-sm btn-outline-danger mb-1" title="Hapus Siswa">
-                                <i class="bi bi-trash"></i>
-                            </button>
-                        </form>
+                            <ul class="dropdown-menu dropdown-menu-end shadow border-0 py-1" style="border-radius: 12px; font-size: 0.85rem; min-width: 180px; box-shadow: 0 10px 25px rgba(0,0,0,0.12) !important;">
+                                <li>
+                                    <a class="dropdown-item py-1.5 px-3 d-flex align-items-center gap-2" href="{{ route('admin.siswa.show', $s) }}">
+                                        <i class="bi bi-eye text-info"></i>
+                                        <span>Lihat Detail</span>
+                                    </a>
+                                </li>
+                                @if($s->is_active)
+                                    <li>
+                                        <button type="button" class="dropdown-item py-1.5 px-3 d-flex align-items-center gap-2 text-warning-emphasis" onclick="openDeactivateModal('{{ $s->id }}', '{{ addslashes($s->name) }}')">
+                                            <i class="bi bi-lock text-warning"></i>
+                                            <span>Nonaktifkan Akun</span>
+                                        </button>
+                                    </li>
+                                @else
+                                    <li>
+                                        <form action="{{ route('admin.siswa.toggle', $s) }}" method="POST" class="d-inline"
+                                              data-confirm="Aktifkan kembali akun siswa {{ addslashes($s->name) }}?"
+                                              data-confirm-title="Aktifkan Akun Siswa"
+                                              data-confirm-btn="Aktifkan"
+                                              data-confirm-type="question">
+                                            @csrf @method('PATCH')
+                                            <button type="submit" class="dropdown-item py-1.5 px-3 d-flex align-items-center gap-2 text-success">
+                                                <i class="bi bi-unlock text-success"></i>
+                                                <span>Aktifkan Akun</span>
+                                            </button>
+                                        </form>
+                                    </li>
+                                @endif
+                                <li><hr class="dropdown-divider my-1"></li>
+                                <li>
+                                    <form action="{{ route('admin.siswa.destroy', $s) }}" method="POST" class="d-inline"
+                                          data-confirm="Yakin ingin menghapus siswa {{ addslashes($s->name) }} (NIS: {{ $s->nis }})? Data yang dihapus tidak dapat dipulihkan."
+                                          data-confirm-title="Hapus Data Siswa"
+                                          data-confirm-btn="Ya, Hapus"
+                                          data-confirm-type="danger">
+                                        @csrf @method('DELETE')
+                                        <button type="submit" class="dropdown-item py-1.5 px-3 d-flex align-items-center gap-2 text-danger">
+                                            <i class="bi bi-trash text-danger"></i>
+                                            <span>Hapus Siswa</span>
+                                        </button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </div>
                     </td>
                 </tr>
                 @empty

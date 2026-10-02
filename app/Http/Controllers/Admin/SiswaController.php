@@ -21,6 +21,24 @@ class SiswaController extends Controller
                 $q->where('kelas.id', $request->kelas);
             });
         }
+
+        // Filter berdasarkan status aktif/nonaktif
+        if ($request->filled('status')) {
+            if ($request->status === 'aktif') {
+                $query->where('is_active', true);
+            } elseif ($request->status === 'nonaktif') {
+                $query->where('is_active', false);
+            }
+        }
+
+        // Pencarian nama atau NIS
+        if ($request->filled('search')) {
+            $s = trim($request->search);
+            $query->where(function ($q) use ($s) {
+                $q->where('name', 'like', "%{$s}%")
+                  ->orWhere('nis', 'like', "%{$s}%");
+            });
+        }
         
         $siswa = $query->latest()->paginate(20)->withQueryString();
         $kelasList = Kelas::orderBy('tingkat')->orderBy('nama_kelas')->get();

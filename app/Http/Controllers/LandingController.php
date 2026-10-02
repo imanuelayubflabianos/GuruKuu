@@ -18,21 +18,15 @@ class LandingController extends Controller
         $totalSiswa = User::where('role', 'siswa')->count();
         $totalPenilaian = Penilaian::count();
 
-        // Top 3 guru terbaik secara keseluruhan
-        $topGuru = Guru::with('jurusan')
-            ->withRatings()
-            ->orderBy('rata_rata_nilai', 'desc')
-            ->orderBy('total_penilaian', 'desc')
-            ->limit(3)
-            ->get();
-
+        // Leaderboard resmi menggunakan aturan standar sistem (minimal 5 ulasan)
+        $leaderboard = Guru::leaderboardFor('rating', null, $periodeAktif?->id);
 
         return view('landing.index', compact(
             'periodeAktif',
             'totalGuru',
             'totalSiswa',
             'totalPenilaian',
-            'topGuru'
+            'leaderboard'
         ));
     }
 

@@ -14,14 +14,24 @@
     @forelse($riwayat as $item)
     <div class="col-md-6 col-lg-4">
         <div class="card-custom p-4 h-100 position-relative">
-            {{-- Tombol Hapus di Pojok Kanan Atas --}}
-            <form action="{{ route('siswa.riwayat.destroy', $item->id) }}" method="POST" class="position-absolute top-0 end-0 p-3" onsubmit="return confirm('Yakin ingin menghapus riwayat penilaian ini? Tindakan ini tidak dapat dibatalkan.')">
-                @csrf
-                @method('DELETE')
-                <button type="submit" class="btn btn-sm btn-outline-danger border-0" title="Hapus Riwayat">
-                    <i class="bi bi-trash-fill"></i>
+            {{-- Tombol Menu Titik Tiga --}}
+            <div class="dropdown position-absolute top-0 end-0 p-3">
+                <button class="btn btn-sm btn-light border shadow-xs rounded-circle d-inline-flex align-items-center justify-content-center" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="width: 32px; height: 32px;" title="Pilihan Aksi">
+                    <i class="bi bi-three-dots-vertical"></i>
                 </button>
-            </form>
+                <ul class="dropdown-menu dropdown-menu-end shadow border-0 py-1" style="border-radius: 12px; font-size: 0.85rem; min-width: 170px; box-shadow: 0 10px 25px rgba(0,0,0,0.12) !important;">
+                    <li>
+                        <form action="{{ route('siswa.riwayat.destroy', $item->id) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus riwayat penilaian ini? Tindakan ini tidak dapat dibatalkan.')">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="dropdown-item py-1.5 px-3 d-flex align-items-center gap-2 text-danger">
+                                <i class="bi bi-trash text-danger"></i>
+                                <span>Hapus Riwayat</span>
+                            </button>
+                        </form>
+                    </li>
+                </ul>
+            </div>
 
             <div class="d-flex align-items-center gap-3 mb-3">
                 <img src="{{ $item->guru->photo_url }}" class="rounded-circle flex-shrink-0" style="width: 60px; height: 60px; min-width: 60px; min-height: 60px; aspect-ratio: 1 / 1; object-fit: cover; flex-shrink: 0;">

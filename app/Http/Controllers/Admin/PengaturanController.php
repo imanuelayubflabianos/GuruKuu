@@ -390,6 +390,7 @@ class PengaturanController extends Controller
     {
         $wordToDelete = mb_strtolower(trim((string)$request->input('word')), 'UTF-8');
         if ($wordToDelete !== '') {
+            // 1. Hapus dari daftar kata kustom jika ada
             $existing = collect(preg_split('/[\r\n,]+/', (string) Setting::get('profanity_words', ''), -1, PREG_SPLIT_NO_EMPTY))
                 ->map(fn ($w) => mb_strtolower(trim($w), 'UTF-8'))
                 ->filter(fn ($w) => $w !== $wordToDelete && mb_strlen($w) >= 2)
@@ -397,10 +398,83 @@ class PengaturanController extends Controller
                 ->values()
                 ->implode("\n");
             Setting::set('profanity_words', $existing);
+
+            // 2. Jika kata ini adalah kata bawaan sistem (default), catat ke daftar kata yang dihapus
+            $rawDefaults = array_map('mb_strtolower', \App\Services\ProfanityFilterService::getRawOriginalDefaultBadWords());
+            if (in_array($wordToDelete, $rawDefaults, true)) {
+                $deletedList = collect(\App\Services\ProfanityFilterService::getDeletedWords())
+                    ->push($wordToDelete)
+                    ->unique()
+                    ->values()
+                    ->implode("\n");
+                Setting::set('profanity_deleted_words', $deletedList);
+            }
+
+            try {
+                \Illuminate\Support\Facades\Cache::flush();
+                \Illuminate\Support\Facades\Artisan::call('view:clear');
+            } catch (\Throwable $e) {}
         }
 
         return redirect()->to(route('admin.pengaturan.index') . '#tabModerasi')
-            ->with('success', "Kata '{$wordToDelete}' berhasil dihapus dari daftar kustom!");
+            ->with('success', "Kata '{$wordToDelete}' berhasil dihapus dari library kamus kata terlarang!");
+    }
+
+    public function editProfanityWord(Request $request)
+    {
+        $request->validate([
+            'old_word' => 'required|string',
+            'new_word' => 'required|string|min:2|max:50',
+        ]);
+
+        $oldWord = mb_strtolower(trim($request->old_word), 'UTF-8');
+        $newWord = mb_strtolower(trim($request->new_word), 'UTF-8');
+
+        if ($oldWord !== $newWord) {
+            // Hapus kata lama
+            $rawDefaults = array_map('mb_strtolower', \App\Services\ProfanityFilterService::getRawOriginalDefaultBadWords());
+            if (in_array($oldWord, $rawDefaults, true)) {
+                $deletedList = collect(\App\Services\ProfanityFilterService::getDeletedWords())
+                    ->push($oldWord)
+                    ->unique()
+                    ->values()
+                    ->implode("\n");
+                Setting::set('profanity_deleted_words', $deletedList);
+            }
+
+            $existing = collect(preg_split('/[\r\n,]+/', (string) Setting::get('profanity_words', ''), -1, PREG_SPLIT_NO_EMPTY))
+                ->map(fn ($w) => mb_strtolower(trim($w), 'UTF-8'))
+                ->filter(fn ($w) => $w !== $oldWord && mb_strlen($w) >= 2);
+
+            // Tambahkan kata baru hasil koreksi
+            $existing->push($newWord);
+            Setting::set('profanity_words', $existing->unique()->values()->implode("\n"));
+
+            // Retroactive filter
+            \App\Services\ProfanityFilterService::retroactiveFilter();
+
+            try {
+                \Illuminate\Support\Facades\Cache::flush();
+                \Illuminate\Support\Facades\Artisan::call('view:clear');
+            } catch (\Throwable $e) {}
+        }
+
+        return redirect()->to(route('admin.pengaturan.index') . '#tabModerasi')
+            ->with('success', "Kata '{$oldWord}' berhasil dikoreksi menjadi '{$newWord}'!");
+    }
+
+    public function resetProfanityWords()
+    {
+        Setting::set('profanity_deleted_words', '');
+        Setting::set('profanity_words', '');
+
+        try {
+            \Illuminate\Support\Facades\Cache::flush();
+            \Illuminate\Support\Facades\Artisan::call('view:clear');
+        } catch (\Throwable $e) {}
+
+        return redirect()->to(route('admin.pengaturan.index') . '#tabModerasi')
+            ->with('success', 'Library kata moderasi berhasil di-reset kembali ke bawaan sistem murni!');
     }
 
     // FAQ Management

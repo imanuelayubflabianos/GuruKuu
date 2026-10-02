@@ -72,7 +72,8 @@ class GuruController extends Controller
     {
         $jurusans = Jurusan::orderBy('nama_jurusan')->get();
         $badges = \App\Models\Badge::orderBy('nama_badge')->get();
-        return view('admin.guru.create', compact('jurusans', 'badges'));
+        $kelasList = Kelas::with('jurusan')->orderBy('tingkat')->orderBy('nama_kelas')->get();
+        return view('admin.guru.create', compact('jurusans', 'badges', 'kelasList'));
     }
 
     public function store(Request $request)
@@ -84,13 +85,15 @@ class GuruController extends Controller
             'phone'      => 'nullable|string|max:50',
             'kategori'   => 'nullable|in:normada,produktif',
             'jurusan_id' => 'nullable|exists:jurusan,id',
+            'kelas_ids'  => 'nullable|array',
+            'kelas_ids.*'=> 'exists:kelas,id',
             'bio'        => 'nullable|string',
             'photo'      => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'badge_ids'  => 'nullable|array',
             'badge_ids.*'=> 'exists:badge,id',
         ]);
 
-        $data = $request->except(['photo', 'badge_ids']);
+        $data = $request->except(['photo', 'badge_ids', 'kelas_ids']);
         $data['kategori'] = $request->input('kategori') ?: 'normada';
 
         if ($request->hasFile('photo')) {
@@ -99,6 +102,7 @@ class GuruController extends Controller
         }
 
         $guru = Guru::create($data);
+        $guru->kelas()->sync($request->input('kelas_ids', []));
 
         if ($request->filled('badge_ids')) {
             $periodeAktif = \App\Models\Periode::where('status', 'aktif')->first() ?? \App\Models\Periode::first();
@@ -112,6 +116,46 @@ class GuruController extends Controller
         }
 
         return redirect()->route('admin.guru.index')->with('success', 'Guru berhasil ditambahkan!');
+    }
+
+    /**
+     * Import Jadwal dan Pembagian Jam Mengajar Guru dari Spreadsheet Excel / CSV
+     */
+    public function importJadwal(Request $request, \App\Services\GuruJadwalImportService $service)
+    {
+        $request->validate([
+            'file' => 'required|file|mimes:xlsx,xls,csv|max:15360',
+            'replace_existing' => 'nullable',
+            'create_if_not_found' => 'nullable',
+        ], [
+            'file.required' => 'Silakan pilih file spreadsheet (.xlsx, .xls, .csv).',
+            'file.mimes'    => 'Format file harus berupa Excel (.xlsx, .xls) atau CSV (.csv).',
+            'file.max'      => 'Ukuran file maksimal adalah 15 MB.',
+        ]);
+
+        $replaceExisting = $request->boolean('replace_existing', true);
+        $createIfNotFound = $request->boolean('create_if_not_found', false);
+
+        try {
+            $result = $service->import($request->file('file'), $replaceExisting, $createIfNotFound);
+
+            if (!$result['success']) {
+                return redirect()->back()->with('error', $result['message'] ?? 'Gagal memproses file.');
+            }
+
+            $msg = $result['message'];
+            if (!empty($result['unmatched_teachers'])) {
+                $unmatchedCount = count($result['unmatched_teachers']);
+                $msg .= " Catatan: Terdapat {$unmatchedCount} nama guru di file yang belum terdaftar di GuruKuu.";
+            }
+
+            return redirect()->route('admin.guru.index')
+                ->with('success', $msg)
+                ->with('import_details', $result);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('Import Jadwal Guru Error: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Terjadi kesalahan saat memproses file Excel: ' . $e->getMessage());
+        }
     }
 
     public function show(Guru $guru)

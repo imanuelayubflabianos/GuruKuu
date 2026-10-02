@@ -477,15 +477,35 @@
 </div>
 
 <script>
+const roleInputs = {
+    siswa: { nis: document.getElementById('inputNis')?.value || '', password: '' },
+    guru: { nis: '', password: '' }
+};
+let activeRole = 'siswa';
+
 function updateForm() {
     const roleSiswa = document.getElementById('roleSiswa');
     const labelNis = document.getElementById('labelNis');
     const inputNis = document.getElementById('inputNis');
+    const inputPassword = document.getElementById('inputPassword');
     const btnSubmit = document.getElementById('btnSubmit');
 
-    if (!roleSiswa || !labelNis || !inputNis || !btnSubmit) return;
+    if (!roleSiswa || !labelNis || !inputNis || !btnSubmit || !inputPassword) return;
 
-    if (roleSiswa.checked) {
+    const newRole = roleSiswa.checked ? 'siswa' : 'guru';
+
+    if (newRole !== activeRole) {
+        // Simpan input saat ini ke peran aktif sebelumnya
+        roleInputs[activeRole].nis = inputNis.value;
+        roleInputs[activeRole].password = inputPassword.value;
+
+        // Terapkan nilai tersimpan dari peran baru (kosong jika belum diisi)
+        activeRole = newRole;
+        inputNis.value = roleInputs[newRole].nis;
+        inputPassword.value = roleInputs[newRole].password;
+    }
+
+    if (activeRole === 'siswa') {
         labelNis.textContent = 'NIS SISWA';
         inputNis.placeholder = 'Masukkan NIS siswa';
         btnSubmit.innerHTML = '<i class="bi bi-box-arrow-in-right"></i> Masuk sebagai Siswa';

@@ -96,31 +96,32 @@ class ProfanityFilterService
         $rawNormalized = mb_strtolower($text, 'UTF-8');
         $leetNormalized = self::normalize($text);
 
-        // Hilangkan spasi/titik antar huruf untuk deteksi evasion seperti "a n j i n g" atau "f.u.c.k"
-        $compactRaw = preg_replace('/[\\s._\\-*]+/u', '', $rawNormalized);
-        $compactLeet = preg_replace('/[\\s._\\-*]+/u', '', $leetNormalized);
-
         $detected = [];
 
         foreach (self::getBadWords() as $word) {
-            $pattern = '/\\b' . preg_quote($word, '/') . '\\b/iu';
+            $pattern = '/\b' . preg_quote($word, '/') . '\b/iu';
 
-            // 1. Cek pada teks asli
+            // 1. Cek pada teks asli dengan batas kata utuh (\b)
             if (preg_match($pattern, $rawNormalized)) {
                 $detected[] = $word;
                 continue;
             }
 
-            // 2. Cek pada teks hasil leetspeak normalisasi
+            // 2. Cek pada teks hasil leetspeak normalisasi dengan batas kata utuh (\b)
             if (preg_match($pattern, $leetNormalized)) {
                 $detected[] = $word;
                 continue;
             }
 
-            // 3. Cek pada teks padat tanpa spasi (hanya untuk kata panjang >= 4 huruf untuk menghindari false positive)
-            if (mb_strlen($word) >= 4) {
-                if (str_contains($compactRaw, $word) || str_contains($compactLeet, $word)) {
+            // 3. Deteksi variasi spasi/titik (contoh: "j a w i r", "a.n.j.i.n.g", "b_o_d_o_h")
+            // Menggunakan lookaround batas huruf (?<![\p{L}\p{N}]) & (?![\p{L}\p{N}])
+            // AGAR TIDAK SALAH MENYENSOR KATA SEPERTI "kerJA WIRausaha"
+            $chars = preg_split('//u', $word, -1, PREG_SPLIT_NO_EMPTY);
+            if (count($chars) >= 3) {
+                $evasionPattern = '/(?<![\p{L}\p{N}])' . implode('[\s._\-\*]+', array_map(fn($c) => preg_quote($c, '/'), $chars)) . '(?![\p{L}\p{N}])/iu';
+                if (preg_match($evasionPattern, $rawNormalized) || preg_match($evasionPattern, $leetNormalized)) {
                     $detected[] = $word;
+                    continue;
                 }
             }
         }
@@ -175,9 +176,31 @@ class ProfanityFilterService
     }
 
     /**
-     * Ambil daftar kata kotor bawaan sistem (library default).
+     * Ambil daftar kata bawaan yang telah dihapus / dikecualikan oleh admin.
+     */
+    public static function getDeletedWords(): array
+    {
+        $deleted = \App\Models\Setting::get('profanity_deleted_words', '');
+        $words = preg_split('/[\r\n,]+/', (string) $deleted, -1, PREG_SPLIT_NO_EMPTY);
+        return array_values(array_unique(array_map(fn ($w) => mb_strtolower(trim($w), 'UTF-8'), $words)));
+    }
+
+    /**
+     * Ambil daftar kata kotor bawaan sistem (library default) yang masih aktif (belum dihapus admin).
      */
     public static function getDefaultBadWords(): array
+    {
+        $deleted = self::getDeletedWords();
+        if (empty($deleted)) {
+            return self::$defaultBadWords;
+        }
+        return array_values(array_diff(self::$defaultBadWords, $deleted));
+    }
+
+    /**
+     * Ambil kata kotor asli bawaan bawaan dasar (tanpa pengurangan).
+     */
+    public static function getRawOriginalDefaultBadWords(): array
     {
         return self::$defaultBadWords;
     }
@@ -200,7 +223,7 @@ class ProfanityFilterService
      */
     public static function getBadWords(): array
     {
-        return array_values(array_unique(array_merge(self::$defaultBadWords, self::getCustomBadWords())));
+        return array_values(array_unique(array_merge(self::getDefaultBadWords(), self::getCustomBadWords())));
     }
 
     /**

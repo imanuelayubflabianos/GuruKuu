@@ -20,61 +20,50 @@
             <thead>
                 <tr>
                     <th>PENGIRIM</th>
-                    <th>PESAN</th>
-                    <th>STATUS</th>
-                    <th>WAKTU</th>
-                    <th class="text-center">AKSI</th>
+                    <th style="width: 200px;">WAKTU</th>
+                    <th class="text-center" style="width: 120px;">AKSI</th>
                 </tr>
             </thead>
             <tbody>
                 @forelse($kontak as $k)
                 <tr>
                     <td>
-                        <a href="{{ route('admin.kontak.chat', $k->identifier) }}" class="text-decoration-none text-dark fw-bold d-inline-flex align-items-center gap-1" title="Klik untuk membuka ruang chat">
-                            <span>{{ $k->display_pengirim }}</span>
-                            <i class="bi bi-box-arrow-up-right text-primary small" style="font-size: 0.72rem;"></i>
-                        </a>
-                        <br><small class="text-muted font-mono">{{ $k->is_siswa ? 'Siswa (NIS: ' . $k->identifier . ')' : 'Pengguna / Tamu (' . (substr($k->display_pengirim, 6) ?: '-') . ')' }}</small>
-                    </td>
-                    <td style="max-width: 320px;">
-                        @if($k->pesan === '[Pesan Dihapus]')
-                            <span class="fst-italic text-muted">[Pesan Dihapus]</span>
-                        @else
-                            {{ Str::limit($k->pesan, 80) }}
-                        @endif
-                        
-                        @if($k->balasan)
-                            <div class="mt-2 p-2 small rounded" style="background: #d1e7dd; border-left: 3px solid #198754;">
-                                <strong class="text-success">Balasan:</strong><br>
-                                {{ Str::limit($k->balasan, 70) }}
+                        <a href="{{ route('admin.kontak.chat', $k->identifier) }}" class="text-decoration-none d-flex align-items-center gap-3 p-2 rounded-3 hover-bg-light transition-all" style="cursor: pointer;" title="Klik untuk membuka ruang chat & membalas pesan">
+                            <div class="rounded-circle d-flex align-items-center justify-content-center text-white flex-shrink-0 fw-bold" style="width: 40px; height: 40px; background: linear-gradient(135deg, #003366, #0055a5); font-size: 0.95rem;">
+                                {{ strtoupper(substr($k->display_pengirim, 0, 1) ?: 'U') }}
                             </div>
-                        @endif
-                    </td>
-                    <td>
-                        @if($k->is_replied) 
-                            <span class="badge bg-success d-inline-flex align-items-center gap-1">
-                                <i class="bi bi-check2-all text-white"></i> Dibalas
-                            </span>
-                        @else 
-                            <span class="badge bg-light text-muted border d-inline-flex align-items-center gap-1">
-                                <i class="bi bi-check2-all text-secondary"></i> Menunggu
-                            </span> 
-                        @endif
-                    </td>
-                    <td class="font-mono small">{{ $k->created_at->format('d M Y, H:i') }}</td>
-                    <td class="text-center">
-                        <a href="{{ route('admin.kontak.chat', $k->identifier) }}" class="btn btn-sm btn-outline-primary mb-1 me-1" title="Buka Ruang Chat">
-                            <i class="bi bi-chat-dots-fill"></i> Chat
+                            <div>
+                                <div class="fw-bold text-dark d-flex align-items-center gap-1.5">
+                                    <span>{{ $k->display_pengirim }}</span>
+                                    <i class="bi bi-box-arrow-up-right text-primary small" style="font-size: 0.72rem;"></i>
+                                    @if(!$k->is_replied)
+                                        <span class="badge rounded-pill bg-danger-subtle text-danger border border-danger ms-1" style="font-size: 0.65rem;">Menunggu Balasan</span>
+                                    @else
+                                        <span class="badge rounded-pill bg-success-subtle text-success border border-success ms-1" style="font-size: 0.65rem;">Dibalas</span>
+                                    @endif
+                                </div>
+                                <small class="text-muted font-mono" style="font-size: 0.78rem;">
+                                    {{ $k->is_siswa ? 'Siswa (NIS: ' . $k->identifier . ')' : 'Pengguna / Tamu (' . (substr($k->display_pengirim, 6) ?: '-') . ')' }}
+                                </small>
+                            </div>
                         </a>
-                        <form action="{{ route('admin.kontak.destroy', $k) }}" method="POST" class="d-inline" onsubmit="return confirm('Hapus pesan ini secara permanen?')">
+                    </td>
+                    <td class="font-mono small align-middle text-muted">
+                        <i class="bi bi-clock me-1"></i>{{ $k->created_at->format('d M Y, H:i') }}
+                    </td>
+                    <td class="text-center align-middle">
+                        <form action="{{ route('admin.kontak.destroy', $k) }}" method="POST" onsubmit="return confirm('Hapus pesan ini secara permanen?')">
                             @csrf @method('DELETE')
-                            <button class="btn btn-sm btn-outline-danger mb-1" title="Hapus Pesan"><i class="bi bi-trash"></i></button>
+                            <button type="submit" class="btn btn-sm btn-outline-danger d-inline-flex align-items-center gap-1.5 px-3 py-1.5 rounded-pill shadow-xs" title="Hapus Pesan">
+                                <i class="bi bi-trash"></i>
+                                <span>Hapus</span>
+                            </button>
                         </form>
                     </td>
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="5" class="text-center py-5 text-muted">
+                    <td colspan="3" class="text-center py-5 text-muted">
                         <i class="bi bi-inbox fs-1 d-block mb-3"></i>
                         Belum ada pesan masuk.
                     </td>

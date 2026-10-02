@@ -866,224 +866,396 @@ document.addEventListener('DOMContentLoaded', function() {
         </div>
 
         @php
-            $allTeachers = \App\Models\Guru::with(['jurusan', 'penghargaan.badge'])->withRatings()
-                ->orderByDesc('rata_rata_nilai')->orderByDesc('total_penilaian')->limit(3)->get();
-            
-            $topList = $allTeachers->map(function($guru) {
-                $guru->persentase = round(($guru->rata_rata_nilai / 5) * 100);
-                return $guru;
-            })->sortByDesc('rata_rata_nilai')->take(3)->values();
+            $list = $leaderboard ?? \App\Models\Guru::leaderboardFor('rating');
+            $eligibleList = $list->filter(fn($g) => !empty($g->leaderboard_rank))->values();
+            $top1 = $eligibleList->get(0);
+            $top2 = $eligibleList->get(1);
+            $top3 = $eligibleList->get(2);
         @endphp
 
-        <div class="row g-3 g-lg-4 justify-content-center align-items-end mb-5 gk-podium-row" id="leaderboardPodium">
-            @if($topList->count() > 0)
-                {{-- #2 PERAK (KIRI - NORMAL) --}}
-                @if($topList->count() > 1)
-                <div class="col-11 col-sm-8 col-md-4 order-2 order-md-1 podium-anim-item podium-rank-2 gk-podium-2">
-                    <div class="gk-podium-card-revised p-3.5 p-md-4 text-center h-100 d-flex flex-column justify-content-between">
-                        <div>
-                            <div class="mb-1">
-                                <span class="badge rounded-pill px-3 py-1.5 fw-bold" style="background: #f1f5f9; color: #475569; font-size: 0.8rem;">
-                                    #2nd
-                                </span>
-                            </div>
-                            
-                            {{-- Badges di Bawah Rank (Always Rendered as Consistent Spacer) --}}
-                            <div class="gk-podium-badges-row">
-                                @foreach(($topList[1]->penghargaan ?? collect()) as $penghargaan)
-                                    @if($penghargaan->badge)
-                                        <span class="gk-badge-mini-icon" style="background: {{ $penghargaan->badge->warna }}18; color: {{ $penghargaan->badge->warna }}; border-color: {{ $penghargaan->badge->warna }}33;" data-bs-toggle="tooltip" title="{{ $penghargaan->badge->nama_badge }}: {{ $penghargaan->badge->deskripsi }}">
-                                            @if(str_starts_with($penghargaan->badge->icon, 'bi-'))
-                                                 <i class="bi {{ $penghargaan->badge->icon }}"></i>
-                                            @else
-                                                {{ $penghargaan->badge->icon }}
-                                            @endif
-                                        </span>
-                                    @endif
-                                @endforeach
-                            </div>
-
-                            <div class="gk-avatar-clean-wrap mb-3" style="width: 96px; height: 96px;">
-                                <img src="{{ $topList[1]->photo_url }}" width="96" height="96" alt="{{ $topList[1]->nama }}">
-                            </div>
-                            <h5 class="fw-bold mb-1 text-dark" style="font-size: 1.05rem;" title="{{ $topList[1]->nama }}">{{ $topList[1]->nama }}</h5>
-                            
-                            {{-- Bintang (Support 0.5 Setengah Bintang) --}}
-                            <div class="text-warning mb-2" style="font-size: 0.95rem; letter-spacing: 2px;">
-                                @php
-                                    $val2 = $topList[1]->persentase / 20;
-                                    $stars2 = round($val2 * 2) / 2;
-                                @endphp
-                                @for($i = 1; $i <= 5; $i++)
-                                    @if($stars2 >= $i)
-                                        <i class="bi bi-star-fill"></i>
-                                    @elseif($stars2 >= ($i - 0.5))
-                                        <i class="bi bi-star-half"></i>
-                                    @else
-                                        <i class="bi bi-star text-muted opacity-25"></i>
-                                    @endif
-                                @endfor
-                            </div>
-
-                            {{-- Progress Pill Normal --}}
-                            <div class="mb-2">
-                                <div class="gk-progress-pill gk-pill-rank-2 mx-auto" style="width: 140px; height: 32px; font-size: 0.84rem;">
-                                    <div class="gk-progress-pill-fill {{ $topList[1]->persentase >= 75 ? 'gk-bar-blue-high' : ($topList[1]->persentase >= 50 ? 'gk-bar-blue-mid' : 'gk-bar-blue-low') }}" style="width: 0%;" data-percentage="{{ $topList[1]->persentase }}"></div>
-                                    <span class="position-relative text-white" style="z-index: 2; text-shadow: 0 1px 2px rgba(0,0,0,0.6);">{{ $topList[1]->persentase }}%</span>
-                                </div>
-                            </div>
-                            <small class="text-muted font-mono d-block" style="font-size: 0.78rem;">{{ $topList[1]->total_penilaian }} ulasan</small>
+        @if(!$top1)
+            <div class="row justify-content-center mb-5" data-aos="fade-up">
+                <div class="col-12 col-md-10 col-lg-8">
+                    <div class="card-custom p-4 text-center border shadow-xs" style="background: rgba(0, 51, 102, 0.03); border-color: rgba(0, 51, 102, 0.1) !important; border-radius: 14px;">
+                        <div class="rounded-circle d-inline-flex align-items-center justify-content-center mb-2" style="width: 42px; height: 42px; background: rgba(0, 51, 102, 0.08); color: #003366;">
+                            <i class="bi bi-info-circle fs-5"></i>
                         </div>
+                        <h6 class="fw-bold text-dark mb-1">Belum Ada Guru di Ranking Podium</h6>
+                        <p class="text-muted small mb-0" style="max-width: 580px; margin: 0 auto; line-height: 1.5;">
+                            Sesuai ketentuan, guru harus memiliki <strong>minimal 5 penilaian</strong> dari siswa untuk dapat masuk dalam peringkat leaderboard. Seluruh nilai guru tetap tercatat dan dapat dilihat pada leaderboard lengkap.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        @else
+            @if(!$top2)
+                {{-- HANYA 1 GURU TOP --}}
+                @php $pct1 = round(($top1->rata_rata_nilai / 5) * 100); @endphp
+                <div class="row justify-content-center mb-5" data-aos="zoom-in">
+                    <div class="col-12 col-sm-10 col-md-8 col-lg-5">
+                        <div class="gk-podium-card-revised is-first p-4 p-md-5 text-center d-flex flex-column justify-content-between shadow position-relative">
+                            <div>
+                                <div class="mb-1">
+                                    <span class="badge rounded-pill px-4 py-1.5 fw-bold" style="background: #fef08a; color: #854d0e; font-size: 0.9rem;">
+                                        #1st
+                                    </span>
+                                </div>
+                                <div class="gk-podium-badges-row">
+                                    @foreach(($top1->penghargaan ?? collect()) as $penghargaan)
+                                        @if($penghargaan->badge)
+                                            <span class="gk-badge-mini-icon" style="background: {{ $penghargaan->badge->warna }}18; color: {{ $penghargaan->badge->warna }}; border-color: {{ $penghargaan->badge->warna }}33;" data-bs-toggle="tooltip" title="{{ $penghargaan->badge->nama_badge }}: {{ $penghargaan->badge->deskripsi }}">
+                                                @if(str_starts_with($penghargaan->badge->icon, 'bi-'))<i class="bi {{ $penghargaan->badge->icon }}"></i>@else{{ $penghargaan->badge->icon }}@endif
+                                            </span>
+                                        @endif
+                                    @endforeach
+                                </div>
+                                <div class="gk-avatar-clean-wrap mb-3" style="width: 114px; height: 114px;">
+                                    <img src="{{ $top1->photo_url }}" width="114" height="114" alt="{{ $top1->nama }}">
+                                </div>
+                                <h4 class="fw-bold mb-1 text-dark" style="font-size: 1.25rem;" title="{{ $top1->nama }}">{{ $top1->nama }}</h4>
+                                <div class="text-muted small mb-2">{{ strtoupper($top1->jurusan?->nama_jurusan ?? $top1->kategori_label ?? 'UMUM') }}</div>
+                                
+                                <div class="text-warning mb-2" style="font-size: 1.1rem; letter-spacing: 2.5px;">
+                                    @php
+                                        $val1 = $pct1 / 20;
+                                        $stars1 = round($val1 * 2) / 2;
+                                    @endphp
+                                    @for($i = 1; $i <= 5; $i++)
+                                        @if($stars1 >= $i)
+                                            <i class="bi bi-star-fill"></i>
+                                        @elseif($stars1 >= ($i - 0.5))
+                                            <i class="bi bi-star-half"></i>
+                                        @else
+                                            <i class="bi bi-star text-muted opacity-25"></i>
+                                        @endif
+                                    @endfor
+                                </div>
 
-                        {{-- Tombol Profil --}}
-                        <div class="mt-3">
-                            <a href="{{ route('landing.guru.detail', $topList[1]->id) }}" class="btn btn-sm btn-outline-primary gk-btn-podium-profile mb-2">
+                                <div class="mb-2">
+                                    <div class="gk-progress-pill gk-pill-rank-1 mx-auto" style="width: 145px; height: 24px; font-size: 0.8rem;">
+                                        <div class="gk-progress-pill-fill {{ $pct1 >= 75 ? 'gk-bar-blue-high' : ($pct1 >= 50 ? 'gk-bar-blue-mid' : 'gk-bar-blue-low') }}" style="width: {{ $pct1 }}%;"></div>
+                                        <span class="position-relative text-white" style="z-index: 2; text-shadow: 0 1px 2px rgba(0,0,0,0.6);">{{ $pct1 }}%</span>
+                                    </div>
+                                </div>
+                                <small class="text-muted font-mono d-block mb-3" style="font-size: 0.8rem;">{{ $top1->total_penilaian }} ulasan</small>
+                            </div>
+
+                            <a href="{{ route('landing.guru.detail', $top1->id) }}" class="btn btn-sm btn-outline-primary gk-btn-podium-profile mb-2">
                                 <i class="bi bi-eye me-1"></i> Profil
                             </a>
                         </div>
                     </div>
                 </div>
-                @endif
-
-                {{-- #1 EMAS (TENGAH - BESAR) --}}
-                @if($topList->count() > 0)
-                <div class="col-11 col-sm-8 col-md-4 order-1 order-md-2 podium-anim-item podium-rank-1 gk-podium-1">
-                    <div class="gk-podium-card-revised is-first p-4 p-md-5 text-center h-100 d-flex flex-column justify-content-between">
-                        <div>
-                            <div class="mb-1">
-                                <span class="badge rounded-pill px-4 py-1.5 fw-bold" style="background: #fef08a; color: #854d0e; font-size: 0.9rem;">
-                                    #1st
-                                </span>
-                            </div>
-
-                            {{-- Badges di Bawah Rank (Always Rendered as Consistent Spacer) --}}
-                            <div class="gk-podium-badges-row">
-                                @foreach(($topList[0]->penghargaan ?? collect()) as $penghargaan)
-                                    @if($penghargaan->badge)
-                                        <span class="gk-badge-mini-icon" style="background: {{ $penghargaan->badge->warna }}18; color: {{ $penghargaan->badge->warna }}; border-color: {{ $penghargaan->badge->warna }}33;" data-bs-toggle="tooltip" title="{{ $penghargaan->badge->nama_badge }}: {{ $penghargaan->badge->deskripsi }}">
-                                            @if(str_starts_with($penghargaan->badge->icon, 'bi-'))
-                                                 <i class="bi {{ $penghargaan->badge->icon }}"></i>
-                                            @else
-                                                {{ $penghargaan->badge->icon }}
-                                            @endif
-                                        </span>
-                                    @endif
-                                @endforeach
-                            </div>
-
-                            <div class="gk-avatar-clean-wrap mb-3" style="width: 114px; height: 114px;">
-                                <img src="{{ $topList[0]->photo_url }}" width="114" height="114" alt="{{ $topList[0]->nama }}">
-                            </div>
-                            <h4 class="fw-bold mb-1 text-dark" style="font-size: 1.25rem;" title="{{ $topList[0]->nama }}">{{ $topList[0]->nama }}</h4>
-                            
-                            {{-- Bintang (Support 0.5 Setengah Bintang) --}}
-                            <div class="text-warning mb-2" style="font-size: 1.1rem; letter-spacing: 2.5px;">
-                                @php
-                                    $val1 = $topList[0]->persentase / 20;
-                                    $stars1 = round($val1 * 2) / 2;
-                                @endphp
-                                @for($i = 1; $i <= 5; $i++)
-                                    @if($stars1 >= $i)
-                                        <i class="bi bi-star-fill"></i>
-                                    @elseif($stars1 >= ($i - 0.5))
-                                        <i class="bi bi-star-half"></i>
-                                    @else
-                                        <i class="bi bi-star text-muted opacity-25"></i>
-                                    @endif
-                                @endfor
-                            </div>
-
-                            {{-- Progress Pill Besar --}}
-                            <div class="mb-2">
-                                <div class="gk-progress-pill gk-pill-rank-1 mx-auto" style="width: 156px; height: 35px; font-size: 0.92rem;">
-                                    <div class="gk-progress-pill-fill {{ $topList[0]->persentase >= 75 ? 'gk-bar-blue-high' : ($topList[0]->persentase >= 50 ? 'gk-bar-blue-mid' : 'gk-bar-blue-low') }}" style="width: 0%;" data-percentage="{{ $topList[0]->persentase }}"></div>
-                                    <span class="position-relative text-white" style="z-index: 2; text-shadow: 0 1px 2px rgba(0,0,0,0.6);">{{ $topList[0]->persentase }}%</span>
+            @elseif(!$top3)
+                {{-- HANYA 2 GURU TOP --}}
+                @php
+                    $pct1 = round(($top1->rata_rata_nilai / 5) * 100);
+                    $pct2 = round(($top2->rata_rata_nilai / 5) * 100);
+                @endphp
+                <div class="row g-3 g-md-4 justify-content-center align-items-end mb-5">
+                    {{-- #2 PERAK --}}
+                    <div class="col-6 col-md-5" data-aos="fade-right">
+                        <div class="gk-podium-card-revised p-3.5 p-md-4 text-center h-100 d-flex flex-column justify-content-between shadow-sm">
+                            <div>
+                                <div class="mb-1">
+                                    <span class="badge rounded-pill px-3 py-1.5 fw-bold" style="background: #f1f5f9; color: #475569; font-size: 0.8rem;">
+                                        #2nd
+                                    </span>
                                 </div>
+                                <div class="gk-podium-badges-row">
+                                    @foreach(($top2->penghargaan ?? collect()) as $penghargaan)
+                                        @if($penghargaan->badge)
+                                            <span class="gk-badge-mini-icon" style="background: {{ $penghargaan->badge->warna }}18; color: {{ $penghargaan->badge->warna }}; border-color: {{ $penghargaan->badge->warna }}33;" data-bs-toggle="tooltip" title="{{ $penghargaan->badge->nama_badge }}: {{ $penghargaan->badge->deskripsi }}">
+                                                @if(str_starts_with($penghargaan->badge->icon, 'bi-'))<i class="bi {{ $penghargaan->badge->icon }}"></i>@else{{ $penghargaan->badge->icon }}@endif
+                                            </span>
+                                        @endif
+                                    @endforeach
+                                </div>
+                                <div class="gk-avatar-clean-wrap mb-3" style="width: 96px; height: 96px;">
+                                    <img src="{{ $top2->photo_url }}" width="96" height="96" alt="{{ $top2->nama }}">
+                                </div>
+                                <h5 class="fw-bold mb-1 text-dark" style="font-size: 1.05rem;" title="{{ $top2->nama }}">{{ $top2->nama }}</h5>
+                                <div class="text-muted small mb-2">{{ strtoupper($top2->jurusan?->nama_jurusan ?? $top2->kategori_label ?? 'UMUM') }}</div>
+                                <div class="text-warning mb-2" style="font-size: 0.95rem; letter-spacing: 2px;">
+                                    @php
+                                        $val2 = $pct2 / 20;
+                                        $stars2 = round($val2 * 2) / 2;
+                                    @endphp
+                                    @for($i = 1; $i <= 5; $i++)
+                                        @if($stars2 >= $i)
+                                            <i class="bi bi-star-fill"></i>
+                                        @elseif($stars2 >= ($i - 0.5))
+                                            <i class="bi bi-star-half"></i>
+                                        @else
+                                            <i class="bi bi-star text-muted opacity-25"></i>
+                                        @endif
+                                    @endfor
+                                </div>
+                                <div class="mb-2">
+                                    <div class="gk-progress-pill gk-pill-rank-2 mx-auto" style="width: 135px; height: 22px; font-size: 0.74rem;">
+                                        <div class="gk-progress-pill-fill {{ $pct2 >= 75 ? 'gk-bar-blue-high' : ($pct2 >= 50 ? 'gk-bar-blue-mid' : 'gk-bar-blue-low') }}" style="width: {{ $pct2 }}%;"></div>
+                                        <span class="position-relative text-white" style="z-index: 2; text-shadow: 0 1px 2px rgba(0,0,0,0.6);">{{ $pct2 }}%</span>
+                                    </div>
+                                </div>
+                                <small class="text-muted font-mono d-block mb-3" style="font-size: 0.78rem;">{{ $top2->total_penilaian }} ulasan</small>
                             </div>
-                            <small class="text-muted font-mono d-block" style="font-size: 0.8rem;">{{ $topList[0]->total_penilaian }} ulasan</small>
+                            <a href="{{ route('landing.guru.detail', $top2->id) }}" class="btn btn-sm btn-outline-primary gk-btn-podium-profile mb-2">
+                                <i class="bi bi-eye me-1"></i> Profil
+                            </a>
                         </div>
+                    </div>
 
-                        {{-- Tombol Profil --}}
-                        <div class="mt-3">
-                            <a href="{{ route('landing.guru.detail', $topList[0]->id) }}" class="btn btn-sm btn-outline-primary gk-btn-podium-profile mb-2">
+                    {{-- #1 EMAS --}}
+                    <div class="col-6 col-md-5" data-aos="fade-left">
+                        <div class="gk-podium-card-revised is-first p-3.5 p-md-4 text-center h-100 d-flex flex-column justify-content-between shadow position-relative">
+                            <div>
+                                <div class="mb-1">
+                                    <span class="badge rounded-pill px-4 py-1.5 fw-bold" style="background: #fef08a; color: #854d0e; font-size: 0.85rem;">
+                                        #1st
+                                    </span>
+                                </div>
+                                <div class="gk-podium-badges-row">
+                                    @foreach(($top1->penghargaan ?? collect()) as $penghargaan)
+                                        @if($penghargaan->badge)
+                                            <span class="gk-badge-mini-icon" style="background: {{ $penghargaan->badge->warna }}18; color: {{ $penghargaan->badge->warna }}; border-color: {{ $penghargaan->badge->warna }}33;" data-bs-toggle="tooltip" title="{{ $penghargaan->badge->nama_badge }}: {{ $penghargaan->badge->deskripsi }}">
+                                                @if(str_starts_with($penghargaan->badge->icon, 'bi-'))<i class="bi {{ $penghargaan->badge->icon }}"></i>@else{{ $penghargaan->badge->icon }}@endif
+                                            </span>
+                                        @endif
+                                    @endforeach
+                                </div>
+                                <div class="gk-avatar-clean-wrap mb-3" style="width: 104px; height: 104px;">
+                                    <img src="{{ $top1->photo_url }}" width="104" height="104" alt="{{ $top1->nama }}">
+                                </div>
+                                <h4 class="fw-bold mb-1 text-dark" style="font-size: 1.15rem;" title="{{ $top1->nama }}">{{ $top1->nama }}</h4>
+                                <div class="text-muted small mb-2">{{ strtoupper($top1->jurusan?->nama_jurusan ?? $top1->kategori_label ?? 'UMUM') }}</div>
+                                <div class="text-warning mb-2" style="font-size: 1rem; letter-spacing: 2px;">
+                                    @php
+                                        $val1 = $pct1 / 20;
+                                        $stars1 = round($val1 * 2) / 2;
+                                    @endphp
+                                    @for($i = 1; $i <= 5; $i++)
+                                        @if($stars1 >= $i)
+                                            <i class="bi bi-star-fill"></i>
+                                        @elseif($stars1 >= ($i - 0.5))
+                                            <i class="bi bi-star-half"></i>
+                                        @else
+                                            <i class="bi bi-star text-muted opacity-25"></i>
+                                        @endif
+                                    @endfor
+                                </div>
+                                <div class="mb-2">
+                                    <div class="gk-progress-pill gk-pill-rank-1 mx-auto" style="width: 140px; height: 22px; font-size: 0.74rem;">
+                                        <div class="gk-progress-pill-fill {{ $pct1 >= 75 ? 'gk-bar-blue-high' : ($pct1 >= 50 ? 'gk-bar-blue-mid' : 'gk-bar-blue-low') }}" style="width: {{ $pct1 }}%;"></div>
+                                        <span class="position-relative text-white" style="z-index: 2; text-shadow: 0 1px 2px rgba(0,0,0,0.6);">{{ $pct1 }}%</span>
+                                    </div>
+                                </div>
+                                <small class="text-muted font-mono d-block mb-3" style="font-size: 0.78rem;">{{ $top1->total_penilaian }} ulasan</small>
+                            </div>
+                            <a href="{{ route('landing.guru.detail', $top1->id) }}" class="btn btn-sm btn-outline-primary gk-btn-podium-profile mb-2">
                                 <i class="bi bi-eye me-1"></i> Profil
                             </a>
                         </div>
                     </div>
                 </div>
-                @endif
-
-                {{-- #3 PERUNGGU (KANAN - KECIL) --}}
-                @if($topList->count() > 2)
-                <div class="col-11 col-sm-8 col-md-4 order-3 order-md-3 podium-anim-item podium-rank-3 gk-podium-3">
-                    <div class="gk-podium-card-revised p-3 p-md-3.5 text-center h-100 d-flex flex-column justify-content-between">
-                        <div>
-                            <div class="mb-1">
-                                <span class="badge rounded-pill px-2.5 py-1 fw-bold" style="background: #fed7aa; color: #9a3412; font-size: 0.75rem;">
-                                    #3rd
-                                </span>
-                            </div>
-
-                            {{-- Badges di Bawah Rank (Always Rendered as Consistent Spacer) --}}
-                            <div class="gk-podium-badges-row">
-                                @foreach(($topList[2]->penghargaan ?? collect()) as $penghargaan)
-                                    @if($penghargaan->badge)
-                                        <span class="gk-badge-mini-icon" style="background: {{ $penghargaan->badge->warna }}18; color: {{ $penghargaan->badge->warna }}; border-color: {{ $penghargaan->badge->warna }}33;" data-bs-toggle="tooltip" title="{{ $penghargaan->badge->nama_badge }}: {{ $penghargaan->badge->deskripsi }}">
-                                            @if(str_starts_with($penghargaan->badge->icon, 'bi-'))
-                                                 <i class="bi {{ $penghargaan->badge->icon }}"></i>
-                                            @else
-                                                {{ $penghargaan->badge->icon }}
-                                            @endif
-                                        </span>
-                                    @endif
-                                @endforeach
-                            </div>
-
-                            <div class="gk-avatar-clean-wrap mb-3" style="width: 82px; height: 82px;">
-                                <img src="{{ $topList[2]->photo_url }}" width="82" height="82" alt="{{ $topList[2]->nama }}">
-                            </div>
-                            <h5 class="fw-bold mb-1 text-dark" style="font-size: 0.95rem;" title="{{ $topList[2]->nama }}">{{ $topList[2]->nama }}</h5>
-                            
-                            {{-- Bintang (Support 0.5 Setengah Bintang) --}}
-                            <div class="text-warning mb-2" style="font-size: 0.85rem; letter-spacing: 1.5px;">
-                                @php
-                                    $val3 = $topList[2]->persentase / 20;
-                                    $stars3 = round($val3 * 2) / 2;
-                                @endphp
-                                @for($i = 1; $i <= 5; $i++)
-                                    @if($stars3 >= $i)
-                                        <i class="bi bi-star-fill"></i>
-                                    @elseif($stars3 >= ($i - 0.5))
-                                        <i class="bi bi-star-half"></i>
-                                    @else
-                                        <i class="bi bi-star text-muted opacity-25"></i>
-                                    @endif
-                                @endfor
-                            </div>
-
-                            {{-- Progress Pill Kecil --}}
-                            <div class="mb-2">
-                                <div class="gk-progress-pill gk-pill-rank-3 mx-auto" style="width: 124px; height: 28px; font-size: 0.78rem;">
-                                    <div class="gk-progress-pill-fill {{ $topList[2]->persentase >= 75 ? 'gk-bar-blue-high' : ($topList[2]->persentase >= 50 ? 'gk-bar-blue-mid' : 'gk-bar-blue-low') }}" style="width: 0%;" data-percentage="{{ $topList[2]->persentase }}"></div>
-                                    <span class="position-relative text-white" style="z-index: 2; text-shadow: 0 1px 2px rgba(0,0,0,0.6);">{{ $topList[2]->persentase }}%</span>
-                                </div>
-                            </div>
-                            <small class="text-muted font-mono d-block" style="font-size: 0.75rem;">{{ $topList[2]->total_penilaian }} ulasan</small>
-                        </div>
-
-                        {{-- Tombol Profil --}}
-                        <div class="mt-3">
-                            <a href="{{ route('landing.guru.detail', $topList[2]->id) }}" class="btn btn-sm btn-outline-primary gk-btn-podium-profile mb-2">
-                                <i class="bi bi-eye me-1"></i> Profil
-                            </a>
-                        </div>
-                    </div>
-                </div>
-                @endif
             @else
-                <div class="col-12 text-center text-muted py-4">Belum ada data evaluasi guru.</div>
+                {{-- TOP 3 LENGKAP --}}
+                @php
+                    $pct1 = round(($top1->rata_rata_nilai / 5) * 100);
+                    $pct2 = round(($top2->rata_rata_nilai / 5) * 100);
+                    $pct3 = round(($top3->rata_rata_nilai / 5) * 100);
+                @endphp
+                <div class="row g-3 g-lg-4 justify-content-center align-items-end mb-5 gk-podium-row" id="leaderboardPodium">
+                    {{-- #2 PERAK (KIRI - NORMAL) --}}
+                    <div class="col-11 col-sm-8 col-md-4 order-2 order-md-1 podium-anim-item podium-rank-2 gk-podium-2">
+                        <div class="gk-podium-card-revised p-3.5 p-md-4 text-center h-100 d-flex flex-column justify-content-between">
+                            <div>
+                                <div class="mb-1">
+                                    <span class="badge rounded-pill px-3 py-1.5 fw-bold" style="background: #f1f5f9; color: #475569; font-size: 0.8rem;">
+                                        #2nd
+                                    </span>
+                                </div>
+                                
+                                <div class="gk-podium-badges-row">
+                                    @foreach(($top2->penghargaan ?? collect()) as $penghargaan)
+                                        @if($penghargaan->badge)
+                                            <span class="gk-badge-mini-icon" style="background: {{ $penghargaan->badge->warna }}18; color: {{ $penghargaan->badge->warna }}; border-color: {{ $penghargaan->badge->warna }}33;" data-bs-toggle="tooltip" title="{{ $penghargaan->badge->nama_badge }}: {{ $penghargaan->badge->deskripsi }}">
+                                                @if(str_starts_with($penghargaan->badge->icon, 'bi-'))
+                                                     <i class="bi {{ $penghargaan->badge->icon }}"></i>
+                                                @else
+                                                    {{ $penghargaan->badge->icon }}
+                                                @endif
+                                            </span>
+                                        @endif
+                                    @endforeach
+                                </div>
+
+                                <div class="gk-avatar-clean-wrap mb-3" style="width: 96px; height: 96px;">
+                                    <img src="{{ $top2->photo_url }}" width="96" height="96" alt="{{ $top2->nama }}">
+                                </div>
+                                <h5 class="fw-bold mb-1 text-dark" style="font-size: 1.05rem;" title="{{ $top2->nama }}">{{ $top2->nama }}</h5>
+                                <div class="text-muted small mb-2">{{ strtoupper($top2->jurusan?->nama_jurusan ?? $top2->kategori_label ?? 'UMUM') }}</div>
+                                
+                                <div class="text-warning mb-2" style="font-size: 0.95rem; letter-spacing: 2px;">
+                                    @php
+                                        $val2 = $pct2 / 20;
+                                        $stars2 = round($val2 * 2) / 2;
+                                    @endphp
+                                    @for($i = 1; $i <= 5; $i++)
+                                        @if($stars2 >= $i)
+                                            <i class="bi bi-star-fill"></i>
+                                        @elseif($stars2 >= ($i - 0.5))
+                                            <i class="bi bi-star-half"></i>
+                                        @else
+                                            <i class="bi bi-star text-muted opacity-25"></i>
+                                        @endif
+                                    @endfor
+                                </div>
+
+                                <div class="mb-2">
+                                    <div class="gk-progress-pill gk-pill-rank-2 mx-auto" style="width: 140px; height: 32px; font-size: 0.84rem;">
+                                        <div class="gk-progress-pill-fill {{ $pct2 >= 75 ? 'gk-bar-blue-high' : ($pct2 >= 50 ? 'gk-bar-blue-mid' : 'gk-bar-blue-low') }}" style="width: 0%;" data-percentage="{{ $pct2 }}"></div>
+                                        <span class="position-relative text-white" style="z-index: 2; text-shadow: 0 1px 2px rgba(0,0,0,0.6);">{{ $pct2 }}%</span>
+                                    </div>
+                                </div>
+                                <small class="text-muted font-mono d-block" style="font-size: 0.78rem;">{{ $top2->total_penilaian }} ulasan</small>
+                            </div>
+
+                            <div class="mt-3">
+                                <a href="{{ route('landing.guru.detail', $top2->id) }}" class="btn btn-sm btn-outline-primary gk-btn-podium-profile mb-2">
+                                    <i class="bi bi-eye me-1"></i> Profil
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- #1 EMAS (TENGAH - BESAR) --}}
+                    <div class="col-11 col-sm-8 col-md-4 order-1 order-md-2 podium-anim-item podium-rank-1 gk-podium-1">
+                        <div class="gk-podium-card-revised is-first p-4 p-md-5 text-center h-100 d-flex flex-column justify-content-between">
+                            <div>
+                                <div class="mb-1">
+                                    <span class="badge rounded-pill px-4 py-1.5 fw-bold" style="background: #fef08a; color: #854d0e; font-size: 0.9rem;">
+                                        #1st
+                                    </span>
+                                </div>
+
+                                <div class="gk-podium-badges-row">
+                                    @foreach(($top1->penghargaan ?? collect()) as $penghargaan)
+                                        @if($penghargaan->badge)
+                                            <span class="gk-badge-mini-icon" style="background: {{ $penghargaan->badge->warna }}18; color: {{ $penghargaan->badge->warna }}; border-color: {{ $penghargaan->badge->warna }}33;" data-bs-toggle="tooltip" title="{{ $penghargaan->badge->nama_badge }}: {{ $penghargaan->badge->deskripsi }}">
+                                                @if(str_starts_with($penghargaan->badge->icon, 'bi-'))
+                                                     <i class="bi {{ $penghargaan->badge->icon }}"></i>
+                                                @else
+                                                    {{ $penghargaan->badge->icon }}
+                                                @endif
+                                            </span>
+                                        @endif
+                                    @endforeach
+                                </div>
+
+                                <div class="gk-avatar-clean-wrap mb-3" style="width: 114px; height: 114px;">
+                                    <img src="{{ $top1->photo_url }}" width="114" height="114" alt="{{ $top1->nama }}">
+                                </div>
+                                <h4 class="fw-bold mb-1 text-dark" style="font-size: 1.25rem;" title="{{ $top1->nama }}">{{ $top1->nama }}</h4>
+                                <div class="text-muted small mb-2">{{ strtoupper($top1->jurusan?->nama_jurusan ?? $top1->kategori_label ?? 'UMUM') }}</div>
+                                
+                                <div class="text-warning mb-2" style="font-size: 1.1rem; letter-spacing: 2.5px;">
+                                    @php
+                                        $val1 = $pct1 / 20;
+                                        $stars1 = round($val1 * 2) / 2;
+                                    @endphp
+                                    @for($i = 1; $i <= 5; $i++)
+                                        @if($stars1 >= $i)
+                                            <i class="bi bi-star-fill"></i>
+                                        @elseif($stars1 >= ($i - 0.5))
+                                            <i class="bi bi-star-half"></i>
+                                        @else
+                                            <i class="bi bi-star text-muted opacity-25"></i>
+                                        @endif
+                                    @endfor
+                                </div>
+
+                                <div class="mb-2">
+                                    <div class="gk-progress-pill gk-pill-rank-1 mx-auto" style="width: 156px; height: 35px; font-size: 0.92rem;">
+                                        <div class="gk-progress-pill-fill {{ $pct1 >= 75 ? 'gk-bar-blue-high' : ($pct1 >= 50 ? 'gk-bar-blue-mid' : 'gk-bar-blue-low') }}" style="width: 0%;" data-percentage="{{ $pct1 }}"></div>
+                                        <span class="position-relative text-white" style="z-index: 2; text-shadow: 0 1px 2px rgba(0,0,0,0.6);">{{ $pct1 }}%</span>
+                                    </div>
+                                </div>
+                                <small class="text-muted font-mono d-block" style="font-size: 0.8rem;">{{ $top1->total_penilaian }} ulasan</small>
+                            </div>
+
+                            <div class="mt-3">
+                                <a href="{{ route('landing.guru.detail', $top1->id) }}" class="btn btn-sm btn-outline-primary gk-btn-podium-profile mb-2">
+                                    <i class="bi bi-eye me-1"></i> Profil
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- #3 PERUNGGU (KANAN - KECIL) --}}
+                    <div class="col-11 col-sm-8 col-md-4 order-3 order-md-3 podium-anim-item podium-rank-3 gk-podium-3">
+                        <div class="gk-podium-card-revised p-3 p-md-3.5 text-center h-100 d-flex flex-column justify-content-between">
+                            <div>
+                                <div class="mb-1">
+                                    <span class="badge rounded-pill px-2.5 py-1 fw-bold" style="background: #fed7aa; color: #9a3412; font-size: 0.75rem;">
+                                        #3rd
+                                    </span>
+                                </div>
+
+                                <div class="gk-podium-badges-row">
+                                    @foreach(($top3->penghargaan ?? collect()) as $penghargaan)
+                                        @if($penghargaan->badge)
+                                            <span class="gk-badge-mini-icon" style="background: {{ $penghargaan->badge->warna }}18; color: {{ $penghargaan->badge->warna }}; border-color: {{ $penghargaan->badge->warna }}33;" data-bs-toggle="tooltip" title="{{ $penghargaan->badge->nama_badge }}: {{ $penghargaan->badge->deskripsi }}">
+                                                @if(str_starts_with($penghargaan->badge->icon, 'bi-'))
+                                                     <i class="bi {{ $penghargaan->badge->icon }}"></i>
+                                                @else
+                                                    {{ $penghargaan->badge->icon }}
+                                                @endif
+                                            </span>
+                                        @endif
+                                    @endforeach
+                                </div>
+
+                                <div class="gk-avatar-clean-wrap mb-3" style="width: 82px; height: 82px;">
+                                    <img src="{{ $top3->photo_url }}" width="82" height="82" alt="{{ $top3->nama }}">
+                                </div>
+                                <h5 class="fw-bold mb-1 text-dark" style="font-size: 0.95rem;" title="{{ $top3->nama }}">{{ $top3->nama }}</h5>
+                                <div class="text-muted small mb-2">{{ strtoupper($top3->jurusan?->nama_jurusan ?? $top3->kategori_label ?? 'UMUM') }}</div>
+                                
+                                <div class="text-warning mb-2" style="font-size: 0.85rem; letter-spacing: 1.5px;">
+                                    @php
+                                        $val3 = $pct3 / 20;
+                                        $stars3 = round($val3 * 2) / 2;
+                                    @endphp
+                                    @for($i = 1; $i <= 5; $i++)
+                                        @if($stars3 >= $i)
+                                            <i class="bi bi-star-fill"></i>
+                                        @elseif($stars3 >= ($i - 0.5))
+                                            <i class="bi bi-star-half"></i>
+                                        @else
+                                            <i class="bi bi-star text-muted opacity-25"></i>
+                                        @endif
+                                    @endfor
+                                </div>
+
+                                <div class="mb-2">
+                                    <div class="gk-progress-pill gk-pill-rank-3 mx-auto" style="width: 124px; height: 28px; font-size: 0.78rem;">
+                                        <div class="gk-progress-pill-fill {{ $pct3 >= 75 ? 'gk-bar-blue-high' : ($pct3 >= 50 ? 'gk-bar-blue-mid' : 'gk-bar-blue-low') }}" style="width: 0%;" data-percentage="{{ $pct3 }}"></div>
+                                        <span class="position-relative text-white" style="z-index: 2; text-shadow: 0 1px 2px rgba(0,0,0,0.6);">{{ $pct3 }}%</span>
+                                    </div>
+                                </div>
+                                <small class="text-muted font-mono d-block" style="font-size: 0.75rem;">{{ $top3->total_penilaian }} ulasan</small>
+                            </div>
+
+                            <div class="mt-3">
+                                <a href="{{ route('landing.guru.detail', $top3->id) }}" class="btn btn-sm btn-outline-primary gk-btn-podium-profile mb-2">
+                                    <i class="bi bi-eye me-1"></i> Profil
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             @endif
-        </div>
+        @endif
 
         {{-- Button Pill Hitam: Lihat Selengkapnya --}}
         <div class="text-center" data-aos="zoom-in">

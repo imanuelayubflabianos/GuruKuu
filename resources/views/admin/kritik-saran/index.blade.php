@@ -307,49 +307,60 @@
 
                     {{-- AKSI MODERASI --}}
                     <td class="text-center">
-                        <div class="d-flex justify-content-center align-items-center gap-1">
-                            {{-- TOMBOL MODAL DETAIL --}}
-                            <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#modalDetailEvaluasi-{{ $f->id }}" title="Lihat Detail Nilai & Evaluasi">
-                                <i class="bi bi-eye"></i>
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-light border shadow-xs rounded-circle d-inline-flex align-items-center justify-content-center" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="width: 32px; height: 32px;" title="Pilihan Aksi">
+                                <i class="bi bi-three-dots-vertical"></i>
                             </button>
-
-                            {{-- PERINGATAN / SENSOR --}}
-                            @if(!$isCensored)
-                                <form action="{{ route('admin.kritik-saran.warn', $f->id) }}" method="POST" class="d-inline"
-                                      data-confirm="Beri peringatan kepada {{ $f->siswa ? $f->siswa->name : 'siswa ini' }} dan sensor ulasan agar disembunyikan dari publik & guru?"
-                                      data-confirm-title="Beri Peringatan & Sensor Ulasan"
-                                      data-confirm-btn="Beri Peringatan"
-                                      data-confirm-type="warning">
-                                    @csrf
-                                    <button type="submit" class="btn btn-sm btn-outline-warning" title="Beri Peringatan & Sensor Ulasan">
-                                        <i class="bi bi-shield-exclamation"></i>
+                            <ul class="dropdown-menu dropdown-menu-end shadow border-0 py-1" style="border-radius: 12px; font-size: 0.85rem; min-width: 195px; box-shadow: 0 10px 25px rgba(0,0,0,0.12) !important;">
+                                <li>
+                                    <button type="button" class="dropdown-item py-1.5 px-3 d-flex align-items-center gap-2 text-primary" data-bs-toggle="modal" data-bs-target="#modalDetailEvaluasi-{{ $f->id }}">
+                                        <i class="bi bi-eye text-primary"></i>
+                                        <span>Rincian Evaluasi</span>
                                     </button>
-                                </form>
-                            @else
-                                <form action="{{ route('admin.kritik-saran.unwarn', $f->id) }}" method="POST" class="d-inline"
-                                      data-confirm="Batalkan status sensor dan tampilkan kembali ulasan ini?"
-                                      data-confirm-title="Batalkan Sensor"
-                                      data-confirm-btn="Buka Sensor"
-                                      data-confirm-type="question">
-                                    @csrf
-                                    <button type="submit" class="btn btn-sm btn-outline-success" title="Batalkan Sensor">
-                                        <i class="bi bi-shield-check"></i>
-                                    </button>
-                                </form>
-                            @endif
-
-                            {{-- HAPUS PERMANEN --}}
-                            <form action="{{ route('admin.kritik-saran.destroy', $f->id) }}" method="POST" class="d-inline"
-                                  data-confirm="Apakah Anda yakin ingin menghapus permanen penilaian dan ulasan siswa ini? Rating guru akan dihitung ulang dan siswa dapat menilai kembali."
-                                  data-confirm-title="Hapus Ulasan Permanen"
-                                  data-confirm-btn="Hapus Permanen"
-                                  data-confirm-type="danger">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Hapus Ulasan Permanen">
-                                    <i class="bi bi-trash"></i>
-                                </button>
-                            </form>
+                                </li>
+                                <li>
+                                    @if(!$isCensored)
+                                        <form action="{{ route('admin.kritik-saran.warn', $f->id) }}" method="POST" class="d-inline"
+                                              data-confirm="Beri peringatan kepada {{ $f->siswa ? $f->siswa->name : 'siswa ini' }} dan sensor ulasan agar disembunyikan dari publik & guru?"
+                                              data-confirm-title="Beri Peringatan & Sensor Ulasan"
+                                              data-confirm-btn="Beri Peringatan"
+                                              data-confirm-type="warning">
+                                            @csrf
+                                            <button type="submit" class="dropdown-item py-1.5 px-3 d-flex align-items-center gap-2 text-warning-emphasis">
+                                                <i class="bi bi-shield-exclamation text-warning"></i>
+                                                <span>Beri Peringatan & Sensor</span>
+                                            </button>
+                                        </form>
+                                    @else
+                                        <form action="{{ route('admin.kritik-saran.unwarn', $f->id) }}" method="POST" class="d-inline"
+                                              data-confirm="Batalkan status sensor dan tampilkan kembali ulasan ini?"
+                                              data-confirm-title="Batalkan Sensor"
+                                              data-confirm-btn="Buka Sensor"
+                                              data-confirm-type="question">
+                                            @csrf
+                                            <button type="submit" class="dropdown-item py-1.5 px-3 d-flex align-items-center gap-2 text-success">
+                                                <i class="bi bi-shield-check text-success"></i>
+                                                <span>Buka / Batalkan Sensor</span>
+                                            </button>
+                                        </form>
+                                    @endif
+                                </li>
+                                <li><hr class="dropdown-divider my-1"></li>
+                                <li>
+                                    <form action="{{ route('admin.kritik-saran.destroy', $f->id) }}" method="POST" class="d-inline"
+                                          data-confirm="Apakah Anda yakin ingin menghapus permanen penilaian dan ulasan siswa ini? Rating guru akan dihitung ulang dan siswa dapat menilai kembali."
+                                          data-confirm-title="Hapus Ulasan Permanen"
+                                          data-confirm-btn="Hapus Permanen"
+                                          data-confirm-type="danger">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="dropdown-item py-1.5 px-3 d-flex align-items-center gap-2 text-danger">
+                                            <i class="bi bi-trash text-danger"></i>
+                                            <span>Hapus Ulasan</span>
+                                        </button>
+                                    </form>
+                                </li>
+                            </ul>
                         </div>
                     </td>
                 </tr>

@@ -68,7 +68,7 @@ class User extends Authenticatable
             return 'Nonaktif Berkala (s/d ' . $this->deactivated_until->translatedFormat('d M Y') . ')';
         }
 
-        return 'Nonaktif Permanen';
+        return 'Dinonaktifkan';
     }
 
     public function getNamaKelasAttribute(): string

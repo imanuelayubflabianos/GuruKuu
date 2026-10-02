@@ -57,15 +57,56 @@
                         </select>
                     </div>
                     <div class="col-12">
-                        <label class="form-label font-mono small fw-bold text-muted">KELAS YANG DIAJAR</label>
-                        <select name="kelas_ids[]" class="form-select" multiple size="6" style="border-radius: 8px;">
-                            @foreach($kelasList as $kelas)
-                                <option value="{{ $kelas->id }}" {{ $guru->kelas->contains($kelas->id) ? 'selected' : '' }}>
-                                    {{ $kelas->label_singkat }}
-                                </option>
-                            @endforeach
-                        </select>
-                        <small class="text-muted">Pilih satu atau beberapa kelas. Tahan Ctrl untuk memilih lebih dari satu.</small>
+                        <div class="card border p-3 bg-light-subtle rounded-3">
+                            <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2">
+                                <div>
+                                    <label class="form-label font-mono small fw-bold text-dark mb-0">
+                                        <i class="bi bi-mortarboard text-primary me-1"></i> KELAS YANG DIAJAR (Bisa Pilih Lebih dari 1)
+                                    </label>
+                                    <div class="text-muted" style="font-size: 0.75rem;">
+                                        Centang semua kelas yang diajar guru ini (klik langsung tanpa tahan tombol Ctrl).
+                                    </div>
+                                </div>
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="badge bg-primary rounded-pill px-2.5 py-1.5" id="countKelasSelected">
+                                        {{ $guru->kelas->count() }} Kelas Dipilih
+                                    </span>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary py-0.5 px-2" style="font-size: 0.75rem;" onclick="selectAllKelas(true)">
+                                        Pilih Semua
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary py-0.5 px-2" style="font-size: 0.75rem;" onclick="selectAllKelas(false)">
+                                        Batal Semua
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="mb-2">
+                                <input type="text" id="searchKelasInput" class="form-control form-control-sm" placeholder="🔍 Cari nama kelas (misal: AKL, PPLG, 10, TO)..." onkeyup="filterKelasList()">
+                            </div>
+
+                            <div class="row g-2 overflow-auto p-1" style="max-height: 280px;" id="kelasListContainer">
+                                @php
+                                    $groupedKelas = $kelasList->groupBy('tingkat');
+                                    $assignedIds = old('kelas_ids', $guru->kelas->pluck('id')->toArray());
+                                @endphp
+                                @foreach($groupedKelas as $tingkat => $items)
+                                    <div class="col-12 mt-2 mb-1 tingkat-group-title">
+                                        <span class="badge bg-secondary-subtle text-secondary border fw-bold" style="font-size: 0.72rem;">
+                                            TINGKAT {{ $tingkat }}
+                                        </span>
+                                    </div>
+                                    @foreach($items as $kelas)
+                                        @php $isSelected = in_array($kelas->id, $assignedIds); @endphp
+                                        <div class="col-sm-6 col-md-4 col-lg-3 kelas-item" data-text="{{ strtolower($kelas->label_singkat . ' ' . $kelas->nama_kelas) }}">
+                                            <label class="p-2 rounded-2 border d-flex align-items-center gap-2 w-100 {{ $isSelected ? 'border-primary bg-primary-subtle text-primary fw-semibold' : 'bg-white text-dark' }}" style="cursor: pointer; font-size: 0.82rem; transition: all 0.15s;" id="label_kelas_{{ $kelas->id }}">
+                                                <input type="checkbox" name="kelas_ids[]" value="{{ $kelas->id }}" class="form-check-input mt-0 flex-shrink-0 kelas-checkbox" {{ $isSelected ? 'checked' : '' }} onchange="toggleKelasCard(this, '{{ $kelas->id }}')">
+                                                <span class="text-truncate">{{ $kelas->label_singkat }}</span>
+                                            </label>
+                                        </div>
+                                    @endforeach
+                                @endforeach
+                            </div>
+                        </div>
                     </div>
                     <div class="col-12">
                         <label class="form-label font-mono small fw-bold text-muted">BIO / ALAMAT / KETERANGAN</label>
@@ -107,6 +148,50 @@
                 </div>
             </form>
         </div>
-    </div>
+</div>
+</div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+function toggleKelasCard(cb, id) {
+    const lbl = document.getElementById('label_kelas_' + id);
+    if (!lbl) return;
+    if (cb.checked) {
+        lbl.classList.remove('bg-white', 'text-dark');
+        lbl.classList.add('border-primary', 'bg-primary-subtle', 'text-primary', 'fw-semibold');
+    } else {
+        lbl.classList.remove('border-primary', 'bg-primary-subtle', 'text-primary', 'fw-semibold');
+        lbl.classList.add('bg-white', 'text-dark');
+    }
+    updateKelasCount();
+}
+
+function selectAllKelas(check) {
+    document.querySelectorAll('.kelas-checkbox').forEach(cb => {
+        const item = cb.closest('.kelas-item');
+        if (!item || item.style.display !== 'none') {
+            cb.checked = check;
+            toggleKelasCard(cb, cb.value);
+        }
+    });
+}
+
+function updateKelasCount() {
+    const checked = document.querySelectorAll('.kelas-checkbox:checked').length;
+    const badge = document.getElementById('countKelasSelected');
+    if (badge) {
+        badge.textContent = checked + ' Kelas Dipilih';
+    }
+}
+
+function filterKelasList() {
+    const query = (document.getElementById('searchKelasInput')?.value || '').toLowerCase().trim();
+    document.querySelectorAll('.kelas-item').forEach(item => {
+        const text = item.getAttribute('data-text') || '';
+        item.style.display = (query === '' || text.includes(query)) ? '' : 'none';
+    });
+}
+</script>
+@endpush

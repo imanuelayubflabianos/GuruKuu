@@ -66,13 +66,23 @@
                         </small>
                     </td>
                     <td class="text-center">
-                        <form action="{{ route('siswa.riwayat.destroy', $r) }}" method="POST" onsubmit="return confirm('Hapus riwayat penilaian ini? Rating guru akan dihitung ulang dan Anda dapat menilai kembali.')">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="btn btn-sm btn-outline-danger" title="Hapus riwayat" aria-label="Hapus riwayat">
-                                <i class="bi bi-trash"></i>
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-light border shadow-xs rounded-circle d-inline-flex align-items-center justify-content-center" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="width: 32px; height: 32px;" title="Pilihan Aksi">
+                                <i class="bi bi-three-dots-vertical"></i>
                             </button>
-                        </form>
+                            <ul class="dropdown-menu dropdown-menu-end shadow border-0 py-1" style="border-radius: 12px; font-size: 0.85rem; min-width: 170px; box-shadow: 0 10px 25px rgba(0,0,0,0.12) !important;">
+                                <li>
+                                    <form action="{{ route('siswa.riwayat.destroy', $r) }}" method="POST" onsubmit="return confirm('Hapus riwayat penilaian ini? Rating guru akan dihitung ulang dan Anda dapat menilai kembali.')">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="dropdown-item py-1.5 px-3 d-flex align-items-center gap-2 text-danger">
+                                            <i class="bi bi-trash text-danger"></i>
+                                            <span>Hapus Riwayat</span>
+                                        </button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </div>
                     </td>
                 </tr>
                 @empty

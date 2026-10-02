@@ -549,8 +549,10 @@
                             @foreach($customBadWords as $cw)
                                 <span class="badge bg-white text-dark border px-2.5 py-1.5 fw-semibold d-inline-flex align-items-center gap-1.5" style="font-size: 0.82rem;">
                                     <i class="bi bi-star-fill text-warning" style="font-size: 0.7rem;"></i>
-                                    <span>{{ $cw }}</span>
-                                    <button type="button" class="btn-close p-0 ms-1" style="font-size: 0.65rem;" onclick="deleteCustomWord('{{ $cw }}')" title="Hapus kata '{{ $cw }}'" aria-label="Hapus kata {{ $cw }}"></button>
+                                    <button type="button" class="btn p-0 border-0 text-muted" style="font-size: 0.7rem; line-height: 1;" onclick="openEditWordModal('{{ addslashes($cw) }}')" title="Koreksi kata">
+                                        <i class="bi bi-pencil-fill text-primary" style="font-size: 0.65rem;"></i>
+                                    </button>
+                                    <button type="button" class="btn-close p-0 ms-1" style="font-size: 0.65rem;" onclick="deleteWord('{{ addslashes($cw) }}')" title="Hapus kata '{{ $cw }}'" aria-label="Hapus kata {{ $cw }}"></button>
                                 </span>
                             @endforeach
                         </div>
@@ -659,14 +661,31 @@
                                 <td><div class="fw-semibold">{{ $p->nama_periode }}</div><small class="text-muted text-capitalize">{{ $p->semester }} · {{ $p->tahun_ajaran }}</small></td>
                                 <td class="small text-muted">{{ $p->tanggal_mulai?->format('d/m/Y H:i') }} – {{ $p->tanggal_selesai?->format('d/m/Y H:i') }}</td>
                                 <td><span class="badge {{ $p->status === 'aktif' ? 'bg-success' : 'bg-secondary' }}">{{ ucfirst($p->status) }}</span></td>
-                                <td class="text-end text-nowrap">
-                                    @if($p->status !== 'aktif')
-                                        <form action="{{ route('admin.pengaturan.periode.aktifkan', $p) }}" method="POST" class="d-inline" data-confirm="Aktifkan periode {{ $p->nama_periode }}?" data-confirm-title="Aktifkan periode" data-confirm-btn="Aktifkan" data-confirm-type="question">
-                                            @csrf
-                                            <button type="submit" class="btn btn-sm btn-success settings-icon-button" title="Aktifkan" aria-label="Aktifkan {{ $p->nama_periode }}"><i class="bi bi-check-lg"></i></button>
-                                        </form>
-                                    @endif
-                                    <button type="button" class="btn btn-sm btn-light border settings-icon-button" onclick='editPeriode(@json($p))' title="Edit" aria-label="Edit {{ $p->nama_periode }}"><i class="bi bi-pencil"></i></button>
+                                <td class="text-end">
+                                    <div class="dropdown d-inline-block">
+                                        <button class="btn btn-sm btn-light border shadow-xs rounded-circle d-inline-flex align-items-center justify-content-center" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="width: 32px; height: 32px;" title="Pilihan Aksi">
+                                            <i class="bi bi-three-dots-vertical"></i>
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-menu-end shadow border-0 py-1" style="border-radius: 12px; font-size: 0.85rem; min-width: 175px; box-shadow: 0 10px 25px rgba(0,0,0,0.12) !important;">
+                                            @if($p->status !== 'aktif')
+                                            <li>
+                                                <form action="{{ route('admin.pengaturan.periode.aktifkan', $p) }}" method="POST" data-confirm="Aktifkan periode {{ $p->nama_periode }}?" data-confirm-title="Aktifkan periode" data-confirm-btn="Aktifkan" data-confirm-type="question">
+                                                    @csrf
+                                                    <button type="submit" class="dropdown-item py-1.5 px-3 d-flex align-items-center gap-2 text-success">
+                                                        <i class="bi bi-check-circle text-success"></i>
+                                                        <span>Aktifkan Periode</span>
+                                                    </button>
+                                                </form>
+                                            </li>
+                                            @endif
+                                            <li>
+                                                <button type="button" class="dropdown-item py-1.5 px-3 d-flex align-items-center gap-2 text-primary" onclick='editPeriode(@json($p))'>
+                                                    <i class="bi bi-pencil text-primary"></i>
+                                                    <span>Edit Periode</span>
+                                                </button>
+                                            </li>
+                                        </ul>
+                                    </div>
                                 </td>
                             </tr>
                         @empty
@@ -1113,7 +1132,7 @@
                     <h5 class="modal-title fw-bold mb-0" id="modalLihatKataLabel">
                         <i class="bi bi-journal-bookmark-fill text-danger me-2"></i>Library Kata & Frasa Terlarang
                     </h5>
-                    <p class="text-muted small mb-0">Daftar kata kotor, kasar, dan ejekan yang langsung diblokir otomatis oleh sistem.</p>
+                    <p class="text-muted small mb-0">Seluruh kata dapat dihapus, dikoreksi/diedit, atau ditambahkan bebas oleh admin.</p>
                 </div>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
@@ -1122,31 +1141,50 @@
                 <div class="mb-3">
                     <div class="input-group">
                         <span class="input-group-text bg-white border-end-0"><i class="bi bi-search text-muted"></i></span>
-                        <input type="text" id="badWordSearchInput" class="form-control border-start-0" placeholder="Ketik kata untuk memeriksa apakah dilarang...">
+                        <input type="text" id="badWordSearchInput" class="form-control border-start-0" placeholder="Ketik kata untuk mencari atau mengoreksi...">
                     </div>
                 </div>
 
-                <div class="d-flex gap-2 mb-3 flex-wrap align-items-center">
-                    <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill active word-filter-btn" data-filter="all">
-                        Semua Kata ({{ count($allBadWords) }})
-                    </button>
-                    <button type="button" class="btn btn-sm btn-outline-warning rounded-pill word-filter-btn" data-filter="custom">
-                        Kustom Admin ({{ count($customBadWords) }})
-                    </button>
+                <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                    <div class="d-flex gap-2 flex-wrap align-items-center">
+                        <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill active word-filter-btn" data-filter="all">
+                            Semua Kata Aktif ({{ count($allBadWords) }})
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-primary rounded-pill word-filter-btn" data-filter="default">
+                            Bawaan Sistem ({{ count($defaultBadWords) }})
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-warning rounded-pill word-filter-btn" data-filter="custom">
+                            Kustom Admin ({{ count($customBadWords) }})
+                        </button>
+                    </div>
+                    <div>
+                        <button type="button" class="btn btn-sm btn-outline-danger rounded-pill" onclick="resetProfanityWords()" title="Kembalikan semua kata ke library bawaan asli">
+                            <i class="bi bi-arrow-counterclockwise me-1"></i> Reset ke Default Asli
+                        </button>
+                    </div>
                 </div>
 
-                {{-- Badges Cloud --}}
+                {{-- Badges Cloud: SEMUA KATA BISA DIHAPUS DAN DIKOREKSI --}}
                 <div class="p-3 bg-light rounded-3 border" style="min-height: 250px; max-height: 400px; overflow-y: auto;">
                     <div class="d-flex flex-wrap gap-1.5" id="badWordCloud">
                         @foreach($defaultBadWords as $bw)
-                            <span class="badge bg-white text-secondary border px-2.5 py-1.5 fw-normal bad-word-tag" data-type="default" data-word="{{ strtolower($bw) }}" style="font-size: 0.82rem;">
-                                {{ $bw }}
+                            <span class="badge bg-white text-secondary border px-2.5 py-1.5 fw-normal bad-word-tag d-inline-flex align-items-center gap-1.5" data-type="default" data-word="{{ strtolower($bw) }}" style="font-size: 0.82rem;">
+                                <span>{{ $bw }}</span>
+                                <button type="button" class="btn p-0 border-0 text-muted" style="font-size: 0.7rem; line-height: 1;" onclick="openEditWordModal('{{ addslashes($bw) }}')" title="Koreksi / Edit kata ini">
+                                    <i class="bi bi-pencil-fill text-primary" style="font-size: 0.68rem;"></i>
+                                </button>
+                                <button type="button" class="btn-close p-0" style="font-size: 0.65rem;" onclick="deleteWord('{{ addslashes($bw) }}')" title="Hapus kata '{{ $bw }}'" aria-label="Hapus kata {{ $bw }}"></button>
                             </span>
                         @endforeach
 
                         @foreach($customBadWords as $cw)
-                            <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle px-2.5 py-1.5 fw-semibold bad-word-tag" data-type="custom" data-word="{{ strtolower($cw) }}" style="font-size: 0.82rem;">
-                                <i class="bi bi-star-fill text-warning me-1" style="font-size: 0.7rem;"></i>{{ $cw }}
+                            <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle px-2.5 py-1.5 fw-semibold bad-word-tag d-inline-flex align-items-center gap-1.5" data-type="custom" data-word="{{ strtolower($cw) }}" style="font-size: 0.82rem;">
+                                <i class="bi bi-star-fill text-warning" style="font-size: 0.68rem;"></i>
+                                <span>{{ $cw }}</span>
+                                <button type="button" class="btn p-0 border-0 text-muted" style="font-size: 0.7rem; line-height: 1;" onclick="openEditWordModal('{{ addslashes($cw) }}')" title="Koreksi / Edit kata ini">
+                                    <i class="bi bi-pencil-fill text-primary" style="font-size: 0.68rem;"></i>
+                                </button>
+                                <button type="button" class="btn-close p-0" style="font-size: 0.65rem;" onclick="deleteWord('{{ addslashes($cw) }}')" title="Hapus kata '{{ $cw }}'" aria-label="Hapus kata {{ $cw }}"></button>
                             </span>
                         @endforeach
                     </div>
@@ -1158,13 +1196,45 @@
             <div class="modal-footer border-top bg-light justify-content-between">
                 <span class="small text-muted">
                     <span class="badge bg-white text-secondary border me-1">Putih: Bawaan</span>
-                    <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle">Kuning: Tambahan Admin</span>
+                    <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle me-1">Kuning: Tambahan Admin</span>
+                    <span class="text-muted small">&bull; Klik <i class="bi bi-pencil-fill text-primary"></i> untuk koreksi kata, atau <i class="bi bi-x text-danger fw-bold"></i> untuk menghapus.</span>
                 </span>
                 <button type="button" class="btn btn-secondary btn-sm px-3" data-bs-dismiss="modal">Tutup</button>
             </div>
         </div>
     </div>
 </div>
+
+{{-- MODAL KOREKSI / EDIT KATA --}}
+<div class="modal fade" id="modalEditWord" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header py-2 bg-light border-bottom">
+                <h6 class="modal-title fw-bold mb-0 text-dark"><i class="bi bi-pencil-square me-1 text-primary"></i>Koreksi Kata</h6>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="{{ route('admin.pelanggaran.words.edit') }}" method="POST">
+                @csrf
+                <input type="hidden" name="old_word" id="editOldWordInput">
+                <div class="modal-body p-3">
+                    <label class="form-label small fw-bold text-muted mb-1">Kata Asli:</label>
+                    <input type="text" id="displayOldWord" class="form-control form-control-sm bg-light mb-2" readonly>
+                    <label class="form-label small fw-bold text-dark mb-1">Kata Pengganti / Koreksi Baru:</label>
+                    <input type="text" name="new_word" id="editNewWordInput" class="form-control form-control-sm" required placeholder="Contoh kata yang benar..." maxlength="50">
+                </div>
+                <div class="modal-footer py-2 bg-light">
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary-custom btn-sm px-3">Simpan Koreksi</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{{-- Form Tersembunyi untuk Reset Kata --}}
+<form id="resetWordsForm" action="{{ route('admin.pelanggaran.words.reset') }}" method="POST" style="display: none;">
+    @csrf
+</form>
 
 <script>
 function padZero(number) { return number.toString().padStart(2, '0'); }
@@ -1207,12 +1277,26 @@ function openEditFaq(faq) {
     modal.show();
 }
 
-function deleteCustomWord(word) {
-    if (confirm(`Hapus kata '${word}' dari daftar kata terlarang kustom?`)) {
+function deleteWord(word) {
+    if (confirm(`Hapus kata '${word}' dari library kata terlarang? Kata ini tidak akan lagi diblokir otomatis oleh sistem.`)) {
         document.getElementById('deleteWordInput').value = word;
         document.getElementById('deleteCustomWordForm').submit();
     }
 }
+
+function openEditWordModal(word) {
+    document.getElementById('editOldWordInput').value = word;
+    document.getElementById('displayOldWord').value = word;
+    document.getElementById('editNewWordInput').value = word;
+    new bootstrap.Modal(document.getElementById('modalEditWord')).show();
+}
+
+function resetProfanityWords() {
+    if (confirm('Kembalikan seluruh daftar kata terlarang ke library bawaan asli sistem? Perubahan kustom Anda akan direset.')) {
+        document.getElementById('resetWordsForm').submit();
+    }
+}
+
 
 document.addEventListener('DOMContentLoaded', function() {
     const tabButtons = document.querySelectorAll('#pengaturanTabs [data-target]');

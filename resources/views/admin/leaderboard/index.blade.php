@@ -474,9 +474,19 @@
                         <strong>{{ $g->total_penilaian }}</strong> <span class="text-muted small">{{ $mode === 'partisipasi' ? 'siswa' : 'penilaian' }}</span>
                     </td>
                     <td class="text-center align-middle">
-                        <a href="{{ route('admin.guru.show', $g->id) }}" class="btn btn-sm btn-outline-primary" style="border-radius: 6px; font-size: 0.82rem; font-weight: 600; padding: 0.35rem 0.8rem;">
-                            <i class="bi bi-eye me-1"></i> Profil
-                        </a>
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-light border shadow-xs rounded-circle d-inline-flex align-items-center justify-content-center" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="width: 32px; height: 32px;" title="Pilihan Aksi">
+                                <i class="bi bi-three-dots-vertical"></i>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end shadow border-0 py-1" style="border-radius: 12px; font-size: 0.85rem; min-width: 170px; box-shadow: 0 10px 25px rgba(0,0,0,0.12) !important;">
+                                <li>
+                                    <a class="dropdown-item py-1.5 px-3 d-flex align-items-center gap-2 text-primary" href="{{ route('admin.guru.show', $g->id) }}">
+                                        <i class="bi bi-person-badge text-primary"></i>
+                                        <span>Lihat Profil Guru</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
                     </td>
                 </tr>
                 @empty

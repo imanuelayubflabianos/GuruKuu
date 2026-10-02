@@ -132,8 +132,11 @@ class Guru extends Model
                 return $guru;
             });
 
-            // Bagi 2 grup: Memenuhi syarat (>= 10) & Belum memenuhi syarat (< 10)
-            $eligible = $gurus->filter(fn ($g) => $g->is_eligible_leaderboard)
+            // Hanya tampilkan guru yang memiliki setidaknya 1 penilaian pada kelas ini
+            $gurusWithData = $gurus->filter(fn ($g) => $g->total_penilaian > 0);
+
+            // Bagi 2 grup: Memenuhi syarat (>= MIN) & Belum memenuhi syarat (1 s/d < MIN)
+            $eligible = $gurusWithData->filter(fn ($g) => $g->is_eligible_leaderboard)
                 ->sort(function ($a, $b) {
                     if ($b->partisipasi_persen != $a->partisipasi_persen) {
                         return $b->partisipasi_persen <=> $a->partisipasi_persen;
@@ -144,7 +147,7 @@ class Guru extends Model
                     return strcmp($a->nama, $b->nama);
                 })->values();
 
-            $notEligible = $gurus->filter(fn ($g) => !$g->is_eligible_leaderboard)
+            $notEligible = $gurusWithData->filter(fn ($g) => !$g->is_eligible_leaderboard)
                 ->sort(function ($a, $b) {
                     if ($b->partisipasi_persen != $a->partisipasi_persen) {
                         return $b->partisipasi_persen <=> $a->partisipasi_persen;

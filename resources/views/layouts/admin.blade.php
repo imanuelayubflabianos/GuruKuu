@@ -44,6 +44,8 @@
         .stat-card:hover { transform:translateY(-5px); }
         .stat-card-label { font-size:0.85rem; color:var(--text-muted); text-transform:uppercase; font-weight:600; }
         .stat-card-value { font-size:2rem; font-weight:800; color:var(--text-dark); }
+        .table-responsive { min-height: 220px; }
+        .table-custom .dropdown-menu { z-index: 1060; }
     </style>
     <link href="{{ asset('css/gurukuu-theme.css') }}?v={{ file_exists(public_path('css/gurukuu-theme.css')) ? filemtime(public_path('css/gurukuu-theme.css')) : time() }}" rel="stylesheet">
     @stack('styles')
@@ -125,11 +127,10 @@
                 <i class="bi bi-database"></i> Data Lokal
                 <i class="bi bi-chevron-down ms-auto" style="font-size:0.8rem;"></i>
             </div>
-            <div class="collapse {{ request()->routeIs('admin.guru.*', 'admin.siswa.*', 'admin.jurusan.*') ? 'show' : '' }}" id="menuData">
+            <div class="collapse {{ request()->routeIs('admin.guru.*', 'admin.siswa.*') ? 'show' : '' }}" id="menuData">
                 <div class="sidebar-submenu">
                     <a href="{{ route('admin.guru.index') }}" class="sidebar-link {{ request()->routeIs('admin.guru.*') ? 'active' : '' }}" data-admin-page-link>Data Guru</a>
                     <a href="{{ route('admin.siswa.index') }}" class="sidebar-link {{ request()->routeIs('admin.siswa.*') ? 'active' : '' }}" data-admin-page-link>Data Siswa</a>
-                    <a href="{{ route('admin.jurusan.index') }}" class="sidebar-link {{ request()->routeIs('admin.jurusan.*') ? 'active' : '' }}" data-admin-page-link>Data Jurusan</a>
                 </div>
             </div>
 

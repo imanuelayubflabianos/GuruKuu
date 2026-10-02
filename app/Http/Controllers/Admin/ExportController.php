@@ -57,19 +57,33 @@ class ExportController extends Controller
 
     public function siswaPdf()
     {
+        @ini_set('max_execution_time', '300');
+        @ini_set('memory_limit', '512M');
+        if (function_exists('set_time_limit')) {
+            @set_time_limit(300);
+        }
+
         $siswa = User::where('role', 'siswa')
             ->with(['jurusan', 'kelas'])
             ->orderBy('name', 'asc')
             ->get();
 
         $pdf = Pdf::loadView('exports.siswa-pdf', compact('siswa'))
-            ->setPaper('a4', 'landscape');
+            ->setPaper('a4', 'landscape')
+            ->setOption('isHtml5ParserEnabled', true)
+            ->setOption('isRemoteEnabled', false);
 
         return $pdf->download('data_siswa_' . date('Y-m-d_His') . '.pdf');
     }
 
     public function allZip()
     {
+        @ini_set('max_execution_time', '300');
+        @ini_set('memory_limit', '512M');
+        if (function_exists('set_time_limit')) {
+            @set_time_limit(300);
+        }
+
         $tempDir = storage_path('app/temp_export_' . time());
         if (!File::exists($tempDir)) {
             File::makeDirectory($tempDir, 0755, true);

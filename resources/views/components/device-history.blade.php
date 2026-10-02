@@ -108,12 +108,22 @@
                                     <i class="bi bi-lock-fill me-1"></i>Sesi Utama
                                 </span>
                             @elseif($history->is_active_session)
-                                <form action="{{ route('auth.device.logout', $history->id ?: $history->session_id) }}" method="POST" class="d-inline" onsubmit="return confirm('Keluarkan sesi pada perangkat {{ $history->device_name }}?');">
-                                    @csrf
-                                    <button type="submit" class="btn btn-sm btn-outline-danger px-2.5 py-1" title="Keluarkan perangkat ini">
-                                        <i class="bi bi-box-arrow-right me-1"></i> Log Out
+                                <div class="dropdown d-inline-block">
+                                    <button class="btn btn-sm btn-light border shadow-xs rounded-circle d-inline-flex align-items-center justify-content-center" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="width: 32px; height: 32px;" title="Pilihan Aksi">
+                                        <i class="bi bi-three-dots-vertical"></i>
                                     </button>
-                                </form>
+                                    <ul class="dropdown-menu dropdown-menu-end shadow border-0 py-1" style="border-radius: 12px; font-size: 0.85rem; min-width: 175px; box-shadow: 0 10px 25px rgba(0,0,0,0.12) !important;">
+                                        <li>
+                                            <form action="{{ route('auth.device.logout', $history->id ?: $history->session_id) }}" method="POST" onsubmit="return confirm('Keluarkan sesi pada perangkat {{ $history->device_name }}?');">
+                                                @csrf
+                                                <button type="submit" class="dropdown-item py-1.5 px-3 d-flex align-items-center gap-2 text-danger">
+                                                    <i class="bi bi-box-arrow-right text-danger"></i>
+                                                    <span>Keluarkan Sesi</span>
+                                                </button>
+                                            </form>
+                                        </li>
+                                    </ul>
+                                </div>
                             @else
                                 <span class="text-muted small fst-italic">Selesai</span>
                             @endif

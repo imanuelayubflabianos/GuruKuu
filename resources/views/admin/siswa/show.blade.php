@@ -20,7 +20,19 @@
                 <img src="{{ $siswa->photo_url }}" alt="{{ $siswa->name }}" class="rounded-circle border" style="width: 104px; height: 104px; object-fit: cover;">
                 <h4 class="fw-bold mt-3 mb-1">{{ $siswa->name }}</h4>
                 <div class="mb-2">
-                    <span class="badge {{ $siswa->is_active ? 'bg-success' : 'bg-danger' }}">{{ $siswa->is_active ? 'Aktif' : 'Nonaktif' }}</span>
+                    @if($siswa->is_active)
+                        <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-3 py-1 fw-semibold">
+                            <i class="bi bi-check-circle-fill me-1"></i>Aktif
+                        </span>
+                    @elseif($siswa->deactivation_type === 'berkala')
+                        <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle rounded-pill px-3 py-1 font-mono">
+                            <i class="bi bi-clock-history me-1"></i>Nonaktif s/d {{ $siswa->deactivated_until?->format('d/m/Y') }}
+                        </span>
+                    @else
+                        <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill px-3 py-1 font-mono">
+                            <i class="bi bi-slash-circle me-1"></i>Dinonaktifkan
+                        </span>
+                    @endif
                 </div>
 
                 {{-- LENCANA & BADGE SISWA --}}

@@ -52,22 +52,39 @@
                         </span>
                     </td>
                     <td class="text-center">
-                        <a href="{{ route('admin.jurusan.show', $j) }}" class="btn btn-sm btn-info text-white me-1" title="Lihat Detail Rombel & Siswa">
-                            <i class="bi bi-eye"></i> Detail
-                        </a>
-                        <a href="{{ route('admin.jurusan.edit', $j) }}" class="btn btn-sm btn-outline-primary me-1" title="Edit Jurusan & Foto">
-                            <i class="bi bi-pencil"></i>
-                        </a>
-                        <form action="{{ route('admin.jurusan.destroy', $j) }}" method="POST" class="d-inline"
-                              data-confirm="Yakin ingin menghapus jurusan {{ addslashes($j->nama_jurusan) }}? Data rombel dan siswa terkait akan terdampak."
-                              data-confirm-title="Hapus Jurusan"
-                              data-confirm-btn="Ya, Hapus"
-                              data-confirm-type="danger">
-                            @csrf @method('DELETE')
-                            <button class="btn btn-sm btn-outline-danger" title="Hapus Jurusan">
-                                <i class="bi bi-trash"></i>
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-light border shadow-xs rounded-circle d-inline-flex align-items-center justify-content-center" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="width: 32px; height: 32px;" title="Pilihan Aksi">
+                                <i class="bi bi-three-dots-vertical"></i>
                             </button>
-                        </form>
+                            <ul class="dropdown-menu dropdown-menu-end shadow border-0 py-1" style="border-radius: 12px; font-size: 0.85rem; min-width: 180px; box-shadow: 0 10px 25px rgba(0,0,0,0.12) !important;">
+                                <li>
+                                    <a class="dropdown-item py-1.5 px-3 d-flex align-items-center gap-2" href="{{ route('admin.jurusan.show', $j) }}">
+                                        <i class="bi bi-eye text-info"></i>
+                                        <span>Lihat Detail Rombel</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item py-1.5 px-3 d-flex align-items-center gap-2 text-primary" href="{{ route('admin.jurusan.edit', $j) }}">
+                                        <i class="bi bi-pencil text-primary"></i>
+                                        <span>Edit Jurusan</span>
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider my-1"></li>
+                                <li>
+                                    <form action="{{ route('admin.jurusan.destroy', $j) }}" method="POST" class="d-inline"
+                                          data-confirm="Yakin ingin menghapus jurusan {{ addslashes($j->nama_jurusan) }}? Data rombel dan siswa terkait akan terdampak."
+                                          data-confirm-title="Hapus Jurusan"
+                                          data-confirm-btn="Ya, Hapus"
+                                          data-confirm-type="danger">
+                                        @csrf @method('DELETE')
+                                        <button type="submit" class="dropdown-item py-1.5 px-3 d-flex align-items-center gap-2 text-danger">
+                                            <i class="bi bi-trash text-danger"></i>
+                                            <span>Hapus Jurusan</span>
+                                        </button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </div>
                     </td>
                 </tr>
                 @empty

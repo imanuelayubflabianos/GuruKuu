@@ -25,9 +25,9 @@
         </div>
     </div>
     <div class="col-md-4">
-        <div class="stat-card" style="border-left: 4px solid var(--secondary);">
-            <div class="stat-card-label">BELUM DIAKTIFKAN</div>
-            <div class="stat-card-value" style="color: var(--secondary);">{{ $stats['belum'] }}</div>
+        <div class="stat-card" style="border-left: 4px solid #ef4444;">
+            <div class="stat-card-label">DINONAKTIFKAN</div>
+            <div class="stat-card-value" style="color: #ef4444;">{{ $stats['belum'] }}</div>
         </div>
     </div>
 </div>
@@ -68,9 +68,9 @@
         <div class="col-md-3">
             <label class="form-label font-mono small">STATUS</label>
             <select name="filter" class="form-select" style="border-radius: 8px;" onchange="this.form.submit()">
-                <option value="">Semua</option>
-                <option value="aktif" {{ request('filter') === 'aktif' ? 'selected' : '' }}>Aktif</option>
-                <option value="belum" {{ request('filter') === 'belum' ? 'selected' : '' }}>Belum Aktif</option>
+                <option value="">Semua Status</option>
+                <option value="aktif" {{ request('filter') === 'aktif' ? 'selected' : '' }}>✅ Aktif</option>
+                <option value="belum" {{ request('filter') === 'belum' || request('filter') === 'nonaktif' ? 'selected' : '' }}>⛔ Dinonaktifkan</option>
             </select>
         </div>
         <div class="col-md-3">
@@ -113,37 +113,52 @@
                     <td>
                         @if($s->is_active)
                             @if($s->force_change_password)
-                                <span class="badge-custom" style="background: #fef3c7; color: #92400e;">⏳ Belum Login Pertama</span>
+                                <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle rounded-pill px-2.5 py-1 font-mono" style="font-size: 0.72rem;">
+                                    <i class="bi bi-clock-history me-1"></i>Belum Login Pertama
+                                </span>
                             @else
-                                <span class="badge-custom" style="background: #d1fae5; color: #065f46;">✅ Aktif</span>
+                                <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-2.5 py-1 fw-semibold">
+                                    <i class="bi bi-check-circle-fill me-1"></i>Aktif
+                                </span>
                             @endif
                         @else
-                            <span class="badge-custom" style="background: #fee2e2; color: #991b1b;">❌ Belum Aktif</span>
+                            <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill px-2.5 py-1 font-mono" style="font-size: 0.72rem;">
+                                <i class="bi bi-slash-circle me-1"></i>Dinonaktifkan
+                            </span>
                         @endif
                     </td>
                     <td class="font-mono" style="font-size: 0.8rem;">
                         {{ $s->activated_at ? $s->activated_at->format('d M Y') : '-' }}
                     </td>
                     <td class="text-center">
-                        <div class="btn-group">
-                            @if(!$s->is_active)
-                                <form action="{{ route('admin.manajemen-akun.activate', $s) }}" method="POST" class="d-inline">
-                                    @csrf
-                                    <button type="submit" class="btn btn-sm btn-outline-custom" title="Aktifkan Akun">
-                                        <i class="bi bi-unlock"></i>
-                                    </button>
-                                </form>
-                            @endif
-                            
-                            @if($s->is_active)
-                                <form action="{{ route('admin.manajemen-akun.deactivate', $s) }}" method="POST" class="d-inline"
-                                      onsubmit="return confirm('Nonaktifkan akun {{ $s->name }}?')">
-                                    @csrf
-                                    <button type="submit" class="btn btn-sm btn-danger" title="Nonaktifkan">
-                                        <i class="bi bi-lock"></i>
-                                    </button>
-                                </form>
-                            @endif
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-light border shadow-xs rounded-circle d-inline-flex align-items-center justify-content-center" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="width: 32px; height: 32px;" title="Pilihan Aksi">
+                                <i class="bi bi-three-dots-vertical"></i>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end shadow border-0 py-1" style="border-radius: 12px; font-size: 0.85rem; min-width: 175px; box-shadow: 0 10px 25px rgba(0,0,0,0.12) !important;">
+                                @if(!$s->is_active)
+                                    <li>
+                                        <form action="{{ route('admin.manajemen-akun.activate', $s) }}" method="POST" class="d-inline">
+                                            @csrf
+                                            <button type="submit" class="dropdown-item py-1.5 px-3 d-flex align-items-center gap-2 text-success">
+                                                <i class="bi bi-unlock text-success"></i>
+                                                <span>Aktifkan Akun</span>
+                                            </button>
+                                        </form>
+                                    </li>
+                                @else
+                                    <li>
+                                        <form action="{{ route('admin.manajemen-akun.deactivate', $s) }}" method="POST" class="d-inline"
+                                              onsubmit="return confirm('Nonaktifkan akun {{ $s->name }}?')">
+                                            @csrf
+                                            <button type="submit" class="dropdown-item py-1.5 px-3 d-flex align-items-center gap-2 text-danger">
+                                                <i class="bi bi-lock text-danger"></i>
+                                                <span>Nonaktifkan Akun</span>
+                                            </button>
+                                        </form>
+                                    </li>
+                                @endif
+                            </ul>
                         </div>
                     </td>
                 </tr>

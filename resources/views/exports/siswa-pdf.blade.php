@@ -43,23 +43,25 @@
             width: 100%;
             border-collapse: collapse;
             margin-top: 10px;
+            table-layout: fixed;
         }
         th {
             background-color: #003366;
             color: #ffffff;
             font-weight: bold;
             text-align: left;
-            padding: 9px 10px;
-            font-size: 10px;
+            padding: 7px 8px;
+            font-size: 9.5px;
             text-transform: uppercase;
             letter-spacing: 0.3px;
             border: 1px solid #002244;
         }
         td {
-            padding: 8px 10px;
+            padding: 6px 8px;
             border: 1px solid #e2e8f0;
-            font-size: 10px;
+            font-size: 9.5px;
             vertical-align: middle;
+            word-wrap: break-word;
         }
         tr:nth-child(even) {
             background-color: #f8fafc;
@@ -84,47 +86,67 @@
         <div class="meta">Total Data: {{ $siswa->count() }} Siswa &nbsp;|&nbsp; Dicetak pada: {{ now()->translatedFormat('d F Y, H:i') }} WIB</div>
     </div>
 
-    <table>
-        <thead>
-            <tr>
-                <th class="text-center" style="width: 35px;">No</th>
-                <th style="width: 110px;">NIS</th>
-                <th>Nama Siswa</th>
-                <th style="width: 120px;">Kelas</th>
-                <th>Jurusan</th>
-                <th class="text-center" style="width: 95px;">Tanggal Lahir</th>
-                <th class="text-center" style="width: 80px;">Status Akun</th>
-            </tr>
-        </thead>
-        <tbody>
-            @forelse($siswa as $index => $s)
-            @php
-                $kelasRel = $s->relationLoaded('kelas') ? $s->getRelation('kelas') : null;
-                if ($kelasRel && $kelasRel->isNotEmpty()) {
-                    $first = $kelasRel->first();
-                    $kelasName = $first->nama_kelas . ($first->tingkat ? ' Kelas ' . $first->tingkat : '');
-                } elseif (is_string($s->kelas) && !empty($s->kelas)) {
-                    $kelasName = $s->kelas;
-                } else {
-                    $kelasName = '-';
-                }
-            @endphp
-            <tr>
-                <td class="text-center">{{ $index + 1 }}</td>
-                <td>{{ $s->nis ?? '-' }}</td>
-                <td><strong>{{ $s->name }}</strong></td>
-                <td>{{ $kelasName }}</td>
-                <td>{{ $s->jurusan?->nama_jurusan ?? '-' }}</td>
-                <td class="text-center">{{ $s->tanggal_lahir ? $s->tanggal_lahir->format('d-m-Y') : '-' }}</td>
-                <td class="text-center">{{ $s->is_active ? 'Aktif' : 'Nonaktif' }}</td>
-            </tr>
-            @empty
-            <tr>
-                <td colspan="7" class="text-center" style="padding: 24px; color: #64748b;">Belum ada data siswa yang tercatat.</td>
-            </tr>
-            @endforelse
-        </tbody>
-    </table>
+    @php
+        $chunks = $siswa->chunk(30);
+        $globalIndex = 0;
+    @endphp
+
+    @forelse($chunks as $chunkIndex => $chunkSiswa)
+        @if($chunkIndex > 0)
+            <div style="page-break-before: always;"></div>
+            <div class="header" style="margin-bottom: 10px; padding-bottom: 6px;">
+                <div class="title" style="font-size: 14px;">Master Data Siswa Terdaftar (Lanjutan)</div>
+                <div class="meta">Halaman {{ $chunkIndex + 1 }} dari {{ count($chunks) }} &nbsp;|&nbsp; {{ $schoolName ?? 'SMK Negeri 1 Bangsri' }}</div>
+            </div>
+        @endif
+
+        <table>
+            <thead>
+                <tr>
+                    <th class="text-center" style="width: 35px;">No</th>
+                    <th style="width: 110px;">NIS</th>
+                    <th>Nama Siswa</th>
+                    <th style="width: 120px;">Kelas</th>
+                    <th>Jurusan</th>
+                    <th class="text-center" style="width: 95px;">Tanggal Lahir</th>
+                    <th class="text-center" style="width: 80px;">Status Akun</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($chunkSiswa as $s)
+                @php
+                    $globalIndex++;
+                    $kelasRel = $s->relationLoaded('kelas') ? $s->getRelation('kelas') : null;
+                    if ($kelasRel && $kelasRel->isNotEmpty()) {
+                        $first = $kelasRel->first();
+                        $kelasName = $first->nama_kelas . ($first->tingkat ? ' Kelas ' . $first->tingkat : '');
+                    } elseif (is_string($s->kelas) && !empty($s->kelas)) {
+                        $kelasName = $s->kelas;
+                    } else {
+                        $kelasName = '-';
+                    }
+                @endphp
+                <tr>
+                    <td class="text-center">{{ $globalIndex }}</td>
+                    <td>{{ $s->nis ?? '-' }}</td>
+                    <td><strong>{{ $s->name }}</strong></td>
+                    <td>{{ $kelasName }}</td>
+                    <td>{{ $s->jurusan?->nama_jurusan ?? '-' }}</td>
+                    <td class="text-center">{{ $s->tanggal_lahir ? $s->tanggal_lahir->format('d-m-Y') : '-' }}</td>
+                    <td class="text-center">{{ $s->is_active ? 'Aktif' : 'Dinonaktifkan' }}</td>
+                </tr>
+                @endforeach
+            </tbody>
+        </table>
+    @empty
+        <table>
+            <tbody>
+                <tr>
+                    <td colspan="7" class="text-center" style="padding: 24px; color: #64748b;">Belum ada data siswa yang tercatat.</td>
+                </tr>
+            </tbody>
+        </table>
+    @endforelse
 
     <div class="footer">
         Dokumen resmi di-generate oleh Sistem {{ $siteTitle ?? 'GuruKuu' }} &bull; {{ $schoolName ?? 'SMK Negeri 1 Bangsri' }}

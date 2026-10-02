@@ -79,11 +79,15 @@ Route::middleware('auth')->group(function () {
     Route::delete('/penilaian-balasan/{balasan}', [\App\Http\Controllers\PenilaianBalasanController::class, 'destroy'])->name('penilaian.balasan.destroy');
 });
 
+// SISTEM LAPORAN / REPORT ULASAN SISWA (DAPAT DIAKSES PENGGUNA)
+Route::post('/ulasan/{penilaian}/report', [\App\Http\Controllers\UlasanReportController::class, 'store'])->name('ulasan.report');
+
 // ==================== 4. ADMIN ROUTES ====================
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
     Route::post('/dashboard/clear-cache', [AdminDashboardController::class, 'clearCache'])->name('dashboard.clear-cache');
     Route::get('/profil', [AdminProfilController::class, 'index'])->name('profil.index');
+    Route::post('/guru/import-jadwal', [AdminGuruController::class, 'importJadwal'])->name('guru.import-jadwal');
     Route::resource('guru', AdminGuruController::class);
     Route::patch('/guru/{guru}/toggle', [AdminGuruController::class, 'toggleStatus'])->name('guru.toggle');
     Route::resource('siswa', AdminSiswaController::class);
@@ -113,12 +117,22 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::post('/pelanggaran/read-all', [\App\Http\Controllers\Admin\PelanggaranController::class, 'markAllAsRead'])->name('pelanggaran.read-all');
     Route::delete('/pelanggaran/{pelanggaran}', [\App\Http\Controllers\Admin\PelanggaranController::class, 'destroy'])->name('pelanggaran.destroy');
     Route::post('/pelanggaran/{pelanggaran}/warn-siswa', [\App\Http\Controllers\Admin\PelanggaranController::class, 'warnSiswa'])->name('pelanggaran.warn-siswa');
+    Route::post('/pelanggaran/reset-all', [\App\Http\Controllers\Admin\PelanggaranController::class, 'resetAll'])->name('pelanggaran.reset-all');
+    Route::delete('/pelanggaran/user/{user}/reset', [\App\Http\Controllers\Admin\PelanggaranController::class, 'resetUser'])->name('pelanggaran.reset-user');
+    Route::post('/pelanggaran/user/{user}/tindak', [\App\Http\Controllers\Admin\PelanggaranController::class, 'tindakUser'])->name('pelanggaran.tindak-user');
+    Route::delete('/pelanggaran/siswa/{user}/reset', [\App\Http\Controllers\Admin\PelanggaranController::class, 'resetUser'])->name('pelanggaran.reset-siswa');
+    Route::delete('/pelanggaran/guru/{guru}/reset', [\App\Http\Controllers\Admin\PelanggaranController::class, 'resetGuru'])->name('pelanggaran.reset-guru');
+    Route::post('/pelanggaran/report/{penilaian}/censor', [\App\Http\Controllers\Admin\PelanggaranController::class, 'censorReportedReview'])->name('pelanggaran.report.censor');
+    Route::delete('/pelanggaran/report/{penilaian}/dismiss', [\App\Http\Controllers\Admin\PelanggaranController::class, 'dismissReportedReview'])->name('pelanggaran.report.dismiss');
+    Route::delete('/pelanggaran/report/{penilaian}/delete-review', [\App\Http\Controllers\Admin\PelanggaranController::class, 'deleteReportedReview'])->name('pelanggaran.report.delete-review');
     
     Route::get('/leaderboard', [AdminLeaderboardController::class, 'index'])->name('leaderboard.index');
     Route::get('/pengaturan', [PengaturanController::class, 'index'])->name('pengaturan.index');
     Route::post('/pengaturan/landing', [PengaturanController::class, 'updateLanding'])->name('pengaturan.landing');
     Route::post('/pelanggaran/kata-toxic', [PengaturanController::class, 'updateProfanityWords'])->name('pelanggaran.words.update');
     Route::post('/pelanggaran/kata-toxic/delete', [PengaturanController::class, 'deleteProfanityWord'])->name('pelanggaran.words.delete');
+    Route::post('/pelanggaran/kata-toxic/edit', [PengaturanController::class, 'editProfanityWord'])->name('pelanggaran.words.edit');
+    Route::post('/pelanggaran/kata-toxic/reset', [PengaturanController::class, 'resetProfanityWords'])->name('pelanggaran.words.reset');
     Route::post('/pengaturan/landing/reset', [PengaturanController::class, 'resetLandingHero'])->name('pengaturan.landing.reset');
     Route::post('/pengaturan/reset', [PengaturanController::class, 'reset'])->name('pengaturan.reset');
     Route::post('/pengaturan/ganti-password', [PengaturanController::class, 'gantiPassword'])->name('pengaturan.password');

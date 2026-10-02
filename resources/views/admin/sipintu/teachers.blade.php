@@ -146,13 +146,24 @@
                         @endif
                     </td>
                     <td class="text-center">
-                        <div class="d-flex justify-content-center gap-1">
-                            <button type="button" class="btn btn-sm btn-outline-info" onclick="showTeacherDetail({{ json_encode($t) }}, {{ $isLocal ? 'true' : 'false' }})" title="Lihat Detail Lengkap">
-                                <i class="bi bi-eye"></i>
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-light border shadow-xs rounded-circle d-inline-flex align-items-center justify-content-center" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="width: 32px; height: 32px;" title="Pilihan Aksi">
+                                <i class="bi bi-three-dots-vertical"></i>
                             </button>
-                            <button type="button" class="btn btn-sm btn-outline-primary" onclick="openImportModal({{ json_encode($t) }})" title="{{ $isLocal ? 'Perbarui Data di GuruKuu' : 'Impor ke Database GuruKuu' }}">
-                                <i class="bi {{ $isLocal ? 'bi-arrow-repeat' : 'bi-download' }}"></i>
-                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end shadow border-0 py-1" style="border-radius: 12px; font-size: 0.85rem; min-width: 195px; box-shadow: 0 10px 25px rgba(0,0,0,0.12) !important;">
+                                <li>
+                                    <button type="button" class="dropdown-item py-1.5 px-3 d-flex align-items-center gap-2 text-info-emphasis" onclick="showTeacherDetail({{ json_encode($t) }}, {{ $isLocal ? 'true' : 'false' }})">
+                                        <i class="bi bi-eye text-info"></i>
+                                        <span>Lihat Detail Lengkap</span>
+                                    </button>
+                                </li>
+                                <li>
+                                    <button type="button" class="dropdown-item py-1.5 px-3 d-flex align-items-center gap-2 text-primary" onclick="openImportModal({{ json_encode($t) }})">
+                                        <i class="bi {{ $isLocal ? 'bi-arrow-repeat text-primary' : 'bi-download text-success' }}"></i>
+                                        <span>{{ $isLocal ? 'Perbarui di GuruKuu' : 'Impor ke GuruKuu' }}</span>
+                                    </button>
+                                </li>
+                            </ul>
                         </div>
                     </td>
                 </tr>

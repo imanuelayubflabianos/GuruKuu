@@ -1451,3 +1451,96 @@ img.rounded-circle,
     background-color: #0284c7 !important;
     border-color: #0f172a !important;
 }
+
+/* ===================================================
+   UNIFIED STATUS BADGES & VISUAL BALANCE ENGINE
+   =================================================== */
+.badge.bg-success-subtle,
+.badge-status-aktif {
+    background-color: rgba(16, 185, 129, 0.12) !important;
+    color: #059669 !important;
+    border: 1px solid rgba(16, 185, 129, 0.28) !important;
+}
+.badge.bg-danger-subtle,
+.badge-status-nonaktif {
+    background-color: rgba(239, 68, 68, 0.12) !important;
+    color: #dc2626 !important;
+    border: 1px solid rgba(239, 68, 68, 0.28) !important;
+}
+.badge.bg-warning-subtle,
+.badge-status-warning {
+    background-color: rgba(245, 158, 11, 0.12) !important;
+    color: #b45309 !important;
+    border: 1px solid rgba(245, 158, 11, 0.3) !important;
+}
+.badge.bg-primary-subtle {
+    background-color: rgba(0, 51, 102, 0.09) !important;
+    color: #003366 !important;
+    border: 1px solid rgba(0, 51, 102, 0.22) !important;
+}
+.badge.bg-info-subtle {
+    background-color: rgba(14, 165, 233, 0.12) !important;
+    color: #0284c7 !important;
+    border: 1px solid rgba(14, 165, 233, 0.25) !important;
+}
+.badge.bg-secondary-subtle {
+    background-color: rgba(100, 116, 139, 0.1) !important;
+    color: #475569 !important;
+    border: 1px solid rgba(100, 116, 139, 0.22) !important;
+}
+
+/* Dark Mode Overrides for Status Badges */
+[data-theme="dark"] .badge.bg-success-subtle,
+[data-theme="dark"] .badge-status-aktif {
+    background-color: rgba(16, 185, 129, 0.2) !important;
+    color: #34d399 !important;
+    border-color: rgba(16, 185, 129, 0.35) !important;
+}
+[data-theme="dark"] .badge.bg-danger-subtle,
+[data-theme="dark"] .badge-status-nonaktif {
+    background-color: rgba(239, 68, 68, 0.2) !important;
+    color: #f87171 !important;
+    border-color: rgba(239, 68, 68, 0.35) !important;
+}
+[data-theme="dark"] .badge.bg-warning-subtle,
+[data-theme="dark"] .badge-status-warning {
+    background-color: rgba(245, 158, 11, 0.2) !important;
+    color: #fbbf24 !important;
+    border-color: rgba(245, 158, 11, 0.35) !important;
+}
+[data-theme="dark"] .badge.bg-primary-subtle {
+    background-color: rgba(56, 189, 248, 0.2) !important;
+    color: #38bdf8 !important;
+    border-color: rgba(56, 189, 248, 0.35) !important;
+}
+[data-theme="dark"] .badge.bg-secondary-subtle {
+    background-color: rgba(148, 163, 184, 0.15) !important;
+    color: #cbd5e1 !important;
+    border-color: rgba(148, 163, 184, 0.3) !important;
+}
+
+/* Unified Meatballs Menu & Action Dropdowns */
+.table td .dropdown .btn,
+.table-custom td .dropdown .btn {
+    transition: all 0.18s ease-in-out !important;
+}
+.table td .dropdown .btn:hover,
+.table-custom td .dropdown .btn:hover {
+    background-color: var(--primary) !important;
+    color: #ffffff !important;
+    border-color: var(--primary) !important;
+}
+[data-theme="dark"] .table td .dropdown .btn:hover,
+[data-theme="dark"] .table-custom td .dropdown .btn:hover {
+    background-color: #0284c7 !important;
+    color: #ffffff !important;
+    border-color: #0284c7 !important;
+}
+
+/* Harmonious Card Spacing and Table Elevation */
+.card-custom {
+    transition: box-shadow 0.2s ease, border-color 0.2s ease;
+}
+.card-custom:hover {
+    box-shadow: var(--card-hover-shadow);
+}
