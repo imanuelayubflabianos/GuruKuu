@@ -149,7 +149,7 @@
                                 @else
                                     <li>
                                         <form action="{{ route('admin.manajemen-akun.deactivate', $s) }}" method="POST" class="d-inline"
-                                              onsubmit="return confirm('Nonaktifkan akun {{ $s->name }}?')">
+                                              data-confirm="Nonaktifkan akun {{ $s->name }}?" data-confirm-title="Nonaktifkan Akun?" data-confirm-btn="Ya, Nonaktifkan" data-confirm-type="danger">
                                             @csrf
                                             <button type="submit" class="dropdown-item py-1.5 px-3 d-flex align-items-center gap-2 text-danger">
                                                 <i class="bi bi-lock text-danger"></i>

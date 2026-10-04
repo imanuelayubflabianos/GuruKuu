@@ -187,7 +187,7 @@
                 <div class="d-flex justify-content-between align-items-center mb-2">
                     <h6 class="fw-bold small text-uppercase text-muted mb-0">Sinkronisasi Instan Seluruh Data</h6>
                 </div>
-                <form action="{{ route('admin.sipintu.sync-all-full') }}" method="POST" onsubmit="return confirm('Mulai sinkronisasi seluruh Guru, Siswa Aktif, Jurusan, dan Kelas dari SiPintu Gateway?')">
+                <form action="{{ route('admin.sipintu.sync-all-full') }}" method="POST" data-confirm="Mulai sinkronisasi seluruh Guru, Siswa Aktif, Jurusan, dan Kelas dari SiPintu Gateway?" data-confirm-title="Sinkronisasi Penuh SiPintu?" data-confirm-btn="Ya, Sinkronkan Semua" data-confirm-type="info">
                     @csrf
                     <button type="submit" class="btn btn-success w-100 py-2 fw-bold shadow-sm">
                         <i class="bi bi-cloud-arrow-down-fill me-1"></i> Sinkronkan Semua Data dari SiPintu Sekarang

@@ -2,14 +2,241 @@
 @section('title', 'Dashboard')
 
 @section('content')
-<div class="page-header d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+<style>
+    /* ==============================================================
+       TEMA GURUKUU: CLEAN PUBLIC DASHBOARD STYLE (MINIMAL & MODERN)
+       ============================================================== */
+    .gk-clean-card {
+        background: var(--bg-card, #ffffff);
+        border-radius: 20px;
+        border: 1px solid rgba(15, 23, 42, 0.08) !important;
+        box-shadow: 0 10px 25px -4px rgba(15, 23, 42, 0.06), 0 4px 10px -2px rgba(15, 23, 42, 0.03) !important;
+        transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s ease;
+    }
+    .gk-clean-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 16px 32px -6px rgba(15, 23, 42, 0.1), 0 6px 14px -3px rgba(15, 23, 42, 0.04) !important;
+        border-color: rgba(15, 23, 42, 0.14) !important;
+    }
+
+    /* PANDUAN SLIDER / CAROUSEL MIRIP DASHBOARD PUBLIK */
+    .gk-panduan-slider-wrapper {
+        position: relative;
+        max-width: 580px;
+        width: 100%;
+        margin: 0 auto;
+    }
+    .gk-panduan-viewport {
+        overflow: hidden;
+        position: relative;
+        padding: 10px 4px;
+        cursor: grab;
+        touch-action: pan-y;
+        user-select: none;
+        -webkit-user-select: none;
+    }
+    .gk-panduan-viewport:active {
+        cursor: grabbing;
+    }
+    .gk-panduan-track {
+        display: flex;
+        transition: transform 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+        will-change: transform;
+    }
+    .gk-panduan-slide {
+        min-width: 100%;
+        width: 100%;
+        flex-shrink: 0;
+        padding: 0 6px;
+        box-sizing: border-box;
+    }
+    .gk-step-roman {
+        width: 54px;
+        height: 54px;
+        border-radius: 50%;
+        background: #e2e8f0;
+        color: #1e293b;
+        font-weight: 800;
+        font-size: 1.3rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+    }
+    .gk-panduan-nav-btn {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        background: #ffffff;
+        border: 1.5px solid rgba(15, 23, 42, 0.1);
+        color: #1e293b;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+        box-shadow: 0 4px 10px rgba(15, 23, 42, 0.06);
+        cursor: pointer;
+        transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        outline: none;
+    }
+    .gk-panduan-nav-btn:hover {
+        background: #003366;
+        border-color: #003366;
+        color: #ffffff;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(0, 51, 102, 0.2);
+    }
+    .gk-panduan-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 20px;
+        background: #cbd5e1;
+        border: none;
+        padding: 0;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+        outline: none;
+    }
+    .gk-panduan-dot:hover {
+        background: #94a3b8;
+    }
+    .gk-panduan-dot.active {
+        width: 26px;
+        background: #003366;
+    }
+
+    /* AVATAR BERSIH MIRIP PUBLIK */
+    .gk-avatar-clean-wrap {
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        border-radius: 50% !important;
+        background: transparent !important;
+        padding: 0 !important;
+        box-shadow: 0 8px 18px -3px rgba(15, 23, 42, 0.12) !important;
+        border: none !important;
+        margin: 0 auto;
+    }
+    .gk-avatar-clean-wrap img {
+        border-radius: 50% !important;
+        object-fit: cover !important;
+        display: block !important;
+        border: 3px solid #ffffff !important;
+        box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.08) !important;
+    }
+
+    /* PROGRESS PILL HITAM/NAVY MIRIP PUBLIK */
+    .gk-progress-pill {
+        background: #0f172a !important;
+        border-radius: 50px;
+        color: #ffffff !important;
+        font-weight: 800;
+        font-size: 0.82rem;
+        padding: 0.25rem 0.85rem;
+        display: inline-block;
+        min-width: 110px;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15);
+    }
+    .gk-progress-pill-fill {
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+        border-radius: 50px;
+        background: linear-gradient(90deg, #0284c7, #38bdf8) !important;
+        transition: width 1s ease;
+    }
+
+    /* TOMBOL PILL HITAM LIHAT SELENGKAPNYA */
+    .gk-pill-btn-dark {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: #000000;
+        color: #ffffff !important;
+        font-weight: 700;
+        font-size: 0.85rem;
+        padding: 0.55rem 2rem;
+        border-radius: 50px;
+        text-decoration: none;
+        transition: all 0.25s ease;
+        box-shadow: 0 6px 16px -4px rgba(0,0,0,0.3);
+    }
+    .gk-pill-btn-dark:hover {
+        background: #1e293b;
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px -4px rgba(0,0,0,0.4);
+    }
+
+    /* SCROLL FEED RIWAYAT TERAKHIR (TINGGI VERTIKAL MIRIP DASHBOARD GURU) */
+    .gk-feed-scroll::-webkit-scrollbar {
+        width: 5px;
+    }
+    .gk-feed-scroll::-webkit-scrollbar-track {
+        background: #f8fafc;
+        border-radius: 10px;
+    }
+    .gk-feed-scroll::-webkit-scrollbar-thumb {
+        background: rgba(0, 51, 102, 0.15);
+        border-radius: 10px;
+    }
+    .gk-feed-scroll::-webkit-scrollbar-thumb:hover {
+        background: rgba(0, 51, 102, 0.3);
+    }
+
+    .gk-history-item {
+        background: var(--bg-card, #ffffff);
+        border: 1px solid rgba(15, 23, 42, 0.08) !important;
+        border-radius: 16px;
+        padding: 0.9rem 1.1rem;
+        transition: all 0.2s ease-in-out;
+    }
+    .gk-history-item:hover {
+        transform: translateY(-1px);
+        border-color: rgba(0, 51, 102, 0.2) !important;
+        box-shadow: 0 4px 12px rgba(0, 51, 102, 0.05);
+    }
+
+    /* DARK MODE SUPPORT */
+    [data-bs-theme="dark"] .gk-clean-card,
+    [data-bs-theme="dark"] .gk-history-item {
+        background: #1e293b !important;
+        border-color: rgba(255, 255, 255, 0.08) !important;
+    }
+    [data-bs-theme="dark"] .gk-step-roman {
+        background: #334155;
+        color: #f8fafc;
+    }
+    [data-bs-theme="dark"] .gk-panduan-nav-btn {
+        background: #1e293b;
+        color: #f8fafc;
+        border-color: rgba(255, 255, 255, 0.12);
+    }
+    [data-bs-theme="dark"] .gk-avatar-clean-wrap img {
+        border-color: #1e293b !important;
+    }
+    [data-bs-theme="dark"] .gk-feed-scroll::-webkit-scrollbar-track {
+        background: #0f172a;
+    }
+    [data-bs-theme="dark"] .gk-feed-scroll::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.15);
+    }
+</style>
+
+{{-- PAGE HEADER: PORTAL SISWA, GREETING & STATUS SEMESTER --}}
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
     <div>
-        <div class="page-label">PORTAL SISWA</div>
-        <h1 class="page-title">Halo, {{ auth()->user()->name }}! 👋</h1>
+        <div class="page-label text-uppercase" style="color: #003366; font-weight: 700; letter-spacing: 1.2px; font-size: 0.75rem;">PORTAL SISWA</div>
+        <h1 class="page-title mb-1" style="color: #003366; font-weight: 800; font-size: 1.75rem;">Halo, {{ auth()->user()->name }}! 👋</h1>
         @if(!empty($kelasAktif))
-            <p class="page-subtitle">Kelas: <strong>{{ $kelasAktif->nama_kelas }} Kelas {{ $kelasAktif->tingkat }}</strong> ({{ $kelasAktif->jurusan->nama_jurusan }})</p>
+            <p class="text-muted mb-0 small">
+                Kelas: <strong class="text-dark">{{ $kelasAktif->nama_kelas }} Kelas {{ $kelasAktif->tingkat }}</strong> ({{ $kelasAktif->jurusan->nama_jurusan }})
+            </p>
         @else
-            <p class="page-subtitle text-muted">Akses seluruh data guru sekolah untuk evaluasi pengajaran yang objektif dan transparan.</p>
+            <p class="text-muted mb-0 small">Akses data evaluasi guru sekolah secara objektif dan transparan.</p>
         @endif
     </div>
     <div>
@@ -23,246 +250,204 @@
     $pctSelesai = $totalGuru > 0 ? round(($jumlahSudah / $totalGuru) * 100) : 0;
 @endphp
 
+{{-- ALERT NOTIFIKASI PELANGGARAN --}}
 @if(($notifikasiPelanggaran ?? collect())->isNotEmpty())
     <div class="alert alert-warning border-warning shadow-sm mb-4">
         <div class="d-flex align-items-center gap-2 mb-2">
             <i class="bi bi-shield-exclamation fs-5"></i>
-            <strong>Notifikasi pelanggaran</strong>
+            <strong>Notifikasi Pelanggaran</strong>
         </div>
         @foreach($notifikasiPelanggaran as $notifikasi)
             <div class="d-flex align-items-start justify-content-between gap-3 border-top border-warning-subtle pt-2 mt-2">
                 <span class="small">{{ $notifikasi->notifikasi_siswa ?: 'Anda menerima notifikasi pelanggaran dari sistem.' }}</span>
-                <form action="{{ route('siswa.notifikasi.read', $notifikasi) }}" method="POST" class="flex-shrink-0">
-                    @csrf
-                    @method('PATCH')
-                    <button type="submit" class="btn btn-sm btn-outline-dark">Mengerti</button>
-                </form>
+                <div class="d-flex align-items-center gap-2 flex-shrink-0">
+                    @if($notifikasi->guru_id)
+                        <a href="{{ route('siswa.guru.show', $notifikasi->guru_id) }}" class="btn btn-sm btn-outline-primary">Lihat Guru</a>
+                    @endif
+                    <form action="{{ route('siswa.notifikasi.read', $notifikasi) }}" method="POST" class="m-0">
+                        @csrf
+                        @method('PATCH')
+                        <button type="submit" class="btn btn-sm btn-outline-dark">Mengerti</button>
+                    </form>
+                </div>
             </div>
         @endforeach
     </div>
 @endif
 
-{{-- PANDUAN CARA MEMBERI PENILAIAN (TERHUBUNG KE PENGATURAN ADMIN) --}}
-<div class="card-glass p-3.5 p-md-4 mb-3 mb-md-4 shadow-sm" style="border-left: 4px solid var(--primary);">
-    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
-        <div>
-            <div class="text-primary small font-mono fw-bold text-uppercase" style="letter-spacing: 0.8px; font-size: 0.72rem;">
-                <i class="bi bi-info-circle-fill me-1"></i> {{ \App\Models\Setting::get('panduan_label', 'PANDUAN PENGGUNAAN') }}
+{{-- 1. PANDUAN PENGGUNAAN (CAROUSEL SLIDER MIRIP DASHBOARD PUBLIK) --}}
+<div class="text-center mb-3">
+    <div class="small fw-semibold text-muted mb-1" style="font-size: 0.78rem; letter-spacing: 0.8px; text-transform: uppercase;">
+        {{ \App\Models\Setting::get('panduan_label', 'PANDUAN PENGGUNAAN') }}
+    </div>
+    <h3 class="fw-bold mb-0 text-dark" style="font-size: clamp(1.3rem, 2.5vw, 1.75rem);">
+        {{ \App\Models\Setting::get('panduan_title', 'Bagaimana Cara Memberi Penilaian?') }}
+    </h3>
+</div>
+
+<div class="gk-panduan-slider-wrapper mb-4">
+    <div class="gk-panduan-viewport" id="panduanViewport">
+        <div class="gk-panduan-track" id="panduanTrack">
+            {{-- LANGKAH 1 --}}
+            <div class="gk-panduan-slide is-active" data-slide="0">
+                <div class="gk-clean-card p-4 text-center h-100 d-flex flex-column justify-content-between" style="min-height: 220px;">
+                    <div>
+                        <div class="d-flex align-items-center justify-content-center gap-2 mb-3">
+                            <span class="badge rounded-pill px-3 py-1.5 fw-bold text-uppercase" style="background: #f1f5f9; color: #475569; font-size: 0.72rem; letter-spacing: 0.5px;">
+                                {{ \App\Models\Setting::get('panduan_step1_title', 'LOGIN NIS') }}
+                            </span>
+                            <span class="badge rounded-pill px-2.5 py-1 text-muted fw-semibold" style="background: #f8fafc; font-size: 0.7rem; font-family: monospace;">
+                                01 / 03
+                            </span>
+                        </div>
+                        <div class="gk-step-roman">I</div>
+                        <p class="text-dark fw-semibold mb-0" style="font-size: 0.95rem; line-height: 1.5;">
+                            {{ \App\Models\Setting::get('panduan_step1_desc', 'Masuk dengan akun NIS & tanggal lahir resmi terverifikasi.') }}
+                        </p>
+                    </div>
+                </div>
             </div>
-            <h5 class="fw-bold mb-0 text-dark mt-1" style="font-size: clamp(1rem, 2.5vw, 1.25rem);">
-                {{ \App\Models\Setting::get('panduan_title', 'Bagaimana Cara Memberi Penilaian?') }}
-            </h5>
-            <p class="text-muted mb-0 small" style="font-size: 0.82rem;">
-                {{ \App\Models\Setting::get('panduan_subtitle', 'Hanya butuh 3 langkah mudah untuk berkontribusi bagi sekolahmu') }}
-            </p>
-        </div>
-        <div>
-            <a href="{{ route('siswa.guru.index') }}" class="btn btn-sm btn-primary-custom rounded-pill px-3 py-1.5 fw-semibold shadow-sm" style="font-size: 0.8rem;">
-                <i class="bi bi-pencil-square me-1"></i> Mulai Nilai Guru
-            </a>
+
+            {{-- LANGKAH 2 --}}
+            <div class="gk-panduan-slide" data-slide="1">
+                <div class="gk-clean-card p-4 text-center h-100 d-flex flex-column justify-content-between" style="min-height: 220px;">
+                    <div>
+                        <div class="d-flex align-items-center justify-content-center gap-2 mb-3">
+                            <span class="badge rounded-pill px-3 py-1.5 fw-bold text-uppercase" style="background: #f1f5f9; color: #475569; font-size: 0.72rem; letter-spacing: 0.5px;">
+                                {{ \App\Models\Setting::get('panduan_step2_title', 'BERI NILAI') }}
+                            </span>
+                            <span class="badge rounded-pill px-2.5 py-1 text-muted fw-semibold" style="background: #f8fafc; font-size: 0.7rem; font-family: monospace;">
+                                02 / 03
+                            </span>
+                        </div>
+                        <div class="gk-step-roman">II</div>
+                        <p class="text-dark fw-semibold mb-0" style="font-size: 0.95rem; line-height: 1.5;">
+                            {{ \App\Models\Setting::get('panduan_step2_desc', 'Pilih guru Normada/Produktif, beri nilai (1-5) pada 5 kriteria.') }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            {{-- LANGKAH 3 --}}
+            <div class="gk-panduan-slide" data-slide="2">
+                <div class="gk-clean-card p-4 text-center h-100 d-flex flex-column justify-content-between" style="min-height: 220px;">
+                    <div>
+                        <div class="d-flex align-items-center justify-content-center gap-2 mb-3">
+                            <span class="badge rounded-pill px-3 py-1.5 fw-bold text-uppercase" style="background: #f1f5f9; color: #475569; font-size: 0.72rem; letter-spacing: 0.5px;">
+                                {{ \App\Models\Setting::get('panduan_step3_title', 'KIRIM ANONIM') }}
+                            </span>
+                            <span class="badge rounded-pill px-2.5 py-1 text-muted fw-semibold" style="background: #f8fafc; font-size: 0.7rem; font-family: monospace;">
+                                03 / 03
+                            </span>
+                        </div>
+                        <div class="gk-step-roman">III</div>
+                        <p class="text-dark fw-semibold mb-0" style="font-size: 0.95rem; line-height: 1.5;">
+                            {{ \App\Models\Setting::get('panduan_step3_desc', 'Data tersimpan aman & anonim untuk perbaikan pengajaran.') }}
+                        </p>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-    
-    <div class="row g-2.5 g-md-3">
-        <div class="col-12 col-md-4">
-            <div class="p-3 rounded-3 h-100 border d-flex gap-3 align-items-start" style="background: var(--bg-card, #ffffff); border-color: var(--border) !important;">
-                <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0 fw-bold shadow-sm" style="width: 36px; height: 36px; background: var(--primary); color: #ffffff; font-size: 0.95rem;">
-                    1
-                </div>
-                <div>
-                    <h6 class="fw-bold mb-1 text-dark" style="font-size: 0.88rem;">{{ \App\Models\Setting::get('panduan_step1_title', 'Login NIS') }}</h6>
-                    <p class="text-muted mb-0 small" style="font-size: 0.78rem; line-height: 1.45;">{{ \App\Models\Setting::get('panduan_step1_desc', 'Masuk dengan akun NIS & tanggal lahir resmi terverifikasi.') }}</p>
-                </div>
-            </div>
+
+    {{-- NAVIGASI SLIDER & INDIKATOR DOTS --}}
+    <div class="d-flex align-items-center justify-content-center gap-3 mt-2.5">
+        <button type="button" class="gk-panduan-nav-btn" id="panduanPrevBtn" aria-label="Langkah Sebelumnya" title="Sebelumnya">
+            <i class="bi bi-chevron-left"></i>
+        </button>
+
+        <div class="d-flex align-items-center gap-1.5" id="panduanDots">
+            <button type="button" class="gk-panduan-dot active" data-index="0" aria-label="Langkah 1"></button>
+            <button type="button" class="gk-panduan-dot" data-index="1" aria-label="Langkah 2"></button>
+            <button type="button" class="gk-panduan-dot" data-index="2" aria-label="Langkah 3"></button>
         </div>
-        <div class="col-12 col-md-4">
-            <div class="p-3 rounded-3 h-100 border d-flex gap-3 align-items-start" style="background: var(--bg-card, #ffffff); border-color: var(--border) !important;">
-                <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0 fw-bold shadow-sm" style="width: 36px; height: 36px; background: var(--accent); color: #ffffff; font-size: 0.95rem;">
-                    2
-                </div>
-                <div>
-                    <h6 class="fw-bold mb-1 text-dark" style="font-size: 0.88rem;">{{ \App\Models\Setting::get('panduan_step2_title', 'Beri Nilai') }}</h6>
-                    <p class="text-muted mb-0 small" style="font-size: 0.78rem; line-height: 1.45;">{{ \App\Models\Setting::get('panduan_step2_desc', 'Pilih guru Normada/Produktif, beri nilai (1-5) pada 5 kriteria.') }}</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-12 col-md-4">
-            <div class="p-3 rounded-3 h-100 border d-flex gap-3 align-items-start" style="background: var(--bg-card, #ffffff); border-color: var(--border) !important;">
-                <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0 fw-bold shadow-sm" style="width: 36px; height: 36px; background: #f59e0b; color: #ffffff; font-size: 0.95rem;">
-                    3
-                </div>
-                <div>
-                    <h6 class="fw-bold mb-1 text-dark" style="font-size: 0.88rem;">{{ \App\Models\Setting::get('panduan_step3_title', 'Kirim Anonim') }}</h6>
-                    <p class="text-muted mb-0 small" style="font-size: 0.78rem; line-height: 1.45;">{{ \App\Models\Setting::get('panduan_step3_desc', 'Data tersimpan aman & anonim untuk perbaikan pengajaran.') }}</p>
-                </div>
-            </div>
-        </div>
+
+        <button type="button" class="gk-panduan-nav-btn" id="panduanNextBtn" aria-label="Langkah Selanjutnya" title="Selanjutnya">
+            <i class="bi bi-chevron-right"></i>
+        </button>
     </div>
 </div>
 
-{{-- STATISTIK CEPAT (FROSTED GLASS CARDS) --}}
-<div class="row g-2 g-md-4 mb-3 mb-md-4">
-    <div class="col-4 col-md-4">
-        <div class="card-glass p-2.5 p-md-4 h-100 d-flex flex-column justify-content-between">
-            <div>
-                <div class="d-flex align-items-center justify-content-between mb-2">
-                    <div class="rounded-3 d-flex align-items-center justify-content-center" style="width: 38px; height: 38px; background: rgba(0, 51, 102, 0.08); color: var(--primary);">
-                        <i class="bi bi-people-fill fs-5"></i>
+{{-- 2. GRID UTAMA 2 KOLOM: METRIK & TOP GURU (KIRI) vs RIWAYAT TERAKHIR TINGGI (KANAN) --}}
+<div class="row g-4 align-items-stretch">
+    {{-- KOLOM KIRI (7 Kolom): METRIK KOMPAK + TOP GURU SEKOLAH SEJAJAR & RAPI --}}
+    <div class="col-lg-7 d-flex flex-column justify-content-between">
+        <div>
+            {{-- KARTU METRIK KOMPAK (SEJAJAR PERSIS DENGAN 3 KARTU GURU DI BAWAHNYA) --}}
+            <div class="row g-3 mb-4">
+                {{-- 1. Total Guru --}}
+                <div class="col-4">
+                    <div class="gk-clean-card p-3 h-100 d-flex flex-column justify-content-between">
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <span class="text-muted fw-bold text-uppercase" style="font-size: 0.68rem; letter-spacing: 0.6px;">TOTAL GURU</span>
+                            <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 32px; height: 32px; background: rgba(0, 51, 102, 0.08); color: #003366;">
+                                <i class="bi bi-people-fill" style="font-size: 0.95rem;"></i>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-baseline gap-1 mt-1">
+                            <h3 class="fw-bold text-dark mb-0 font-mono" style="font-size: 1.55rem; line-height: 1;">{{ $totalGuru }}</h3>
+                            <span class="text-muted small" style="font-size: 0.75rem;">Guru</span>
+                        </div>
                     </div>
-                    <span class="badge rounded-pill d-none d-sm-inline" style="background: rgba(0, 51, 102, 0.08); color: var(--primary); font-size: 0.7rem; font-weight: 600;">Guru</span>
                 </div>
-                <div class="text-muted small font-mono" style="font-size: 0.62rem; letter-spacing: 0.5px;">TOTAL GURU</div>
-                <div class="fw-bold fs-3 text-dark mt-0.5" style="font-feature-settings: 'tnum';">{{ $totalGuru }}</div>
-            </div>
-            <small class="text-muted font-mono d-none d-md-block mt-1" style="font-size: 0.72rem;">Daftar guru aktif sekolah</small>
-        </div>
-    </div>
-    <div class="col-4 col-md-4">
-        <div class="card-glass p-2.5 p-md-4 h-100 d-flex flex-column justify-content-between">
-            <div>
-                <div class="d-flex align-items-center justify-content-between mb-2">
-                    <div class="rounded-3 d-flex align-items-center justify-content-center" style="width: 38px; height: 38px; background: rgba(0, 168, 107, 0.1); color: var(--accent);">
-                        <i class="bi bi-check2-circle fs-5"></i>
-                    </div>
-                    <span class="badge rounded-pill d-none d-sm-inline" style="background: rgba(0, 168, 107, 0.1); color: var(--accent); font-size: 0.7rem; font-weight: 600;">{{ $pctSelesai }}%</span>
-                </div>
-                <div class="text-muted small font-mono" style="font-size: 0.62rem; letter-spacing: 0.5px;">SUDAH DINILAI</div>
-                <div class="fw-bold fs-3 text-dark mt-0.5" style="font-feature-settings: 'tnum';">
-                    {{ $jumlahSudah }} <span class="text-muted fs-6 fw-normal d-none d-sm-inline">/ {{ $totalGuru }}</span>
-                </div>
-            </div>
-            <div class="progress mt-1.5" style="height: 5px; border-radius: 10px; background: rgba(0,0,0,0.06);">
-                <div class="progress-bar bg-success rounded-pill" style="width: {{ $pctSelesai }}%;"></div>
-            </div>
-        </div>
-    </div>
-    <div class="col-4 col-md-4">
-        <div class="card-glass p-2.5 p-md-4 h-100 d-flex flex-column justify-content-between">
-            <div>
-                <div class="d-flex align-items-center justify-content-between mb-2">
-                    <div class="rounded-3 d-flex align-items-center justify-content-center" style="width: 38px; height: 38px; background: rgba(245, 158, 11, 0.12); color: #d97706;">
-                        <i class="bi bi-hourglass-split fs-5"></i>
-                    </div>
-                    <span class="badge rounded-pill d-none d-sm-inline" style="background: rgba(245, 158, 11, 0.12); color: #d97706; font-size: 0.7rem; font-weight: 600;">Sisa</span>
-                </div>
-                <div class="text-muted small font-mono" style="font-size: 0.62rem; letter-spacing: 0.5px;">SISA PENILAIAN</div>
-                <div class="fw-bold fs-3 text-dark mt-0.5" style="font-feature-settings: 'tnum';">{{ max(0, $totalGuru - $jumlahSudah) }}</div>
-            </div>
-            <small class="text-muted font-mono d-none d-md-block mt-1" style="font-size: 0.72rem;">Menunggu evaluasi Anda</small>
-        </div>
-    </div>
-</div>
 
-<div class="row g-4">
-    {{-- TOP GURU SEKOLAH (PODIUM GLASS 2-1-3) --}}
-    <div class="col-lg-8">
-        <div class="card-glass p-3 p-md-4 h-100">
-            <div class="d-flex justify-content-between align-items-center mb-3 mb-md-4 flex-wrap gap-2">
+                {{-- 2. Sudah Dinilai --}}
+                <div class="col-4">
+                    <div class="gk-clean-card p-3 h-100 d-flex flex-column justify-content-between">
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <span class="text-muted fw-bold text-uppercase" style="font-size: 0.68rem; letter-spacing: 0.6px;">SUDAH DINILAI</span>
+                            <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 32px; height: 32px; background: rgba(16, 185, 129, 0.12); color: #059669;">
+                                <i class="bi bi-check2-circle" style="font-size: 0.95rem;"></i>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-baseline justify-content-between mt-1 flex-wrap gap-1">
+                            <div class="d-flex align-items-baseline gap-1">
+                                <h3 class="fw-bold text-dark mb-0 font-mono" style="font-size: 1.55rem; line-height: 1;">{{ $jumlahSudah }}</h3>
+                                <span class="text-muted small" style="font-size: 0.75rem;">Guru</span>
+                            </div>
+                            <span class="badge rounded-pill px-2 py-0.5" style="background: rgba(16, 185, 129, 0.12); color: #059669; font-size: 0.72rem; font-weight: 700;">
+                                {{ $pctSelesai }}%
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- 3. Sisa Penilaian --}}
+                <div class="col-4">
+                    <div class="gk-clean-card p-3 h-100 d-flex flex-column justify-content-between">
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <span class="text-muted fw-bold text-uppercase" style="font-size: 0.68rem; letter-spacing: 0.6px;">SISA PENILAIAN</span>
+                            <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 32px; height: 32px; background: rgba(245, 158, 11, 0.12); color: #d97706;">
+                                <i class="bi bi-hourglass-split" style="font-size: 0.95rem;"></i>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-baseline gap-1 mt-1">
+                            <h3 class="fw-bold text-dark mb-0 font-mono" style="font-size: 1.55rem; line-height: 1;">{{ max(0, $totalGuru - $jumlahSudah) }}</h3>
+                            <span class="text-muted small" style="font-size: 0.75rem;">Guru</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {{-- HEADER SECTION GURU DENGAN PARTISIPASI TERTINGGI --}}
+            <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
                 <div>
-                    <h6 class="fw-bold mb-0 text-dark fs-5"><i class="bi bi-trophy-fill text-warning me-2"></i>Top Guru Sekolah</h6>
-                    <small class="text-muted" style="font-size: 0.75rem;">Peringkat guru favorit berdasarkan rating siswa</small>
+                    <h4 class="fw-bold mb-0 text-dark" style="font-size: 1.25rem;">Guru dengan Partisipasi Tertinggi</h4>
+                    <small class="text-muted" style="font-size: 0.78rem;">Data Guru dengan persentase nilai terbaik dari siswa</small>
                 </div>
-                <a href="{{ route('siswa.leaderboard.index') }}" class="btn btn-sm btn-outline-custom rounded-pill px-2.5 py-1" style="font-size: 0.75rem;">Leaderboard</a>
+                <div>
+                    <a href="{{ route('siswa.guru.index') }}" class="btn btn-sm btn-primary rounded-pill px-3 py-1.5 fw-semibold shadow-xs" style="background: #003366; border-color: #003366; font-size: 0.78rem;">
+                        <i class="bi bi-pencil-square me-1"></i> Mulai Nilai Guru
+                    </a>
+                </div>
             </div>
 
+            {{-- 3 KARTU GURU BERSIH SEJAJAR (COL-4 MASING-MASING, IDENTIK DENGAN KOLOM METRIK DI ATASNYA) --}}
             @if($topGuru->isEmpty())
-                <div class="text-center py-4 text-muted">
-                    <i class="bi bi-inbox fs-2 d-block mb-2"></i>
-                    <p class="mb-0 small">Belum ada data evaluasi guru untuk periode ini.</p>
-                </div>
-            @elseif($topGuru->count() === 1)
-                @php $g1 = $topGuru->first(); @endphp
-                {{-- TAMPILAN ELEGAN JIKA HANYA 1 TOP GURU (FULL GOLD CONTAINER) --}}
-                <div class="row justify-content-center pt-2 pb-1">
-                    <div class="col-12 col-sm-10 col-md-9 col-lg-8">
-                        <div class="card-custom gk-podium-card gk-podium-gold p-3.5 p-md-4 text-center position-relative shadow" style="border-radius: 16px;">
-                            <div class="mb-2">
-                                <span class="badge rounded-pill px-3 py-1 fw-bold shadow-sm" style="background: linear-gradient(135deg, #d97706, #b45309); color: #ffffff; font-size: 0.78rem;">
-                                    <i class="bi bi-trophy-fill me-1"></i> #1 EMAS
-                                </span>
-                            </div>
-                            <div class="position-relative d-inline-block mb-2 mt-1">
-                                <img src="{{ $g1->photo_url }}" class="rounded-circle shadow gk-podium-avatar-1" style="width: 72px; height: 72px; min-width: 72px; min-height: 72px; aspect-ratio: 1 / 1; object-fit: cover; flex-shrink: 0;">
-                            </div>
-                            <h5 class="fw-bold mb-1 gk-podium-nama" title="{{ $g1->nama }}">{{ $g1->nama }}</h5>
-                            <small class="d-block mb-2.5 gk-podium-jurusan font-mono fw-semibold" style="font-size: 0.75rem;">{{ strtoupper($g1->jurusan?->nama_jurusan ?? 'UMUM') }}</small>
-                            <div class="p-2.5 rounded-3 mb-3 gk-podium-statbox">
-                                <div class="d-flex justify-content-between align-items-center font-mono mb-1.5" style="font-size: 0.75rem;">
-                                    <span class="fw-bold text-dark">Skor Evaluasi Siswa</span>
-                                    <span class="fw-bold gk-podium-score fs-6">{{ round(($g1->rata_rata_nilai / 5) * 100) }}%</span>
-                                </div>
-                                <div class="progress" style="height: 6px; border-radius: 4px; background: #e2e8f0;">
-                                    @php $p1 = round(($g1->rata_rata_nilai / 5) * 100); @endphp
-                                    <div class="progress-bar rounded-pill {{ $p1 >= 75 ? 'gk-bar-blue-high' : ($p1 >= 50 ? 'gk-bar-blue-mid' : 'gk-bar-blue-low') }}" style="width: {{ $p1 }}%;"></div>
-                                </div>
-                            </div>
-                            <a href="{{ route('siswa.guru.show', $g1) }}" class="btn btn-primary-custom w-100 rounded-pill py-2 fw-semibold" style="font-size: 0.82rem; background: #003366;">
-                                <i class="bi bi-eye me-1"></i> Detail Guru
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            @elseif($topGuru->count() === 2)
-                @php
-                    $g1 = $topGuru->get(0);
-                    $g2 = $topGuru->get(1);
-                @endphp
-                {{-- TAMPILAN 2 GURU (FULL CONTAINER SILVER & GOLD) --}}
-                <div class="row g-3 justify-content-center align-items-end pt-1 pb-1">
-                    <div class="col-6 col-md-6">
-                        <div class="card-custom gk-podium-card gk-podium-silver p-2.5 p-md-3 text-center h-100 shadow-sm" style="border-radius: 16px;">
-                            <div class="mb-1 mb-md-2">
-                                <span class="badge rounded-pill px-2.5 py-0.5" style="background: #64748b; color: #fff; font-size: 0.7rem;">
-                                    <i class="bi bi-award-fill me-1"></i> #2 PERAK
-                                </span>
-                            </div>
-                            <div class="position-relative d-inline-block mb-1 mb-md-2">
-                                <img src="{{ $g2->photo_url }}" class="rounded-circle shadow-sm gk-podium-avatar-2" style="width: 58px; height: 58px; min-width: 58px; min-height: 58px; aspect-ratio: 1 / 1; object-fit: cover; flex-shrink: 0;">
-                            </div>
-                            <h6 class="fw-bold mb-0.5 text-truncate gk-podium-nama" title="{{ $g2->nama }}" style="font-size: 0.85rem;">{{ $g2->nama }}</h6>
-                            <small class="d-block mb-2 text-truncate font-mono gk-podium-jurusan" style="font-size: 0.68rem;">{{ strtoupper($g2->jurusan?->nama_jurusan ?? 'UMUM') }}</small>
-                            <div class="gk-podium-statbox p-2 rounded-2 mb-2">
-                                <div class="d-flex justify-content-between font-mono mb-1" style="font-size: 0.72rem;">
-                                    <span class="text-muted">Skor</span>
-                                    <span class="fw-bold gk-podium-score">{{ round(($g2->rata_rata_nilai / 5) * 100) }}%</span>
-                                </div>
-                                <div class="progress" style="height: 5px; border-radius: 4px; background: #e2e8f0;">
-                                    @php $p2 = round(($g2->rata_rata_nilai / 5) * 100); @endphp
-                                    <div class="progress-bar rounded-pill {{ $p2 >= 75 ? 'gk-bar-blue-high' : ($p2 >= 50 ? 'gk-bar-blue-mid' : 'gk-bar-blue-low') }}" style="width: {{ $p2 }}%;"></div>
-                                </div>
-                            </div>
-                            <a href="{{ route('siswa.guru.show', $g2) }}" class="btn btn-sm btn-outline-custom w-100 rounded-pill py-1.5" style="font-size: 0.75rem;">
-                                Detail
-                            </a>
-                        </div>
-                    </div>
-                    <div class="col-6 col-md-6">
-                        <div class="card-custom gk-podium-card gk-podium-gold p-2.5 p-md-3 text-center h-100 position-relative shadow" style="border-radius: 16px;">
-                            <div class="mb-1 mb-md-2">
-                                <span class="badge rounded-pill px-2.5 py-0.5 fw-bold shadow-sm" style="background: linear-gradient(135deg, #d97706, #b45309); color: #ffffff; font-size: 0.72rem;">
-                                    <i class="bi bi-trophy-fill me-1"></i> #1 EMAS
-                                </span>
-                            </div>
-                            <div class="position-relative d-inline-block mb-1 mb-md-2">
-                                <img src="{{ $g1->photo_url }}" class="rounded-circle shadow gk-podium-avatar-1" style="width: 66px; height: 66px; min-width: 66px; min-height: 66px; aspect-ratio: 1 / 1; object-fit: cover; flex-shrink: 0;">
-                            </div>
-                            <h6 class="fw-bold mb-0.5 text-truncate gk-podium-nama" title="{{ $g1->nama }}" style="font-size: 0.88rem;">{{ $g1->nama }}</h6>
-                            <small class="d-block mb-2 text-truncate font-mono gk-podium-jurusan" style="font-size: 0.68rem;">{{ strtoupper($g1->jurusan?->nama_jurusan ?? 'UMUM') }}</small>
-                            <div class="gk-podium-statbox p-2 rounded-2 mb-2">
-                                <div class="d-flex justify-content-between font-mono mb-1" style="font-size: 0.72rem;">
-                                    <span class="text-dark fw-bold">Skor</span>
-                                    <span class="fw-bold gk-podium-score">{{ round(($g1->rata_rata_nilai / 5) * 100) }}%</span>
-                                </div>
-                                <div class="progress" style="height: 5px; border-radius: 4px; background: #e2e8f0;">
-                                    @php $p1 = round(($g1->rata_rata_nilai / 5) * 100); @endphp
-                                    <div class="progress-bar rounded-pill {{ $p1 >= 75 ? 'gk-bar-blue-high' : ($p1 >= 50 ? 'gk-bar-blue-mid' : 'gk-bar-blue-low') }}" style="width: {{ $p1 }}%;"></div>
-                                </div>
-                            </div>
-                            <a href="{{ route('siswa.guru.show', $g1) }}" class="btn btn-sm btn-primary-custom w-100 rounded-pill py-1.5 fw-bold" style="font-size: 0.75rem; background: #003366;">
-                                Detail
-                            </a>
-                        </div>
-                    </div>
+                <div class="gk-clean-card p-5 text-center text-muted mb-3">
+                    <i class="bi bi-trophy fs-1 d-block mb-2 opacity-50" style="color: #cbd5e1;"></i>
+                    <p class="mb-1 fw-semibold text-dark">Belum Ada Peringkat</p>
+                    <p class="small text-muted mb-0">Belum ada evaluasi guru untuk periode ini.</p>
                 </div>
             @else
                 @php
@@ -270,139 +455,523 @@
                     $g2 = $topGuru->get(1);
                     $g3 = $topGuru->get(2);
                 @endphp
-                {{-- TAMPILAN 3 PODIUM PENUH (2-1-3 FULL CONTAINER) --}}
-                <div class="row g-2 g-md-3 align-items-end pt-1 pb-1 gk-podium-row">
-                    {{-- #2 PERAK (KIRI) --}}
-                    <div class="col-4 order-1 order-md-1 gk-podium-col gk-podium-2">
-                        <div class="card-custom gk-podium-card gk-podium-silver p-2 p-md-3 text-center h-100" style="border-radius: 14px;">
-                            <div class="mb-1 mb-md-2">
-                                <span class="badge rounded-pill px-2 py-0.5" style="background: #64748b; color: #fff; font-size: 0.68rem;">
-                                    <i class="bi bi-award-fill me-1"></i> #2 PERAK
-                                </span>
-                            </div>
-                            <div class="position-relative d-inline-block mb-1 mb-md-2">
-                                <img src="{{ $g2->photo_url }}" class="rounded-circle shadow-sm gk-podium-avatar-2" style="width: 54px; height: 54px; min-width: 54px; min-height: 54px; aspect-ratio: 1 / 1; object-fit: cover; flex-shrink: 0;">
-                            </div>
-                            <h6 class="fw-bold mb-0.5 text-truncate gk-podium-nama" title="{{ $g2->nama }}" style="font-size: 0.82rem;">{{ $g2->nama }}</h6>
-                            <small class="d-block mb-1.5 text-truncate font-mono gk-podium-jurusan" style="font-size: 0.65rem;">{{ strtoupper($g2->jurusan?->nama_jurusan ?? 'UMUM') }}</small>
-                            <div class="gk-podium-statbox p-1.5 rounded-2 mb-1.5">
-                                <div class="d-flex justify-content-between font-mono mb-1" style="font-size: 0.7rem;">
-                                    <span class="text-muted">Skor</span>
-                                    <span class="fw-bold gk-podium-score">{{ round(($g2->rata_rata_nilai / 5) * 100) }}%</span>
+                <div class="row g-3 align-items-stretch mb-3.5">
+                    {{-- #1st (KIRI - SEJAJAR PERSIS DENGAN TOTAL GURU) --}}
+                    @if($g1)
+                    @php
+                        $score1 = (float)($g1->rata_rata_nilai ?? 0);
+                        $pct1 = round(($score1 / 5) * 100);
+                        $stars1 = round($score1 * 2) / 2;
+                    @endphp
+                    <div class="col-4">
+                        <div class="gk-clean-card p-3.5 text-center h-100 d-flex flex-column justify-content-between">
+                            <div>
+                                <div class="mb-2">
+                                    <span class="badge rounded-pill px-3 py-1 fw-bold" style="background: #fef08a; color: #854d0e; font-size: 0.75rem;">
+                                        #1st
+                                    </span>
                                 </div>
-                                <div class="progress" style="height: 4px; border-radius: 4px; background: #e2e8f0;">
-                                    @php $p2 = round(($g2->rata_rata_nilai / 5) * 100); @endphp
-                                    <div class="progress-bar rounded-pill {{ $p2 >= 75 ? 'gk-bar-blue-high' : ($p2 >= 50 ? 'gk-bar-blue-mid' : 'gk-bar-blue-low') }}" style="width: {{ $p2 }}%;"></div>
+                                <div class="gk-avatar-clean-wrap mb-2.5" style="width: 76px; height: 76px;">
+                                    <img src="{{ $g1->photo_url }}" width="76" height="76" alt="{{ $g1->nama }}">
                                 </div>
-                            </div>
-                            <a href="{{ route('siswa.guru.show', $g2) }}" class="btn btn-sm btn-outline-custom btn-podium w-100 rounded-pill py-1" style="font-size: 0.72rem;">
-                                Detail
-                            </a>
-                        </div>
-                    </div>
+                                <h6 class="fw-bold mb-0.5 text-dark text-truncate" title="{{ $g1->nama }}" style="font-size: 0.88rem;">{{ $g1->nama }}</h6>
+                                <div class="text-muted small mb-2 text-truncate font-mono" style="font-size: 0.68rem;">
+                                    {{ strtoupper($g1->jurusan?->nama_jurusan ?? $g1->kategori_label ?? 'GURU NORMADA') }}
+                                </div>
 
-                    {{-- #1 EMAS (TENGAH - ELEVATED PODIUM) --}}
-                    <div class="col-4 order-2 order-md-2 mb-0 gk-podium-col gk-podium-1">
-                        <div class="card-custom gk-podium-card gk-podium-gold p-2 p-md-3 text-center h-100 position-relative shadow" style="border-radius: 16px;">
-                            <div class="mb-1 mb-md-2">
-                                <span class="badge rounded-pill px-2 px-md-3 py-0.5 py-md-1 fw-bold shadow-sm" style="background: linear-gradient(135deg, #d97706, #b45309); color: #ffffff; font-size: 0.72rem;">
-                                    <i class="bi bi-trophy-fill me-1"></i> #1 EMAS
-                                </span>
-                            </div>
-                            <div class="position-relative d-inline-block mb-1 mb-md-2">
-                                <img src="{{ $g1->photo_url }}" class="rounded-circle shadow gk-podium-avatar-1" style="width: 64px; height: 64px; min-width: 64px; min-height: 64px; aspect-ratio: 1 / 1; object-fit: cover; flex-shrink: 0;">
-                            </div>
-                            <h6 class="fw-bold mb-0.5 text-truncate gk-podium-nama" title="{{ $g1->nama }}" style="font-size: 0.88rem;">{{ $g1->nama }}</h6>
-                            <small class="d-block mb-1.5 text-truncate font-mono gk-podium-jurusan" style="font-size: 0.68rem;">{{ strtoupper($g1->jurusan?->nama_jurusan ?? 'UMUM') }}</small>
-                            <div class="gk-podium-statbox p-1.5 rounded-2 mb-1.5">
-                                <div class="d-flex justify-content-between font-mono mb-1" style="font-size: 0.72rem;">
-                                    <span class="text-dark fw-bold">Skor</span>
-                                    <span class="fw-bold gk-podium-score">{{ round(($g1->rata_rata_nilai / 5) * 100) }}%</span>
+                                {{-- BINTANG EMAS --}}
+                                <div class="text-warning mb-2" style="font-size: 0.82rem; letter-spacing: 1.5px;">
+                                    @for($i = 1; $i <= 5; $i++)
+                                        @if($stars1 >= $i)
+                                            <i class="bi bi-star-fill"></i>
+                                        @elseif($stars1 >= ($i - 0.5))
+                                            <i class="bi bi-star-half"></i>
+                                        @else
+                                            <i class="bi bi-star text-muted opacity-25"></i>
+                                        @endif
+                                    @endfor
                                 </div>
-                                <div class="progress" style="height: 5px; border-radius: 4px; background: #e2e8f0;">
-                                    @php $p1 = round(($g1->rata_rata_nilai / 5) * 100); @endphp
-                                    <div class="progress-bar rounded-pill {{ $p1 >= 75 ? 'gk-bar-blue-high' : ($p1 >= 50 ? 'gk-bar-blue-mid' : 'gk-bar-blue-low') }}" style="width: {{ $p1 }}%;"></div>
-                                </div>
-                            </div>
-                            <a href="{{ route('siswa.guru.show', $g1) }}" class="btn btn-sm btn-primary-custom btn-podium w-100 rounded-pill py-1 fw-bold" style="font-size: 0.75rem; background: #003366;">
-                                Detail
-                            </a>
-                        </div>
-                    </div>
 
-                    {{-- #3 PERUNGGU (KANAN) --}}
-                    <div class="col-4 order-3 order-md-3 gk-podium-col gk-podium-3">
-                        <div class="card-custom gk-podium-card gk-podium-bronze p-2 p-md-3 text-center h-100" style="border-radius: 14px;">
-                            <div class="mb-1 mb-md-2">
-                                <span class="badge rounded-pill px-2 py-0.5" style="background: #c2410c; color: #fff; font-size: 0.68rem;">
-                                    <i class="bi bi-award-fill me-1"></i> #3 PERUNGGU
-                                </span>
-                            </div>
-                            <div class="position-relative d-inline-block mb-1 mb-md-2">
-                                <img src="{{ $g3->photo_url }}" class="rounded-circle shadow-sm gk-podium-avatar-3" style="width: 54px; height: 54px; min-width: 54px; min-height: 54px; aspect-ratio: 1 / 1; object-fit: cover; flex-shrink: 0;">
-                            </div>
-                            <h6 class="fw-bold mb-0.5 text-truncate gk-podium-nama" title="{{ $g3->nama }}" style="font-size: 0.82rem;">{{ $g3->nama }}</h6>
-                            <small class="d-block mb-1.5 text-truncate font-mono gk-podium-jurusan" style="font-size: 0.65rem;">{{ strtoupper($g3->jurusan?->nama_jurusan ?? 'UMUM') }}</small>
-                            <div class="gk-podium-statbox p-1.5 rounded-2 mb-1.5">
-                                <div class="d-flex justify-content-between font-mono mb-1" style="font-size: 0.7rem;">
-                                    <span class="text-muted">Skor</span>
-                                    <span class="fw-bold gk-podium-score">{{ round(($g3->rata_rata_nilai / 5) * 100) }}%</span>
+                                {{-- PROGRESS PILL PERSENTASE --}}
+                                <div class="mb-1.5">
+                                    <div class="gk-progress-pill mx-auto">
+                                        <div class="gk-progress-pill-fill" style="width: {{ $pct1 }}%;"></div>
+                                        <span class="position-relative text-white" style="z-index: 2; text-shadow: 0 1px 2px rgba(0,0,0,0.6);">{{ $pct1 }}%</span>
+                                    </div>
                                 </div>
-                                <div class="progress" style="height: 4px; border-radius: 4px; background: #e2e8f0;">
-                                    @php $p3 = round(($g3->rata_rata_nilai / 5) * 100); @endphp
-                                    <div class="progress-bar rounded-pill {{ $p3 >= 75 ? 'gk-bar-blue-high' : ($p3 >= 50 ? 'gk-bar-blue-mid' : 'gk-bar-blue-low') }}" style="width: {{ $p3 }}%;"></div>
-                                </div>
+                                <small class="text-muted font-mono d-block mb-3" style="font-size: 0.72rem;">{{ $g1->penilaian_count ?? $g1->total_penilaian ?? 0 }} ulasan</small>
                             </div>
-                            <a href="{{ route('siswa.guru.show', $g3) }}" class="btn btn-sm btn-outline-custom btn-podium w-100 rounded-pill py-1" style="font-size: 0.72rem;">
-                                Detail
-                            </a>
+
+                            <div>
+                                <a href="{{ route('siswa.guru.show', $g1) }}" class="btn btn-sm btn-outline-primary w-100 rounded-pill py-1.5 fw-semibold" style="font-size: 0.75rem; border-color: rgba(0, 51, 102, 0.25); color: #003366;">
+                                    <i class="bi bi-eye me-1"></i> Profil
+                                </a>
+                            </div>
                         </div>
                     </div>
+                    @endif
+
+                    {{-- #2nd (TENGAH - SEJAJAR PERSIS DENGAN SUDAH DINILAI) --}}
+                    @if($g2)
+                    @php
+                        $score2 = (float)($g2->rata_rata_nilai ?? 0);
+                        $pct2 = round(($score2 / 5) * 100);
+                        $stars2 = round($score2 * 2) / 2;
+                    @endphp
+                    <div class="col-4">
+                        <div class="gk-clean-card p-3.5 text-center h-100 d-flex flex-column justify-content-between">
+                            <div>
+                                <div class="mb-2">
+                                    <span class="badge rounded-pill px-3 py-1 fw-bold" style="background: #e0f2fe; color: #0369a1; font-size: 0.75rem;">
+                                        #2nd
+                                    </span>
+                                </div>
+                                <div class="gk-avatar-clean-wrap mb-2.5" style="width: 72px; height: 72px;">
+                                    <img src="{{ $g2->photo_url }}" width="72" height="72" alt="{{ $g2->nama }}">
+                                </div>
+                                <h6 class="fw-bold mb-0.5 text-dark text-truncate" title="{{ $g2->nama }}" style="font-size: 0.86rem;">{{ $g2->nama }}</h6>
+                                <div class="text-muted small mb-2 text-truncate font-mono" style="font-size: 0.68rem;">
+                                    {{ strtoupper($g2->jurusan?->nama_jurusan ?? $g2->kategori_label ?? 'GURU NORMADA') }}
+                                </div>
+
+                                {{-- BINTANG EMAS --}}
+                                <div class="text-warning mb-2" style="font-size: 0.82rem; letter-spacing: 1.5px;">
+                                    @for($i = 1; $i <= 5; $i++)
+                                        @if($stars2 >= $i)
+                                            <i class="bi bi-star-fill"></i>
+                                        @elseif($stars2 >= ($i - 0.5))
+                                            <i class="bi bi-star-half"></i>
+                                        @else
+                                            <i class="bi bi-star text-muted opacity-25"></i>
+                                        @endif
+                                    @endfor
+                                </div>
+
+                                {{-- PROGRESS PILL PERSENTASE --}}
+                                <div class="mb-1.5">
+                                    <div class="gk-progress-pill mx-auto">
+                                        <div class="gk-progress-pill-fill" style="width: {{ $pct2 }}%;"></div>
+                                        <span class="position-relative text-white" style="z-index: 2; text-shadow: 0 1px 2px rgba(0,0,0,0.6);">{{ $pct2 }}%</span>
+                                    </div>
+                                </div>
+                                <small class="text-muted font-mono d-block mb-3" style="font-size: 0.72rem;">{{ $g2->penilaian_count ?? $g2->total_penilaian ?? 0 }} ulasan</small>
+                            </div>
+
+                            <div>
+                                <a href="{{ route('siswa.guru.show', $g2) }}" class="btn btn-sm btn-outline-primary w-100 rounded-pill py-1.5 fw-semibold" style="font-size: 0.75rem; border-color: rgba(0, 51, 102, 0.25); color: #003366;">
+                                    <i class="bi bi-eye me-1"></i> Profil
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    @endif
+
+                    {{-- #3rd (KANAN - SEJAJAR PERSIS DENGAN SISA PENILAIAN) --}}
+                    @if($g3)
+                    @php
+                        $score3 = (float)($g3->rata_rata_nilai ?? 0);
+                        $pct3 = round(($score3 / 5) * 100);
+                        $stars3 = round($score3 * 2) / 2;
+                    @endphp
+                    <div class="col-4">
+                        <div class="gk-clean-card p-3.5 text-center h-100 d-flex flex-column justify-content-between">
+                            <div>
+                                <div class="mb-2">
+                                    <span class="badge rounded-pill px-3 py-1 fw-bold" style="background: #fed7aa; color: #9a3412; font-size: 0.75rem;">
+                                        #3rd
+                                    </span>
+                                </div>
+                                <div class="gk-avatar-clean-wrap mb-2.5" style="width: 72px; height: 72px;">
+                                    <img src="{{ $g3->photo_url }}" width="72" height="72" alt="{{ $g3->nama }}">
+                                </div>
+                                <h6 class="fw-bold mb-0.5 text-dark text-truncate" title="{{ $g3->nama }}" style="font-size: 0.86rem;">{{ $g3->nama }}</h6>
+                                <div class="text-muted small mb-2 text-truncate font-mono" style="font-size: 0.68rem;">
+                                    {{ strtoupper($g3->jurusan?->nama_jurusan ?? $g3->kategori_label ?? 'GURU NORMADA') }}
+                                </div>
+
+                                {{-- BINTANG EMAS --}}
+                                <div class="text-warning mb-2" style="font-size: 0.82rem; letter-spacing: 1.5px;">
+                                    @for($i = 1; $i <= 5; $i++)
+                                        @if($stars3 >= $i)
+                                            <i class="bi bi-star-fill"></i>
+                                        @elseif($stars3 >= ($i - 0.5))
+                                            <i class="bi bi-star-half"></i>
+                                        @else
+                                            <i class="bi bi-star text-muted opacity-25"></i>
+                                        @endif
+                                    @endfor
+                                </div>
+
+                                {{-- PROGRESS PILL PERSENTASE --}}
+                                <div class="mb-1.5">
+                                    <div class="gk-progress-pill mx-auto">
+                                        <div class="gk-progress-pill-fill" style="width: {{ $pct3 }}%;"></div>
+                                        <span class="position-relative text-white" style="z-index: 2; text-shadow: 0 1px 2px rgba(0,0,0,0.6);">{{ $pct3 }}%</span>
+                                    </div>
+                                </div>
+                                <small class="text-muted font-mono d-block mb-3" style="font-size: 0.72rem;">{{ $g3->penilaian_count ?? $g3->total_penilaian ?? 0 }} ulasan</small>
+                            </div>
+
+                            <div>
+                                <a href="{{ route('siswa.guru.show', $g3) }}" class="btn btn-sm btn-outline-primary w-100 rounded-pill py-1.5 fw-semibold" style="font-size: 0.75rem; border-color: rgba(0, 51, 102, 0.25); color: #003366;">
+                                    <i class="bi bi-eye me-1"></i> Profil
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    @endif
+                </div>
+
+                {{-- TOMBOL PILL HITAM LIHAT SELENGKAPNYA MIRIP PUBLIK --}}
+                <div class="text-center pt-1 mb-2">
+                    <a href="{{ route('siswa.leaderboard.index') }}" class="gk-pill-btn-dark">
+                        Lihat selengkapnya
+                    </a>
                 </div>
             @endif
         </div>
     </div>
 
-    {{-- RIWAYAT PENILAIAN TERAKHIR --}}
-    <div class="col-lg-4">
-        <div class="card-glass p-4 h-100">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h5 class="fw-bold mb-0 text-dark"><i class="bi bi-clock-history text-primary me-2"></i>Riwayat Terakhir</h5>
-                <a href="{{ route('siswa.riwayat') }}" class="btn btn-sm btn-outline-custom rounded-pill px-3 py-1">Semua</a>
-            </div>
-
-            @if($riwayatTerakhir->isEmpty())
-                <div class="text-center py-5 text-muted">
-                    <i class="bi bi-journal-x fs-1 d-block mb-2 opacity-50"></i>
-                    <p class="mb-2 small">Anda belum memberikan penilaian periode ini.</p>
-                    <a href="{{ route('siswa.guru.index') }}" class="btn btn-sm btn-primary-custom rounded-pill px-3">Mulai Menilai</a>
+    {{-- KOLOM KANAN (5 Kolom): RIWAYAT PENILAIAN TERAKHIR (VERTIKAL TINGGI MIRIP DASHBOARD GURU) --}}
+    <div class="col-lg-5 d-flex flex-column">
+        <div class="gk-clean-card p-3.5 p-md-4 h-100 d-flex flex-column justify-content-between" style="min-height: 540px;">
+            <div>
+                {{-- Header Riwayat --}}
+                <div class="d-flex justify-content-between align-items-center mb-3.5">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 36px; height: 36px; background: rgba(0, 51, 102, 0.08); color: #003366; font-size: 1rem;">
+                            <i class="bi bi-clock-history"></i>
+                        </div>
+                        <div>
+                            <h5 class="fw-bold mb-0 text-dark" style="font-size: 1.05rem;">Riwayat Terakhir</h5>
+                            <small class="text-muted" style="font-size: 0.72rem;">Penilaian yang telah Anda kirimkan</small>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="badge rounded-pill px-2.5 py-1" style="background: rgba(0, 51, 102, 0.08); color: #003366; font-size: 0.72rem; font-weight: 700;">
+                            {{ $jumlahSudah }} Selesai
+                        </span>
+                        <a href="{{ route('siswa.riwayat') }}" class="btn btn-sm btn-primary rounded-pill px-3 py-1 fw-semibold" style="background: #003366; border-color: #003366; font-size: 0.75rem;">
+                            Semua
+                        </a>
+                    </div>
                 </div>
-            @else
-                <div class="d-flex flex-column gap-2.5">
-                    @foreach($riwayatTerakhir as $riwayat)
+
+                {{-- Feed Scrollable Berdiri: Tinggi vertikal proporsional serupa feed ulasan Guru --}}
+                <div class="gk-feed-scroll flex-grow-1 overflow-y-auto pe-1" style="max-height: 460px; min-height: 400px;">
+                    @forelse($riwayatTerakhir as $riwayat)
                         @php
                             $rwScore = round(($riwayat->rata_rata_evaluasi / 5) * 100);
-                            $rwBadge = $rwScore >= 80 ? 'bg-success' : ($rwScore >= 60 ? 'bg-info' : 'bg-warning');
+                            $badgeColor = $rwScore >= 75 ? 'rgba(16, 185, 129, 0.12)' : ($rwScore >= 50 ? 'rgba(0, 51, 102, 0.08)' : 'rgba(245, 158, 11, 0.12)');
+                            $badgeTextColor = $rwScore >= 75 ? '#059669' : ($rwScore >= 50 ? '#003366' : '#b45309');
                         @endphp
-                        <div class="d-flex align-items-center gap-3 p-2.5 rounded-3 border" style="background: var(--bg-card); border-color: var(--border) !important;">
-                            <img src="{{ $riwayat->guru->photo_url }}" class="rounded-circle flex-shrink-0 shadow-sm" style="width: 42px; height: 42px; min-width: 42px; min-height: 42px; aspect-ratio: 1 / 1; object-fit: cover; border: 2px solid var(--border); flex-shrink: 0;">
-                            <div class="flex-grow-1 overflow-hidden">
-                                <h6 class="fw-bold mb-0 text-truncate text-dark" style="font-size: 0.88rem;">{{ $riwayat->guru->nama }}</h6>
-                                <div class="d-flex align-items-center gap-2 mt-1">
-                                    <span class="badge {{ $rwBadge }} font-mono px-2 py-0.5" style="font-size: 0.7rem;">
+                        <div class="gk-history-item mb-2.5">
+                            <div class="d-flex align-items-center justify-content-between gap-2 mb-2">
+                                <div class="d-flex align-items-center gap-2.5 overflow-hidden">
+                                    <img src="{{ $riwayat->guru->photo_url }}" class="rounded-circle shadow-sm flex-shrink-0" style="width: 38px; height: 38px; min-width: 38px; min-height: 38px; aspect-ratio: 1 / 1; object-fit: cover; border: 2px solid rgba(0, 51, 102, 0.12);">
+                                    <div class="overflow-hidden">
+                                        <h6 class="fw-bold mb-0 text-truncate text-dark" title="{{ $riwayat->guru->nama }}" style="font-size: 0.88rem;">{{ $riwayat->guru->nama }}</h6>
+                                        <span class="badge rounded-pill px-2 py-0.5 mt-0.5" style="background: rgba(0, 51, 102, 0.06); color: #003366; font-size: 0.66rem; font-weight: 600;">
+                                            {{ strtoupper($riwayat->guru->jurusan?->nama_jurusan ?? $riwayat->guru->kategori ?? 'UMUM') }}
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="text-end flex-shrink-0">
+                                    <span class="badge rounded-pill px-2 py-0.5 font-mono fw-bold" style="background: {{ $badgeColor }}; color: {{ $badgeTextColor }}; font-size: 0.72rem;">
                                         {{ $rwScore }}%
                                     </span>
-                                    <div class="progress flex-grow-1" style="height: 4px; border-radius: 2px;">
-                                        <div class="progress-bar {{ $rwBadge }}" style="width: {{ $rwScore }}%;"></div>
+                                    <div class="text-muted font-mono d-block mt-0.5" style="font-size: 0.68rem;">
+                                        {{ $riwayat->created_at->diffForHumans() }}
                                     </div>
-                                    <small class="text-muted font-mono text-nowrap" style="font-size: 0.68rem;">{{ $riwayat->created_at->diffForHumans() }}</small>
                                 </div>
                             </div>
+
+                            {{-- Rating Bar --}}
+                            @php
+                                $dashStars = round(($riwayat->rata_rata_evaluasi ?? ($riwayat->total_nilai / 5)) * 2) / 2;
+                            @endphp
+                            <div class="mb-2">
+                                <div class="d-flex justify-content-between align-items-center mb-1 font-mono" style="font-size: 0.7rem;">
+                                    <div class="d-flex align-items-center gap-1">
+                                        <span class="text-warning d-inline-flex align-items-center" style="font-size: 0.72rem;">
+                                            @for($i = 1; $i <= 5; $i++)
+                                                @if($dashStars >= $i)
+                                                    <i class="bi bi-star-fill"></i>
+                                                @elseif($dashStars >= ($i - 0.5))
+                                                    <i class="bi bi-star-half"></i>
+                                                @else
+                                                    <i class="bi bi-star text-muted opacity-25"></i>
+                                                @endif
+                                            @endfor
+                                        </span>
+                                        <span class="text-muted ms-0.5">({{ number_format($riwayat->total_nilai, 2) }}/25)</span>
+                                    </div>
+                                    <span class="fw-semibold text-dark">{{ $rwScore }}%</span>
+                                </div>
+                                <div class="progress" style="height: 5px; border-radius: 4px; background: #e2e8f0;">
+                                    <div class="progress-bar rounded-pill" style="width: {{ $rwScore }}%; background: linear-gradient(90deg, #0284c7, #38bdf8);"></div>
+                                </div>
+                            </div>
+
+                            {{-- Aksi Cepat / Status --}}
+                            <div class="d-flex justify-content-between align-items-center pt-1.5 border-top" style="border-color: rgba(15, 23, 42, 0.06) !important;">
+                                @if($riwayat->kritik || $riwayat->saran)
+                                    <span class="badge rounded-pill px-2 py-0.5" style="background: rgba(2, 132, 199, 0.08); color: #0284c7; font-size: 0.68rem; font-weight: 600;">
+                                        <i class="bi bi-chat-text me-0.5"></i> Ada Masukan
+                                    </span>
+                                @else
+                                    <span class="badge rounded-pill px-2 py-0.5" style="background: rgba(16, 185, 129, 0.08); color: #059669; font-size: 0.68rem; font-weight: 600;">
+                                        <i class="bi bi-check2 me-0.5"></i> Telah Dinilai
+                                    </span>
+                                @endif
+                                <a href="{{ route('siswa.guru.show', $riwayat->guru_id) }}" class="btn btn-sm btn-link p-0 text-decoration-none fw-semibold" style="font-size: 0.74rem; color: #003366;">
+                                    Lihat Profil <i class="bi bi-chevron-right"></i>
+                                </a>
+                            </div>
                         </div>
-                    @endforeach
+                    @empty
+                        <div class="text-center py-5 text-muted">
+                            <i class="bi bi-journal-x fs-1 d-block mb-2 opacity-40" style="color: #cbd5e1;"></i>
+                            <p class="mb-1 fw-semibold text-dark" style="font-size: 0.9rem;">Belum Ada Penilaian</p>
+                            <p class="text-muted small mb-3" style="font-size: 0.78rem;">Anda belum memberikan penilaian guru pada periode ini.</p>
+                            <a href="{{ route('siswa.guru.index') }}" class="btn btn-sm btn-primary rounded-pill px-3 py-1.5 fw-semibold" style="background: #003366; border-color: #003366;">
+                                <i class="bi bi-pencil-square me-1"></i> Mulai Menilai
+                            </a>
+                        </div>
+                    @endforelse
                 </div>
-            @endif
+            </div>
+
+            {{-- Footer Riwayat --}}
+            <div class="mt-3 pt-2.5 border-top d-flex justify-content-between align-items-center">
+                <span class="text-muted small" style="font-size: 0.74rem;">
+                    Ditampilkan {{ $riwayatTerakhir->count() }} penilaian terakhir.
+                </span>
+                <a href="{{ route('siswa.riwayat') }}" class="fw-bold small text-decoration-none" style="color: #003366; font-size: 0.78rem;">
+                    Kelola Semua <i class="bi bi-arrow-right"></i>
+                </a>
+            </div>
         </div>
     </div>
 </div>
+
+{{-- SCRIPT SLIDER PANDUAN PENGGUNAAN (AUTOPLAY CONTINUOUS 1-2-3, PAUSE ON INTERACTION, TOUCH & DRAG) --}}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const track = document.getElementById('panduanTrack');
+    const viewport = document.getElementById('panduanViewport');
+    const prevBtn = document.getElementById('panduanPrevBtn');
+    const nextBtn = document.getElementById('panduanNextBtn');
+    const dots = document.querySelectorAll('#panduanDots .gk-panduan-dot');
+    const slides = document.querySelectorAll('.gk-panduan-slide');
+
+    if (!track || !viewport || slides.length === 0) return;
+
+    let currentIndex = 0;
+    const totalSlides = slides.length;
+    let autoplayTimer = null;
+    let idleTimer = null;
+    const AUTOPLAY_DELAY = 4000;      // 4 detik jeda geser otomatis berkala
+    const RESUME_IDLE_DELAY = 4500;   // 4.5 detik diam setelah interaksi sebelum mulai geser lagi
+
+    function updateSlide(animate = true) {
+        if (!animate) {
+            track.style.transition = 'none';
+        } else {
+            track.style.transition = 'transform 0.65s cubic-bezier(0.22, 1, 0.36, 1)';
+        }
+
+        track.style.transform = `translateX(-${currentIndex * 100}%)`;
+
+        slides.forEach((slide, idx) => {
+            slide.classList.toggle('is-active', idx === currentIndex);
+        });
+
+        dots.forEach((dot, idx) => {
+            dot.classList.toggle('active', idx === currentIndex);
+        });
+    }
+
+    function nextSlide() {
+        currentIndex = (currentIndex + 1) % totalSlides;
+        updateSlide(true);
+    }
+
+    function prevSlide() {
+        currentIndex = (currentIndex - 1 + totalSlides) % totalSlides;
+        updateSlide(true);
+    }
+
+    function goToSlide(index) {
+        if (index < 0 || index >= totalSlides) return;
+        currentIndex = index;
+        updateSlide(true);
+    }
+
+    function startAutoplay() {
+        stopAutoplay();
+        autoplayTimer = setInterval(nextSlide, AUTOPLAY_DELAY);
+    }
+
+    function stopAutoplay() {
+        if (autoplayTimer) {
+            clearInterval(autoplayTimer);
+            autoplayTimer = null;
+        }
+    }
+
+    // Diam saat disentuh/diinteraksi, lalu jalan kembali setelah tidak ada interaksi selama beberapa waktu
+    function pauseAndScheduleResume() {
+        stopAutoplay();
+        if (idleTimer) {
+            clearTimeout(idleTimer);
+            idleTimer = null;
+        }
+        idleTimer = setTimeout(function () {
+            startAutoplay();
+        }, RESUME_IDLE_DELAY);
+    }
+
+    if (nextBtn) {
+        nextBtn.addEventListener('click', function () {
+            nextSlide();
+            pauseAndScheduleResume();
+        });
+    }
+
+    if (prevBtn) {
+        prevBtn.addEventListener('click', function () {
+            prevSlide();
+            pauseAndScheduleResume();
+        });
+    }
+
+    dots.forEach((dot) => {
+        dot.addEventListener('click', function () {
+            const idx = parseInt(this.getAttribute('data-index'), 10);
+            goToSlide(idx);
+            pauseAndScheduleResume();
+        });
+    });
+
+    viewport.addEventListener('mouseenter', stopAutoplay);
+    viewport.addEventListener('mouseleave', pauseAndScheduleResume);
+
+    // ==========================================
+    // GESER PAKAI TANGAN / SENTUH (TOUCH MOBILE)
+    // ==========================================
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let touchCurrentX = 0;
+    let isTouchSwiping = false;
+    let hasDeterminedTouchDirection = false;
+    let isTouchHorizontal = false;
+
+    viewport.addEventListener('touchstart', function (e) {
+        if (e.touches.length !== 1) return;
+        touchStartX = e.touches[0].clientX;
+        touchStartY = e.touches[0].clientY;
+        touchCurrentX = touchStartX;
+        isTouchSwiping = true;
+        hasDeterminedTouchDirection = false;
+        isTouchHorizontal = false;
+        stopAutoplay();
+    }, { passive: true });
+
+    viewport.addEventListener('touchmove', function (e) {
+        if (!isTouchSwiping || e.touches.length !== 1) return;
+        touchCurrentX = e.touches[0].clientX;
+        const currentY = e.touches[0].clientY;
+        const diffX = touchCurrentX - touchStartX;
+        const diffY = currentY - touchStartY;
+
+        if (!hasDeterminedTouchDirection) {
+            if (Math.abs(diffX) > 6 || Math.abs(diffY) > 6) {
+                hasDeterminedTouchDirection = true;
+                isTouchHorizontal = Math.abs(diffX) > Math.abs(diffY);
+            }
+        }
+
+        if (isTouchHorizontal) {
+            if (e.cancelable) e.preventDefault();
+            const vpWidth = viewport.offsetWidth || 300;
+            const dragPercent = (diffX / vpWidth) * 100;
+            const currentTranslate = -currentIndex * 100;
+            track.style.transition = 'none';
+            track.style.transform = `translateX(${currentTranslate + dragPercent}%)`;
+        }
+    }, { passive: false });
+
+    function handleTouchEnd() {
+        if (!isTouchSwiping) return;
+        isTouchSwiping = false;
+        const diffX = touchCurrentX - touchStartX;
+        track.style.transition = 'transform 0.65s cubic-bezier(0.22, 1, 0.36, 1)';
+
+        if (isTouchHorizontal && Math.abs(diffX) > 35) {
+            if (diffX < 0) {
+                nextSlide();
+            } else {
+                prevSlide();
+            }
+        } else {
+            updateSlide(true);
+        }
+        pauseAndScheduleResume();
+    }
+
+    viewport.addEventListener('touchend', handleTouchEnd);
+    viewport.addEventListener('touchcancel', handleTouchEnd);
+
+    // ==========================================
+    // GESER DENGAN DRAG MOUSE (DESKTOP)
+    // ==========================================
+    let isMouseDown = false;
+    let mouseStartX = 0;
+    let mouseCurrentX = 0;
+
+    viewport.addEventListener('mousedown', function (e) {
+        if (e.button !== 0) return;
+        isMouseDown = true;
+        mouseStartX = e.clientX;
+        mouseCurrentX = mouseStartX;
+        viewport.style.cursor = 'grabbing';
+        stopAutoplay();
+        e.preventDefault();
+    });
+
+    window.addEventListener('mousemove', function (e) {
+        if (!isMouseDown) return;
+        mouseCurrentX = e.clientX;
+        const diffX = mouseCurrentX - mouseStartX;
+        const vpWidth = viewport.offsetWidth || 300;
+        const dragPercent = (diffX / vpWidth) * 100;
+        const currentTranslate = -currentIndex * 100;
+        track.style.transition = 'none';
+        track.style.transform = `translateX(${currentTranslate + dragPercent}%)`;
+    });
+
+    window.addEventListener('mouseup', function () {
+        if (!isMouseDown) return;
+        isMouseDown = false;
+        viewport.style.cursor = 'grab';
+        const diffX = mouseCurrentX - mouseStartX;
+        track.style.transition = 'transform 0.65s cubic-bezier(0.22, 1, 0.36, 1)';
+
+        if (Math.abs(diffX) > 40) {
+            if (diffX < 0) {
+                nextSlide();
+            } else {
+                prevSlide();
+            }
+        } else {
+            updateSlide(true);
+        }
+        pauseAndScheduleResume();
+    });
+
+    // Mulai autoplay berkala
+    startAutoplay();
+});
+</script>
 @endsection

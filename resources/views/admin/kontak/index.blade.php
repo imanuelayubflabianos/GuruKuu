@@ -52,7 +52,7 @@
                         <i class="bi bi-clock me-1"></i>{{ $k->created_at->format('d M Y, H:i') }}
                     </td>
                     <td class="text-center align-middle">
-                        <form action="{{ route('admin.kontak.destroy', $k) }}" method="POST" onsubmit="return confirm('Hapus pesan ini secara permanen?')">
+                        <form action="{{ route('admin.kontak.destroy', $k) }}" method="POST" data-confirm="Hapus pesan ini secara permanen?" data-confirm-title="Hapus Pesan?" data-confirm-btn="Ya, Hapus" data-confirm-type="danger">
                             @csrf @method('DELETE')
                             <button type="submit" class="btn btn-sm btn-outline-danger d-inline-flex align-items-center gap-1.5 px-3 py-1.5 rounded-pill shadow-xs" title="Hapus Pesan">
                                 <i class="bi bi-trash"></i>
@@ -177,11 +177,18 @@ function openReplyModal(k) {
 
 function submitHapusBalasan() {
     if (!activeKontakId) return;
-    if (confirm('Yakin ingin menghapus balasan pesan ini?')) {
-        const delForm = document.getElementById('formHapusBalasan');
-        delForm.action = '/admin/kontak/' + activeKontakId + '/reply';
-        delForm.submit();
-    }
+    window.gurukuuConfirm({
+        title: 'Hapus Balasan Pesan?',
+        text: 'Yakin ingin menghapus balasan pesan ini?',
+        icon: 'warning',
+        confirmButtonText: 'Ya, Hapus',
+        type: 'danger',
+        onConfirm: function() {
+            const delForm = document.getElementById('formHapusBalasan');
+            delForm.action = '/admin/kontak/' + activeKontakId + '/reply';
+            delForm.submit();
+        }
+    });
 }
 </script>
 @endpush

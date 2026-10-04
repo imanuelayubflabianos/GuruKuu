@@ -46,6 +46,7 @@
         <button class="settings-nav__item" type="button" data-target="#tabPeriode"><i class="bi bi-calendar-range"></i> Periode</button>
         <button class="settings-nav__item" type="button" data-target="#tabAkun"><i class="bi bi-shield-lock"></i> Akun</button>
         <button class="settings-nav__item" type="button" data-target="#tabPerangkat"><i class="bi bi-laptop"></i> Perangkat</button>
+        <button class="settings-nav__item" type="button" data-target="#tabSistem"><i class="bi bi-hdd-network"></i> Cache & Log</button>
         <button class="settings-nav__item" type="button" data-target="#tabFaq"><i class="bi bi-question-circle"></i> FAQ</button>
     </nav>
 
@@ -516,51 +517,18 @@
 
                 {{-- STATISTIK KATA BADGES --}}
                 <div class="row g-3 mb-4">
-                    <div class="col-sm-4">
+                    <div class="col-sm-6">
                         <div class="p-3 bg-light rounded-3 border text-center">
                             <div class="fs-4 fw-bold text-danger">{{ count($allBadWords) }}</div>
-                            <div class="text-muted small">Total Kata Terfilter Aktif</div>
+                            <div class="text-muted small">Semua Kata Terfilter Aktif</div>
                         </div>
                     </div>
-                    <div class="col-sm-4">
-                        <div class="p-3 bg-light rounded-3 border text-center">
-                            <div class="fs-4 fw-bold text-primary">{{ count($defaultBadWords) }}</div>
-                            <div class="text-muted small">Library Bawaan Sistem</div>
-                        </div>
-                    </div>
-                    <div class="col-sm-4">
+                    <div class="col-sm-6">
                         <div class="p-3 bg-light rounded-3 border text-center">
                             <div class="fs-4 fw-bold text-warning">{{ count($customBadWords) }}</div>
                             <div class="text-muted small">Kata Tambahan Kustom Admin</div>
                         </div>
                     </div>
-                </div>
-
-                {{-- DAFTAR KATA KUSTOM AKTIF --}}
-                <div class="mb-4 p-3 bg-light rounded-3 border">
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <span class="fw-bold small text-dark">
-                            <i class="bi bi-tags-fill text-warning me-1"></i> Daftar Kata Kustom Tersimpan ({{ count($customBadWords) }})
-                        </span>
-                        <span class="text-muted small">Klik <i class="bi bi-x text-danger fw-bold"></i> untuk menghapus kata</span>
-                    </div>
-                    @if(count($customBadWords) > 0)
-                        <div class="d-flex flex-wrap gap-1.5 align-items-center">
-                            @foreach($customBadWords as $cw)
-                                <span class="badge bg-white text-dark border px-2.5 py-1.5 fw-semibold d-inline-flex align-items-center gap-1.5" style="font-size: 0.82rem;">
-                                    <i class="bi bi-star-fill text-warning" style="font-size: 0.7rem;"></i>
-                                    <button type="button" class="btn p-0 border-0 text-muted" style="font-size: 0.7rem; line-height: 1;" onclick="openEditWordModal('{{ addslashes($cw) }}')" title="Koreksi kata">
-                                        <i class="bi bi-pencil-fill text-primary" style="font-size: 0.65rem;"></i>
-                                    </button>
-                                    <button type="button" class="btn-close p-0 ms-1" style="font-size: 0.65rem;" onclick="deleteWord('{{ addslashes($cw) }}')" title="Hapus kata '{{ $cw }}'" aria-label="Hapus kata {{ $cw }}"></button>
-                                </span>
-                            @endforeach
-                        </div>
-                    @else
-                        <div class="text-muted small py-2">
-                            <i class="bi bi-info-circle me-1"></i> Belum ada kata kustom yang ditambahkan oleh admin.
-                        </div>
-                    @endif
                 </div>
 
                 {{-- FORM INPUT KATA TAMBAHAN (MERGE TANPA MENIMPA) --}}
@@ -684,6 +652,19 @@
                                                     <span>Edit Periode</span>
                                                 </button>
                                             </li>
+                                            @if($p->status !== 'aktif')
+                                            <li><hr class="dropdown-divider my-1"></li>
+                                            <li>
+                                                <form action="{{ route('admin.pengaturan.periode.destroy', $p) }}" method="POST" data-confirm="Hapus periode {{ $p->nama_periode }} beserta seluruh data ulasannya? Tindakan ini tidak dapat dibatalkan." data-confirm-title="Hapus Periode" data-confirm-btn="Ya, Hapus" data-confirm-type="danger">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="dropdown-item py-1.5 px-3 d-flex align-items-center gap-2 text-danger">
+                                                        <i class="bi bi-trash3 text-danger"></i>
+                                                        <span>Hapus Periode</span>
+                                                    </button>
+                                                </form>
+                                            </li>
+                                            @endif
                                         </ul>
                                     </div>
                                 </td>
@@ -728,10 +709,10 @@
             <div class="col-12">
                 <div class="settings-card border-danger border-opacity-25 d-flex align-items-center justify-content-between flex-wrap gap-3">
                     <div>
-                        <h2 class="settings-heading text-danger"><i class="bi bi-exclamation-triangle me-2 text-danger"></i>Hapus seluruh penilaian</h2>
-                        <div class="settings-muted mt-1">{{ number_format($jumlahPenilaian, 0, ',', '.') }} penilaian akan dihapus permanen. Log pelanggaran tetap disimpan sebagai audit.</div>
+                        <h2 class="settings-heading text-danger"><i class="bi bi-trash3 me-2 text-danger"></i>Hapus data penilaian</h2>
+                        <div class="settings-muted mt-1">{{ number_format($jumlahPenilaian, 0, ',', '.') }} ulasan tercatat. Anda dapat menghapus seluruh ulasan, per periode akademik, atau rentang tanggal tertentu.</div>
                     </div>
-                    <button type="button" class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#resetPenilaianModal"><i class="bi bi-shield-exclamation me-1"></i>Lanjutkan</button>
+                    <button type="button" class="btn btn-outline-danger btn-sm text-nowrap" data-bs-toggle="modal" data-bs-target="#resetPenilaianModal"><i class="bi bi-trash3 me-1"></i>Opsi Penghapusan</button>
                 </div>
             </div>
         </div>
@@ -743,34 +724,92 @@
                         @csrf
                         <div class="modal-header border-danger border-opacity-25">
                             <div>
-                                <h2 class="modal-title fs-5 text-danger" id="resetPenilaianModalLabel"><i class="bi bi-exclamation-octagon-fill me-2"></i>Konfirmasi penghapusan</h2>
-                                <div class="small text-muted mt-1">Aksi ini tidak dapat dibatalkan.</div>
+                                <h2 class="modal-title fs-5 text-danger" id="resetPenilaianModalLabel"><i class="bi bi-exclamation-octagon-fill me-2"></i>Penghapusan Data Penilaian</h2>
+                                <div class="small text-muted mt-1">Pilih cakupan ulasan yang ingin dihapus permanen.</div>
                             </div>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
                         </div>
                         <div class="modal-body">
-                            <div class="alert alert-danger small py-2">
-                                Data nilai, kritik, saran, dan balasan dari <strong>{{ number_format($jumlahPenilaian, 0, ',', '.') }}</strong> penilaian akan dihapus. Statistik seluruh guru akan kembali ke nol.
-                            </div>
+                            <!-- Pilihan Cakupan -->
                             <div class="mb-3">
-                                <label class="form-label" for="resetCurrentPassword">Password administrator</label>
-                                <div class="input-group"><input type="password" name="reset_current_password" id="resetCurrentPassword" class="form-control @error('reset_current_password') is-invalid @enderror" autocomplete="current-password" required><button type="button" class="btn btn-outline-secondary toggle-password" data-target="resetCurrentPassword" aria-label="Tampilkan password administrator"><i class="bi bi-eye"></i></button></div>
+                                <label class="form-label small fw-semibold text-dark mb-2">Cakupan Data yang Ingin Dihapus</label>
+                                <div class="d-flex flex-column gap-2">
+                                    <label class="p-2.5 rounded-3 border d-flex align-items-start gap-2.5 bg-light-subtle" style="cursor: pointer;">
+                                        <input type="radio" name="scope" value="semua" class="form-check-input mt-1" checked onchange="toggleResetScope(this.value)">
+                                        <div>
+                                            <div class="fw-semibold text-dark small">Semua Penilaian (Seluruh Waktu & Periode)</div>
+                                            <div class="text-muted" style="font-size: 0.78rem;">Menghapus total {{ number_format($jumlahPenilaian, 0, ',', '.') }} ulasan dan mereset nilai seluruh guru ke nol.</div>
+                                        </div>
+                                    </label>
+
+                                    <label class="p-2.5 rounded-3 border d-flex align-items-start gap-2.5 bg-light-subtle" style="cursor: pointer;">
+                                        <input type="radio" name="scope" value="periode" class="form-check-input mt-1" onchange="toggleResetScope(this.value)">
+                                        <div>
+                                            <div class="fw-semibold text-dark small">Berdasarkan Periode Tertentu</div>
+                                            <div class="text-muted" style="font-size: 0.78rem;">Hanya menghapus data ulasan pada semester/periode akademik tertentu.</div>
+                                        </div>
+                                    </label>
+
+                                    <label class="p-2.5 rounded-3 border d-flex align-items-start gap-2.5 bg-light-subtle" style="cursor: pointer;">
+                                        <input type="radio" name="scope" value="rentang_tanggal" class="form-check-input mt-1" onchange="toggleResetScope(this.value)">
+                                        <div>
+                                            <div class="fw-semibold text-dark small">Berdasarkan Rentang Tanggal / Waktu</div>
+                                            <div class="text-muted" style="font-size: 0.78rem;">Hanya menghapus data ulasan yang dikirim antara tanggal/tahun pilihan.</div>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Opsi Filter Periode -->
+                            <div id="resetScopePeriodeBox" class="mb-3 p-3 rounded-3 border bg-white shadow-xs" style="display: none;">
+                                <label class="form-label small fw-semibold text-dark" for="filterPeriodeSelect"><i class="bi bi-calendar-event me-1 text-primary"></i>Pilih Periode</label>
+                                <select name="filter_periode_id" id="filterPeriodeSelect" class="form-select form-select-sm">
+                                    <option value="">-- Pilih Periode Akademik --</option>
+                                    @foreach($semuaPeriode as $sp)
+                                        <option value="{{ $sp->id }}">{{ $sp->nama_periode }} ({{ $sp->tahun_ajaran }} - {{ ucfirst($sp->semester) }}) {{ $sp->status === 'aktif' ? '[AKTIF]' : '' }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <!-- Opsi Filter Rentang Tanggal -->
+                            <div id="resetScopeDateBox" class="mb-3 p-3 rounded-3 border bg-white shadow-xs" style="display: none;">
+                                <div class="row g-2">
+                                    <div class="col-6">
+                                        <label class="form-label small fw-semibold text-dark" for="filterTanggalMulai"><i class="bi bi-calendar-range me-1 text-primary"></i>Dari Tanggal</label>
+                                        <input type="date" name="filter_tanggal_mulai" id="filterTanggalMulai" class="form-control form-control-sm">
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="form-label small fw-semibold text-dark" for="filterTanggalSelesai"><i class="bi bi-calendar-check me-1 text-primary"></i>Sampai Tanggal</label>
+                                        <input type="date" name="filter_tanggal_selesai" id="filterTanggalSelesai" class="form-control form-control-sm">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="alert alert-danger small py-2 mb-3">
+                                <i class="bi bi-exclamation-triangle-fill me-1"></i> Data nilai, saran, kritik, balasan, dan dukungan ulasan terkait akan dihapus permanen. Statistik guru akan otomatis disinkronkan kembali.
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label small fw-semibold" for="resetCurrentPassword">Password administrator</label>
+                                <div class="input-group"><input type="password" name="reset_current_password" id="resetCurrentPassword" class="form-control @error('reset_current_password') is-invalid @enderror" autocomplete="current-password" placeholder="Masukkan password Anda" required><button type="button" class="btn btn-outline-secondary toggle-password" data-target="resetCurrentPassword" aria-label="Tampilkan password administrator"><i class="bi bi-eye"></i></button></div>
                                 @error('reset_current_password')<div class="invalid-feedback">{{ $message }}</div>@enderror
                             </div>
+
                             <div class="mb-3">
-                                <label class="form-label" for="resetConfirmation">Ketik <code>HAPUS PENILAIAN</code></label>
-                                <input type="text" name="reset_confirmation" id="resetConfirmation" class="form-control @error('reset_confirmation') is-invalid @enderror" autocomplete="off" required>
+                                <label class="form-label small fw-semibold" for="resetConfirmation">Ketik <code>HAPUS PENILAIAN</code></label>
+                                <input type="text" name="reset_confirmation" id="resetConfirmation" class="form-control @error('reset_confirmation') is-invalid @enderror" placeholder="HAPUS PENILAIAN" autocomplete="off" required>
                                 @error('reset_confirmation')<div class="invalid-feedback">{{ $message }}</div>@enderror
                             </div>
+
                             <div class="form-check">
                                 <input class="form-check-input @error('reset_acknowledged') is-invalid @enderror" type="checkbox" name="reset_acknowledged" value="1" id="resetAcknowledged" required>
-                                <label class="form-check-label small" for="resetAcknowledged">Saya memahami bahwa data penilaian tidak dapat dipulihkan.</label>
+                                <label class="form-check-label small" for="resetAcknowledged">Saya memahami bahwa data ulasan yang dipilih tidak dapat dipulihkan kembali.</label>
                                 @error('reset_acknowledged')<div class="invalid-feedback">{{ $message }}</div>@enderror
                             </div>
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-light border" data-bs-dismiss="modal">Batal</button>
-                            <button type="submit" class="btn btn-danger" id="resetSubmitButton" disabled><i class="bi bi-trash3 me-1"></i>Hapus permanen</button>
+                            <button type="submit" class="btn btn-danger" id="resetSubmitButton" disabled><i class="bi bi-trash3 me-1"></i>Hapus Permanen</button>
                         </div>
                     </form>
                 </div>
@@ -780,6 +819,116 @@
 
     <section class="settings-panel" id="tabPerangkat" hidden>
         @include('components.device-history')
+    </section>
+
+    <section class="settings-panel" id="tabSistem" hidden>
+        <div class="settings-card mb-4">
+            <div class="d-flex align-items-center justify-content-between mb-4 pb-3 border-bottom flex-wrap gap-3">
+                <div>
+                    <h2 class="settings-heading mb-1 d-flex align-items-center">
+                        <i class="bi bi-hdd-network-fill me-2 text-primary"></i>Pemeliharaan Sistem, Cache & File Log
+                    </h2>
+                    <p class="settings-muted mb-0">
+                        Kelola kapasitas penyimpanan server, bersihkan cache aplikasi, dan hapus log server agar web tetap ringan dan tidak lag.
+                    </p>
+                </div>
+                <div>
+                    <form action="{{ route('admin.pengaturan.clear-cache') }}" method="POST" data-confirm="Bersihkan SELURUH cache, file log server, dan sesi kedaluwarsa sekarang? Website akan dioptimasi ulang." data-confirm-title="Bersihkan Semua Cache & Log?" data-confirm-btn="Ya, Bersihkan Semua" data-confirm-type="warning">
+                        @csrf
+                        <input type="hidden" name="scope" value="all">
+                        <button type="submit" class="btn btn-primary-custom px-3 py-2 rounded-pill shadow-sm d-inline-flex align-items-center gap-1.5 fw-semibold">
+                            <i class="bi bi-lightning-charge-fill"></i>
+                            <span>Bersihkan Semua Sekaligus</span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="row g-3 mb-4">
+                {{-- KARTU LOG SERVER --}}
+                <div class="col-md-4">
+                    <div class="p-3 border rounded-3 h-100 bg-light d-flex flex-column justify-content-between">
+                        <div>
+                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                <span class="badge bg-secondary-subtle text-dark border">
+                                    <i class="bi bi-file-earmark-text me-1 text-danger"></i>Server Log
+                                </span>
+                                <span class="badge bg-light text-muted border font-monospace">laravel.log</span>
+                            </div>
+                            <h4 class="fw-bold mb-1 font-monospace text-danger">{{ $systemStats['log_size'] ?? '0 KB' }}</h4>
+                            <p class="small text-muted mb-3">Ukuran file log error & aktivitas server lokal/hosting.</p>
+                        </div>
+                        <form action="{{ route('admin.pengaturan.clear-cache') }}" method="POST" data-confirm="Kosongkan isi file log server (laravel.log)? File log akan direset menjadi 0 KB." data-confirm-title="Kosongkan File Log Server?" data-confirm-btn="Ya, Kosongkan Log" data-confirm-type="danger">
+                            @csrf
+                            <input type="hidden" name="scope" value="logs">
+                            <button type="submit" class="btn btn-outline-danger btn-sm w-100 fw-semibold">
+                                <i class="bi bi-trash3 me-1"></i> Kosongkan File Log
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                {{-- KARTU CACHE APLIKASI --}}
+                <div class="col-md-4">
+                    <div class="p-3 border rounded-3 h-100 bg-light d-flex flex-column justify-content-between">
+                        <div>
+                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                <span class="badge bg-secondary-subtle text-dark border">
+                                    <i class="bi bi-cpu me-1 text-primary"></i>Cache Web
+                                </span>
+                                <span class="badge bg-success-subtle text-success border">Tampilan & Rute</span>
+                            </div>
+                            <h4 class="fw-bold mb-1 text-dark">Blade & Config</h4>
+                            <p class="small text-muted mb-3">Cache view template yang dikompilasi, rute URL, dan konfigurasi .env.</p>
+                        </div>
+                        <form action="{{ route('admin.pengaturan.clear-cache') }}" method="POST" data-confirm="Bersihkan seluruh cache view, rute, dan konfigurasi aplikasi sekarang?" data-confirm-title="Bersihkan Cache Web?" data-confirm-btn="Ya, Bersihkan Cache" data-confirm-type="warning">
+                            @csrf
+                            <input type="hidden" name="scope" value="cache">
+                            <button type="submit" class="btn btn-outline-primary btn-sm w-100 fw-semibold">
+                                <i class="bi bi-arrow-repeat me-1"></i> Bersihkan Cache Web
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                {{-- KARTU SESI & RIWAYAT USANG --}}
+                <div class="col-md-4">
+                    <div class="p-3 border rounded-3 h-100 bg-light d-flex flex-column justify-content-between">
+                        <div>
+                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                <span class="badge bg-secondary-subtle text-dark border">
+                                    <i class="bi bi-clock-history me-1 text-warning"></i>Sesi & Riwayat
+                                </span>
+                                <span class="badge bg-light text-muted border">Database</span>
+                            </div>
+                            <h4 class="fw-bold mb-1 text-warning font-monospace">{{ $systemStats['expired_sessions'] ?? 0 }} Sesi</h4>
+                            <p class="small text-muted mb-3">Sesi login kedaluwarsa & {{ $systemStats['inactive_histories'] ?? 0 }} riwayat logout.</p>
+                        </div>
+                        <form action="{{ route('admin.pengaturan.clear-cache') }}" method="POST" data-confirm="Bersihkan sesi kedaluwarsa dan catatan riwayat perangkat lama di database?" data-confirm-title="Bersihkan Sesi Usang?" data-confirm-btn="Ya, Bersihkan Sesi" data-confirm-type="warning">
+                            @csrf
+                            <input type="hidden" name="scope" value="sessions">
+                            <button type="submit" class="btn btn-outline-warning btn-sm w-100 fw-semibold">
+                                <i class="bi bi-clock-history me-1"></i> Bersihkan Sesi Usang
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-3 bg-white border rounded-3">
+                <div class="d-flex align-items-start gap-3">
+                    <div class="rounded-circle d-flex align-items-center justify-content-center bg-primary-subtle text-primary p-2 mt-1" style="width: 38px; height: 38px;">
+                        <i class="bi bi-shield-check fs-5"></i>
+                    </div>
+                    <div>
+                        <strong class="d-block text-dark mb-1">Tips Pemeliharaan & Performa Server</strong>
+                        <p class="text-muted small mb-0">
+                            Membersihkan cache dan mengosongkan log server secara berkala sangat disarankan terutama setelah perubahan besar data, uji coba sistem, atau saat disk hosting mulai penuh. Data operasional utama seperti siswa, guru, penilaian ulasan, dan periode <strong>tetap aman dan tidak akan terhapus</strong>.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
     </section>
 
     <section class="settings-panel" id="tabFaq" hidden>
@@ -793,7 +942,7 @@
                     <button type="button" class="btn btn-primary-custom px-3 py-2 rounded-pill shadow-sm" data-bs-toggle="modal" data-bs-target="#modalTambahFaq">
                         <i class="bi bi-plus-lg me-1"></i> Tambah FAQ Baru
                     </button>
-                    <form action="{{ route('admin.pengaturan.faq.reset') }}" method="POST" class="d-inline" onsubmit="return confirm('Kembalikan seluruh daftar FAQ ke standar sistem bawaan? FAQ kustom yang belum disimpan terpisah akan tereset.');">
+                    <form action="{{ route('admin.pengaturan.faq.reset') }}" method="POST" class="d-inline" data-confirm="Kembalikan seluruh daftar FAQ ke standar sistem bawaan? FAQ kustom yang belum disimpan terpisah akan tereset." data-confirm-title="Reset FAQ ke Standar?" data-confirm-btn="Ya, Reset FAQ" data-confirm-type="warning">
                         @csrf
                         <button type="submit" class="btn btn-light border px-3 py-2 rounded-pill shadow-sm text-secondary" title="Reset ke FAQ Bawaan">
                             <i class="bi bi-arrow-counterclockwise me-1"></i> Reset Default
@@ -837,7 +986,7 @@
                                 <button type="button" class="btn btn-sm btn-light border settings-icon-button" onclick='openEditFaq(@json($f))' title="Edit FAQ">
                                     <i class="bi bi-pencil text-primary"></i>
                                 </button>
-                                <form action="{{ route('admin.pengaturan.faq.destroy', $f['id']) }}" method="POST" class="d-inline" onsubmit="return confirm('Hapus pertanyaan ini?');">
+                                <form action="{{ route('admin.pengaturan.faq.destroy', $f['id']) }}" method="POST" class="d-inline" data-confirm="Hapus pertanyaan ini?" data-confirm-title="Hapus FAQ?" data-confirm-btn="Ya, Hapus" data-confirm-type="danger">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="btn btn-sm btn-light border settings-icon-button text-danger" title="Hapus FAQ">
@@ -919,7 +1068,7 @@
                                         title="Edit Badge">
                                         <i class="bi bi-pencil-square"></i> Edit
                                     </button>
-                                    <form action="{{ route('admin.badge.destroy', $badge) }}" method="POST" class="d-inline" onsubmit="return confirm('Apakah Anda yakin ingin menghapus badge {{ $badge->nama_badge }}?')">
+                                    <form action="{{ route('admin.badge.destroy', $badge) }}" method="POST" class="d-inline" data-confirm="Apakah Anda yakin ingin menghapus badge {{ $badge->nama_badge }}?" data-confirm-title="Hapus Badge?" data-confirm-btn="Ya, Hapus" data-confirm-type="danger">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="btn btn-sm btn-outline-danger py-1 px-2 rounded-pill" title="Hapus Badge">
@@ -1150,9 +1299,6 @@
                         <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill active word-filter-btn" data-filter="all">
                             Semua Kata Aktif ({{ count($allBadWords) }})
                         </button>
-                        <button type="button" class="btn btn-sm btn-outline-primary rounded-pill word-filter-btn" data-filter="default">
-                            Bawaan Sistem ({{ count($defaultBadWords) }})
-                        </button>
                         <button type="button" class="btn btn-sm btn-outline-warning rounded-pill word-filter-btn" data-filter="custom">
                             Kustom Admin ({{ count($customBadWords) }})
                         </button>
@@ -1168,7 +1314,7 @@
                 <div class="p-3 bg-light rounded-3 border" style="min-height: 250px; max-height: 400px; overflow-y: auto;">
                     <div class="d-flex flex-wrap gap-1.5" id="badWordCloud">
                         @foreach($defaultBadWords as $bw)
-                            <span class="badge bg-white text-secondary border px-2.5 py-1.5 fw-normal bad-word-tag d-inline-flex align-items-center gap-1.5" data-type="default" data-word="{{ strtolower($bw) }}" style="font-size: 0.82rem;">
+                            <span class="badge bg-white text-secondary border px-2.5 py-1.5 fw-normal bad-word-tag align-items-center gap-1.5" data-type="default" data-word="{{ strtolower($bw) }}" style="font-size: 0.82rem; display: inline-flex;">
                                 <span>{{ $bw }}</span>
                                 <button type="button" class="btn p-0 border-0 text-muted" style="font-size: 0.7rem; line-height: 1;" onclick="openEditWordModal('{{ addslashes($bw) }}')" title="Koreksi / Edit kata ini">
                                     <i class="bi bi-pencil-fill text-primary" style="font-size: 0.68rem;"></i>
@@ -1178,7 +1324,7 @@
                         @endforeach
 
                         @foreach($customBadWords as $cw)
-                            <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle px-2.5 py-1.5 fw-semibold bad-word-tag d-inline-flex align-items-center gap-1.5" data-type="custom" data-word="{{ strtolower($cw) }}" style="font-size: 0.82rem;">
+                            <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle px-2.5 py-1.5 fw-semibold bad-word-tag align-items-center gap-1.5" data-type="custom" data-word="{{ strtolower($cw) }}" style="font-size: 0.82rem; display: inline-flex;">
                                 <i class="bi bi-star-fill text-warning" style="font-size: 0.68rem;"></i>
                                 <span>{{ $cw }}</span>
                                 <button type="button" class="btn p-0 border-0 text-muted" style="font-size: 0.7rem; line-height: 1;" onclick="openEditWordModal('{{ addslashes($cw) }}')" title="Koreksi / Edit kata ini">
@@ -1278,10 +1424,17 @@ function openEditFaq(faq) {
 }
 
 function deleteWord(word) {
-    if (confirm(`Hapus kata '${word}' dari library kata terlarang? Kata ini tidak akan lagi diblokir otomatis oleh sistem.`)) {
-        document.getElementById('deleteWordInput').value = word;
-        document.getElementById('deleteCustomWordForm').submit();
-    }
+    window.gurukuuConfirm({
+        title: 'Hapus Kata Terlarang?',
+        text: `Hapus kata '${word}' dari library kata terlarang? Kata ini tidak akan lagi diblokir otomatis oleh sistem.`,
+        icon: 'warning',
+        confirmButtonText: 'Ya, Hapus',
+        type: 'danger',
+        onConfirm: function() {
+            document.getElementById('deleteWordInput').value = word;
+            document.getElementById('deleteCustomWordForm').submit();
+        }
+    });
 }
 
 function openEditWordModal(word) {
@@ -1292,9 +1445,16 @@ function openEditWordModal(word) {
 }
 
 function resetProfanityWords() {
-    if (confirm('Kembalikan seluruh daftar kata terlarang ke library bawaan asli sistem? Perubahan kustom Anda akan direset.')) {
-        document.getElementById('resetWordsForm').submit();
-    }
+    window.gurukuuConfirm({
+        title: 'Reset Library Kata?',
+        text: 'Kembalikan seluruh daftar kata terlarang ke library bawaan asli sistem? Perubahan kustom Anda akan direset.',
+        icon: 'warning',
+        confirmButtonText: 'Ya, Reset Library',
+        type: 'danger',
+        onConfirm: function() {
+            document.getElementById('resetWordsForm').submit();
+        }
+    });
 }
 
 
@@ -1361,20 +1521,20 @@ document.addEventListener('DOMContentLoaded', function() {
     let currentWordFilter = 'all';
 
     function filterBadWords() {
-        const query = (badWordInput.value || '').toLowerCase().trim();
+        const query = (badWordInput ? badWordInput.value : '').toLowerCase().trim();
         let visibleCount = 0;
 
         badWordTags.forEach(tag => {
-            const word = tag.dataset.word;
-            const type = tag.dataset.type;
+            const word = (tag.dataset.word || '').toLowerCase();
+            const type = tag.dataset.type || '';
             const matchesQuery = query === '' || word.includes(query);
             const matchesType = currentWordFilter === 'all' || type === currentWordFilter;
 
             if (matchesQuery && matchesType) {
-                tag.style.display = '';
+                tag.style.setProperty('display', 'inline-flex', 'important');
                 visibleCount++;
             } else {
-                tag.style.display = 'none';
+                tag.style.setProperty('display', 'none', 'important');
             }
         });
 
@@ -1395,6 +1555,13 @@ document.addEventListener('DOMContentLoaded', function() {
             filterBadWords();
         });
     });
+
+    const modalLihatKataEl = document.getElementById('modalLihatKata');
+    if (modalLihatKataEl) {
+        modalLihatKataEl.addEventListener('shown.bs.modal', function() {
+            filterBadWords();
+        });
+    }
 
     // Brand live preview
     const part1 = document.getElementById('part1Input');
@@ -1437,6 +1604,13 @@ document.addEventListener('DOMContentLoaded', function() {
         reader.onload = event => heroPreview.style.backgroundImage = `linear-gradient(rgba(10,25,47,.82),rgba(0,51,102,.75)),url('${event.target.result}')`;
         reader.readAsDataURL(this.files[0]);
     });
+
+    window.toggleResetScope = function(scope) {
+        const periodeBox = document.getElementById('resetScopePeriodeBox');
+        const dateBox = document.getElementById('resetScopeDateBox');
+        if (periodeBox) periodeBox.style.display = (scope === 'periode') ? 'block' : 'none';
+        if (dateBox) dateBox.style.display = (scope === 'rentang_tanggal') ? 'block' : 'none';
+    };
 
     const resetPhrase = document.getElementById('resetConfirmation');
     const resetAcknowledged = document.getElementById('resetAcknowledged');

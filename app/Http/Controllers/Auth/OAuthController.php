@@ -172,8 +172,10 @@ class OAuthController extends Controller
 
         Log::info("SSO SiPintu berhasil untuk user ID: {$user->id}, Role: {$user->role}, NIS/NIP: {$user->nis}");
 
-        // Tandai agar muncul pop-up konfirmasi beranda/dashboard
+        // Tandai agar muncul pop-up konfirmasi beranda/dashboard KHUSUS masuk lewat SSO gateway SiPintu
+        $ssoToken = uniqid('sipintu_', true);
         $request->session()->flash('show_welcome_landing_popup', true);
+        $request->session()->flash('sso_entry_token', $ssoToken);
 
         // 11. Redirect ke dashboard yang sesuai (mencegah redirect loop)
         if ($user->role === 'admin') {

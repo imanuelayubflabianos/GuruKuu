@@ -15,7 +15,7 @@ class Penilaian extends Model
         'siswa_id', 'guru_id', 'periode_id', 'class_id',
         'kedisiplinan', 'komunikasi',
         'tanggung_jawab', 'kreativitas', 'keramahan',
-        'total_nilai', 'kritik', 'saran',
+        'total_nilai', 'kritik', 'saran', 'helpful_count',
         'is_censored', 'censored_reason',
         'balasan_guru', 'balasan_guru_at',
     ];
@@ -23,6 +23,7 @@ class Penilaian extends Model
     protected $casts = [
         'is_censored' => 'boolean',
         'balasan_guru_at' => 'datetime',
+        'helpful_count' => 'integer',
     ];
 
     protected $attributes = [
@@ -54,6 +55,22 @@ class Penilaian extends Model
     public function balasans()
     {
         return $this->hasMany(PenilaianBalasan::class, 'penilaian_id')->oldest();
+    }
+
+    public function helpfuls()
+    {
+        return $this->hasMany(PenilaianHelpful::class, 'penilaian_id');
+    }
+
+    public function isHelpfulBy(?int $userId = null, ?string $ip = null): bool
+    {
+        if ($userId) {
+            return $this->helpfuls()->where('user_id', $userId)->exists();
+        }
+        if ($ip) {
+            return $this->helpfuls()->where('ip_address', $ip)->exists();
+        }
+        return false;
     }
 
     // ==================== METHOD ====================

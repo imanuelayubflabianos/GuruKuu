@@ -34,7 +34,7 @@
             </span>
 
             @if(isset($currentUser) && $currentUser && ($currentUser->id === $b->user_id || $currentUser->role === 'admin'))
-                <form action="{{ route('penilaian.balasan.destroy', $b) }}" method="POST" class="d-inline" onsubmit="return confirm('Hapus balasan ini?')">
+                <form action="{{ route('penilaian.balasan.destroy', $b) }}" method="POST" class="d-inline" data-confirm="Hapus balasan ini?" data-confirm-title="Hapus Balasan?" data-confirm-btn="Ya, Hapus" data-confirm-type="danger">
                     @csrf
                     @method('DELETE')
                     <button type="submit" class="btn btn-link text-danger p-0 border-0" title="Hapus Balasan" style="font-size: 0.72rem;">

@@ -62,7 +62,17 @@ class PeriodeController extends Controller
 
     public function destroy(Periode $periode)
     {
+        if ($periode->status === 'aktif') {
+            return back()->with('error', 'Periode yang sedang aktif tidak dapat dihapus. Nonaktifkan atau aktifkan periode lain terlebih dahulu.');
+        }
+
+        $nama = $periode->nama_periode;
+        \App\Models\Penilaian::where('periode_id', $periode->id)->delete();
         $periode->delete();
-        return back()->with('success', 'Periode berhasil dihapus!');
+
+        $activePeriode = Periode::where('status', 'aktif')->first();
+        \App\Models\Guru::recalculateAll($activePeriode?->id);
+
+        return back()->with('success', "Periode '{$nama}' dan seluruh data ulasan di dalamnya berhasil dihapus!");
     }
 }

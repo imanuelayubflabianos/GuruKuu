@@ -20,8 +20,8 @@
     <style>
         html { scroll-behavior: smooth; }
         :root {
-            --primary: #003366; --primary-light: #004080; --secondary: #FFC107;
-            --accent: #00A86B; --bg-light: #f5f7fa; --text-dark: #1a1a2e; --text-muted: #64748b; --border: #e2e8f0;
+            --primary: #003366; --primary-light: #004080; --secondary: #ff6600;
+            --accent: #f97316; --bg-light: #f8fafc; --text-dark: #0f172a; --text-muted: #64748b; --border: #e2e8f0;
         }
         * { font-family: 'Inter', sans-serif; box-sizing: border-box; }
         .font-mono { font-family: 'JetBrains Mono', monospace; }
@@ -43,6 +43,31 @@
             transition: all 0.3s;
             z-index: 1030;
         }
+
+        /* CIRCULAR TOPBAR ACTION BUTTONS */
+        .gk-topbar-btn {
+            width: 40px !important;
+            height: 40px !important;
+            min-width: 40px !important;
+            min-height: 40px !important;
+            max-width: 40px !important;
+            max-height: 40px !important;
+            aspect-ratio: 1 / 1 !important;
+            border-radius: 50% !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            flex-shrink: 0 !important;
+            line-height: 1 !important;
+            box-sizing: border-box !important;
+            text-decoration: none !important;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+        }
+        .gk-topbar-btn i { font-size: 1.15rem !important; line-height: 1 !important; display: inline-flex; align-items: center; justify-content: center; }
+        .gk-topbar-btn img { width: 22px !important; height: 22px !important; object-fit: contain !important; display: block !important; }
+        .gk-topbar-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important; }
         .navbar-brand-custom { font-weight: 800; font-size: 1.5rem; color: var(--primary); margin-right: 2rem; text-decoration: none; }
         .nav-menu-center { flex: 1; display: flex; justify-content: center; gap: 2rem; }
         .nav-link-custom {
@@ -361,10 +386,9 @@
                 <div class="nav-actions d-flex align-items-center gap-2">
                     <a href="{{ config('services.sipintu.base_url', 'https://sipintu.smkn1bangsri.sch.id') }}" 
                        target="_blank" rel="noopener noreferrer"
-                       class="btn btn-light border p-1 rounded-circle shadow-sm d-flex align-items-center justify-content-center"
-                       style="width: 38px; height: 38px;"
+                       class="btn btn-light border rounded-circle shadow-sm gk-topbar-btn"
                        title="Portal SiPintu">
-                        <img src="{{ asset('images/sipintu-logo.png') }}" alt="SiPintu" style="height: 22px; width: 22px; object-fit: contain;">
+                        <img src="{{ asset('images/sipintu-logo.png') }}" alt="SiPintu">
                     </a>
                     @auth
                         @php

@@ -67,12 +67,14 @@ Route::delete('/hubungi-admin/{kontak}/message', [KontakController::class, 'dest
 Route::middleware('auth')->group(function () {
     Route::get('/ganti-password', [LoginController::class, 'showGantiPassword'])->name('auth.ganti-password');
     Route::post('/ganti-password', [LoginController::class, 'gantiPassword'])->name('auth.ganti-password.post');
-    Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+    Route::match(['get', 'post'], '/logout', [LoginController::class, 'logout'])->name('logout');
 
     // MANAJEMEN SESI & PERANGKAT LOGIN
     Route::post('/auth/device/{history}/logout', [\App\Http\Controllers\Auth\DeviceSessionController::class, 'logoutDevice'])->name('auth.device.logout');
     Route::post('/auth/device/logout-others', [\App\Http\Controllers\Auth\DeviceSessionController::class, 'logoutOthers'])->name('auth.device.logout-others');
     Route::post('/auth/device/logout-all', [\App\Http\Controllers\Auth\DeviceSessionController::class, 'logoutAll'])->name('auth.device.logout-all');
+    Route::post('/auth/device/clear-history', [\App\Http\Controllers\Auth\DeviceSessionController::class, 'clearHistory'])->name('auth.device.clear-history');
+    Route::delete('/auth/device/{id}', [\App\Http\Controllers\Auth\DeviceSessionController::class, 'destroy'])->name('auth.device.destroy');
 
     // THREADED BALASAN ULASAN (SISWA, GURU, ADMIN)
     Route::post('/penilaian/{penilaian}/balasan', [\App\Http\Controllers\PenilaianBalasanController::class, 'store'])->name('penilaian.balasan.store');
@@ -81,6 +83,9 @@ Route::middleware('auth')->group(function () {
 
 // SISTEM LAPORAN / REPORT ULASAN SISWA (DAPAT DIAKSES PENGGUNA)
 Route::post('/ulasan/{penilaian}/report', [\App\Http\Controllers\UlasanReportController::class, 'store'])->name('ulasan.report');
+
+// REAKSI ULASAN BERGUNA (THUMBS UP / HELPFUL ALA PLAY STORE)
+Route::post('/penilaian/{penilaian}/helpful', [\App\Http\Controllers\PenilaianHelpfulController::class, 'toggle'])->name('penilaian.helpful');
 
 // ==================== 4. ADMIN ROUTES ====================
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
@@ -117,6 +122,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::post('/pelanggaran/read-all', [\App\Http\Controllers\Admin\PelanggaranController::class, 'markAllAsRead'])->name('pelanggaran.read-all');
     Route::delete('/pelanggaran/{pelanggaran}', [\App\Http\Controllers\Admin\PelanggaranController::class, 'destroy'])->name('pelanggaran.destroy');
     Route::post('/pelanggaran/{pelanggaran}/warn-siswa', [\App\Http\Controllers\Admin\PelanggaranController::class, 'warnSiswa'])->name('pelanggaran.warn-siswa');
+    Route::post('/pelanggaran/clean-logs', [\App\Http\Controllers\Admin\PelanggaranController::class, 'cleanLogs'])->name('pelanggaran.clean-logs');
     Route::post('/pelanggaran/reset-all', [\App\Http\Controllers\Admin\PelanggaranController::class, 'resetAll'])->name('pelanggaran.reset-all');
     Route::delete('/pelanggaran/user/{user}/reset', [\App\Http\Controllers\Admin\PelanggaranController::class, 'resetUser'])->name('pelanggaran.reset-user');
     Route::post('/pelanggaran/user/{user}/tindak', [\App\Http\Controllers\Admin\PelanggaranController::class, 'tindakUser'])->name('pelanggaran.tindak-user');
@@ -128,6 +134,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     
     Route::get('/leaderboard', [AdminLeaderboardController::class, 'index'])->name('leaderboard.index');
     Route::get('/pengaturan', [PengaturanController::class, 'index'])->name('pengaturan.index');
+    Route::post('/pengaturan/clear-cache', [AdminDashboardController::class, 'clearCache'])->name('pengaturan.clear-cache');
     Route::post('/pengaturan/landing', [PengaturanController::class, 'updateLanding'])->name('pengaturan.landing');
     Route::post('/pelanggaran/kata-toxic', [PengaturanController::class, 'updateProfanityWords'])->name('pelanggaran.words.update');
     Route::post('/pelanggaran/kata-toxic/delete', [PengaturanController::class, 'deleteProfanityWord'])->name('pelanggaran.words.delete');
@@ -138,6 +145,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::post('/pengaturan/ganti-password', [PengaturanController::class, 'gantiPassword'])->name('pengaturan.password');
     Route::post('/pengaturan/periode', [PengaturanController::class, 'simpanPeriode'])->name('pengaturan.periode');
     Route::post('/pengaturan/periode/{periode}/aktifkan', [PengaturanController::class, 'aktifkanPeriode'])->name('pengaturan.periode.aktifkan');
+    Route::delete('/pengaturan/periode/{periode}', [PengaturanController::class, 'destroyPeriode'])->name('pengaturan.periode.destroy');
     
     // PENGATURAN FAQ
     Route::post('/pengaturan/faq', [PengaturanController::class, 'storeFaq'])->name('pengaturan.faq.store');

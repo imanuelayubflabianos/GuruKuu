@@ -21,8 +21,25 @@ class LoginController extends Controller
         $this->siPintu = $siPintu;
     }
 
-    public function showLoginForm()
+    public function showLoginForm(Request $request)
     {
+        // 🔄 Opsi pergantian akun: jika user mengakses /login?switch=1 atau ?logout=1, paksa logout bersih
+        if ($request->has('switch') || $request->has('logout')) {
+            $sessionId = $request->session()->getId();
+            $userId = Auth::id();
+            if ($userId) {
+                \App\Models\LoginHistory::markLoggedOut($sessionId, $userId);
+            }
+            Auth::guard('web')->logout();
+            $request->session()->forget('url.intended');
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+            $recaller = Auth::getRecallerName();
+            \Illuminate\Support\Facades\Cookie::queue(\Illuminate\Support\Facades\Cookie::forget($recaller));
+
+            return redirect()->route('login')->with('info', 'Sesi sebelumnya telah dibersihkan. Silakan masuk dengan akun yang Anda tuju.');
+        }
+
         if (Auth::check()) {
             $user = Auth::user();
             if ($user->role === 'admin') {
@@ -40,6 +57,21 @@ class LoginController extends Controller
         // 🛡️ 1. Anti-Bot Honeypot Protection
         if ($request->filled('website_hp')) {
             return back()->withErrors(['nis' => 'Deteksi aktivitas bot yang mencurigakan.'])->withInput();
+        }
+
+        // 🛡️ Bersihkan sesi aktif lama secara menyeluruh jika user sebelumnya sudah login dengan akun/peran lain
+        if (Auth::check()) {
+            $oldSessionId = $request->session()->getId();
+            $oldUserId = Auth::id();
+            if ($oldUserId) {
+                \App\Models\LoginHistory::markLoggedOut($oldSessionId, $oldUserId);
+            }
+            Auth::guard('web')->logout();
+            $request->session()->forget('url.intended');
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+            $recaller = Auth::getRecallerName();
+            \Illuminate\Support\Facades\Cookie::queue(\Illuminate\Support\Facades\Cookie::forget($recaller));
         }
 
         $request->validate([
@@ -105,17 +137,17 @@ class LoginController extends Controller
                     ]);
                 } else {
                     \Illuminate\Support\Facades\RateLimiter::hit($throttleKey, 60);
-                    $reason = $user->deactivated_reason ? " Alasan: {$user->deactivated_reason}." : '';
+                    $reason = $user->deactivated_reason ? " Catatan Alasan: \"{$user->deactivated_reason}\"." : '';
 
                     if ($user->deactivation_type === 'berkala' && $user->deactivated_until) {
                         $untilStr = $user->deactivated_until->translatedFormat('d F Y H:i');
                         $diff = $user->deactivated_until->diffForHumans();
                         return back()->withErrors([
-                            'nis' => "Akun Anda dinonaktifkan sementara hingga {$untilStr} ({$diff}) oleh Admin / Operator Sekolah.{$reason} Silakan hubungi Admin / Operator Sekolah jika memerlukan bantuan."
+                            'nis' => "Akun Anda dinonaktifkan sementara hingga {$untilStr} ({$diff}).{$reason} Silakan hubungi Administrator / Operator Sekolah jika memerlukan bantuan."
                         ])->withInput();
                     } else {
                         return back()->withErrors([
-                            'nis' => "Akun Anda telah dinonaktifkan secara permanen oleh Admin / Operator Sekolah.{$reason} Silakan hubungi Admin / Operator Sekolah untuk pengaktifan kembali."
+                            'nis' => "Akun Anda telah dinonaktifkan secara permanen oleh Administrator Sekolah.{$reason} Silakan hubungi pihak sekolah untuk pengaktifan kembali."
                         ])->withInput();
                     }
                 }
@@ -141,9 +173,13 @@ class LoginController extends Controller
             Auth::login($user, $request->boolean('remember'));
             $request->session()->regenerate();
             \App\Models\LoginHistory::recordLogin($user, $request);
-            $request->session()->flash('show_welcome_landing_popup', true);
 
-            return redirect()->intended(route('siswa.dashboard'))
+            // 🛡️ Pastikan redirect HANYA ke dashboard siswa atau URL siswa yang valid
+            $intended = $request->session()->get('url.intended');
+            $request->session()->forget('url.intended');
+            $targetUrl = ($intended && str_contains($intended, '/siswa')) ? $intended : route('siswa.dashboard');
+
+            return redirect()->to($targetUrl)
                 ->with('success', 'Selamat datang, ' . $user->name . '!');
         }
 
@@ -203,9 +239,13 @@ class LoginController extends Controller
                 Auth::login($admin, $request->boolean('remember'));
                 $request->session()->regenerate();
                 \App\Models\LoginHistory::recordLogin($admin, $request);
-                $request->session()->flash('show_welcome_landing_popup', true);
 
-                return redirect()->intended(route('admin.dashboard'))
+                // 🛡️ Pastikan redirect HANYA ke dashboard admin atau URL admin yang valid
+                $intended = $request->session()->get('url.intended');
+                $request->session()->forget('url.intended');
+                $targetUrl = ($intended && str_contains($intended, '/admin')) ? $intended : route('admin.dashboard');
+
+                return redirect()->to($targetUrl)
                     ->with('success', 'Selamat datang, Administrator!');
             }
 
@@ -255,17 +295,17 @@ class LoginController extends Controller
                     ]);
                 } else {
                     \Illuminate\Support\Facades\RateLimiter::hit($throttleKey, 60);
-                    $reason = $user->deactivated_reason ? " Alasan: {$user->deactivated_reason}." : '';
+                    $reason = $user->deactivated_reason ? " Catatan Alasan: \"{$user->deactivated_reason}\"." : '';
 
                     if ($user->deactivation_type === 'berkala' && $user->deactivated_until) {
                         $untilStr = $user->deactivated_until->translatedFormat('d F Y H:i');
                         $diff = $user->deactivated_until->diffForHumans();
                         return back()->withErrors([
-                            'nis' => "Akun Guru Anda dinonaktifkan sementara hingga {$untilStr} ({$diff}) oleh Admin / Operator Sekolah.{$reason} Silakan hubungi Admin / Operator Sekolah jika memerlukan bantuan."
+                            'nis' => "Akun Guru Anda dinonaktifkan sementara hingga {$untilStr} ({$diff}).{$reason} Silakan hubungi Administrator / Operator Sekolah jika memerlukan bantuan."
                         ])->withInput();
                     } else {
                         return back()->withErrors([
-                            'nis' => "Akun Guru Anda telah dinonaktifkan secara permanen oleh Admin / Operator Sekolah.{$reason} Silakan hubungi Admin / Operator Sekolah untuk pengaktifan kembali."
+                            'nis' => "Akun Guru Anda telah dinonaktifkan secara permanen oleh Administrator Sekolah.{$reason} Silakan hubungi pihak sekolah untuk pengaktifan kembali."
                         ])->withInput();
                     }
                 }
@@ -291,9 +331,13 @@ class LoginController extends Controller
             Auth::login($user, $request->boolean('remember'));
             $request->session()->regenerate();
             \App\Models\LoginHistory::recordLogin($user, $request);
-            $request->session()->flash('show_welcome_landing_popup', true);
 
-            return redirect()->intended(route('guru.dashboard'))
+            // 🛡️ Pastikan redirect HANYA ke dashboard guru atau URL guru yang valid (bukan ke URL siswa!)
+            $intended = $request->session()->get('url.intended');
+            $request->session()->forget('url.intended');
+            $targetUrl = ($intended && str_contains($intended, '/guru')) ? $intended : route('guru.dashboard');
+
+            return redirect()->to($targetUrl)
                 ->with('success', 'Selamat datang, ' . $user->name . '!');
         }
 
@@ -343,12 +387,19 @@ class LoginController extends Controller
     {
         $sessionId = $request->session()->getId();
         $userId = Auth::id();
-        \App\Models\LoginHistory::markLoggedOut($sessionId, $userId);
+        if ($userId) {
+            \App\Models\LoginHistory::markLoggedOut($sessionId, $userId);
+        }
 
-        Auth::logout();
+        Auth::guard('web')->logout();
+        
+        $request->session()->forget('url.intended');
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect()->route('landing.index');
+        $recaller = Auth::getRecallerName();
+        \Illuminate\Support\Facades\Cookie::queue(\Illuminate\Support\Facades\Cookie::forget($recaller));
+
+        return redirect()->route('login')->with('logout', 'Anda telah keluar dari akun.');
     }
 }

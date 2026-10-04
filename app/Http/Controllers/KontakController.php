@@ -31,6 +31,8 @@ class KontakController extends Controller
 
     public function storeGuest(Request $request)
     {
+        $deviceId = $this->getOrCreateDeviceId($request);
+
         // 🛡️ Honeypot bot detection
         if ($request->filled('website_hp')) {
             return back()->withErrors(['pesan' => 'Aktivitas mencurigakan terdeteksi.'])->withInput();
@@ -122,8 +124,7 @@ class KontakController extends Controller
         if ($kontak->identifier !== $deviceId || $kontak->is_siswa) {
             return back()->with('error', 'Akses ditolak.');
         }
-        // Hapus permanen tanpa menyisakan teks [Pesan Dihapus]
-        $kontak->delete();
+        $kontak->update(['pesan' => '[Pesan Dihapus]']);
         return back()->with('success', 'Pesan Anda berhasil dihapus.');
     }
 
@@ -231,15 +232,14 @@ class KontakController extends Controller
     public function siswaDestroy(Kontak $kontak)
     {
         if ($kontak->identifier !== Auth::user()->nis) return back()->with('error', 'Akses ditolak.');
-        $kontak->delete();
+        $kontak->update(['pesan' => '[Pesan Dihapus]']);
         return back()->with('success', 'Pesan berhasil dihapus.');
     }
 
     public function destroySiswaMessage(Kontak $kontak)
     {
         if ($kontak->identifier !== Auth::user()->nis) return back()->with('error', 'Akses ditolak.');
-        // Hapus permanen tanpa menyisakan teks [Pesan Dihapus]
-        $kontak->delete();
+        $kontak->update(['pesan' => '[Pesan Dihapus]']);
         return back()->with('success', 'Pesan Anda berhasil dihapus.');
     }
 

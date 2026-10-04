@@ -27,7 +27,7 @@
             </ul>
         </div>
         <div class="btn-group shadow-sm">
-            <form action="{{ route('admin.sipintu.siswa.sync-all') }}" method="POST" id="formSyncSiswa" class="d-inline" onsubmit="return confirmSyncSiswa(event)">
+            <form action="{{ route('admin.sipintu.siswa.sync-all') }}" method="POST" id="formSyncSiswa" class="d-inline" data-confirm="Tarik dan sinkronkan seluruh data siswa aktif dari SiPintu Gateway ke database lokal GuruKuu sekarang?" data-confirm-title="Sinkronkan Data Siswa?" data-confirm-btn="Ya, Sinkronkan" data-confirm-type="info">
                 @csrf
                 <button type="submit" class="btn btn-success" id="btnSyncSiswa" title="Tarik dan sinkronkan seluruh data siswa dari SiPintu ke GuruKuu" style="border-top-right-radius: 0; border-bottom-right-radius: 0;">
                     <i class="bi bi-cloud-arrow-down me-1"></i> Tarik dari SiPintu
@@ -323,14 +323,23 @@ function openDeactivateModal(id, name) {
 }
 
 function confirmSyncSiswa(e) {
-    if (!confirm('Tarik dan sinkronkan seluruh data siswa aktif dari SiPintu Gateway ke database lokal GuruKuu sekarang?')) {
-        e.preventDefault();
-        return false;
-    }
-    const btn = document.getElementById('btnSyncSiswa');
-    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> Menarik Data...';
-    btn.classList.add('disabled');
-    return true;
+    e.preventDefault();
+    window.gurukuuConfirm({
+        title: 'Sinkronkan Data Siswa?',
+        text: 'Tarik dan sinkronkan seluruh data siswa aktif dari SiPintu Gateway ke database lokal GuruKuu sekarang?',
+        icon: 'question',
+        confirmButtonText: 'Ya, Sinkronkan',
+        type: 'info',
+        onConfirm: function() {
+            const btn = document.getElementById('btnSyncSiswa');
+            if (btn) {
+                btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> Menarik Data...';
+                btn.classList.add('disabled');
+            }
+            document.getElementById('formSyncSiswa').submit();
+        }
+    });
+    return false;
 }
 
 </script>

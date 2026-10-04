@@ -69,13 +69,17 @@ class GuruController extends Controller
         }
         $sudahMenilai = (bool) $penilaianSaya;
 
-        // Ambil semua penilaian/feedback siswa untuk guru ini (termasuk yang hanya memberi rating bintang)
+        // Ambil semua penilaian/feedback siswa untuk guru ini (Ulasan siswa yang login diposisikan paling atas khusus untuk siswa tsb)
+        $userId = $user->id;
         $semuaFeedback = Penilaian::with(['siswa', 'balasans.user'])
             ->where('guru_id', $guru->id)
             ->where('periode_id', $periodeId)
-            ->where(function($q) {
-                $q->where('is_censored', false)->orWhereNull('is_censored');
+            ->where(function($q) use ($userId) {
+                $q->where(function($sub) {
+                    $sub->where('is_censored', false)->orWhereNull('is_censored');
+                })->orWhere('siswa_id', $userId);
             })
+            ->orderByRaw("CASE WHEN siswa_id = ? THEN 0 ELSE 1 END", [$userId])
             ->latest()
             ->get();
 
@@ -98,8 +102,10 @@ class GuruController extends Controller
             ->whereHas('penilaian', function($q) use ($guru) {
                 $q->where('guru_id', $guru->id);
             })
-            ->with(['penilaian' => function($q) use ($guru) {
-                $q->where('guru_id', $guru->id)->latest();
+            ->with(['penilaian' => function($q) use ($guru, $userId) {
+                $q->where('guru_id', $guru->id)
+                  ->orderByRaw("CASE WHEN siswa_id = ? THEN 0 ELSE 1 END", [$userId])
+                  ->latest();
             }])
             ->latest('tanggal_mulai')
             ->get();

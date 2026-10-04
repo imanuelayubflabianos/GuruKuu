@@ -9,6 +9,7 @@ use App\Models\Pelanggaran;
 use App\Services\ProfanityFilterService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 
 class PenilaianBalasanController extends Controller
 {
@@ -19,29 +20,61 @@ class PenilaianBalasanController extends Controller
     {
         $user = Auth::user();
         if (!$user) {
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => 'Silakan login terlebih dahulu untuk membalas ulasan.'], 401);
+            }
             return back()->with('error', 'Silakan login terlebih dahulu untuk membalas ulasan.');
         }
 
         // Cek apakah akun pengirim sedang dinonaktifkan (berlaku untuk Siswa maupun Guru)
         if ($user->isDeactivated()) {
-            return back()->with('error', 'Akun Anda sedang dinonaktifkan oleh Admin/Operator Sekolah. ' . ($user->deactivated_reason ?: 'Hubungi Admin / Operator Sekolah.'));
+            $msg = 'Akun Anda sedang dinonaktifkan oleh Admin/Operator Sekolah. ' . ($user->deactivated_reason ?: 'Hubungi Admin / Operator Sekolah.');
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => $msg], 403);
+            }
+            return back()->with('error', $msg);
         }
 
-        // Cek Hak Akses Berdasarkan Role
+        // Cek Hak Akses Berdasarkan Role (Privasi: Hanya Siswa pembuat ulasan, Guru yang dinilai, atau Admin)
         if ($user->role === 'guru') {
             $guru = Guru::where('nip', $user->nis)
                 ->orWhere('email', $user->email)
                 ->first();
 
             if (!$guru || $penilaian->guru_id != $guru->id) {
-                return back()->with('error', 'Anda hanya dapat membalas ulasan yang ditujukan untuk diri Anda.');
+                $msg = 'Anda hanya dapat membalas ulasan yang ditujukan untuk diri Anda.';
+                if ($request->ajax() || $request->wantsJson()) {
+                    return response()->json(['success' => false, 'message' => $msg], 403);
+                }
+                return back()->with('error', $msg);
             }
         } elseif ($user->role === 'siswa') {
             if ($penilaian->siswa_id != $user->id) {
-                return back()->with('error', 'Anda hanya berhak membalas pada ulasan yang Anda buat.');
+                $msg = 'Diskusi ini bersifat pribadi antara guru dan siswa yang menilai.';
+                if ($request->ajax() || $request->wantsJson()) {
+                    return response()->json(['success' => false, 'message' => $msg], 403);
+                }
+                return back()->with('error', $msg);
             }
         } elseif ($user->role !== 'admin') {
-            return back()->with('error', 'Anda tidak memiliki hak akses untuk membalas ulasan ini.');
+            $msg = 'Anda tidak memiliki hak akses untuk membalas ulasan ini.';
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => $msg], 403);
+            }
+            return back()->with('error', $msg);
+        }
+
+        // ⏱️ SLOWMODE ANTI-SPAM (Mirip Discord Cooldown)
+        $cooldownSeconds = 25;
+        $slowmodeKey = "slowmode_reply_{$user->id}";
+        if ($user->role !== 'admin' && Cache::has($slowmodeKey)) {
+            $expiresAt = Cache::get($slowmodeKey);
+            $remaining = max(1, $expiresAt - now()->timestamp);
+            $msg = "Mode lambat (Slowmode) aktif seperti Discord! Harap tunggu {$remaining} detik sebelum dapat mengirim pesan lagi.";
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => $msg, 'remaining' => $remaining], 429);
+            }
+            return back()->withInput()->with('error', $msg);
         }
 
         $validated = $request->validate([
@@ -91,7 +124,7 @@ class PenilaianBalasanController extends Controller
             $isAnonim = true;
         }
 
-        PenilaianBalasan::create([
+        $balasan = PenilaianBalasan::create([
             'penilaian_id' => $penilaian->id,
             'user_id' => $user->id,
             'parent_id' => $validated['parent_id'] ?? null,
@@ -105,6 +138,26 @@ class PenilaianBalasanController extends Controller
             $penilaian->update([
                 'balasan_guru' => trim($validated['pesan']),
                 'balasan_guru_at' => now(),
+            ]);
+        }
+
+        // Aktifkan cooldown Slowmode (25 detik) untuk non-admin
+        if ($user->role !== 'admin') {
+            Cache::put($slowmodeKey, now()->addSeconds($cooldownSeconds)->timestamp, $cooldownSeconds);
+        }
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Balasan ulasan berhasil dikirimkan.',
+                'cooldown' => $user->role !== 'admin' ? $cooldownSeconds : 0,
+                'balasan' => [
+                    'id' => $balasan->id,
+                    'pesan' => $balasan->pesan,
+                    'role' => $balasan->role,
+                    'is_anonim' => $balasan->is_anonim,
+                    'created_at_human' => $balasan->created_at->diffForHumans(),
+                ]
             ]);
         }
 

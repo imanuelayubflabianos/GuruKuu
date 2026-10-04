@@ -47,20 +47,15 @@ class KontakController extends Controller
 
     public function destroyReply(Kontak $kontak)
     {
-        if ($kontak->pesan === null) {
-            $kontak->delete();
-        } else {
-            $kontak->update([
-                'balasan' => null,
-                'is_replied' => false
-            ]);
-        }
+        $kontak->update([
+            'balasan' => '[Pesan Dihapus]'
+        ]);
         return back()->with('success', 'Balasan berhasil dihapus.');
     }
 
     public function destroy(Kontak $kontak)
     {
-        $kontak->delete();
+        $kontak->update(['pesan' => '[Pesan Dihapus]']);
         return back()->with('success', 'Pesan berhasil dihapus.');
     }
 

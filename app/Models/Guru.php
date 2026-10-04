@@ -91,12 +91,19 @@ class Guru extends Model
 
     public const MIN_PENILAIAN_LEADERBOARD = 5;
 
+    protected static array $leaderboardCache = [];
+
     public static function leaderboardFor(string $mode = 'rating', ?int $kelasId = null, ?int $periodeId = null)
     {
         // Pastikan periode aktif jika tidak dispesifikasi
         if (!$periodeId) {
             $periodeAktif = Periode::where('status', 'aktif')->first();
             $periodeId = $periodeAktif?->id;
+        }
+
+        $cacheKey = $mode . '_' . ($kelasId ?? 0) . '_' . ($periodeId ?? 0);
+        if (isset(self::$leaderboardCache[$cacheKey])) {
+            return self::$leaderboardCache[$cacheKey];
         }
 
         $query = self::with(['jurusan', 'penghargaan.badge']);
@@ -110,7 +117,8 @@ class Guru extends Model
             $totalSiswa = $kelas?->jumlah_siswa ?: ($kelas?->siswa()->count() ?: 0);
 
             // Ambil penilaian siswa unik (1 siswa tidak dihitung ganda untuk guru yang sama)
-            $penilaians = Penilaian::where('class_id', $kelasId)
+            $penilaians = Penilaian::select('id', 'guru_id', 'siswa_id', 'total_nilai', 'periode_id', 'class_id')
+                ->where('class_id', $kelasId)
                 ->when($periodeId, fn ($penilaian) => $penilaian->where('periode_id', $periodeId))
                 ->latest()
                 ->get()
@@ -166,12 +174,13 @@ class Guru extends Model
                 $guru->setAttribute('leaderboard_rank', null);
             }
 
-            return $eligible->concat($notEligible);
+            return self::$leaderboardCache[$cacheKey] = $eligible->concat($notEligible);
         }
 
         // Mode Semua Guru (Rating Kepuasan)
         // Ambil penilaian periode aktif, pastikan 1 siswa tidak dihitung ganda untuk guru yang sama
-        $penilaians = Penilaian::when($periodeId, fn ($q) => $q->where('periode_id', $periodeId))
+        $penilaians = Penilaian::select('id', 'guru_id', 'siswa_id', 'total_nilai', 'periode_id')
+            ->when($periodeId, fn ($q) => $q->where('periode_id', $periodeId))
             ->latest()
             ->get()
             ->unique(fn ($p) => $p->guru_id . '_' . $p->siswa_id);
@@ -201,8 +210,7 @@ class Guru extends Model
         // Hanya tampilkan guru yang memiliki setidaknya 1 penilaian pada periode ini
         $gurusWithData = $gurus->filter(fn ($g) => $g->total_penilaian > 0);
 
-        // Group 1: Memenuhi syarat ranking (minimal 10 penilaian)
-        // Aturan urut: Rata-rata Nilai DESC -> Tie-breaker: Total Penilaian DESC -> Tie-breaker: Nama ASC
+        // Group 1: Memenuhi syarat ranking (minimal 5 penilaian)
         $eligible = $gurusWithData->filter(fn ($g) => $g->is_eligible_leaderboard)
             ->sort(function ($a, $b) {
                 if ($b->rata_rata_nilai != $a->rata_rata_nilai) {
@@ -214,8 +222,7 @@ class Guru extends Model
                 return strcmp($a->nama, $b->nama);
             })->values();
 
-        // Group 2: Belum memenuhi syarat (< 10 penilaian)
-        // Nilai tetap dihitung & tampil di tabel, namun tidak mendapatkan nomor peringkat leaderboard
+        // Group 2: Belum memenuhi syarat (< 5 penilaian)
         $notEligible = $gurusWithData->filter(fn ($g) => !$g->is_eligible_leaderboard)
             ->sort(function ($a, $b) {
                 if ($b->rata_rata_nilai != $a->rata_rata_nilai) {
@@ -236,7 +243,7 @@ class Guru extends Model
             $guru->setAttribute('leaderboard_rank', null);
         }
 
-        return $eligible->concat($notEligible);
+        return self::$leaderboardCache[$cacheKey] = $eligible->concat($notEligible);
     }
 
     // ==================== ACCESSOR & HELPER ====================
@@ -348,7 +355,7 @@ class Guru extends Model
             $periodeId = $periodeAktif?->id;
         }
 
-        $query = $this->penilaian();
+        $query = $this->penilaian()->select(['id', 'guru_id', 'siswa_id', 'total_nilai', 'periode_id']);
         if ($periodeId) {
             $query->where('periode_id', $periodeId);
         }
@@ -371,5 +378,9 @@ class Guru extends Model
         foreach ($gurus as $guru) {
             $guru->updateRataRata($periodeId);
         }
+
+        try {
+            \Illuminate\Support\Facades\Cache::flush();
+        } catch (\Throwable $e) {}
     }
 }

@@ -13,7 +13,7 @@
             <div class="fs-1 mb-2">{{ $b->icon }}</div>
             <h6 class="fw-bold">{{ $b->nama_badge }}</h6>
             <small class="text-muted d-block mb-3">{{ $b->penghargaan_count }} Guru menerima</small>
-            <form action="{{ route('admin.badge.destroy', $b) }}" method="POST" onsubmit="return confirm('Hapus badge ini?')">@csrf @method('DELETE')<button class="btn btn-sm btn-danger w-100">Hapus</button></form>
+            <form action="{{ route('admin.badge.destroy', $b) }}" method="POST" data-confirm="Hapus badge {{ $b->nama_badge }}?" data-confirm-title="Hapus Badge?" data-confirm-btn="Ya, Hapus" data-confirm-type="danger">@csrf @method('DELETE')<button class="btn btn-sm btn-danger w-100">Hapus</button></form>
         </div>
     </div>
     @endforeach

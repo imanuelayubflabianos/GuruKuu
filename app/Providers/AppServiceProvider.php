@@ -24,6 +24,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        if (!app()->runningInConsole()) {
+            @ini_set('max_execution_time', '120');
+        }
+
         Paginator::useBootstrapFive();
 
         // 1. Rate Limiters untuk Perlindungan Server & Anti-Abuse

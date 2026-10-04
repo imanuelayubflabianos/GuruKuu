@@ -101,6 +101,41 @@ class LoginHistory extends Model
         ];
     }
 
+    public static function cleanupDuplicatesForUser($userId): void
+    {
+        try {
+            if (!Schema::hasTable('login_histories')) return;
+
+            // Dapatkan riwayat terurut: prioritaskan yang masih aktif, lalu aktivitas terbaru
+            $histories = self::where('user_id', $userId)
+                ->orderByDesc('is_active')
+                ->orderByDesc('last_activity')
+                ->get();
+
+            $seenDevices = [];
+            $toDeleteIds = [];
+
+            foreach ($histories as $item) {
+                $ip = $item->ip_address ?: '127.0.0.1';
+                $device = $item->device_name ?: 'Unknown';
+                $key = "{$ip}|{$device}";
+
+                if (!isset($seenDevices[$key])) {
+                    $seenDevices[$key] = $item->id;
+                } else {
+                    // Record kedua dan seterusnya untuk perangkat & IP yang sama dihapus agar tidak menumpuk
+                    $toDeleteIds[] = $item->id;
+                }
+            }
+
+            if (!empty($toDeleteIds)) {
+                self::whereIn('id', $toDeleteIds)->delete();
+            }
+        } catch (\Throwable $e) {
+            // Silently fail
+        }
+    }
+
     public static function recordLogin($user, Request $request, ?string $sessionId = null): ?self
     {
         if (!$user) return null;
@@ -111,9 +146,45 @@ class LoginHistory extends Model
             $parsed = self::parseUserAgent($userAgent);
             $ip = $request->ip() ?: '127.0.0.1';
 
-            // Mark any previous active session with this exact session_id as logged out first
             if (Schema::hasTable('login_histories')) {
-                return self::create([
+                // Cari apakah perangkat & IP ini sudah pernah login sebelumnya
+                $existing = self::where('user_id', $user->id)
+                    ->where(function($q) use ($sessionId, $ip, $userAgent, $parsed) {
+                        $q->where('session_id', $sessionId)
+                          ->orWhere(function($sub) use ($ip, $userAgent) {
+                              $sub->where('ip_address', $ip)
+                                  ->where('user_agent', $userAgent);
+                          })
+                          ->orWhere(function($sub) use ($ip, $parsed) {
+                              $sub->where('ip_address', $ip)
+                                  ->where('device_name', $parsed['device_name']);
+                          });
+                    })
+                    ->orderByDesc('is_active')
+                    ->orderByDesc('last_activity')
+                    ->first();
+
+                if ($existing) {
+                    $existing->update([
+                        'session_id' => $sessionId,
+                        'ip_address' => $ip,
+                        'user_agent' => $userAgent,
+                        'device_name' => $parsed['device_name'],
+                        'device_type' => $parsed['device_type'],
+                        'platform' => $parsed['platform'],
+                        'browser' => $parsed['browser'],
+                        'status' => 'active',
+                        'is_active' => true,
+                        'login_at' => now(),
+                        'last_activity' => now(),
+                        'logout_at' => null,
+                    ]);
+
+                    self::cleanupDuplicatesForUser($user->id);
+                    return $existing;
+                }
+
+                $newRecord = self::create([
                     'user_id' => $user->id,
                     'session_id' => $sessionId,
                     'ip_address' => $ip,
@@ -127,6 +198,9 @@ class LoginHistory extends Model
                     'login_at' => now(),
                     'last_activity' => now(),
                 ]);
+
+                self::cleanupDuplicatesForUser($user->id);
+                return $newRecord;
             }
         } catch (\Throwable $e) {
             // Silently fail if table not yet migrated
@@ -154,7 +228,7 @@ class LoginHistory extends Model
                     'ip_address' => $request->ip() ?: $history->ip_address,
                 ]);
             } else {
-                // If not tracked yet in this session, track now
+                // If not tracked yet in this session, track now (will reuse same device row if matched)
                 self::recordLogin($user, $request, $sessionId);
             }
         } catch (\Throwable $e) {
@@ -195,6 +269,9 @@ class LoginHistory extends Model
                 if (request()) {
                     self::recordActivity($user, request());
                 }
+
+                // Bersihkan duplikasi lama untuk IP & perangkat yang sama
+                self::cleanupDuplicatesForUser($user->id);
 
                 // Check active sessions from Laravel's sessions table if driver is database
                 $activeSessionIds = [];

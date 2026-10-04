@@ -56,9 +56,12 @@ class DeviceSessionController extends Controller
 
         // If user logged out their current device
         if ($sessionId === $currentSessionId) {
-            Auth::logout();
+            Auth::guard('web')->logout();
+            $request->session()->forget('url.intended');
             $request->session()->invalidate();
             $request->session()->regenerateToken();
+            $recaller = Auth::getRecallerName();
+            \Illuminate\Support\Facades\Cookie::queue(\Illuminate\Support\Facades\Cookie::forget($recaller));
             return redirect()->route('login')->with('info', 'Anda telah keluar dari perangkat ini.');
         }
 
@@ -115,10 +118,57 @@ class DeviceSessionController extends Controller
                 ]);
         }
 
-        Auth::logout();
+        Auth::guard('web')->logout();
+        $request->session()->forget('url.intended');
         $request->session()->invalidate();
         $request->session()->regenerateToken();
+        $recaller = Auth::getRecallerName();
+        \Illuminate\Support\Facades\Cookie::queue(\Illuminate\Support\Facades\Cookie::forget($recaller));
 
         return redirect()->route('login')->with('info', 'Seluruh perangkat berhasil dikeluarkan. Silakan login kembali.');
+    }
+
+    public function clearHistory(Request $request)
+    {
+        $user = Auth::user();
+        $currentSessionId = $request->session()->getId();
+
+        if (Schema::hasTable('login_histories')) {
+            $activeSessionIds = [];
+            if (Schema::hasTable('sessions')) {
+                $activeSessionIds = DB::table('sessions')
+                    ->where('user_id', $user->id)
+                    ->pluck('id')
+                    ->toArray();
+            }
+
+            // Hapus riwayat yang sudah logout / tidak aktif
+            LoginHistory::where('user_id', $user->id)
+                ->where(function ($q) use ($currentSessionId, $activeSessionIds) {
+                    $q->where('is_active', false)
+                      ->orWhere('status', 'logged_out')
+                      ->orWhere(function ($sub) use ($currentSessionId, $activeSessionIds) {
+                          $sub->where('session_id', '!=', $currentSessionId);
+                          if (!empty($activeSessionIds)) {
+                              $sub->whereNotIn('session_id', $activeSessionIds);
+                          }
+                      });
+                })
+                ->delete();
+        }
+
+        return back()->with('success', 'Riwayat sesi perangkat yang sudah keluar berhasil dibersihkan.');
+    }
+
+    public function destroy(Request $request, $id)
+    {
+        $user = Auth::user();
+        if (Schema::hasTable('login_histories')) {
+            LoginHistory::where('id', $id)
+                ->where('user_id', $user->id)
+                ->delete();
+        }
+
+        return back()->with('success', 'Catatan riwayat perangkat berhasil dihapus.');
     }
 }

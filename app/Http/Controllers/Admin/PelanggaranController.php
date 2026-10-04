@@ -8,6 +8,8 @@ use App\Models\Penilaian;
 use App\Models\UlasanReport;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class PelanggaranController extends Controller
 {
@@ -48,14 +50,16 @@ class PelanggaranController extends Controller
 
         $pelanggarans = $query->latest()->paginate(15)->withQueryString();
 
+        $hasReportTable = Schema::hasTable('ulasan_reports');
+
         // Statistik ringkas
         $stats = [
             'total' => Pelanggaran::count(),
             'unread' => Pelanggaran::where('is_read', false)->count(),
             'penilaian' => Pelanggaran::where('tipe', 'penilaian_toxic')->count(),
             'kontak' => Pelanggaran::where('tipe', 'kontak_toxic')->count(),
-            'reports' => UlasanReport::count(),
-            'reported_items' => UlasanReport::distinct('penilaian_id')->count('penilaian_id'),
+            'reports' => $hasReportTable ? UlasanReport::count() : 0,
+            'reported_items' => $hasReportTable ? UlasanReport::distinct('penilaian_id')->count('penilaian_id') : 0,
         ];
 
         // Peringkat Siswa yang melanggar aturan (role siswa)
@@ -89,20 +93,28 @@ class PelanggaranController extends Controller
             });
 
         // Laporan Ulasan dari User
-        $reportedReviews = UlasanReport::with(['penilaian.guru', 'penilaian.siswa', 'user'])
-            ->selectRaw('penilaian_id, count(*) as total_reports, max(created_at) as latest_report_at')
-            ->groupBy('penilaian_id')
-            ->orderByDesc('total_reports')
-            ->paginate(15, ['*'], 'page_reports')
-            ->withQueryString();
+        if ($hasReportTable) {
+            $reportedReviews = UlasanReport::with(['penilaian.guru', 'penilaian.siswa', 'user'])
+                ->selectRaw('penilaian_id, count(*) as total_reports, max(created_at) as latest_report_at')
+                ->groupBy('penilaian_id')
+                ->orderByDesc('total_reports')
+                ->paginate(15, ['*'], 'page_reports')
+                ->withQueryString();
 
-        $reportedReviews->getCollection()->transform(function ($item) {
-            $item->reports_detail = UlasanReport::with('user')
-                ->where('penilaian_id', $item->penilaian_id)
-                ->latest()
-                ->get();
-            return $item;
-        });
+            $reportedReviews->getCollection()->transform(function ($item) {
+                $item->reports_detail = UlasanReport::with('user')
+                    ->where('penilaian_id', $item->penilaian_id)
+                    ->latest()
+                    ->get();
+                return $item;
+            });
+        } else {
+            $reportedReviews = new LengthAwarePaginator([], 0, 15, 1, [
+                'path' => request()->url(),
+                'query' => request()->query(),
+                'pageName' => 'page_reports',
+            ]);
+        }
 
         return view('admin.pelanggaran.index', compact('pelanggarans', 'stats', 'topSiswa', 'topGuru', 'reportedReviews'));
     }
@@ -226,6 +238,31 @@ class PelanggaranController extends Controller
         return back()->with('success', 'Seluruh log pelanggaran telah berhasil direset dan seluruh akun siswa & guru dipulihkan normal.');
     }
 
+    public function cleanLogs(Request $request)
+    {
+        $mode = $request->input('mode', 'read');
+
+        if ($mode === 'read') {
+            $count = Pelanggaran::where('is_read', true)->count();
+            Pelanggaran::where('is_read', true)->delete();
+            return back()->with('success', "Sebanyak {$count} catatan log insiden yang sudah dibaca berhasil dibersihkan dari database.");
+        }
+
+        if ($mode === 'old') {
+            $count = Pelanggaran::where('created_at', '<', now()->subDays(30))->count();
+            Pelanggaran::where('created_at', '<', now()->subDays(30))->delete();
+            return back()->with('success', "Sebanyak {$count} catatan log insiden lama (> 30 hari) berhasil dibersihkan dari database.");
+        }
+
+        if ($mode === 'all') {
+            $count = Pelanggaran::count();
+            Pelanggaran::query()->delete();
+            return back()->with('success', "Seluruh riwayat catatan log insiden ({$count} data) berhasil dibersihkan tanpa mengubah status akun pengguna.");
+        }
+
+        return back()->with('info', 'Tidak ada data log yang dibersihkan.');
+    }
+
     public function resetUser(User $user)
     {
         Pelanggaran::where('user_id', $user->id)->delete();
@@ -311,7 +348,9 @@ class PelanggaranController extends Controller
     public function dismissReportedReview($penilaian)
     {
         $penilaianId = $penilaian instanceof Penilaian ? $penilaian->id : $penilaian;
-        UlasanReport::where('penilaian_id', $penilaianId)->delete();
+        if (Schema::hasTable('ulasan_reports')) {
+            UlasanReport::where('penilaian_id', $penilaianId)->delete();
+        }
         Pelanggaran::where('penilaian_id', $penilaianId)->where('tipe', 'ulasan_reported')->delete();
 
         return back()->with('success', 'Laporan ulasan berhasil ditolak dan dibersihkan dari daftar laporan.');
@@ -326,7 +365,9 @@ class PelanggaranController extends Controller
         $periodeId = $penilaian->periode_id;
         $penilaianId = $penilaian->id;
 
-        UlasanReport::where('penilaian_id', $penilaianId)->delete();
+        if (Schema::hasTable('ulasan_reports')) {
+            UlasanReport::where('penilaian_id', $penilaianId)->delete();
+        }
         Pelanggaran::where('penilaian_id', $penilaianId)->delete();
         $penilaian->delete();
 

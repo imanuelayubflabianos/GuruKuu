@@ -20,17 +20,17 @@ class DashboardController extends Controller
             : null;
 
         // Semua Guru di sekolah
-        $semuaGuru = \App\Models\Guru::with('jurusan')->withCount('penilaian')->get();
+        $semuaGuru = \App\Models\Guru::with('jurusan')
+            ->withCount(['penilaian' => function ($q) use ($periodeAktif) {
+                if ($periodeAktif) $q->where('periode_id', $periodeAktif->id);
+            }])
+            ->get();
         $guruDiKelas = $semuaGuru; // Kompatibel dengan view
         $guruNormada = $semuaGuru->where('kategori', 'normada');
         $guruProduktif = $semuaGuru->where('kategori', 'produktif');
 
-        // ✅ TOP GURU SEKOLAH
-        $topGuruRated = $semuaGuru->filter(fn ($guru) => $guru->penilaian_count > 0)
-            ->sortByDesc(fn($g) => ($g->rata_rata_nilai * 0.7) + ($g->rasio_penilaian * 0.3))
-            ->values()->take(3);
-        
-        $topGuru = $topGuruRated;
+        // ✅ TOP GURU SEKOLAH (Sesuai Leaderboard Resmi Periode Aktif)
+        $topGuru = \App\Models\Guru::leaderboardFor('rating', null, $periodeAktif?->id)->take(3);
 
         // Status penilaian siswa
         $sudahDinilai = $periodeAktif
@@ -41,7 +41,7 @@ class DashboardController extends Controller
 
         // Riwayat terakhir
         $riwayatTerakhir = Penilaian::where('siswa_id', $user->id)
-            ->with('guru')->latest()->take(3)->get();
+            ->with(['guru.jurusan'])->latest()->take(8)->get();
 
         $notifikasiPelanggaran = Pelanggaran::where('user_id', $user->id)
             ->where('siswa_is_read', false)

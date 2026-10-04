@@ -105,6 +105,38 @@ class PengaturanController extends Controller
 
         $semuaPeriode = Periode::orderBy('tahun_ajaran', 'desc')->orderBy('semester', 'desc')->get();
         $jumlahPenilaian = Penilaian::count();
+        // System & Maintenance stats
+        $logSize = 0;
+        $logFiles = glob(storage_path('logs/*.log'));
+        if (!empty($logFiles)) {
+            foreach ($logFiles as $lf) {
+                if (is_file($lf)) $logSize += filesize($lf);
+            }
+        }
+        $logSizeFormatted = $logSize > 1048576 
+            ? round($logSize / 1048576, 2) . ' MB' 
+            : round($logSize / 1024, 1) . ' KB';
+
+        $expiredSessionsCount = 0;
+        if (\Illuminate\Support\Facades\Schema::hasTable('sessions')) {
+            $lifetime = config('session.lifetime', 120) * 60;
+            $expiredSessionsCount = \Illuminate\Support\Facades\DB::table('sessions')
+                ->where('last_activity', '<', time() - $lifetime)
+                ->count();
+        }
+
+        $inactiveLoginHistoriesCount = 0;
+        if (\Illuminate\Support\Facades\Schema::hasTable('login_histories')) {
+            $inactiveLoginHistoriesCount = \App\Models\LoginHistory::where('is_active', false)->count();
+        }
+
+        $systemStats = [
+            'log_size' => $logSizeFormatted,
+            'log_bytes' => $logSize,
+            'expired_sessions' => $expiredSessionsCount,
+            'inactive_histories' => $inactiveLoginHistoriesCount,
+        ];
+
         $badges = \App\Models\Badge::withCount('penghargaan')->get();
 
         return view('admin.pengaturan.index', compact(
@@ -116,7 +148,8 @@ class PengaturanController extends Controller
             'customBadWords',
             'allBadWords',
             'faqs',
-            'badges'
+            'badges',
+            'systemStats'
         ));
     }
 
@@ -613,14 +646,24 @@ class PengaturanController extends Controller
     public function reset(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'reset_confirmation' => ['required', 'string', 'in:HAPUS PENILAIAN'],
-            'reset_acknowledged' => ['accepted'],
+            'scope'                  => ['nullable', 'string', 'in:semua,periode,rentang_tanggal'],
+            'filter_periode_id'      => ['nullable', 'required_if:scope,periode', 'exists:periodes,id'],
+            'filter_tanggal_mulai'   => ['nullable', 'required_if:scope,rentang_tanggal', 'date'],
+            'filter_tanggal_selesai' => ['nullable', 'required_if:scope,rentang_tanggal', 'date', 'after_or_equal:filter_tanggal_mulai'],
+            'reset_confirmation'     => ['required', 'string', 'in:HAPUS PENILAIAN'],
+            'reset_acknowledged'     => ['accepted'],
             'reset_current_password' => ['required', 'string'],
         ], [
-            'reset_confirmation.required' => 'Ketik HAPUS PENILAIAN untuk melanjutkan.',
-            'reset_confirmation.in' => 'Teks konfirmasi tidak sesuai.',
-            'reset_acknowledged.accepted' => 'Anda harus menyetujui peringatan penghapusan.',
-            'reset_current_password.required' => 'Password administrator wajib diisi.',
+            'scope.in'                              => 'Pilihan cakupan penghapusan tidak valid.',
+            'filter_periode_id.required_if'         => 'Silakan pilih periode yang ingin dihapus.',
+            'filter_periode_id.exists'              => 'Periode yang dipilih tidak ditemukan.',
+            'filter_tanggal_mulai.required_if'      => 'Tanggal mulai wajib diisi.',
+            'filter_tanggal_selesai.required_if'    => 'Tanggal selesai wajib diisi.',
+            'filter_tanggal_selesai.after_or_equal' => 'Tanggal selesai tidak boleh sebelum tanggal mulai.',
+            'reset_confirmation.required'           => 'Ketik HAPUS PENILAIAN untuk melanjutkan.',
+            'reset_confirmation.in'                 => 'Teks konfirmasi tidak sesuai.',
+            'reset_acknowledged.accepted'           => 'Anda harus menyetujui peringatan penghapusan.',
+            'reset_current_password.required'       => 'Password administrator wajib diisi.',
         ]);
 
         $redirect = redirect()->to(route('admin.pengaturan.index') . '#tabAkun');
@@ -635,24 +678,42 @@ class PengaturanController extends Controller
                 ->withInput();
         }
 
-        try {
-            DB::transaction(function () {
-                // DELETE menghormati foreign key: balasan terhapus via cascade dan log
-                // pelanggaran dipertahankan sebagai audit dengan penilaian_id menjadi null.
-                Penilaian::query()->delete();
+        $scope = $request->input('scope', 'semua');
+        $keterangan = 'Seluruh data penilaian';
 
-                Guru::query()->update([
-                    'rata_rata_nilai' => 0,
-                    'total_penilaian' => 0,
-                ]);
+        try {
+            DB::transaction(function () use ($scope, $request, &$keterangan) {
+                $query = Penilaian::query();
+
+                if ($scope === 'periode') {
+                    $targetPeriode = Periode::findOrFail($request->input('filter_periode_id'));
+                    $query->where('periode_id', $targetPeriode->id);
+                    $count = $query->count();
+                    $query->delete();
+                    $keterangan = "Data penilaian periode '{$targetPeriode->nama_periode}' ({$count} ulasan)";
+                } elseif ($scope === 'rentang_tanggal') {
+                    $mulai = \Carbon\Carbon::parse($request->input('filter_tanggal_mulai'))->startOfDay();
+                    $selesai = \Carbon\Carbon::parse($request->input('filter_tanggal_selesai'))->endOfDay();
+                    $query->whereBetween('created_at', [$mulai, $selesai]);
+                    $count = $query->count();
+                    $query->delete();
+                    $keterangan = "Data penilaian dari {$mulai->format('d/m/Y')} s/d {$selesai->format('d/m/Y')} ({$count} ulasan)";
+                } else {
+                    $count = $query->count();
+                    $query->delete();
+                    $keterangan = "Seluruh data penilaian ({$count} ulasan)";
+                }
+
+                $activePeriode = Periode::where('status', 'aktif')->first();
+                Guru::recalculateAll($activePeriode?->id);
             });
         } catch (\Throwable $e) {
             report($e);
 
-            return $redirect->with('error', 'Reset tidak dapat diselesaikan. Tidak ada data yang diubah.');
+            return $redirect->with('error', 'Penghapusan tidak dapat diselesaikan: ' . $e->getMessage());
         }
 
-        return $redirect->with('success', 'Seluruh data penilaian telah dihapus. Log pelanggaran tetap tersimpan sebagai audit.');
+        return $redirect->with('success', "{$keterangan} berhasil dihapus permanen. Statistik guru telah diperbarui.");
     }
 
     public function gantiPassword(Request $request)
@@ -734,5 +795,25 @@ class PengaturanController extends Controller
         Guru::recalculateAll($periode->id);
 
         return back()->with('success', "Periode '{$periode->nama_periode}' sekarang aktif! Seluruh statistik & leaderboard telah disinkronkan ke periode ini.");
+    }
+
+    public function destroyPeriode(Periode $periode)
+    {
+        if ($periode->status === 'aktif') {
+            return redirect()->to(route('admin.pengaturan.index') . '#tabPeriode')
+                ->with('error', 'Periode yang sedang aktif tidak dapat dihapus. Nonaktifkan atau aktifkan periode lain terlebih dahulu.');
+        }
+
+        $nama = $periode->nama_periode;
+
+        // Cascade delete penilaians on this periode if any
+        Penilaian::where('periode_id', $periode->id)->delete();
+        $periode->delete();
+
+        $activePeriode = Periode::where('status', 'aktif')->first();
+        Guru::recalculateAll($activePeriode?->id);
+
+        return redirect()->to(route('admin.pengaturan.index') . '#tabPeriode')
+            ->with('success', "Periode '{$nama}' dan seluruh data ulasan di dalamnya berhasil dihapus.");
     }
 }

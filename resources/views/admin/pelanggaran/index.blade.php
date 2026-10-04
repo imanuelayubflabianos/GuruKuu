@@ -7,8 +7,8 @@
     <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
         <div>
             <div class="page-label">AUDIT & KEAMANAN SISTEM</div>
-            <h1 class="page-title d-flex align-items-center gap-2">
-                <i class="bi bi-shield-exclamation text-danger"></i> Log & Peringkat Pelanggaran
+            <h1 class="page-title">
+                Log & Peringkat Pelanggaran
             </h1>
             <p class="page-subtitle mb-0">Pantau catatan insiden kata terlarang, peringkat pelanggar siswa & guru, serta kelola tindakan sanksi akun.</p>
         </div>
@@ -23,9 +23,49 @@
             @endif
 
             @if(($stats['total'] ?? 0) > 0)
+                <div class="dropdown d-inline-block">
+                    <button class="btn btn-outline-secondary btn-sm dropdown-toggle d-inline-flex align-items-center gap-1.5" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-trash3 text-danger"></i>
+                        <span>Bersihkan Log</span>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end shadow border-0 py-2" style="border-radius: 12px; font-size: 0.85rem; min-width: 245px; box-shadow: 0 10px 30px rgba(0,0,0,0.12) !important;">
+                        <li>
+                            <form action="{{ route('admin.pelanggaran.clean-logs') }}" method="POST" data-confirm="Hapus semua catatan log insiden yang statusnya SUDAH DIBACA? Catatan yang belum dibaca akan tetap tersimpan." data-confirm-title="Bersihkan Log Terbaca?" data-confirm-btn="Ya, Bersihkan" data-confirm-type="warning">
+                                @csrf
+                                <input type="hidden" name="mode" value="read">
+                                <button type="submit" class="dropdown-item py-2 px-3 d-flex align-items-center gap-2">
+                                    <i class="bi bi-check2-circle text-success fs-6"></i>
+                                    <span>Hapus Log Terbaca</span>
+                                </button>
+                            </form>
+                        </li>
+                        <li>
+                            <form action="{{ route('admin.pelanggaran.clean-logs') }}" method="POST" data-confirm="Hapus seluruh log insiden yang sudah berumur lebih dari 30 hari?" data-confirm-title="Bersihkan Log Lama?" data-confirm-btn="Ya, Bersihkan" data-confirm-type="warning">
+                                @csrf
+                                <input type="hidden" name="mode" value="old">
+                                <button type="submit" class="dropdown-item py-2 px-3 d-flex align-items-center gap-2">
+                                    <i class="bi bi-clock-history text-warning fs-6"></i>
+                                    <span>Hapus Log Lama (> 30 Hari)</span>
+                                </button>
+                            </form>
+                        </li>
+                        <li><hr class="dropdown-divider my-1"></li>
+                        <li>
+                            <form action="{{ route('admin.pelanggaran.clean-logs') }}" method="POST" data-confirm="PERINGATAN: Kosongkan SEMUA riwayat catatan log pelanggaran sekarang? Status sanksi akun pengguna tidak akan diubah." data-confirm-title="Kosongkan Semua Log Pelanggaran?" data-confirm-btn="Ya, Kosongkan Semua" data-confirm-type="danger">
+                                @csrf
+                                <input type="hidden" name="mode" value="all">
+                                <button type="submit" class="dropdown-item py-2 px-3 d-flex align-items-center gap-2 text-danger">
+                                    <i class="bi bi-trash3-fill text-danger fs-6"></i>
+                                    <span>Kosongkan Semua Catatan Log</span>
+                                </button>
+                            </form>
+                        </li>
+                    </ul>
+                </div>
+
                 <button type="button" class="btn btn-outline-danger btn-sm d-inline-flex align-items-center gap-1.5" data-bs-toggle="modal" data-bs-target="#modalResetAllPelanggaran">
                     <i class="bi bi-arrow-counterclockwise"></i>
-                    <span>Reset Seluruh Log</span>
+                    <span>Reset Log & Pulihkan Akun</span>
                 </button>
             @endif
         </div>
@@ -65,10 +105,10 @@
             </div>
         </div>
         <div class="col-sm-6 col-xl">
-            <div class="card-custom p-3 h-100 shadow-xs position-relative" style="border: 1px solid #e2e8f0; border-top: 3.5px solid #f59e0b !important; background: #ffffff;">
+            <div class="card-custom p-3 h-100 shadow-xs position-relative" style="border: 1px solid #e2e8f0; border-top: 3.5px solid #ff6600 !important; background: #ffffff;">
                 <div class="d-flex align-items-center justify-content-between mb-2">
                     <span class="small fw-bold text-muted font-mono" style="font-size: 0.72rem; letter-spacing: 0.5px;">MODERASI ULASAN</span>
-                    <div class="rounded-circle d-flex align-items-center justify-content-center text-warning" style="width: 26px; height: 26px; background: rgba(245, 158, 11, 0.1);">
+                    <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 26px; height: 26px; background: rgba(255, 102, 0, 0.1); color: #ff6600;">
                         <i class="bi bi-chat-quote-fill" style="font-size: 0.85rem;"></i>
                     </div>
                 </div>
@@ -77,10 +117,10 @@
             </div>
         </div>
         <div class="col-sm-6 col-xl">
-            <div class="card-custom p-3 h-100 shadow-xs position-relative" style="border: 1px solid #e2e8f0; border-top: 3.5px solid #0284c7 !important; background: #ffffff;">
+            <div class="card-custom p-3 h-100 shadow-xs position-relative" style="border: 1px solid #e2e8f0; border-top: 3.5px solid #004d99 !important; background: #ffffff;">
                 <div class="d-flex align-items-center justify-content-between mb-2">
                     <span class="small fw-bold text-muted font-mono" style="font-size: 0.72rem; letter-spacing: 0.5px;">PESAN BANTUAN</span>
-                    <div class="rounded-circle d-flex align-items-center justify-content-center text-info" style="width: 26px; height: 26px; background: rgba(14, 165, 233, 0.1);">
+                    <div class="rounded-circle d-flex align-items-center justify-content-center text-primary" style="width: 26px; height: 26px; background: rgba(0, 77, 153, 0.1);">
                         <i class="bi bi-envelope-exclamation-fill" style="font-size: 0.85rem;"></i>
                     </div>
                 </div>
@@ -89,10 +129,10 @@
             </div>
         </div>
         <div class="col-sm-6 col-xl">
-            <div class="card-custom p-3 h-100 shadow-xs position-relative" style="border: 1px solid #e2e8f0; border-top: 3.5px solid #8b5cf6 !important; background: #ffffff;">
+            <div class="card-custom p-3 h-100 shadow-xs position-relative" style="border: 1px solid #e2e8f0; border-top: 3.5px solid #ff6600 !important; background: #ffffff;">
                 <div class="d-flex align-items-center justify-content-between mb-2">
                     <span class="small fw-bold text-muted font-mono" style="font-size: 0.72rem; letter-spacing: 0.5px;">LAPORAN DARI USER</span>
-                    <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 26px; height: 26px; background: rgba(139, 92, 246, 0.1); color: #8b5cf6;">
+                    <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 26px; height: 26px; background: rgba(255, 102, 0, 0.1); color: #ff6600;">
                         <i class="bi bi-flag-fill" style="font-size: 0.85rem;"></i>
                     </div>
                 </div>
@@ -176,16 +216,16 @@
             <div class="card-custom overflow-hidden" style="border: 1px solid #e2e8f0;">
                 <div class="table-responsive">
                     <table class="table table-custom table-hover align-middle mb-0">
-                        <thead class="bg-light">
-                            <tr>
-                                <th style="width: 45px;">Status</th>
-                                <th style="width: 150px;">Waktu & Tanggal</th>
-                                <th>Identitas Pelanggar</th>
-                                <th>Tipe & Sasaran</th>
-                                <th>Kata Terdeteksi</th>
-                                <th>Isi Percobaan Komentar</th>
-                                <th>Tindakan Sistem</th>
-                                <th class="text-center" style="width: 110px;">Aksi</th>
+                        <thead>
+                            <tr class="text-muted font-mono" style="font-size: 0.74rem; letter-spacing: 0.5px; background: #f8fafc; border-bottom: 2px solid #e2e8f0;">
+                                <th class="text-center py-3" style="width: 50px;">STATUS</th>
+                                <th class="py-3" style="width: 140px;">WAKTU</th>
+                                <th class="py-3" style="min-width: 200px;">IDENTITAS PELANGGAR</th>
+                                <th class="py-3" style="min-width: 160px;">TIPE & SASARAN</th>
+                                <th class="py-3" style="min-width: 130px;">KATA TERDETEKSI</th>
+                                <th class="text-center py-3" style="width: 130px;">ISI ULASAN</th>
+                                <th class="py-3" style="min-width: 140px;">TINDAKAN</th>
+                                <th class="text-center py-3" style="width: 85px;">AKSI</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -270,18 +310,24 @@
                                             <span class="text-muted small">-</span>
                                         @endif
                                     </td>
-                                    <td>
-                                        <div class="small text-break" style="max-width: 260px; line-height: 1.4;">
-                                            &ldquo;{{ Str::limit($p->isi_teks, 80) }}&rdquo;
-                                        </div>
-                                        @if(strlen($p->isi_teks) > 80)
-                                            <details class="mt-1">
-                                                <summary class="text-primary small" style="cursor: pointer;">Teks lengkap</summary>
-                                                <div class="p-2 bg-light rounded small mt-1 border text-break">
-                                                    {{ $p->isi_teks }}
-                                                </div>
-                                            </details>
-                                        @endif
+                                    <td class="text-center">
+                                        <button type="button" 
+                                            class="btn btn-sm btn-outline-primary rounded-pill px-2.5 py-1 d-inline-flex align-items-center gap-1.5 shadow-xs" 
+                                            onclick="openModalDetailUlasan(this)"
+                                            data-nama="{{ e($p->user?->name ?? 'Anonim') }}"
+                                            data-role="{{ e(ucfirst($p->user?->role ?? 'Tamu')) }}"
+                                            data-nis="{{ e($p->user?->nis ?? '-') }}"
+                                            data-kelas="{{ e($p->user?->role === 'guru' ? ($p->user?->jurusan?->nama_jurusan ?? 'Guru') : ($p->user?->nama_kelas ?? '-')) }}"
+                                            data-sasaran="{{ e($p->guru?->nama ?? '-') }}"
+                                            data-tipe="{{ e($p->tipe_label) }}"
+                                            data-waktu="{{ e($p->created_at->translatedFormat('d F Y, H:i')) }} WIB ({{ e($p->created_at->diffForHumans()) }})"
+                                            data-kata='@json($p->kata_terdeteksi ?? [])'
+                                            data-isi="{{ e($p->isi_teks) }}"
+                                            data-tindakan="{{ e($p->tindakan) }}"
+                                            title="Klik untuk melihat teks ulasan lengkap">
+                                            <i class="bi bi-chat-quote-fill"></i>
+                                            <span class="fw-semibold" style="font-size: 0.78rem;">Lihat Ulasan</span>
+                                        </button>
                                     </td>
                                     <td>
                                         @if($p->tindakan === 'dinonaktifkan_permanen')
@@ -308,7 +354,7 @@
                                                     </button>
                                                 </form>
                                             @endif
-                                            <form action="{{ route('admin.pelanggaran.destroy', $p) }}" method="POST" class="d-inline" onsubmit="return confirm('Hapus catatan log pelanggaran ini?')" title="Hapus Log">
+                                            <form action="{{ route('admin.pelanggaran.destroy', $p) }}" method="POST" class="d-inline" data-confirm="Hapus catatan log pelanggaran ini?" data-confirm-title="Hapus Log Pelanggaran?" data-confirm-btn="Ya, Hapus" data-confirm-type="danger" title="Hapus Log">
                                                 @csrf @method('DELETE')
                                                 <button type="submit" class="btn btn-sm btn-light border text-danger rounded-circle p-1" style="width: 28px; height: 28px;">
                                                     <i class="bi bi-trash"></i>
@@ -434,7 +480,7 @@
                                     <td class="text-center">
                                         @if($siswaUser)
                                             <div class="d-flex align-items-center justify-content-center gap-1.5">
-                                                <form action="{{ route('admin.pelanggaran.reset-user', $siswaUser) }}" method="POST" onsubmit="return confirm('Pulihkan akun siswa {{ $siswaUser->name }} dan bersihkan seluruh catatan pelanggarannya?')">
+                                                <form action="{{ route('admin.pelanggaran.reset-user', $siswaUser) }}" method="POST" data-confirm="Pulihkan akun siswa {{ $siswaUser->name }} dan bersihkan seluruh catatan pelanggarannya?" data-confirm-title="Pulihkan Akun Siswa?" data-confirm-btn="Ya, Pulihkan" data-confirm-type="warning">
                                                     @csrf @method('DELETE')
                                                     <button type="submit" class="btn btn-sm btn-outline-success d-inline-flex align-items-center gap-1 rounded-pill px-2.5 py-1" title="Pulihkan Akun Siswa">
                                                         <i class="bi bi-arrow-counterclockwise"></i>
@@ -560,7 +606,7 @@
                                     <td class="text-center">
                                         @if($guruUser)
                                             <div class="d-flex align-items-center justify-content-center gap-1.5">
-                                                <form action="{{ route('admin.pelanggaran.reset-user', $guruUser) }}" method="POST" onsubmit="return confirm('Pulihkan akun guru {{ $guruUser->name }} dan bersihkan seluruh catatan pelanggarannya?')">
+                                                <form action="{{ route('admin.pelanggaran.reset-user', $guruUser) }}" method="POST" data-confirm="Pulihkan akun guru {{ $guruUser->name }} dan bersihkan seluruh catatan pelanggarannya?" data-confirm-title="Pulihkan Akun Guru?" data-confirm-btn="Ya, Pulihkan" data-confirm-type="warning">
                                                     @csrf @method('DELETE')
                                                     <button type="submit" class="btn btn-sm btn-outline-success d-inline-flex align-items-center gap-1 rounded-pill px-2.5 py-1" title="Pulihkan Akun Guru">
                                                         <i class="bi bi-arrow-counterclockwise"></i>
@@ -750,7 +796,7 @@
                                                 @endif
                                                 @if($pen)
                                                     <li>
-                                                        <form action="{{ route('admin.pelanggaran.report.delete-review', $pen->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin MENGHAPUS PERMANEN ulasan ini beserta riwayat laporannya?')">
+                                                        <form action="{{ route('admin.pelanggaran.report.delete-review', $pen->id) }}" method="POST" data-confirm="Apakah Anda yakin ingin MENGHAPUS PERMANEN ulasan ini beserta riwayat laporannya?" data-confirm-title="Hapus Ulasan Permanen?" data-confirm-btn="Ya, Hapus Ulasan" data-confirm-type="danger">
                                                             @csrf @method('DELETE')
                                                             <button type="submit" class="dropdown-item py-1.5 rounded-2 d-flex align-items-center gap-2 text-danger">
                                                                 <i class="bi bi-trash"></i>
@@ -761,7 +807,7 @@
                                                 @endif
                                                 <li><hr class="dropdown-divider my-1"></li>
                                                 <li>
-                                                    <form action="{{ route('admin.pelanggaran.report.dismiss', $rep->penilaian_id) }}" method="POST" onsubmit="return confirm('Tolak/Abaikan laporan ini dan bersihkan dari daftar laporan?')">
+                                                    <form action="{{ route('admin.pelanggaran.report.dismiss', $rep->penilaian_id) }}" method="POST" data-confirm="Tolak/Abaikan laporan ini dan bersihkan dari daftar laporan?" data-confirm-title="Tolak Laporan Ulasan?" data-confirm-btn="Ya, Tolak Laporan" data-confirm-type="warning">
                                                         @csrf @method('DELETE')
                                                         <button type="submit" class="dropdown-item py-1.5 rounded-2 d-flex align-items-center gap-2 text-muted">
                                                             <i class="bi bi-x-circle"></i>
@@ -913,6 +959,68 @@
     </div>
 </div>
 
+{{-- MODAL POPUP LIHAT ULASAN LENGKAP --}}
+<div class="modal fade" id="modalDetailUlasanPelanggar" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 16px;">
+            <div class="modal-header border-bottom py-3 px-4" style="background: #f8fafc;">
+                <div class="d-flex align-items-center gap-2">
+                    <div class="rounded-circle d-flex align-items-center justify-content-center text-primary" style="width: 38px; height: 38px; background: rgba(0, 51, 102, 0.08);">
+                        <i class="bi bi-chat-quote-fill fs-5"></i>
+                    </div>
+                    <div>
+                        <h5 class="modal-title fw-bold text-dark mb-0">Isi Ulasan / Pesan Melanggar</h5>
+                        <small class="text-muted font-mono" id="modalUlasanWaktu">-</small>
+                    </div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                {{-- INFO PELANGGAR & SASARAN --}}
+                <div class="row g-3 p-3 rounded-3 bg-light border mb-3">
+                    <div class="col-sm-6">
+                        <span class="text-muted small d-block font-mono mb-1" style="font-size: 0.72rem;">IDENTITAS PENGIRIM:</span>
+                        <div class="d-flex align-items-center gap-1.5 mb-1">
+                            <span class="badge bg-primary text-white font-mono px-2 py-0.5" id="modalUlasanRole" style="font-size: 0.7rem;">SISWA</span>
+                            <strong class="text-dark fs-6" id="modalUlasanNama">-</strong>
+                        </div>
+                        <small class="text-muted font-mono d-block" id="modalUlasanIdentitas">-</small>
+                    </div>
+                    <div class="col-sm-6 border-start-sm">
+                        <span class="text-muted small d-block font-mono mb-1" style="font-size: 0.72rem;">SASARAN & TIPE INSIDEN:</span>
+                        <div class="fw-semibold text-dark mb-1" id="modalUlasanSasaran">-</div>
+                        <span class="badge bg-secondary-subtle text-secondary border font-mono" id="modalUlasanTipe">-</span>
+                    </div>
+                </div>
+
+                {{-- KATA TERDETEKSI --}}
+                <div class="mb-3" id="modalUlasanKataContainer">
+                    <label class="form-label font-mono small fw-bold text-danger mb-1.5" style="font-size: 0.72rem; letter-spacing: 0.5px;">KATA / FRASA TERDETEKSI SISTEM:</label>
+                    <div class="d-flex flex-wrap gap-1.5" id="modalUlasanKataBadges"></div>
+                </div>
+
+                {{-- ISI LENGKAP ULASAN / TEKS --}}
+                <div class="mb-3">
+                    <label class="form-label font-mono small fw-bold text-dark mb-1.5" style="font-size: 0.72rem; letter-spacing: 0.5px;">TEKS LENGKAP PERCOBAAN KOMENTAR / ULASAN:</label>
+                    <div class="p-3 rounded-3 border position-relative" style="background: #ffffff; border-left: 4px solid var(--primary, #003366) !important; font-size: 0.95rem; line-height: 1.6; color: #1e293b;">
+                        <i class="bi bi-quote text-muted opacity-25 position-absolute" style="font-size: 3rem; right: 10px; bottom: -5px; pointer-events: none;"></i>
+                        <p class="mb-0 text-break font-sans" id="modalUlasanTeks" style="white-space: pre-wrap; font-size: 0.92rem;"></p>
+                    </div>
+                </div>
+
+                {{-- STATUS TINDAKAN SISTEM --}}
+                <div class="d-flex align-items-center justify-content-between p-2.5 bg-light rounded-3 border">
+                    <span class="text-muted small font-mono">Tindakan Sistem Terpasang:</span>
+                    <span class="badge bg-dark px-2.5 py-1 font-mono" id="modalUlasanTindakan">-</span>
+                </div>
+            </div>
+            <div class="modal-footer border-top py-2.5 px-4 bg-light justify-content-end">
+                <button type="button" class="btn btn-secondary btn-sm px-3 rounded-pill" data-bs-dismiss="modal">Tutup</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @push('scripts')
 <script>
 function openModalTindakUser(userId, userName, role, isActive) {
@@ -925,6 +1033,53 @@ function openModalTindakUser(userId, userName, role, isActive) {
     toggleTindakOptions('hanya_peringatan');
 
     new bootstrap.Modal(document.getElementById('modalTindakUser')).show();
+}
+
+function openModalDetailUlasan(btn) {
+    const nama = btn.dataset.nama || '-';
+    const role = btn.dataset.role || 'Siswa';
+    const nis = btn.dataset.nis || '-';
+    const kelas = btn.dataset.kelas || '-';
+    const sasaran = btn.dataset.sasaran || '-';
+    const tipe = btn.dataset.tipe || '-';
+    const waktu = btn.dataset.waktu || '-';
+    const isi = btn.dataset.isi || '';
+    const tindakan = btn.dataset.tindakan || '-';
+    
+    let kata = [];
+    try {
+        kata = JSON.parse(btn.dataset.kata || '[]');
+    } catch(e) {
+        kata = [];
+    }
+
+    document.getElementById('modalUlasanNama').innerText = nama;
+    document.getElementById('modalUlasanRole').innerText = role.toUpperCase();
+    document.getElementById('modalUlasanRole').className = 'badge font-mono px-2 py-0.5 ' + (role.toLowerCase() === 'guru' ? 'bg-primary text-white' : 'bg-warning text-dark');
+    document.getElementById('modalUlasanIdentitas').innerText = (role.toLowerCase() === 'guru' ? 'NIP: ' : 'NIS: ') + nis + ' • ' + kelas;
+    document.getElementById('modalUlasanSasaran').innerText = 'Sasaran: ' + sasaran;
+    document.getElementById('modalUlasanTipe').innerText = tipe;
+    document.getElementById('modalUlasanWaktu').innerText = waktu;
+    document.getElementById('modalUlasanTeks').innerText = isi;
+    document.getElementById('modalUlasanTindakan').innerText = tindakan;
+
+    const badgesContainer = document.getElementById('modalUlasanKataBadges');
+    badgesContainer.innerHTML = '';
+    if (kata && kata.length > 0) {
+        document.getElementById('modalUlasanKataContainer').classList.remove('d-none');
+        kata.forEach(k => {
+            const badge = document.createElement('span');
+            badge.className = 'badge bg-danger text-white px-2 py-1 font-mono';
+            badge.style.fontSize = '0.78rem';
+            badge.innerText = k;
+            badgesContainer.appendChild(badge);
+        });
+    } else {
+        document.getElementById('modalUlasanKataContainer').classList.add('d-none');
+    }
+
+    const modal = new bootstrap.Modal(document.getElementById('modalDetailUlasanPelanggar'));
+    modal.show();
 }
 
 function toggleTindakOptions(val) {

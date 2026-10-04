@@ -11,12 +11,13 @@
     <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('apple-touch-icon.png') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
     <style>
-        :root { --primary:#003366; --primary-light:#004080; --secondary:#FFC107; --accent:#00A86B; --bg-light:#f5f7fa; --text-dark:#1a1a2e; --text-muted:#64748b; --border:#e2e8f0; }
+        :root { --primary:#003366; --primary-light:#004080; --secondary:#ff6600; --accent:#f97316; --bg-light:#f8fafc; --text-dark:#0f172a; --text-muted:#64748b; --border:#e2e8f0; }
         body { background-color:var(--bg-light); color:var(--text-dark); font-family:'Inter',sans-serif; }
         .sidebar { width:260px; height:100vh; max-height:100vh; position:fixed; left:0; top:0; background:white; border-right:1px solid var(--border); z-index:1040; overflow-y:auto !important; overflow-x:hidden; display:flex; flex-direction:column; scrollbar-width:thin; padding-bottom:2.5rem; }
         .sidebar::-webkit-scrollbar { width:4px; }
@@ -30,7 +31,7 @@
         .sidebar-submenu .sidebar-link { padding:0.5rem 1.5rem; }
         .main-content { margin-left:260px; padding:2rem; min-height:100vh; }
         .page-header { margin-bottom:2rem; }
-        .page-label { font-family:'JetBrains Mono',monospace; font-size:0.75rem; font-weight:600; color:var(--primary); letter-spacing:1px; text-transform:uppercase; }
+        .page-label { font-family:'Inter',sans-serif; font-size:0.75rem; font-weight:700; color:var(--primary); letter-spacing:1px; text-transform:uppercase; }
         .page-title { font-size:1.75rem; font-weight:800; margin-bottom:0.25rem; }
         .page-subtitle { color:var(--text-muted); font-size:0.95rem; }
         .card-custom { background:white; border-radius:12px; border:1px solid var(--border); box-shadow:0 2px 8px rgba(0,0,0,0.04); }
@@ -46,6 +47,55 @@
         .stat-card-value { font-size:2rem; font-weight:800; color:var(--text-dark); }
         .table-responsive { min-height: 220px; }
         .table-custom .dropdown-menu { z-index: 1060; }
+
+        /* CIRCULAR TOPBAR ACTION BUTTONS */
+        .gk-topbar-btn {
+            width: 40px !important;
+            height: 40px !important;
+            min-width: 40px !important;
+            min-height: 40px !important;
+            max-width: 40px !important;
+            max-height: 40px !important;
+            aspect-ratio: 1 / 1 !important;
+            border-radius: 50% !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            flex-shrink: 0 !important;
+            line-height: 1 !important;
+            box-sizing: border-box !important;
+            text-decoration: none !important;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+        }
+        .gk-topbar-btn i { font-size: 1.15rem !important; line-height: 1 !important; display: inline-flex; align-items: center; justify-content: center; }
+        .gk-topbar-btn img { width: 22px !important; height: 22px !important; object-fit: contain !important; display: block !important; }
+        .gk-topbar-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important; }
+
+        .gk-topbar-btn-sm {
+            width: 34px !important;
+            height: 34px !important;
+            min-width: 34px !important;
+            min-height: 34px !important;
+            max-width: 34px !important;
+            max-height: 34px !important;
+            aspect-ratio: 1 / 1 !important;
+            border-radius: 50% !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            flex-shrink: 0 !important;
+            line-height: 1 !important;
+            box-sizing: border-box !important;
+            text-decoration: none !important;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+        }
+        .gk-topbar-btn-sm i { font-size: 0.95rem !important; line-height: 1 !important; display: inline-flex; align-items: center; justify-content: center; }
+        .gk-topbar-btn-sm img { width: 18px !important; height: 18px !important; object-fit: contain !important; display: block !important; }
+        .gk-topbar-btn-sm:hover { transform: translateY(-1px); box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08) !important; }
     </style>
     <link href="{{ asset('css/gurukuu-theme.css') }}?v={{ file_exists(public_path('css/gurukuu-theme.css')) ? filemtime(public_path('css/gurukuu-theme.css')) : time() }}" rel="stylesheet">
     @stack('styles')
@@ -71,20 +121,15 @@
         </div>
         <div class="d-flex align-items-center gap-2">
             {{-- KEMBALI KE SIPINTU MOBILE --}}
-            <a href="{{ config('services.sipintu.base_url', 'https://sipintu.smkn1bangsri.sch.id') }}" target="_blank" class="btn btn-light border p-1 rounded-circle shadow-sm d-flex align-items-center justify-content-center" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Portal SiPintu" style="width: 32px; height: 32px;">
-                <img src="{{ asset('images/sipintu-logo.png') }}" alt="SiPintu" style="width: 18px; height: 18px; object-fit: contain;">
-            </a>
-
-            {{-- BERANDA PUBLIK MOBILE --}}
-            <a href="{{ url('/') }}" target="_blank" class="btn btn-light border p-1.5 rounded-circle shadow-sm" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Kembali ke Beranda Publik" aria-label="Kembali ke Beranda Publik">
-                <i class="bi bi-globe2 text-primary" style="font-size: 1rem;"></i>
+            <a href="{{ config('services.sipintu.base_url', 'https://sipintu.smkn1bangsri.sch.id') }}" target="_blank" class="btn btn-light border rounded-circle shadow-sm gk-topbar-btn-sm" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Portal SiPintu">
+                <img src="{{ asset('images/sipintu-logo.png') }}" alt="SiPintu">
             </a>
 
             {{-- NOTIFIKASI GABUNGAN MOBILE (PELANGGARAN & CHAT) --}}
             @php $totalNotif = ($unreadPelanggaranCount ?? 0) + ($unreadChatCount ?? 0); @endphp
             <div class="dropdown">
-                <button class="btn btn-light border position-relative p-1.5 rounded-circle shadow-sm" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false" title="Pusat Notifikasi">
-                    <i class="bi bi-bell-fill gk-bell-icon {{ $totalNotif > 0 ? 'has-unread' : 'no-unread' }} admin-bell-icon" style="font-size: 1rem;"></i>
+                <button class="btn btn-light border position-relative rounded-circle shadow-sm gk-topbar-btn-sm" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false" title="Pusat Notifikasi">
+                    <i class="bi bi-bell-fill gk-bell-icon {{ $totalNotif > 0 ? 'has-unread' : 'no-unread' }} admin-bell-icon"></i>
                     <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill gk-notif-badge admin-notif-badge" id="adminNotifBadgeMobile" style="font-size: 0.6rem; padding: 0.2em 0.45em; {{ $totalNotif > 0 ? '' : 'display: none !important;' }}">
                         <span class="admin-notif-count">{{ $totalNotif }}</span>
                     </span>
@@ -93,6 +138,11 @@
                     @include('components.admin-notif-dropdown', ['prefix' => 'mobile'])
                 </ul>
             </div>
+
+            {{-- BERANDA PUBLIK MOBILE --}}
+            <a href="{{ url('/') }}" target="_blank" class="btn btn-light border rounded-circle shadow-sm gk-topbar-btn-sm" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Kembali ke Beranda Publik" aria-label="Kembali ke Beranda Publik">
+                <i class="bi bi-globe2 text-primary"></i>
+            </a>
         </div>
     </header>
 
@@ -116,7 +166,7 @@
         <div class="sidebar-menu">
             <div class="px-3 py-1 mb-1">
                 <span class="badge bg-light text-muted border text-truncate w-100 text-start" style="font-size: 0.65rem;">
-                    🏫 SMKN 1 BANGSRI • ADMIN
+                    SMKN 1 BANGSRI • ADMIN
                 </span>
             </div>
             <a href="{{ route('admin.dashboard') }}" class="sidebar-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
@@ -191,20 +241,20 @@
             </div>
             <div class="d-flex align-items-center gap-2">
                 {{-- KEMBALI KE SIPINTU --}}
-                <a href="{{ config('services.sipintu.base_url', 'https://sipintu.smkn1bangsri.sch.id') }}" target="_blank" class="btn btn-light border p-2 rounded-circle shadow-sm d-flex align-items-center justify-content-center" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Portal SiPintu" style="width: 40px; height: 40px;">
-                    <img src="{{ asset('images/sipintu-logo.png') }}" alt="SiPintu" style="width: 22px; height: 22px; object-fit: contain;">
+                <a href="{{ config('services.sipintu.base_url', 'https://sipintu.smkn1bangsri.sch.id') }}" target="_blank" class="btn btn-light border rounded-circle shadow-sm gk-topbar-btn" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Portal SiPintu">
+                    <img src="{{ asset('images/sipintu-logo.png') }}" alt="SiPintu">
                 </a>
 
                 {{-- BERANDA PUBLIK ICON BUTTON (TOPBAR) --}}
-                <a href="{{ url('/') }}" target="_blank" class="btn btn-light border p-2 rounded-circle shadow-sm" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Kembali ke Beranda Publik" aria-label="Kembali ke Beranda Publik">
-                    <i class="bi bi-globe2 text-primary fs-5"></i>
+                <a href="{{ url('/') }}" target="_blank" class="btn btn-light border rounded-circle shadow-sm gk-topbar-btn" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Kembali ke Beranda Publik" aria-label="Kembali ke Beranda Publik">
+                    <i class="bi bi-globe2 text-primary"></i>
                 </a>
 
                 {{-- NOTIFIKASI GABUNGAN DESKTOP (PELANGGARAN & CHAT) --}}
                 @php $totalNotif = ($unreadPelanggaranCount ?? 0) + ($unreadChatCount ?? 0); @endphp
                 <div class="dropdown">
-                    <button class="btn btn-light position-relative p-2 rounded-circle border shadow-sm" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false" title="Pusat Notifikasi">
-                        <i class="bi bi-bell-fill gk-bell-icon {{ $totalNotif > 0 ? 'has-unread' : 'no-unread' }} fs-5 admin-bell-icon"></i>
+                    <button class="btn btn-light position-relative rounded-circle border shadow-sm gk-topbar-btn" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false" title="Pusat Notifikasi">
+                        <i class="bi bi-bell-fill gk-bell-icon {{ $totalNotif > 0 ? 'has-unread' : 'no-unread' }} admin-bell-icon"></i>
                         <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill gk-notif-badge admin-notif-badge" id="adminNotifBadgeDesktop" style="font-size: 0.65rem; {{ $totalNotif > 0 ? '' : 'display: none !important;' }}">
                             <span class="admin-notif-count">{{ $totalNotif }}</span>
                             <span class="visually-hidden">notifikasi belum dibaca</span>
@@ -216,7 +266,7 @@
                 </div>
 
                 {{-- USER BADGE DROPDOWN --}}
-                <div class="dropdown border-start ps-3">
+                <div class="dropdown border-start ps-3 ms-2">
                     <button class="btn btn-light d-flex align-items-center gap-2 p-1.5 px-2.5 rounded-pill border shadow-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                         @php
                             $adminInitials = collect(explode(' ', auth()->user()->name ?? 'Admin'))
@@ -225,7 +275,7 @@
                                 ->take(2)
                                 ->implode('');
                         @endphp
-                        <div class="rounded-circle text-white d-flex align-items-center justify-content-center fw-bold shadow-sm" style="width: 28px; height: 28px; background: #003366; font-size: 0.75rem;">
+                        <div class="rounded-circle text-white d-flex align-items-center justify-content-center fw-bold shadow-sm" style="width: 28px; height: 28px; background: #003366; font-size: 0.75rem; flex-shrink: 0;">
                             {{ $adminInitials ?: 'A' }}
                         </div>
                         <span class="d-none d-sm-inline small fw-bold text-dark">{{ auth()->user()->name ?? 'Admin' }}</span>

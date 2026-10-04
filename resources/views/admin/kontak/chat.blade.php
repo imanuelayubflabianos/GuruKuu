@@ -120,20 +120,28 @@
                         </div>
                         <div>
                             <div class="bubble-user">
-                                <div class="d-flex justify-content-between align-items-center gap-2 mb-1">
-                                    <div class="fw-bold" style="color: var(--primary, #003366); font-size: 0.78rem;">
+                                <div class="d-flex justify-content-between align-items-center gap-2 mb-                                    <div class="fw-bold" style="color: var(--primary, #003366); font-size: 0.78rem;">
                                         {{ $item->display_pengirim }}
                                     </div>
-                                    <form action="{{ route('admin.kontak.destroy', $item) }}" method="POST" class="d-inline" onsubmit="return confirm('Hapus pesan ini secara permanen?')">
-                                        @csrf @method('DELETE')
-                                        <button type="submit" class="btn btn-sm p-0 text-muted border-0" title="Hapus Pesan Pengguna" style="font-size: 0.72rem;">
-                                            <i class="bi bi-trash"></i>
-                                        </button>
-                                    </form>
+                                    @if($item->pesan !== '[Pesan Dihapus]')
+                                        <form action="{{ route('admin.kontak.destroy', $item) }}" method="POST" class="d-inline" data-confirm="Hapus pesan ini?" data-confirm-title="Hapus Pesan?" data-confirm-btn="Ya, Hapus" data-confirm-type="danger">
+                                            @csrf @method('DELETE')
+                                            <button type="submit" class="btn btn-sm p-0 text-muted border-0" title="Hapus Pesan Pengguna" style="font-size: 0.72rem;">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
+                                    @endif
                                 </div>
-                                <p class="mb-1" style="line-height: 1.5; word-wrap: break-word; font-size: 0.92rem;">
-                                    {{ $item->pesan }}
-                                </p>
+                                @if($item->pesan === '[Pesan Dihapus]')
+                                    <p class="mb-1 fst-italic text-muted d-flex align-items-center gap-1.5" style="font-size: 0.88rem; opacity: 0.85;">
+                                        <i class="bi bi-ban text-muted"></i>
+                                        <span>Pesan ini telah dihapus</span>
+                                    </p>
+                                @else
+                                    <p class="mb-1" style="line-height: 1.5; word-wrap: break-word; font-size: 0.92rem;">
+                                        {{ $item->pesan }}
+                                    </p>
+                                @endif
                                 <div class="text-end text-muted font-mono" style="font-size: 0.7rem;">
                                     {{ $item->created_at->format('H:i') }} WIB
                                 </div>
@@ -151,28 +159,37 @@
                             <span class="fw-bold"><i class="bi bi-headset me-1 text-info"></i> Administrator</span>
                             <span>{{ $item->updated_at->format('H:i') }} WIB</span>
                         </div>
-                        <p class="mb-1" style="line-height: 1.5; word-wrap: break-word; font-size: 0.92rem;" id="balasan-text-{{ $item->id }}">
-                            {{ $item->balasan }}
-                        </p>
+                        @if($item->balasan === '[Pesan Dihapus]')
+                            <p class="mb-1 fst-italic text-white-50 d-flex align-items-center gap-1.5" style="font-size: 0.88rem;">
+                                <i class="bi bi-ban"></i>
+                                <span>Pesan ini telah dihapus</span>
+                            </p>
+                        @else
+                            <p class="mb-1" style="line-height: 1.5; word-wrap: break-word; font-size: 0.92rem;" id="balasan-text-{{ $item->id }}">
+                                {{ $item->balasan }}
+                            </p>
+                        @endif
                         <div class="text-end mt-1 d-flex justify-content-end align-items-center gap-2" style="font-size: 0.7rem; opacity: 0.9;">
                             <i class="bi bi-check2-all" style="color: #38bdf8; font-weight: bold; font-size: 0.9rem;" title="Terkirim & Dilihat"></i>
                             
-                            {{-- TOMBOL EDIT BALASAN ADMIN --}}
-                            <button type="button" class="chat-action-btn" onclick="openAdminEditReplyModal({{ $item->id }}, '{{ addslashes($item->balasan) }}')" title="Edit Balasan">
-                                <i class="bi bi-pencil-fill"></i>
-                            </button>
-
-                            {{-- TOMBOL HAPUS BALASAN ADMIN --}}
-                            <form action="{{ route('admin.kontak.destroy-reply', $item) }}" method="POST" class="d-inline" onsubmit="return confirm('Hapus balasan ini?')">
-                                @csrf @method('DELETE')
-                                <button type="submit" class="chat-action-btn" title="Hapus Balasan">
-                                    <i class="bi bi-trash-fill"></i>
+                            @if($item->balasan !== '[Pesan Dihapus]')
+                                {{-- TOMBOL EDIT BALASAN ADMIN --}}
+                                <button type="button" class="chat-action-btn" onclick="openAdminEditReplyModal({{ $item->id }}, '{{ addslashes($item->balasan) }}')" title="Edit Balasan">
+                                    <i class="bi bi-pencil-fill"></i>
                                 </button>
-                            </form>
+
+                                {{-- TOMBOL HAPUS BALASAN ADMIN --}}
+                                <form action="{{ route('admin.kontak.destroy-reply', $item) }}" method="POST" class="d-inline" data-confirm="Hapus balasan ini?" data-confirm-title="Hapus Balasan?" data-confirm-btn="Ya, Hapus" data-confirm-type="danger">
+                                    @csrf @method('DELETE')
+                                    <button type="submit" class="chat-action-btn" title="Hapus Balasan">
+                                        <i class="bi bi-trash-fill"></i>
+                                    </button>
+                                </form>
+                            @endif
                         </div>
                     </div>
                 </div>
-            @elseif(!$item->balasan && $item->pesan)
+            @elseif(!$item->balasan && $item->pesan && $item->pesan !== '[Pesan Dihapus]')
                 <div class="d-flex justify-content-start mb-3 ms-5">
                     <div class="rounded-pill px-3 py-1 small" style="background: #fef3c7; color: #92400e; font-size: 0.75rem; border: 1px solid #fde68a;">
                         <i class="bi bi-hourglass-split me-1"></i> Menunggu balasan admin...

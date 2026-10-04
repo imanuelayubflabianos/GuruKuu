@@ -28,7 +28,14 @@ class RoleMiddleware
         }
 
         if ($user->role !== $role) {
-            abort(403, 'Akses ditolak. Anda bukan ' . ucfirst($role) . '.');
+            $targetDashboard = match ($user->role) {
+                'admin' => route('admin.dashboard'),
+                'guru' => route('guru.dashboard'),
+                'siswa' => route('siswa.dashboard'),
+                default => route('landing.index'),
+            };
+
+            return redirect($targetDashboard)->with('error', 'Akses dialihkan. Anda saat ini aktif sebagai ' . ucfirst($user->role) . ', bukan ' . ucfirst($role) . '. Silakan logout terlebih dahulu jika ingin mengganti akun.');
         }
 
         return $next($request);

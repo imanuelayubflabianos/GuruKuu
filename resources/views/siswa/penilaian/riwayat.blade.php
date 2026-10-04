@@ -50,7 +50,21 @@
                         </small>
                     </td>
                     <td class="text-center">
-                        @php $pct = round(($r->rata_rata_evaluasi / 5) * 100); @endphp
+                        @php 
+                            $pct = round(($r->rata_rata_evaluasi / 5) * 100); 
+                            $rStars = round(($r->rata_rata_evaluasi ?? ($r->total_nilai / 5)) * 2) / 2;
+                        @endphp
+                        <div class="text-warning mb-1" style="font-size: 0.76rem; letter-spacing: 0.5px;">
+                            @for($i = 1; $i <= 5; $i++)
+                                @if($rStars >= $i)
+                                    <i class="bi bi-star-fill"></i>
+                                @elseif($rStars >= ($i - 0.5))
+                                    <i class="bi bi-star-half"></i>
+                                @else
+                                    <i class="bi bi-star text-muted opacity-25"></i>
+                                @endif
+                            @endfor
+                        </div>
                         <div class="fw-bold font-mono text-primary mb-1">{{ $pct }}%</div>
                         <div class="progress mx-auto" style="height: 6px; width: 80px; border-radius: 10px;">
                             <div class="progress-bar bg-primary rounded-pill" style="width: {{ $pct }}%;"></div>
@@ -72,7 +86,7 @@
                             </button>
                             <ul class="dropdown-menu dropdown-menu-end shadow border-0 py-1" style="border-radius: 12px; font-size: 0.85rem; min-width: 170px; box-shadow: 0 10px 25px rgba(0,0,0,0.12) !important;">
                                 <li>
-                                    <form action="{{ route('siswa.riwayat.destroy', $r) }}" method="POST" onsubmit="return confirm('Hapus riwayat penilaian ini? Rating guru akan dihitung ulang dan Anda dapat menilai kembali.')">
+                                    <form action="{{ route('siswa.riwayat.destroy', $r) }}" method="POST" data-confirm="Hapus riwayat penilaian ini? Rating guru akan dihitung ulang dan Anda dapat menilai kembali." data-confirm-title="Hapus Riwayat Penilaian?" data-confirm-btn="Ya, Hapus" data-confirm-type="danger">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="dropdown-item py-1.5 px-3 d-flex align-items-center gap-2 text-danger">

@@ -381,10 +381,48 @@
                     </p>
                 </div>
 
+                @if(session('logout'))
+                    <div class="alert alert-danger border-0 mb-3 p-3 rounded-3 shadow-xs d-flex align-items-center gap-2" style="background: #fff1f2; border-left: 4px solid #ef4444 !important; color: #991b1b;">
+                        <i class="bi bi-dash-circle-fill text-danger fs-5 flex-shrink-0"></i>
+                        <span class="small fw-semibold">{{ session('logout') }}</span>
+                    </div>
+                @elseif(session('success'))
+                    @if(str_contains(session('success'), 'keluar'))
+                        <div class="alert alert-danger border-0 mb-3 p-3 rounded-3 shadow-xs d-flex align-items-center gap-2" style="background: #fff1f2; border-left: 4px solid #ef4444 !important; color: #991b1b;">
+                            <i class="bi bi-dash-circle-fill text-danger fs-5 flex-shrink-0"></i>
+                            <span class="small fw-semibold">Anda telah keluar dari akun.</span>
+                        </div>
+                    @else
+                        <div class="alert alert-success border-0 mb-3 p-3 rounded-3 shadow-xs d-flex align-items-center gap-2" style="background: #f0fdf4; border-left: 4px solid #22c55e !important; color: #15803d;">
+                            <i class="bi bi-check-circle-fill text-success fs-5 flex-shrink-0"></i>
+                            <span class="small fw-semibold">{{ session('success') }}</span>
+                        </div>
+                    @endif
+                @endif
+
+                @if(session('info'))
+                    <div class="alert alert-info border-0 mb-3 p-3 rounded-3 shadow-xs d-flex align-items-center gap-2" style="background: #f0f9ff; border-left: 4px solid #0284c7 !important; color: #0369a1;">
+                        <i class="bi bi-info-circle-fill text-info fs-5 flex-shrink-0"></i>
+                        <span class="small fw-semibold">{{ session('info') }}</span>
+                    </div>
+                @endif
+
+                @if(session('error'))
+                    <div class="alert alert-danger border-0 mb-3 p-3 rounded-3 shadow-xs d-flex align-items-center gap-2" style="background: #fff1f2; border-left: 4px solid #ef4444 !important; color: #991b1b;">
+                        <i class="bi bi-exclamation-triangle-fill text-danger fs-5 flex-shrink-0"></i>
+                        <span class="small fw-semibold">{{ session('error') }}</span>
+                    </div>
+                @endif
+
                 @if($errors->any())
-                    <div class="alert alert-danger border-0 mb-3 py-2 px-3 rounded-3 shadow-xs">
+                    <div class="alert alert-danger border-0 mb-3 p-3 rounded-3 shadow-xs" style="background: #fff1f2; border-left: 4px solid #ef4444 !important; color: #991b1b;">
                         @foreach($errors->all() as $error)
-                            <div class="small d-flex align-items-center gap-1.5"><i class="bi bi-exclamation-triangle-fill"></i> {{ $error }}</div>
+                            <div class="d-flex align-items-start gap-2.5 mb-1.5 last:mb-0">
+                                <i class="bi bi-exclamation-triangle-fill text-danger fs-5 flex-shrink-0 mt-0.5"></i>
+                                <div class="small text-start" style="line-height: 1.55; color: #881337; font-weight: 500;">
+                                    {{ $error }}
+                                </div>
+                            </div>
                         @endforeach
                     </div>
                 @endif

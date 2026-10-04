@@ -164,32 +164,288 @@
     }
 
     .podium-rank-1 .gk-podium-card-revised {
-        min-height: 480px !important;
-        box-shadow: 0 20px 45px -8px rgba(15, 23, 42, 0.16), 0 8px 18px -4px rgba(15, 23, 42, 0.08) !important;
-        border: none !important;
+        min-height: 335px !important;
+        border: 1.8px solid #f59e0b !important;
+        box-shadow: 0 14px 36px -6px rgba(245, 158, 11, 0.32), 0 0 22px rgba(251, 191, 36, 0.22) !important;
     }
     .podium-rank-2 .gk-podium-card-revised {
-        min-height: 440px !important;
-        box-shadow: 0 14px 32px -6px rgba(15, 23, 42, 0.11), 0 6px 14px -3px rgba(15, 23, 42, 0.05) !important;
-        border: none !important;
+        min-height: 305px !important;
+        border: 1.8px solid #94a3b8 !important;
+        box-shadow: 0 12px 30px -6px rgba(148, 163, 184, 0.3), 0 0 18px rgba(203, 213, 225, 0.24) !important;
     }
     .podium-rank-3 .gk-podium-card-revised {
-        min-height: 410px !important;
-        box-shadow: 0 10px 25px -4px rgba(15, 23, 42, 0.08), 0 4px 10px -2px rgba(15, 23, 42, 0.04) !important;
-        border: none !important;
+        min-height: 285px !important;
+        border: 1.8px solid #cd7f32 !important;
+        box-shadow: 0 10px 28px -6px rgba(205, 127, 50, 0.28), 0 0 16px rgba(217, 119, 6, 0.18) !important;
     }
 
-    .podium-rank-1:hover .gk-podium-card-revised {
-        transform: translateY(-6px);
-        box-shadow: 0 25px 50px -8px rgba(15, 23, 42, 0.2) !important;
+    /* 🌿 Header Badge #1st, #2nd, #3rd Straddling Top Border */
+    .gk-podium-header-badge {
+        position: absolute;
+        top: 0;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 25;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        pointer-events: none;
     }
-    .podium-rank-2:hover .gk-podium-card-revised {
-        transform: translateY(-5px);
-        box-shadow: 0 18px 38px -6px rgba(15, 23, 42, 0.15) !important;
+    .gk-rank-badge-pill {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 999px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        white-space: nowrap;
+        pointer-events: auto;
     }
-    .podium-rank-3:hover .gk-podium-card-revised {
-        transform: translateY(-5px);
-        box-shadow: 0 16px 32px -6px rgba(15, 23, 42, 0.12) !important;
+    .gk-rank-1 .gk-rank-badge-pill {
+        background: linear-gradient(135deg, #fef08a, #fde047) !important;
+        color: #854d0e !important;
+        border: 1.5px solid #eab308 !important;
+        box-shadow: 0 4px 14px rgba(234, 179, 8, 0.4) !important;
+        font-weight: 800 !important;
+        padding: 0.24rem 0.95rem !important;
+        font-size: 0.82rem !important;
+    }
+    .gk-rank-2 .gk-rank-badge-pill {
+        background: linear-gradient(135deg, #ffffff, #e2e8f0) !important;
+        color: #334155 !important;
+        border: 1.5px solid #94a3b8 !important;
+        box-shadow: 0 4px 14px rgba(148, 163, 184, 0.35) !important;
+        font-weight: 800 !important;
+        padding: 0.22rem 0.85rem !important;
+        font-size: 0.78rem !important;
+    }
+    .gk-rank-3 .gk-rank-badge-pill {
+        background: linear-gradient(135deg, #ffedd5, #fed7aa) !important;
+        color: #9a3412 !important;
+        border: 1.5px solid #cd7f32 !important;
+        box-shadow: 0 4px 14px rgba(205, 127, 50, 0.35) !important;
+        font-weight: 800 !important;
+        padding: 0.2rem 0.8rem !important;
+        font-size: 0.74rem !important;
+    }
+
+    /* 🌿 Bottom Roman Laurel Crown Cradle (Menyelimuti Bawah & Samping) */
+    .gk-laurel-bottom-cradle {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        pointer-events: none;
+        z-index: 8;
+        overflow: visible;
+    }
+    .gk-laurel-bottom-branch {
+        position: absolute;
+        bottom: -8px;
+        width: 48px;
+        height: 125px;
+        pointer-events: none;
+        transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), filter 0.35s ease, opacity 0.35s ease;
+    }
+    .gk-laurel-bottom-left {
+        left: -14px;
+    }
+    .gk-laurel-bottom-right {
+        right: -14px;
+        transform: scaleX(-1);
+    }
+    .gk-laurel-bottom-center {
+        position: absolute;
+        bottom: -6px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 46px;
+        height: 18px;
+        opacity: 0.92;
+        pointer-events: none;
+        transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), filter 0.35s ease;
+    }
+    .podium-rank-1 .gk-laurel-bottom-cradle {
+        color: #f59e0b !important;
+        filter: drop-shadow(0 4px 10px rgba(245, 158, 11, 0.45));
+    }
+    .podium-rank-1 .gk-laurel-bottom-branch {
+        width: 48px;
+        height: 130px;
+        bottom: -8px;
+    }
+    .podium-rank-1 .gk-laurel-bottom-left {
+        left: -14px;
+    }
+    .podium-rank-1 .gk-laurel-bottom-right {
+        right: -14px;
+    }
+    .podium-rank-2 .gk-laurel-bottom-cradle {
+        color: #94a3b8 !important;
+        filter: drop-shadow(0 4px 10px rgba(148, 163, 184, 0.45));
+    }
+    .podium-rank-3 .gk-laurel-bottom-cradle {
+        color: #cd7f32 !important;
+        filter: drop-shadow(0 4px 10px rgba(205, 127, 50, 0.45));
+    }
+
+    /* Sizing & Spacing inside Podium */
+    .gk-podium-row {
+        margin-bottom: 1.5rem !important;
+    }
+    .gk-podium-card-revised,
+    .podium-rank-1 .gk-podium-card-revised,
+    .podium-rank-2 .gk-podium-card-revised,
+    .podium-rank-3 .gk-podium-card-revised {
+        width: 275px !important;
+        max-width: 275px !important;
+        min-width: 275px !important;
+        margin-left: auto !important;
+        margin-right: auto !important;
+        box-sizing: border-box !important;
+        padding-left: 0.95rem !important;
+        padding-right: 0.95rem !important;
+    }
+    .podium-rank-1 .gk-podium-card-revised {
+        min-height: 415px !important;
+        padding-top: 1.85rem !important;
+        padding-bottom: 1.15rem !important;
+    }
+    .podium-rank-2 .gk-podium-card-revised {
+        min-height: 355px !important;
+        padding-top: 1.65rem !important;
+        padding-bottom: 1rem !important;
+    }
+    .podium-rank-3 .gk-podium-card-revised {
+        min-height: 310px !important;
+        padding-top: 1.45rem !important;
+        padding-bottom: 0.95rem !important;
+    }
+
+    .gk-podium-row .gk-avatar-clean-wrap {
+        margin: 0 auto 0.55rem !important;
+    }
+    .podium-rank-1 .gk-avatar-clean-wrap {
+        width: 84px !important;
+        height: 84px !important;
+    }
+    .podium-rank-2 .gk-avatar-clean-wrap {
+        width: 72px !important;
+        height: 72px !important;
+    }
+    .podium-rank-3 .gk-avatar-clean-wrap {
+        width: 64px !important;
+        height: 64px !important;
+    }
+    .gk-podium-row h4,
+    .gk-podium-row h5 {
+        font-size: 0.98rem !important;
+        margin-bottom: 0.2rem !important;
+        line-height: 1.25 !important;
+    }
+    .podium-rank-1 h4 {
+        font-size: 1.12rem !important;
+    }
+    .gk-podium-row .text-muted.small {
+        margin-bottom: 0.25rem !important;
+        font-size: 0.74rem !important;
+    }
+    .gk-podium-row .gk-podium-badges-row {
+        margin: 0.15rem auto 0.45rem !important;
+        min-height: 24px !important;
+        gap: 5px !important;
+    }
+    .gk-podium-row .text-warning {
+        margin-bottom: 0.45rem !important;
+        font-size: 0.88rem !important;
+    }
+    .podium-rank-1 .text-warning {
+        font-size: 1rem !important;
+    }
+    .gk-podium-row .gk-progress-pill {
+        height: 22px !important;
+        line-height: 22px !important;
+        font-size: 0.76rem !important;
+        min-width: 110px !important;
+    }
+    .gk-podium-row small.text-muted.font-mono {
+        margin-bottom: 0.5rem !important;
+        font-size: 0.74rem !important;
+    }
+    .gk-podium-row .gk-btn-podium-profile {
+        padding: 0.26rem 0.95rem !important;
+        font-size: 0.8rem !important;
+        margin-bottom: 0.15rem !important;
+        margin-top: 0.45rem !important;
+    }
+    .gk-podium-row .gk-podium-card-revised:hover .gk-laurel-bottom-branch,
+    .gk-podium-row .is-touch-focused .gk-laurel-bottom-branch {
+        filter: drop-shadow(0 6px 16px currentColor);
+    }
+    .gk-podium-row .gk-podium-card-revised:hover .gk-laurel-bottom-left,
+    .gk-podium-row .is-touch-focused .gk-laurel-bottom-left {
+        transform: scale(1.06);
+    }
+    .gk-podium-row .gk-podium-card-revised:hover .gk-laurel-bottom-right,
+    .gk-podium-row .is-touch-focused .gk-laurel-bottom-right {
+        transform: scaleX(-1) scale(1.06);
+    }
+
+    /* 🌟 Interaksi Fokus & Buram (Top 1 Jelas 100%, Top 2 Sedang 0.4px, Top 3 Paling Blur 1.4px) */
+    .gk-podium-card-revised {
+        transition: transform 0.38s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.38s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease, filter 0.35s ease !important;
+    }
+    .gk-podium-row:not(:hover) .podium-rank-1 .gk-podium-card-revised {
+        opacity: 1 !important;
+        filter: none !important;
+    }
+    .gk-podium-row:not(:hover) .podium-rank-2 .gk-podium-card-revised {
+        opacity: 0.88 !important;
+        filter: blur(0.4px) !important;
+    }
+    .gk-podium-row:not(:hover) .podium-rank-3 .gk-podium-card-revised {
+        opacity: 0.60 !important;
+        filter: blur(1.4px) !important;
+    }
+    .gk-podium-row:hover .gk-podium-card-revised {
+        opacity: 0.48 !important;
+        filter: blur(1.5px) !important;
+        transform: scale(0.985);
+    }
+    .gk-podium-row .podium-anim-item:hover .gk-podium-card-revised,
+    .gk-podium-row .gk-podium-card-revised:hover,
+    .gk-podium-row .podium-anim-item.is-touch-focused .gk-podium-card-revised {
+        opacity: 1 !important;
+        filter: none !important;
+        transform: translateY(-8px) scale(1.025) !important;
+        z-index: 35 !important;
+    }
+    .gk-podium-row .podium-rank-1:hover .gk-podium-card-revised,
+    .gk-podium-row .podium-rank-1.is-touch-focused .gk-podium-card-revised {
+        box-shadow: 0 24px 55px -6px rgba(245, 158, 11, 0.45), 0 0 32px rgba(251, 191, 36, 0.35) !important;
+    }
+    .gk-podium-row .podium-rank-2:hover .gk-podium-card-revised,
+    .gk-podium-row .podium-rank-2.is-touch-focused .gk-podium-card-revised {
+        box-shadow: 0 20px 48px -6px rgba(148, 163, 184, 0.45), 0 0 28px rgba(203, 213, 225, 0.38) !important;
+    }
+    .gk-podium-row .podium-rank-3:hover .gk-podium-card-revised,
+    .gk-podium-row .podium-rank-3.is-touch-focused .gk-podium-card-revised {
+        box-shadow: 0 18px 42px -6px rgba(205, 127, 50, 0.45), 0 0 26px rgba(217, 119, 6, 0.32) !important;
+    }
+
+    @media (min-width: 768px) {
+        .gk-podium-row {
+            display: flex !important;
+            align-items: flex-end !important;
+            justify-content: center !important;
+            gap: 1.65rem !important; /* Jarak renggang antar kartu */
+        }
+        .podium-anim-item {
+            flex: 0 0 275px !important;
+            width: 275px !important;
+            max-width: 275px !important;
+            min-width: 275px !important;
+        }
     }
 }
 @media (max-width: 767.98px) {
@@ -531,26 +787,32 @@ document.addEventListener('DOMContentLoaded', function() {
     const nextBtn = document.getElementById('heroNextBtn');
     const totalSlides = {{ count($heroImages) }};
 
-    function updateHeroArrows(index) {
+    function updateHeroArrows() {
         if (!prevBtn || !nextBtn) return;
-        if (index <= 0) {
-            prevBtn.style.display = 'none';
-            nextBtn.style.display = 'flex';
-        } else if (index >= totalSlides - 1) {
-            prevBtn.style.display = 'flex';
-            nextBtn.style.display = 'none';
-        } else {
-            prevBtn.style.display = 'flex';
-            nextBtn.style.display = 'flex';
-        }
+        prevBtn.style.display = 'flex';
+        nextBtn.style.display = 'flex';
     }
 
     if (heroSlider && typeof bootstrap !== 'undefined') {
         const carousel = new bootstrap.Carousel(heroSlider, {
             interval: 5000,
             ride: 'carousel',
-            wrap: false
+            wrap: true
         });
+
+        let heroIdleTimer = null;
+        const HERO_RESUME_IDLE_DELAY = 4500;
+
+        function pauseHeroAndScheduleResume() {
+            carousel.pause();
+            if (heroIdleTimer) {
+                clearTimeout(heroIdleTimer);
+                heroIdleTimer = null;
+            }
+            heroIdleTimer = setTimeout(function() {
+                carousel.cycle();
+            }, HERO_RESUME_IDLE_DELAY);
+        }
 
         // Click listener pada garis indikator
         document.querySelectorAll('[data-bs-target="#heroBgSlider"][data-bs-slide-to]').forEach(btn => {
@@ -559,12 +821,34 @@ document.addEventListener('DOMContentLoaded', function() {
                 const slideIndex = parseInt(this.getAttribute('data-bs-slide-to'), 10);
                 if (!isNaN(slideIndex)) {
                     carousel.to(slideIndex);
+                    pauseHeroAndScheduleResume();
                 }
             });
         });
 
+        if (prevBtn) {
+            prevBtn.addEventListener('click', function() {
+                carousel.prev();
+                pauseHeroAndScheduleResume();
+            });
+        }
+
+        if (nextBtn) {
+            nextBtn.addEventListener('click', function() {
+                carousel.next();
+                pauseHeroAndScheduleResume();
+            });
+        }
+
+        heroSlider.addEventListener('mouseenter', function() {
+            carousel.pause();
+        });
+
+        heroSlider.addEventListener('mouseleave', function() {
+            pauseHeroAndScheduleResume();
+        });
+
         heroSlider.addEventListener('slid.bs.carousel', function(e) {
-            updateHeroArrows(e.to);
             document.querySelectorAll('[data-bs-target="#heroBgSlider"][data-bs-slide-to]').forEach((btn, idx) => {
                 if (idx === e.to) {
                     btn.classList.add('active');
@@ -576,7 +860,7 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
 
-        updateHeroArrows(0);
+        updateHeroArrows();
 
         // 🌟 GESTURE GESER DENGAN JARI (TOUCH MOBILE) & MOUSE DRAG (DESKTOP)
         const heroSection = document.getElementById('home');
@@ -593,24 +877,29 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (e.touches && e.touches.length === 1) {
                     touchStartX = e.touches[0].clientX;
                     touchStartY = e.touches[0].clientY;
+                    carousel.pause();
                 }
             }, { passive: true });
 
-            heroSection.addEventListener('touchend', function(e) {
+            function handleHeroTouchEnd(e) {
                 if (e.changedTouches && e.changedTouches.length === 1) {
                     const diffX = e.changedTouches[0].clientX - touchStartX;
                     const diffY = e.changedTouches[0].clientY - touchStartY;
 
-                    // Deteksi geser horizontal dominan (bukan scroll vertikal)
+                    // Deteksi geser horizontal dominan
                     if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > threshold) {
                         if (diffX < 0) {
-                            carousel.next(); // Geser jari ke kiri -> Slide berikutnya
+                            carousel.next();
                         } else {
-                            carousel.prev(); // Geser jari ke kanan -> Slide sebelumnya
+                            carousel.prev();
                         }
                     }
                 }
-            }, { passive: true });
+                pauseHeroAndScheduleResume();
+            }
+
+            heroSection.addEventListener('touchend', handleHeroTouchEnd, { passive: true });
+            heroSection.addEventListener('touchcancel', handleHeroTouchEnd, { passive: true });
 
             // Mouse drag untuk Desktop
             heroSection.addEventListener('mousedown', function(e) {
@@ -618,6 +907,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 isMouseDown = true;
                 mouseStartX = e.clientX;
                 mouseStartY = e.clientY;
+                carousel.pause();
             });
 
             window.addEventListener('mouseup', function(e) {
@@ -633,6 +923,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         carousel.prev();
                     }
                 }
+                pauseHeroAndScheduleResume();
             });
         }
     }
@@ -1067,14 +1358,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 <div class="row g-3 g-lg-4 justify-content-center align-items-end mb-5 gk-podium-row" id="leaderboardPodium">
                     {{-- #2 PERAK (KIRI - NORMAL) --}}
                     <div class="col-11 col-sm-8 col-md-4 order-2 order-md-1 podium-anim-item podium-rank-2 gk-podium-2">
-                        <div class="gk-podium-card-revised p-3.5 p-md-4 text-center h-100 d-flex flex-column justify-content-between">
+                        <div class="gk-podium-card-revised p-3.5 p-md-4 text-center h-100 d-flex flex-column justify-content-between position-relative">
+                            @include('components.podium-laurel-badge', ['rank' => 2])
                             <div>
-                                <div class="mb-1">
-                                    <span class="badge rounded-pill px-3 py-1.5 fw-bold" style="background: #f1f5f9; color: #475569; font-size: 0.8rem;">
-                                        #2nd
-                                    </span>
-                                </div>
-                                
                                 <div class="gk-podium-badges-row">
                                     @foreach(($top2->penghargaan ?? collect()) as $penghargaan)
                                         @if($penghargaan->badge)
@@ -1130,14 +1416,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
                     {{-- #1 EMAS (TENGAH - BESAR) --}}
                     <div class="col-11 col-sm-8 col-md-4 order-1 order-md-2 podium-anim-item podium-rank-1 gk-podium-1">
-                        <div class="gk-podium-card-revised is-first p-4 p-md-5 text-center h-100 d-flex flex-column justify-content-between">
+                        <div class="gk-podium-card-revised is-first p-4 p-md-5 text-center h-100 d-flex flex-column justify-content-between position-relative">
+                            @include('components.podium-laurel-badge', ['rank' => 1])
                             <div>
-                                <div class="mb-1">
-                                    <span class="badge rounded-pill px-4 py-1.5 fw-bold" style="background: #fef08a; color: #854d0e; font-size: 0.9rem;">
-                                        #1st
-                                    </span>
-                                </div>
-
                                 <div class="gk-podium-badges-row">
                                     @foreach(($top1->penghargaan ?? collect()) as $penghargaan)
                                         @if($penghargaan->badge)
@@ -1193,14 +1474,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
                     {{-- #3 PERUNGGU (KANAN - KECIL) --}}
                     <div class="col-11 col-sm-8 col-md-4 order-3 order-md-3 podium-anim-item podium-rank-3 gk-podium-3">
-                        <div class="gk-podium-card-revised p-3 p-md-3.5 text-center h-100 d-flex flex-column justify-content-between">
+                        <div class="gk-podium-card-revised p-3 p-md-3.5 text-center h-100 d-flex flex-column justify-content-between position-relative">
+                            @include('components.podium-laurel-badge', ['rank' => 3])
                             <div>
-                                <div class="mb-1">
-                                    <span class="badge rounded-pill px-2.5 py-1 fw-bold" style="background: #fed7aa; color: #9a3412; font-size: 0.75rem;">
-                                        #3rd
-                                    </span>
-                                </div>
-
                                 <div class="gk-podium-badges-row">
                                     @foreach(($top3->penghargaan ?? collect()) as $penghargaan)
                                         @if($penghargaan->badge)
@@ -1540,6 +1816,10 @@ document.addEventListener('DOMContentLoaded', function () {
         updateSlide(true);
     }
 
+    let idleTimer = null;
+    const AUTOPLAY_DELAY = 4000;
+    const RESUME_IDLE_DELAY = 4500;
+
     function startAutoplay() {
         stopAutoplay();
         autoplayTimer = setInterval(nextSlide, AUTOPLAY_DELAY);
@@ -1552,23 +1832,29 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    function resetAutoplay() {
+    function pauseAndScheduleResume() {
         stopAutoplay();
-        startAutoplay();
+        if (idleTimer) {
+            clearTimeout(idleTimer);
+            idleTimer = null;
+        }
+        idleTimer = setTimeout(function () {
+            startAutoplay();
+        }, RESUME_IDLE_DELAY);
     }
 
     // Button controls
     if (nextBtn) {
         nextBtn.addEventListener('click', function () {
             nextSlide();
-            resetAutoplay();
+            pauseAndScheduleResume();
         });
     }
 
     if (prevBtn) {
         prevBtn.addEventListener('click', function () {
             prevSlide();
-            resetAutoplay();
+            pauseAndScheduleResume();
         });
     }
 
@@ -1577,13 +1863,13 @@ document.addEventListener('DOMContentLoaded', function () {
         dot.addEventListener('click', function () {
             const idx = parseInt(this.getAttribute('data-index'), 10);
             goToSlide(idx);
-            resetAutoplay();
+            pauseAndScheduleResume();
         });
     });
 
     // Pause autoplay on mouse hover (desktop)
     viewport.addEventListener('mouseenter', stopAutoplay);
-    viewport.addEventListener('mouseleave', startAutoplay);
+    viewport.addEventListener('mouseleave', pauseAndScheduleResume);
 
     // Touch / Swipe Support for Mobile (geser dengan jari)
     let startX = 0;
@@ -1612,29 +1898,30 @@ document.addEventListener('DOMContentLoaded', function () {
         const diffY = currentY - startY;
 
         if (!hasDeterminedDirection) {
-            if (Math.abs(diffX) > 7 || Math.abs(diffY) > 7) {
+            if (Math.abs(diffX) > 6 || Math.abs(diffY) > 6) {
                 hasDeterminedDirection = true;
                 isHorizontal = Math.abs(diffX) > Math.abs(diffY);
             }
         }
 
         if (isHorizontal) {
+            if (e.cancelable) e.preventDefault();
             const vpWidth = viewport.offsetWidth || 300;
             const dragPercent = (diffX / vpWidth) * 100;
             const currentTranslate = -currentIndex * 100;
             track.style.transition = 'none';
             track.style.transform = `translateX(${currentTranslate + dragPercent}%)`;
         }
-    }, { passive: true });
+    }, { passive: false });
 
-    viewport.addEventListener('touchend', function () {
+    function handlePanduanTouchEnd() {
         if (!isSwiping) return;
         isSwiping = false;
         const diffX = currentX - startX;
 
         track.style.transition = 'transform 0.65s cubic-bezier(0.22, 1, 0.36, 1)';
 
-        if (isHorizontal && Math.abs(diffX) > 40) {
+        if (isHorizontal && Math.abs(diffX) > 35) {
             if (diffX < 0) {
                 nextSlide();
             } else {
@@ -1643,8 +1930,11 @@ document.addEventListener('DOMContentLoaded', function () {
         } else {
             updateSlide(true);
         }
-        startAutoplay();
-    });
+        pauseAndScheduleResume();
+    }
+
+    viewport.addEventListener('touchend', handlePanduanTouchEnd);
+    viewport.addEventListener('touchcancel', handlePanduanTouchEnd);
 
     // Mouse drag support for desktop
     let isMouseDown = false;
@@ -1657,6 +1947,7 @@ document.addEventListener('DOMContentLoaded', function () {
         mouseStartX = e.clientX;
         mouseCurrentX = mouseStartX;
         stopAutoplay();
+        e.preventDefault();
     });
 
     window.addEventListener('mousemove', function (e) {
@@ -1675,7 +1966,7 @@ document.addEventListener('DOMContentLoaded', function () {
         isMouseDown = false;
         const diffX = mouseCurrentX - mouseStartX;
         track.style.transition = 'transform 0.65s cubic-bezier(0.22, 1, 0.36, 1)';
-        if (Math.abs(diffX) > 45) {
+        if (Math.abs(diffX) > 40) {
             if (diffX < 0) {
                 nextSlide();
             } else {
@@ -1684,7 +1975,7 @@ document.addEventListener('DOMContentLoaded', function () {
         } else {
             updateSlide(true);
         }
-        startAutoplay();
+        pauseAndScheduleResume();
     });
 
     // Pause when tab is hidden
@@ -1699,6 +1990,29 @@ document.addEventListener('DOMContentLoaded', function () {
     // Initialize
     updateSlide(false);
     startAutoplay();
+
+    // Touch support for mobile devices on podium cards
+    const podiumRows = document.querySelectorAll('.gk-podium-row');
+    podiumRows.forEach(row => {
+        const cards = row.querySelectorAll('.gk-podium-col, .podium-anim-item, .gk-podium-card-revised');
+        cards.forEach(card => {
+            card.addEventListener('pointerenter', function () {
+                const parent = card.closest('.podium-anim-item') || card.closest('.gk-podium-col') || card;
+                cards.forEach(c => c.classList.remove('is-touch-focused'));
+                parent.classList.add('is-touch-focused');
+            });
+            card.addEventListener('touchstart', function () {
+                const parent = card.closest('.podium-anim-item') || card.closest('.gk-podium-col') || card;
+                cards.forEach(c => c.classList.remove('is-touch-focused'));
+                parent.classList.add('is-touch-focused');
+            }, { passive: true });
+        });
+    });
+    document.addEventListener('touchstart', function (e) {
+        if (!e.target.closest('.gk-podium-row')) {
+            document.querySelectorAll('.is-touch-focused').forEach(el => el.classList.remove('is-touch-focused'));
+        }
+    }, { passive: true });
 });
 </script>
 @endpush

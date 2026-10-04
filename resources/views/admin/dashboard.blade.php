@@ -31,7 +31,7 @@
             <p class="text-muted mb-0">Ringkasan operasional GuruKuu.</p>
         </div>
         <div class="d-flex gap-2">
-            <form action="{{ route('admin.dashboard.clear-cache') }}" method="POST" class="d-inline" onsubmit="return confirm('Bersihkan cache seluruh web sekarang?')">
+            <form action="{{ route('admin.dashboard.clear-cache') }}" method="POST" class="d-inline" data-confirm="Bersihkan cache seluruh web sekarang?" data-confirm-title="Bersihkan Cache Web?" data-confirm-btn="Ya, Bersihkan" data-confirm-type="warning">
                 @csrf
                 <button type="submit" class="btn btn-outline-light btn-sm px-3"><i class="bi bi-arrow-clockwise me-1"></i>Bersihkan Cache</button>
             </form>

@@ -1,26 +1,34 @@
-/* Global styles */
+/* Global styles - GuruKuu Design System */
 :root {
-    --primary: #4f46e5;
-    --secondary: #f59e0b;
+    --primary: #003366;
+    --primary-light: #004d99;
+    --primary-subtle: #e0edff;
+    --secondary: #ff6600;
+    --accent: #f97316;
+    --bg-light: #f8fafc;
+    --bg-card: #ffffff;
+    --text-dark: #0f172a;
+    --text-muted: #64748b;
+    --border: #e2e8f0;
 }
 
-body {
-    font-family: 'Segoe UI', system-ui, sans-serif;
+body, button, input, select, textarea, table, .btn, .form-control, .form-select, .badge {
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
 }
 
 .card-custom {
-    border: none;
-    border-radius: 16px;
-    transition: transform .2s, box-shadow .2s;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: #ffffff;
+    transition: transform .2s ease, box-shadow .2s ease;
 }
 
 .card-custom:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 10px 30px rgba(0,0,0,.08);
+    box-shadow: 0 8px 24px rgba(15, 23, 42, .06);
 }
 
 .star-rating {
-    color: #f59e0b;
+    color: var(--secondary);
 }
 
 .btn-primary {
@@ -29,6 +37,115 @@ body {
 }
 
 .btn-primary:hover {
-    background: #4338ca;
-    border-color: #4338ca;
+    background: var(--primary-light);
+    border-color: var(--primary-light);
+}
+
+/* NAVBAR / TOPBAR CIRCULAR ACTION BUTTONS (PREVENT OVAL/STRETCH BUG) */
+.gk-topbar-btn {
+    width: 40px !important;
+    height: 40px !important;
+    min-width: 40px !important;
+    min-height: 40px !important;
+    max-width: 40px !important;
+    max-height: 40px !important;
+    aspect-ratio: 1 / 1 !important;
+    border-radius: 50% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-shrink: 0 !important;
+    line-height: 1 !important;
+    box-sizing: border-box !important;
+    text-decoration: none !important;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.gk-topbar-btn i {
+    font-size: 1.15rem !important;
+    line-height: 1 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+.gk-topbar-btn img {
+    width: 22px !important;
+    height: 22px !important;
+    object-fit: contain !important;
+    display: block !important;
+}
+
+.gk-topbar-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+}
+
+/* MOBILE TOPBAR CIRCULAR ACTION BUTTONS */
+.gk-topbar-btn-sm {
+    width: 34px !important;
+    height: 34px !important;
+    min-width: 34px !important;
+    min-height: 34px !important;
+    max-width: 34px !important;
+    max-height: 34px !important;
+    aspect-ratio: 1 / 1 !important;
+    border-radius: 50% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-shrink: 0 !important;
+    line-height: 1 !important;
+    box-sizing: border-box !important;
+    text-decoration: none !important;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.gk-topbar-btn-sm i {
+    font-size: 0.95rem !important;
+    line-height: 1 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+.gk-topbar-btn-sm img {
+    width: 18px !important;
+    height: 18px !important;
+    object-fit: contain !important;
+    display: block !important;
+}
+
+.gk-topbar-btn-sm:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08) !important;
+}
+
+/* NOTIFICATION BADGE & BELL STYLES */
+.gk-notif-badge {
+    background-color: #003366 !important;
+    color: #ffffff !important;
+    font-weight: 700 !important;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 4px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 999px !important;
+    box-shadow: 0 2px 5px rgba(0, 51, 102, 0.4) !important;
+    border: 2px solid #ffffff !important;
+    line-height: 1 !important;
+}
+
+.gk-bell-icon.has-unread {
+    color: #f59e0b !important;
+}
+
+.gk-bell-icon.no-unread {
+    color: #94a3b8 !important;
 }

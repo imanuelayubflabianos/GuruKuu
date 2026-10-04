@@ -183,7 +183,6 @@
             <i class="bi bi-chat-left-quote me-2 text-primary"></i>Ulasan & Masukan Siswa (Periode Berjalan)
             <span class="badge bg-primary ms-2">{{ $semuaFeedback->count() }}</span>
         </h5>
-        <small class="text-muted"><i class="bi bi-shield-lock-fill text-success me-1"></i>Anonimitas Terjamin</small>
     </div>
 
     @if($semuaFeedback->count() > 0)
@@ -191,26 +190,28 @@
         @php
             $fbScore = round(($fb->rata_rata_evaluasi / 5) * 100);
             $fbColor = $fbScore >= 80 ? 'bg-success' : ($fbScore >= 60 ? 'bg-info' : ($fbScore >= 40 ? 'bg-warning' : 'bg-danger'));
+            $isMyReview = (auth()->check() && $fb->siswa_id === auth()->id());
         @endphp
-        <div class="border rounded p-3 mb-3" style="background: #fdfdfd;">
+        <div id="ulasan-{{ $fb->id }}" class="border rounded p-3 mb-3 ulasan-card-item {{ $isMyReview ? 'shadow-sm' : '' }}" style="background: {{ $isMyReview ? '#f0f7ff' : '#fdfdfd' }}; {{ $isMyReview ? 'border-color: #003366 !important; border-left: 5px solid #003366 !important;' : '' }}; transition: all 0.3s ease;">
             <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
                 <div class="d-flex align-items-center gap-2">
-                    <div class="rounded-circle d-flex align-items-center justify-content-center bg-secondary bg-opacity-10 text-secondary" style="width: 38px; height: 38px;">
-                        <i class="bi bi-incognito fs-5"></i>
+                    <div class="rounded-circle d-flex align-items-center justify-content-center {{ $isMyReview ? 'bg-primary text-white shadow-xs' : 'bg-secondary bg-opacity-10 text-secondary' }}" style="width: 38px; height: 38px;">
+                        <i class="bi {{ $isMyReview ? 'bi-person-fill' : 'bi-incognito' }} fs-5"></i>
                     </div>
                     <div>
-                        <div class="d-flex align-items-center gap-2">
-                            <strong class="small text-dark">Siswa (Anonim)</strong>
+                        <div class="d-flex align-items-center gap-2 flex-wrap">
+                            <strong class="small text-dark">{{ $isMyReview ? 'Ulasan Anda' : 'Siswa (Anonim)' }}</strong>
+                            @if($isMyReview)
+                                <span class="badge bg-primary text-white font-mono" style="font-size: 0.68rem;">
+                                    <i class="bi bi-pin-angle-fill me-0.5"></i> Tersemat di Atas
+                                </span>
+                            @endif
                             <span class="badge {{ $fbColor }} text-white font-mono" style="font-size: 0.72rem;">
                                 Skor: {{ $fbScore }}%
                             </span>
                         </div>
-                        <div class="d-flex align-items-center gap-2 mt-0.5">
+                        <div class="mt-0.5">
                             <small class="text-muted font-mono" style="font-size: 0.72rem;">{{ $fb->created_at->diffForHumans() }}</small>
-                            <button type="button" class="btn btn-sm btn-link text-muted p-0 text-decoration-none d-inline-flex align-items-center gap-1" onclick="openModalReportUlasan({{ $fb->id }})" title="Laporkan ulasan tidak pantas">
-                                <i class="bi bi-flag text-danger" style="font-size: 0.7rem;"></i>
-                                <span style="font-size: 0.7rem;">Laporkan</span>
-                            </button>
                         </div>
                     </div>
                 </div>
@@ -275,12 +276,33 @@
                     </div>
                 @endif
             @endif
-            @if($fb->balasan_guru)
-                <div class="p-2 rounded small mt-2 bg-white border-start border-3 border-primary shadow-sm">
-                    <strong class="text-primary d-block mb-1"><i class="bi bi-reply-fill me-1"></i>Tanggapan Guru ({{ $guru->nama }}):</strong>
-                    <span class="text-dark">{{ $fb->balasan_guru }}</span>
+            {{-- THREAD DISKUSI ULASAN (PRIVAT, SLOWMODE & SOCIAL MEDIA COLLAPSIBLE) --}}
+            <x-penilaian-thread :penilaian="$fb" :currentGuruId="$guru->id" />
+
+            {{-- TOMBOL APAKAH ULASAN INI BERGUNA? & LAPORKAN ULASAN --}}
+            @php
+                $isHelpful = $fb->isHelpfulBy(Auth::id(), request()->ip());
+            @endphp
+            <div class="d-flex align-items-center justify-content-between pt-2.5 mt-2.5 border-top border-light-subtle">
+                <div class="d-flex align-items-center gap-2">
+                    <span class="text-muted small" style="font-size: 0.76rem;">Apakah ulasan ini berguna?</span>
+                    <button type="button" 
+                            class="btn btn-sm btn-helpful-vote {{ $isHelpful ? 'btn-helpful-active' : 'btn-helpful-idle' }} rounded-pill px-2.5 py-0.5 d-inline-flex align-items-center gap-1.5"
+                            data-penilaian-id="{{ $fb->id }}"
+                            data-voted="{{ $isHelpful ? '1' : '0' }}"
+                            title="Tandai ulasan ini bermanfaat"
+                            style="font-size: 0.75rem; transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);">
+                        <i class="bi {{ $isHelpful ? 'bi-hand-thumbs-up-fill' : 'bi-hand-thumbs-up' }} helpful-icon"></i>
+                        <span class="helpful-count font-mono fw-semibold" style="font-size: 0.75rem;">{{ $fb->helpful_count ?? 0 }}</span>
+                    </button>
                 </div>
-            @endif
+                <div>
+                    <button type="button" class="btn btn-sm btn-link text-muted p-0 text-decoration-none d-inline-flex align-items-center gap-1 opacity-75 hover-opacity-100" onclick="openModalReportUlasan({{ $fb->id }})" title="Laporkan ulasan tidak pantas" style="font-size: 0.74rem;">
+                        <i class="bi bi-flag text-danger" style="font-size: 0.7rem;"></i>
+                        <span class="text-secondary">Laporkan</span>
+                    </button>
+                </div>
+            </div>
         </div>
         @endforeach
     @else
@@ -321,12 +343,18 @@
                             @forelse($periodeLalu->penilaian as $fbLalu)
                                 @php
                                     $scoreLalu = round(($fbLalu->rata_rata_evaluasi / 5) * 100);
+                                    $isMyReviewLalu = (auth()->check() && $fbLalu->siswa_id === auth()->id());
                                 @endphp
-                                <div class="p-3 bg-white rounded border mb-2">
+                                <div id="ulasan-{{ $fbLalu->id }}" class="p-3 bg-white rounded border mb-2 {{ $isMyReviewLalu ? 'shadow-sm' : '' }}" style="{{ $isMyReviewLalu ? 'border-color: #003366 !important; border-left: 4px solid #003366 !important; background: #f0f7ff !important;' : '' }}">
                                     <div class="d-flex justify-content-between align-items-center mb-2">
                                         <div class="d-flex align-items-center gap-2">
-                                            <i class="bi bi-incognito text-muted"></i>
-                                            <span class="small fw-bold">Siswa (Anonim)</span>
+                                            <i class="bi {{ $isMyReviewLalu ? 'bi-person-fill text-primary' : 'bi-incognito text-muted' }}"></i>
+                                            <span class="small fw-bold">{{ $isMyReviewLalu ? 'Ulasan Anda' : 'Siswa (Anonim)' }}</span>
+                                            @if($isMyReviewLalu)
+                                                <span class="badge bg-primary text-white font-mono" style="font-size: 0.65rem;">
+                                                    <i class="bi bi-pin-angle-fill me-0.5"></i> Ulasan Anda
+                                                </span>
+                                            @endif
                                             <span class="badge bg-light text-dark border font-mono">Nilai: {{ $scoreLalu }}%</span>
                                         </div>
                                         <small class="text-muted font-mono" style="font-size: 0.72rem;">{{ $fbLalu->created_at->format('d M Y') }}</small>
@@ -342,8 +370,32 @@
                                         @endif
                                     @endif
                                     @if($fbLalu->balasan_guru || ($fbLalu->balasans && $fbLalu->balasans->count() > 0))
-                                        <x-penilaian-thread :penilaian="$fbLalu" />
+                                        <x-penilaian-thread :penilaian="$fbLalu" :currentGuruId="$guru->id" />
                                     @endif
+
+                                    {{-- TOMBOL APAKAH ULASAN INI BERGUNA & LAPORKAN (ARSIP) --}}
+                                    @php
+                                        $isHelpfulLalu = $fbLalu->isHelpfulBy(Auth::id(), request()->ip());
+                                    @endphp
+                                    <div class="d-flex align-items-center justify-content-between pt-2 mt-2 border-top border-light-subtle">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <span class="text-muted small" style="font-size: 0.74rem;">Apakah ulasan ini berguna?</span>
+                                            <button type="button" 
+                                                    class="btn btn-sm btn-helpful-vote {{ $isHelpfulLalu ? 'btn-helpful-active' : 'btn-helpful-idle' }} rounded-pill px-2.5 py-0.5 d-inline-flex align-items-center gap-1.5"
+                                                    data-penilaian-id="{{ $fbLalu->id }}"
+                                                    data-voted="{{ $isHelpfulLalu ? '1' : '0' }}"
+                                                    style="font-size: 0.72rem; transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);">
+                                                <i class="bi {{ $isHelpfulLalu ? 'bi-hand-thumbs-up-fill' : 'bi-hand-thumbs-up' }} helpful-icon"></i>
+                                                <span class="helpful-count font-mono fw-semibold" style="font-size: 0.72rem;">{{ $fbLalu->helpful_count ?? 0 }}</span>
+                                            </button>
+                                        </div>
+                                        <div>
+                                            <button type="button" class="btn btn-sm btn-link text-muted p-0 text-decoration-none d-inline-flex align-items-center gap-1 opacity-75 hover-opacity-100" onclick="openModalReportUlasan({{ $fbLalu->id }})" title="Laporkan ulasan tidak pantas" style="font-size: 0.72rem;">
+                                                <i class="bi bi-flag text-danger" style="font-size: 0.68rem;"></i>
+                                                <span class="text-secondary">Laporkan</span>
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
                             @empty
                                 <div class="text-center py-2 text-muted small">Tidak ada ulasan teks pada periode ini.</div>
@@ -362,5 +414,105 @@
 </div>
 
 @include('components.modal-report-ulasan')
+
+@push('scripts')
+<style>
+.btn-helpful-idle {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    color: #475569;
+}
+.btn-helpful-idle:hover {
+    background: #f1f5f9;
+    border-color: #cbd5e1;
+    color: #003366;
+}
+.btn-helpful-active {
+    background: #003366 !important;
+    border: 1px solid #003366 !important;
+    color: #ffffff !important;
+    box-shadow: 0 1px 3px rgba(0, 51, 102, 0.2);
+}
+.btn-helpful-active:hover {
+    background: #002244 !important;
+    border-color: #002244 !important;
+    color: #ffffff !important;
+}
+</style>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // Handler Reaksi Berguna (Thumbs Up ala Google Play Store)
+    document.querySelectorAll('.btn-helpful-vote').forEach(btn => {
+        btn.addEventListener('click', function () {
+            const penilaianId = this.getAttribute('data-penilaian-id');
+            const icon = this.querySelector('.helpful-icon');
+            const countEl = this.querySelector('.helpful-count');
+
+            // Micro-animation tactile click
+            this.style.transform = 'scale(0.92)';
+            setTimeout(() => this.style.transform = 'scale(1)', 150);
+
+            fetch(`/penilaian/${penilaianId}/helpful`, {
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '{{ csrf_token() }}'
+                }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    if (countEl) countEl.textContent = data.count;
+                    if (data.helpful) {
+                        this.classList.remove('btn-helpful-idle');
+                        this.classList.add('btn-helpful-active');
+                        if (icon) {
+                            icon.classList.remove('bi-hand-thumbs-up');
+                            icon.classList.add('bi-hand-thumbs-up-fill');
+                        }
+                    } else {
+                        this.classList.remove('btn-helpful-active');
+                        this.classList.add('btn-helpful-idle');
+                        if (icon) {
+                            icon.classList.remove('bi-hand-thumbs-up-fill');
+                            icon.classList.add('bi-hand-thumbs-up');
+                        }
+                    }
+                }
+            })
+            .catch(err => console.error('Gagal memperbarui ulasan berguna:', err));
+        });
+    });
+
+    // Auto-scroll & Highlight jika datang dari notifikasi (misal: #ulasan-12)
+    const hash = window.location.hash;
+    if (hash && hash.startsWith('#ulasan-')) {
+        const target = document.querySelector(hash);
+        if (target) {
+            setTimeout(() => {
+                target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                target.style.transition = 'box-shadow 0.4s ease, border-color 0.4s ease';
+                target.style.borderColor = '#003366';
+                target.style.boxShadow = '0 0 0 3px rgba(0, 51, 102, 0.25)';
+
+                // Jika ulasan berada dalam accordion arsip yang tertutup, buka accordionnya
+                const parentAccordion = target.closest('.accordion-collapse');
+                if (parentAccordion && !parentAccordion.classList.contains('show')) {
+                    const bsAcc = new bootstrap.Collapse(parentAccordion, { toggle: true });
+                }
+
+                // Otomatis buka diskusi jika ada balasan yang belum terbuka
+                const idNum = hash.replace('#ulasan-', '');
+                const discCollapse = document.getElementById('discussionDetail-' + idNum);
+                if (discCollapse && !discCollapse.classList.contains('show')) {
+                    const bsDisc = new bootstrap.Collapse(discCollapse, { toggle: true });
+                }
+            }, 350);
+        }
+    }
+});
+</script>
+@endpush
 
 @endsection

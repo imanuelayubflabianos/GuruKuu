@@ -41,13 +41,9 @@
         <div class="row justify-content-center mb-4 mb-md-5">
             <div class="col-12 col-sm-10 col-md-8 col-lg-5">
                 <div class="gk-podium-card-revised is-first p-4 p-md-5 text-center d-flex flex-column justify-content-between shadow position-relative">
+                    @include('components.podium-laurel-badge', ['rank' => 1])
                     <div>
-                        <div class="mb-1">
-                            <span class="badge rounded-pill px-4 py-1.5 fw-bold" style="background: #fef08a; color: #854d0e; font-size: 0.9rem;">
-                                #1st
-                            </span>
-                        </div>
-                        <div class="gk-podium-badges-row">
+                        <div class="gk-podium-badges-row mt-2">
                             @foreach(($top1->penghargaan ?? []) as $penghargaan)
                                 @if($penghargaan->badge)
                                     <span class="gk-badge-mini-icon" style="background: {{ $penghargaan->badge->warna }}18; color: {{ $penghargaan->badge->warna }}; border-color: {{ $penghargaan->badge->warna }}33;" data-bs-toggle="tooltip" title="{{ $penghargaan->badge->nama_badge }}: {{ $penghargaan->badge->deskripsi }}">
@@ -84,7 +80,6 @@
                         </div>
                         <small class="text-muted font-mono d-block mb-3" style="font-size: 0.8rem;">{{ $top1->total_penilaian }} {{ $mode === 'partisipasi' ? 'siswa memilih' : 'ulasan' }}</small>
                     </div>
-
                     <a href="{{ route('guru.detail', $top1->id) }}" class="btn btn-sm btn-outline-primary gk-btn-podium-profile mb-2">
                         <i class="bi bi-eye me-1"></i> Profil
                     </a>
@@ -97,17 +92,13 @@
             $pct1 = round(($top1->rata_rata_nilai / 5) * 100);
             $pct2 = round(($top2->rata_rata_nilai / 5) * 100);
         @endphp
-        <div class="row g-3 g-md-4 justify-content-center align-items-end mb-4 mb-md-5">
+        <div class="row g-3 g-md-4 justify-content-center align-items-end mb-4 mb-md-5 gk-podium-row">
             {{-- #2 PERAK --}}
-            <div class="col-6 col-md-5">
-                <div class="gk-podium-card-revised p-3.5 p-md-4 text-center h-100 d-flex flex-column justify-content-between shadow-sm">
+            <div class="col-6 col-md-5 gk-podium-col gk-podium-2">
+                <div class="gk-podium-card-revised p-3.5 p-md-4 text-center h-100 d-flex flex-column justify-content-between shadow-sm position-relative">
+                    @include('components.podium-laurel-badge', ['rank' => 2])
                     <div>
-                        <div class="mb-1">
-                            <span class="badge rounded-pill px-3 py-1.5 fw-bold" style="background: #f1f5f9; color: #475569; font-size: 0.8rem;">
-                                #2nd
-                            </span>
-                        </div>
-                        <div class="gk-podium-badges-row">
+                        <div class="gk-podium-badges-row mt-2">
                             @foreach(($top2->penghargaan ?? []) as $penghargaan)
                                 @if($penghargaan->badge)
                                     <span class="gk-badge-mini-icon" style="background: {{ $penghargaan->badge->warna }}18; color: {{ $penghargaan->badge->warna }}; border-color: {{ $penghargaan->badge->warna }}33;" data-bs-toggle="tooltip" title="{{ $penghargaan->badge->nama_badge }}: {{ $penghargaan->badge->deskripsi }}">
@@ -151,15 +142,11 @@
             </div>
 
             {{-- #1 EMAS --}}
-            <div class="col-6 col-md-5">
+            <div class="col-6 col-md-5 gk-podium-col gk-podium-1">
                 <div class="gk-podium-card-revised is-first p-3.5 p-md-4 text-center h-100 d-flex flex-column justify-content-between shadow position-relative">
+                    @include('components.podium-laurel-badge', ['rank' => 1])
                     <div>
-                        <div class="mb-1">
-                            <span class="badge rounded-pill px-4 py-1.5 fw-bold" style="background: #fef08a; color: #854d0e; font-size: 0.9rem;">
-                                #1st
-                            </span>
-                        </div>
-                        <div class="gk-podium-badges-row">
+                        <div class="gk-podium-badges-row mt-2">
                             @foreach(($top1->penghargaan ?? []) as $penghargaan)
                                 @if($penghargaan->badge)
                                     <span class="gk-badge-mini-icon" style="background: {{ $penghargaan->badge->warna }}18; color: {{ $penghargaan->badge->warna }}; border-color: {{ $penghargaan->badge->warna }}33;" data-bs-toggle="tooltip" title="{{ $penghargaan->badge->nama_badge }}: {{ $penghargaan->badge->deskripsi }}">
@@ -212,14 +199,10 @@
         <div class="row g-2 g-md-4 mb-4 mb-md-5 align-items-end justify-content-center gk-podium-row">
             {{-- #2 PERAK (NORMAL) --}}
             <div class="col-12 col-md-4 order-2 order-md-1 gk-podium-col gk-podium-2">
-                <div class="gk-podium-card-revised p-3.5 p-md-4 text-center h-100 d-flex flex-column justify-content-between shadow-sm">
+                <div class="gk-podium-card-revised p-3.5 p-md-4 text-center h-100 d-flex flex-column justify-content-between shadow-sm position-relative">
+                    @include('components.podium-laurel-badge', ['rank' => 2])
                     <div>
-                        <div class="mb-1">
-                            <span class="badge rounded-pill px-3 py-1.5 fw-bold" style="background: #f1f5f9; color: #475569; font-size: 0.8rem;">
-                                #2nd
-                            </span>
-                        </div>
-                        <div class="gk-podium-badges-row">
+                        <div class="gk-podium-badges-row mt-2">
                             @foreach(($top2->penghargaan ?? []) as $penghargaan)
                                 @if($penghargaan->badge)
                                     <span class="gk-badge-mini-icon" style="background: {{ $penghargaan->badge->warna }}18; color: {{ $penghargaan->badge->warna }}; border-color: {{ $penghargaan->badge->warna }}33;" data-bs-toggle="tooltip" title="{{ $penghargaan->badge->nama_badge }}: {{ $penghargaan->badge->deskripsi }}">
@@ -265,13 +248,9 @@
             {{-- #1 EMAS (CENTER PODIUM - BESAR) --}}
             <div class="col-12 col-md-4 order-1 order-md-2 mb-3 mb-md-0 gk-podium-col gk-podium-1">
                 <div class="gk-podium-card-revised is-first p-4 p-md-5 text-center h-100 d-flex flex-column justify-content-between shadow position-relative">
+                    @include('components.podium-laurel-badge', ['rank' => 1])
                     <div>
-                        <div class="mb-1">
-                            <span class="badge rounded-pill px-4 py-1.5 fw-bold" style="background: #fef08a; color: #854d0e; font-size: 0.9rem;">
-                                #1st
-                            </span>
-                        </div>
-                        <div class="gk-podium-badges-row">
+                        <div class="gk-podium-badges-row mt-2">
                             @foreach(($top1->penghargaan ?? []) as $penghargaan)
                                 @if($penghargaan->badge)
                                     <span class="gk-badge-mini-icon" style="background: {{ $penghargaan->badge->warna }}18; color: {{ $penghargaan->badge->warna }}; border-color: {{ $penghargaan->badge->warna }}33;" data-bs-toggle="tooltip" title="{{ $penghargaan->badge->nama_badge }}: {{ $penghargaan->badge->deskripsi }}">
@@ -316,14 +295,10 @@
 
             {{-- #3 PERUNGGU (KECIL) --}}
             <div class="col-12 col-md-4 order-3 order-md-3 gk-podium-col gk-podium-3">
-                <div class="gk-podium-card-revised p-3 p-md-3.5 text-center h-100 d-flex flex-column justify-content-between shadow-sm">
+                <div class="gk-podium-card-revised p-3 p-md-3.5 text-center h-100 d-flex flex-column justify-content-between shadow-sm position-relative">
+                    @include('components.podium-laurel-badge', ['rank' => 3])
                     <div>
-                        <div class="mb-1">
-                            <span class="badge rounded-pill px-2.5 py-1 fw-bold" style="background: #fed7aa; color: #9a3412; font-size: 0.75rem;">
-                                #3rd
-                            </span>
-                        </div>
-                        <div class="gk-podium-badges-row">
+                        <div class="gk-podium-badges-row mt-2">
                             @foreach(($top3->penghargaan ?? []) as $penghargaan)
                                 @if($penghargaan->badge)
                                     <span class="gk-badge-mini-icon" style="background: {{ $penghargaan->badge->warna }}18; color: {{ $penghargaan->badge->warna }}; border-color: {{ $penghargaan->badge->warna }}33;" data-bs-toggle="tooltip" title="{{ $penghargaan->badge->nama_badge }}: {{ $penghargaan->badge->deskripsi }}">
@@ -353,7 +328,7 @@
                             @endfor
                         </div>
                         <div class="mb-2">
-                            <div class="gk-progress-pill gk-pill-rank-3 mx-auto" style="width: 135px; height: 22px; font-size: 0.74rem;">
+                            <div class="gk-progress-pill gk-pill-rank-3 mx-auto" style="width: 125px; height: 20px; font-size: 0.72rem;">
                                 <div class="gk-progress-pill-fill {{ $pct3 >= 75 ? 'gk-bar-blue-high' : ($pct3 >= 50 ? 'gk-bar-blue-mid' : 'gk-bar-blue-low') }}" style="width: {{ $pct3 }}%;"></div>
                                 <span class="position-relative text-white" style="z-index: 2; text-shadow: 0 1px 2px rgba(0,0,0,0.6);">{{ $pct3 }}%</span>
                             </div>

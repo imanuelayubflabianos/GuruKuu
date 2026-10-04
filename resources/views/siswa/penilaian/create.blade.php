@@ -148,41 +148,83 @@
                 </h5>
                 <p class="text-muted small mb-3">Tuliskan masukan santun yang dapat membantu guru menjadi lebih hebat dalam mengajar.</p>
 
+                <style>
+                .quick-chip {
+                    font-size: 0.74rem;
+                    transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+                    font-weight: 500;
+                }
+                .btn-chip-idle {
+                    background-color: #ffffff;
+                    border: 1px solid #cbd5e1;
+                    color: #475569;
+                }
+                .btn-chip-idle:hover {
+                    background-color: #f1f5f9;
+                    border-color: #003366;
+                    color: #003366;
+                }
+                .btn-chip-active {
+                    background-color: #003366 !important;
+                    border-color: #003366 !important;
+                    color: #ffffff !important;
+                    box-shadow: 0 2px 6px rgba(0, 51, 102, 0.25);
+                }
+                </style>
+
                 {{-- QUICK CHIPS INSPIRATION --}}
-                <div class="mb-3 p-3 rounded bg-light border">
-                    <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
-                        <small class="fw-bold text-muted font-mono" style="font-size: 0.75rem;">
-                            <i class="bi bi-lightbulb-fill text-warning me-1"></i> CONTOH INSPIRASI SANTUN (Klik untuk menambahkan/hapus dari teks):
+                <div class="mb-4 p-3 rounded-3 border" style="background: #f8fafc; border-color: #e2e8f0 !important;">
+                    <div class="d-flex justify-content-between align-items-center mb-2.5 flex-wrap gap-2">
+                        <small class="fw-bold text-dark font-mono d-flex align-items-center gap-1.5" style="font-size: 0.76rem;">
+                            <i class="bi bi-chat-square-quote text-primary"></i> PILIHAN TEMPLATE MASUKAN:
                         </small>
-                        <small class="text-muted" style="font-size: 0.72rem;">*Klik untuk menyisipkan, klik lagi untuk membatalkan</small>
+                        <small class="text-muted" style="font-size: 0.72rem;">*Klik untuk menyisipkan ke kolom teks, klik lagi untuk membatalkan</small>
                     </div>
 
-                    <div class="mb-2">
-                        <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 mb-1.5" style="font-size: 0.7rem;">Saran & Pujian:</span>
+                    {{-- 1. TEMPLATE KRITIK --}}
+                    <div class="mb-3 pb-2.5 border-bottom" style="border-color: #e2e8f0 !important;">
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <span class="badge rounded-pill border fw-semibold" style="background: rgba(0, 51, 102, 0.08); color: #003366; border-color: rgba(0, 51, 102, 0.15) !important; font-size: 0.72rem;">
+                                <i class="bi bi-pencil-square me-1"></i>Template Kritik
+                            </span>
+                            <small class="text-muted" style="font-size: 0.7rem;">&bull; Disisipkan ke kolom Kritik</small>
+                        </div>
                         <div class="d-flex flex-wrap gap-1.5">
-                            <button type="button" class="btn btn-sm btn-outline-secondary quick-chip py-1 px-2.5 rounded-pill" data-target="saran" data-text="Penyampaian materi terstruktur, jelas, dan mudah dipahami." style="font-size: 0.75rem;">
-                                ✨ Penjelasan Jelas
+                            <button type="button" class="btn btn-sm btn-chip-idle quick-chip py-1 px-2.5 rounded-pill" data-target="kritik" data-text="Mohon izin agar tempo penyampaian materi dapat sedikit diperlambat agar lebih mudah dipahami.">
+                                <i class="bi bi-speedometer2 me-1 opacity-75"></i>Tempo Mengajar
                             </button>
-                            <button type="button" class="btn btn-sm btn-outline-secondary quick-chip py-1 px-2.5 rounded-pill" data-target="saran" data-text="Guru sangat sabar, ramah, dan memotivasi siswa saat belajar." style="font-size: 0.75rem;">
-                                😊 Ramah & Memotivasi
+                            <button type="button" class="btn btn-sm btn-chip-idle quick-chip py-1 px-2.5 rounded-pill" data-target="kritik" data-text="Mohon perbanyak sesi diskusi dan tanya jawab sebelum beralih ke materi selanjutnya.">
+                                <i class="bi bi-chat-dots me-1 opacity-75"></i>Sesi Tanya Jawab
                             </button>
-                            <button type="button" class="btn btn-sm btn-outline-secondary quick-chip py-1 px-2.5 rounded-pill" data-target="saran" data-text="Suasana belajar di kelas seru, interaktif, dan komunikatif." style="font-size: 0.75rem;">
-                                🎯 Kelas Interaktif
+                            <button type="button" class="btn btn-sm btn-chip-idle quick-chip py-1 px-2.5 rounded-pill" data-target="kritik" data-text="Mohon penjelasan materi yang rumit dapat diberikan analogi atau contoh yang lebih sederhana.">
+                                <i class="bi bi-lightbulb me-1 opacity-75"></i>Contoh Analogi
                             </button>
-                            <button type="button" class="btn btn-sm btn-outline-secondary quick-chip py-1 px-2.5 rounded-pill" data-target="saran" data-text="Mohon perbanyak contoh praktik nyata yang aplikatif." style="font-size: 0.75rem;">
-                                💡 Contoh Praktik
+                            <button type="button" class="btn btn-sm btn-chip-idle quick-chip py-1 px-2.5 rounded-pill" data-target="kritik" data-text="Mohon tulisan atau materi presentasi di depan kelas dapat diperjelas lagi saat menerangkan.">
+                                <i class="bi bi-display me-1 opacity-75"></i>Keterbacaan Materi
                             </button>
                         </div>
                     </div>
 
+                    {{-- 2. TEMPLATE SARAN --}}
                     <div>
-                        <span class="badge bg-warning bg-opacity-10 text-warning-emphasis border border-warning border-opacity-25 mb-1.5" style="font-size: 0.7rem;">Masukan Santun:</span>
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <span class="badge rounded-pill border fw-semibold" style="background: rgba(0, 51, 102, 0.08); color: #003366; border-color: rgba(0, 51, 102, 0.15) !important; font-size: 0.72rem;">
+                                <i class="bi bi-lightbulb me-1"></i>Template Saran
+                            </span>
+                            <small class="text-muted" style="font-size: 0.7rem;">&bull; Disisipkan ke kolom Saran</small>
+                        </div>
                         <div class="d-flex flex-wrap gap-1.5">
-                            <button type="button" class="btn btn-sm btn-outline-secondary quick-chip py-1 px-2.5 rounded-pill" data-target="kritik" data-text="Mohon izin agar tempo penyampaian materi dapat sedikit diperlambat." style="font-size: 0.75rem;">
-                                ⏳ Tempo Sedikit Diperlambat
+                            <button type="button" class="btn btn-sm btn-chip-idle quick-chip py-1 px-2.5 rounded-pill" data-target="saran" data-text="Diharapkan materi dapat diperkaya dengan contoh praktik nyata dan studi kasus yang aplikatif.">
+                                <i class="bi bi-laptop me-1 opacity-75"></i>Praktik Nyata
                             </button>
-                            <button type="button" class="btn btn-sm btn-outline-secondary quick-chip py-1 px-2.5 rounded-pill" data-target="kritik" data-text="Mohon perbanyak sesi diskusi dan tanya jawab sebelum ganti materi." style="font-size: 0.75rem;">
-                                💬 Perbanyak Tanya Jawab
+                            <button type="button" class="btn btn-sm btn-chip-idle quick-chip py-1 px-2.5 rounded-pill" data-target="saran" data-text="Bagus jika memanfaatkan media visual, video, atau kuis interaktif agar suasana belajar semakin hidup.">
+                                <i class="bi bi-play-circle me-1 opacity-75"></i>Media Interaktif
+                            </button>
+                            <button type="button" class="btn btn-sm btn-chip-idle quick-chip py-1 px-2.5 rounded-pill" data-target="saran" data-text="Guru sangat ramah dan sabar, diharapkan terus memotivasi dan mendampingi siswa saat belajar.">
+                                <i class="bi bi-heart me-1 opacity-75"></i>Bimbingan Siswa
+                            </button>
+                            <button type="button" class="btn btn-sm btn-chip-idle quick-chip py-1 px-2.5 rounded-pill" data-target="saran" data-text="Akan sangat bermanfaat jika diadakan ulasan atau rangkuman inti materi di akhir jam pelajaran.">
+                                <i class="bi bi-journal-check me-1 opacity-75"></i>Rangkuman Materi
                             </button>
                         </div>
                     </div>
@@ -191,8 +233,8 @@
                 <div class="row g-3">
                     <div class="col-md-6">
                         <div class="d-flex justify-content-between align-items-center mb-1">
-                            <label class="form-label font-mono small fw-bold text-danger mb-0">
-                                <i class="bi bi-chat-dots me-1"></i>KRITIK / MASUKAN SANTUN
+                            <label class="form-label font-mono small fw-bold text-dark mb-0">
+                                <i class="bi bi-chat-left-text text-primary me-1"></i>KRITIK / MASUKAN SANTUN
                             </label>
                             <span class="font-mono text-muted small" id="kritikCounter" style="font-size: 0.72rem;">0 / 255</span>
                         </div>
@@ -204,8 +246,8 @@
                     </div>
                     <div class="col-md-6">
                         <div class="d-flex justify-content-between align-items-center mb-1">
-                            <label class="form-label font-mono small fw-bold text-success mb-0">
-                                <i class="bi bi-lightbulb me-1"></i>SARAN & HARAPAN PERBAIKAN
+                            <label class="form-label font-mono small fw-bold text-dark mb-0">
+                                <i class="bi bi-lightbulb text-primary me-1"></i>SARAN & HARAPAN PERBAIKAN
                             </label>
                             <span class="font-mono text-muted small" id="saranCounter" style="font-size: 0.72rem;">0 / 255</span>
                         </div>
@@ -463,11 +505,11 @@ document.addEventListener('DOMContentLoaded', function() {
             const target = chip.dataset.target === 'kritik' ? kritikInput : saranInput;
             const text = chip.dataset.text;
             if (target && target.value.includes(text)) {
-                chip.classList.remove('btn-outline-secondary');
-                chip.classList.add('btn-primary', 'text-white');
+                chip.classList.remove('btn-chip-idle');
+                chip.classList.add('btn-chip-active');
             } else {
-                chip.classList.remove('btn-primary', 'text-white');
-                chip.classList.add('btn-outline-secondary');
+                chip.classList.remove('btn-chip-active');
+                chip.classList.add('btn-chip-idle');
             }
         });
     }

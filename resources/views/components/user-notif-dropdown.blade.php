@@ -1,213 +1,299 @@
 @php
     $user = auth()->user();
-    $role = $user?->role ?? 'siswa';
-    $notifs = collect();
+    if (!$user) {
+        $notifs = collect();
+        $totalCount = 0;
+    } else {
+        $role = $user->role ?? 'siswa';
 
-    if ($role === 'siswa') {
-        // 1. Status Akun: Suspensi / Banned
-        if ($user->isDeactivated()) {
-            $isPermanent = $user->isPermanentlyDeactivated();
-            $durasiText = 'Permanen';
-            if (!$isPermanent && $user->deactivated_until) {
-                $diffDays = ceil(now()->diffInDays($user->deactivated_until, false));
-                if ($diffDays > 0) {
-                    $durasiText = $diffDays . ' Hari (s/d ' . $user->deactivated_until->translatedFormat('d M Y') . ')';
-                } else {
-                    $durasiText = 's/d ' . $user->deactivated_until->translatedFormat('d M Y H:i');
+        // In-memory static cache agar tidak perlu query berulang antar dropdown desktop & mobile pada 1 request
+        static $userNotifsStaticCache = [];
+        if (isset($userNotifsStaticCache[$user->id])) {
+            $notifList = $userNotifsStaticCache[$user->id];
+        } else {
+            $notifList = [];
+
+            if ($role === 'siswa') {
+                // 1. Status Akun: Suspensi / Banned
+                if (method_exists($user, 'isDeactivated') && $user->isDeactivated()) {
+                    $isPermanent = $user->isPermanentlyDeactivated();
+                    $durasiText = 'Permanen';
+                    if (!$isPermanent && $user->deactivated_until) {
+                        $diffDays = ceil(now()->diffInDays($user->deactivated_until, false));
+                        if ($diffDays > 0) {
+                            $durasiText = $diffDays . ' Hari (s/d ' . $user->deactivated_until->translatedFormat('d M Y') . ')';
+                        } else {
+                            $durasiText = 's/d ' . $user->deactivated_until->translatedFormat('d M Y H:i');
+                        }
+                    }
+                    $notifList[] = [
+                        'id' => 'suspensi_' . $user->id,
+                        'type' => 'danger',
+                        'icon' => 'bi-slash-circle-fill text-danger',
+                        'title' => 'Akun Dinonaktifkan (' . $durasiText . ')',
+                        'desc' => 'Akun Anda dinonaktifkan ' . ($isPermanent ? 'secara permanen' : 'selama ' . $durasiText) . '. Alasan: ' . ($user->deactivated_reason ?: 'Pelanggaran tata tertib ulasan.'),
+                        'time' => 'Status Akun',
+                        'url' => route('siswa.dashboard'),
+                        'action_label' => 'Cek Status &rarr;',
+                    ];
+                }
+
+                // 2. Notifikasi Pelanggaran / Peringatan Etika Belum Dibaca
+                $pelanggarans = \App\Models\Pelanggaran::where('user_id', $user->id)
+                    ->where('siswa_is_read', false)
+                    ->latest()
+                    ->take(3)
+                    ->get();
+                foreach ($pelanggarans as $p) {
+                    $pUrl = $p->guru_id ? route('siswa.guru.show', $p->guru_id) : route('siswa.riwayat');
+                    $notifList[] = [
+                        'id' => 'pelanggaran_' . $p->id,
+                        'type' => 'warning',
+                        'icon' => 'bi-shield-exclamation text-warning',
+                        'title' => 'Peringatan Tata Tertib',
+                        'desc' => $p->notifikasi_siswa ?: 'Ulasan Anda terdeteksi mengandung kata yang tidak sesuai etika sekolah.',
+                        'time' => $p->created_at->diffForHumans(),
+                        'url' => $pUrl,
+                        'action_label' => $p->guru_id ? 'Lihat Guru &rarr;' : 'Cek Riwayat &rarr;',
+                    ];
+                }
+
+                // 3. Notifikasi Guru Membalas Ulasan Anda (Diskusi Thread)
+                $guruThreadReplies = \App\Models\PenilaianBalasan::where('role', 'guru')
+                    ->whereHas('penilaian', function($q) use ($user) {
+                        $q->where('siswa_id', $user->id);
+                    })
+                    ->with(['penilaian.guru'])
+                    ->latest()
+                    ->take(3)
+                    ->get();
+                foreach ($guruThreadReplies as $gtr) {
+                    $namaGuru = $gtr->penilaian?->guru?->nama ?? 'Guru';
+                    $guruId = $gtr->penilaian?->guru_id;
+                    $targetUrl = $guruId 
+                        ? (route('siswa.guru.show', $guruId) . '#ulasan-' . $gtr->penilaian_id)
+                        : route('siswa.riwayat');
+                    $notifList[] = [
+                        'id' => 'guru_reply_' . $gtr->id,
+                        'type' => 'primary',
+                        'icon' => 'bi-chat-dots text-primary',
+                        'title' => "Guru {$namaGuru} Membalas Ulasan",
+                        'desc' => '"' . \Illuminate\Support\Str::limit($gtr->pesan, 65) . '"',
+                        'time' => $gtr->created_at->diffForHumans(),
+                        'url' => $targetUrl,
+                        'action_label' => 'Buka Diskusi &rarr;',
+                    ];
+                }
+
+                // Balasan langsung di tabel penilaian (jika ada balasan_guru dan belum masuk di thread)
+                $directReplies = \App\Models\Penilaian::where('siswa_id', $user->id)
+                    ->whereNotNull('balasan_guru')
+                    ->with('guru')
+                    ->latest('updated_at')
+                    ->take(2)
+                    ->get();
+                foreach ($directReplies as $dr) {
+                    if (!$guruThreadReplies->contains('penilaian_id', $dr->id)) {
+                        $namaGuru = $dr->guru?->nama ?? 'Guru';
+                        $notifList[] = [
+                            'id' => 'direct_reply_' . $dr->id,
+                            'type' => 'primary',
+                            'icon' => 'bi-reply text-primary',
+                            'title' => "Guru {$namaGuru} Menanggapi Ulasan",
+                            'desc' => '"' . \Illuminate\Support\Str::limit($dr->balasan_guru, 65) . '"',
+                            'time' => $dr->updated_at->diffForHumans(),
+                            'url' => route('siswa.guru.show', $dr->guru_id) . '#ulasan-' . $dr->id,
+                            'action_label' => 'Lihat Balasan &rarr;',
+                        ];
+                    }
+                }
+
+                // 4. Status Periode Penilaian (Reset / Aktif Baru)
+                if ($periode = \App\Models\Periode::where('status', 'aktif')->first()) {
+                    $notifList[] = [
+                        'id' => 'periode_' . $periode->id,
+                        'type' => 'success',
+                        'icon' => 'bi-arrow-clockwise text-primary',
+                        'title' => "Periode Baru: {$periode->nama_periode}",
+                        'desc' => "Periode evaluasi {$periode->tahun_ajaran} (Semester {$periode->semester}) telah aktif/direset. Berikan evaluasi objektif!",
+                        'time' => 'Periode Aktif',
+                        'url' => route('siswa.guru.index'),
+                        'action_label' => 'Mulai Menilai &rarr;',
+                    ];
+                }
+
+                // 5. Balasan Pesan dari Admin (Fitur Chat Kontak)
+                $identifier = $user->nis;
+                $repliedChats = $identifier ? \App\Models\Kontak::where('identifier', $identifier)
+                    ->whereNotNull('balasan')
+                    ->latest('updated_at')
+                    ->take(2)
+                    ->get() : collect();
+                foreach ($repliedChats as $c) {
+                    $notifList[] = [
+                        'id' => 'kontak_' . $c->id,
+                        'type' => 'info',
+                        'icon' => 'bi-headset text-primary',
+                        'title' => 'Balasan dari Administrator',
+                        'desc' => \Illuminate\Support\Str::limit($c->balasan, 65),
+                        'time' => $c->updated_at->diffForHumans(),
+                        'url' => route('siswa.pengaturan') . '#tabChat',
+                        'action_label' => 'Buka Chat &rarr;',
+                    ];
+                }
+            } elseif ($role === 'guru') {
+                $guruModel = $user->guru ?? \App\Models\Guru::where('nip', $user->nis)->first();
+
+                // 1. Status Periode Penilaian (Reset / Aktif Baru)
+                if ($periode = \App\Models\Periode::where('status', 'aktif')->first()) {
+                    $notifList[] = [
+                        'id' => 'periode_' . $periode->id,
+                        'type' => 'success',
+                        'icon' => 'bi-arrow-clockwise text-primary',
+                        'title' => "Periode Penilaian: {$periode->nama_periode}",
+                        'desc' => "Periode {$periode->tahun_ajaran} Semester {$periode->semester} berjalan aktif. Seluruh statistik & leaderboard telah disinkronkan ke periode ini.",
+                        'time' => 'Periode Aktif',
+                        'url' => route('guru.dashboard'),
+                        'action_label' => 'Dashboard &rarr;',
+                    ];
+                }
+
+                // 2. Notifikasi Ulasan Dibalas Kembali oleh Siswa
+                if ($guruModel) {
+                    $siswaReplies = \App\Models\PenilaianBalasan::where('role', 'siswa')
+                        ->whereHas('penilaian', function($q) use ($guruModel) {
+                            $q->where('guru_id', $guruModel->id);
+                        })
+                        ->with('penilaian')
+                        ->latest()
+                        ->take(3)
+                        ->get();
+                    foreach ($siswaReplies as $sr) {
+                        $notifList[] = [
+                            'id' => 'siswa_reply_' . $sr->id,
+                            'type' => 'primary',
+                            'icon' => 'bi-chat-left-text text-primary',
+                            'title' => 'Siswa Membalas Tanggapan Anda',
+                            'desc' => 'Tanggapan siswa: "' . \Illuminate\Support\Str::limit($sr->pesan, 65) . '"',
+                            'time' => $sr->created_at->diffForHumans(),
+                            'url' => route('guru.ulasan') . '#ulasan-' . $sr->penilaian_id,
+                            'action_label' => 'Buka Diskusi &rarr;',
+                        ];
+                    }
+
+                    // 3. Ulasan Baru dari Siswa
+                    $recentReviews = \App\Models\Penilaian::where('guru_id', $guruModel->id)
+                        ->where(function($q) {
+                            $q->where('is_censored', false)->orWhereNull('is_censored');
+                        })
+                        ->latest()
+                        ->take(3)
+                        ->get();
+                    foreach ($recentReviews as $rev) {
+                        $score = round(($rev->rata_rata_evaluasi / 5) * 100);
+                        $notifList[] = [
+                            'id' => 'guru_rev_' . $rev->id,
+                            'type' => 'info',
+                            'icon' => 'bi-star text-warning',
+                            'title' => "Penilaian Siswa Baru ({$score}%)",
+                            'desc' => $rev->kritik ?: ($rev->saran ?: 'Siswa memberikan penilaian performa pengajaran.'),
+                            'time' => $rev->created_at->diffForHumans(),
+                            'url' => route('guru.ulasan') . '#ulasan-' . $rev->id,
+                            'action_label' => 'Tanggapi Ulasan &rarr;',
+                        ];
+                    }
+                }
+
+                // 4. Balasan Pesan dari Admin (Fitur Chat Kontak)
+                $identifier = $guruModel?->nip ?? $user->nis;
+                $repliedChats = $identifier ? \App\Models\Kontak::where('identifier', $identifier)
+                    ->whereNotNull('balasan')
+                    ->latest('updated_at')
+                    ->take(2)
+                    ->get() : collect();
+                foreach ($repliedChats as $c) {
+                    $notifList[] = [
+                        'id' => 'guru_kontak_' . $c->id,
+                        'type' => 'info',
+                        'icon' => 'bi-headset text-primary',
+                        'title' => 'Balasan dari Administrator',
+                        'desc' => \Illuminate\Support\Str::limit($c->balasan, 65),
+                        'time' => $c->updated_at->diffForHumans(),
+                        'url' => route('guru.pengaturan') . '#tabChat',
+                        'action_label' => 'Buka Chat &rarr;',
+                    ];
                 }
             }
-            $notifs->push([
-                'id' => 'suspensi_' . $user->id,
-                'type' => 'danger',
-                'icon' => 'bi-slash-circle-fill text-danger',
-                'title' => 'Akun Dinonaktifkan (' . $durasiText . ')',
-                'desc' => 'Akun Anda dinonaktifkan ' . ($isPermanent ? 'secara permanen' : 'selama ' . $durasiText) . '. Alasan: ' . ($user->deactivated_reason ?: 'Pelanggaran tata tertib ulasan.'),
-                'time' => 'Status Akun',
-                'url' => route('siswa.dashboard'),
-            ]);
+
+            $userNotifsStaticCache[$user->id] = $notifList;
         }
 
-        // 2. Notifikasi Pelanggaran / Peringatan Etika Belum Dibaca
-        $pelanggarans = \App\Models\Pelanggaran::where('user_id', $user->id)
-            ->where('siswa_is_read', false)
-            ->latest()
-            ->take(3)
-            ->get();
-        foreach ($pelanggarans as $p) {
-            $notifs->push([
-                'id' => 'pelanggaran_' . $p->id,
-                'type' => 'warning',
-                'icon' => 'bi-shield-exclamation text-warning',
-                'title' => 'Peringatan Tata Tertib',
-                'desc' => $p->notifikasi_siswa ?: 'Ulasan Anda terdeteksi mengandung kata yang tidak sesuai etika sekolah.',
-                'time' => $p->created_at->diffForHumans(),
-                'url' => route('siswa.dashboard'),
-            ]);
-        }
-
-        // 3. Notifikasi Guru Membalas Ulasan Anda
-        $guruThreadReplies = \App\Models\PenilaianBalasan::where('role', 'guru')
-            ->whereHas('penilaian', function($q) use ($user) {
-                $q->where('siswa_id', $user->id);
-            })
-            ->with(['penilaian.guru'])
-            ->latest()
-            ->take(3)
-            ->get();
-        foreach ($guruThreadReplies as $gtr) {
-            $namaGuru = $gtr->penilaian?->guru?->nama ?? 'Guru';
-            $guruId = $gtr->penilaian?->guru_id;
-            $notifs->push([
-                'id' => 'guru_reply_' . $gtr->id,
-                'type' => 'primary',
-                'icon' => 'bi-chat-dots text-primary',
-                'title' => "Guru {$namaGuru} Membalas Ulasan",
-                'desc' => '"' . \Illuminate\Support\Str::limit($gtr->pesan, 65) . '"',
-                'time' => $gtr->created_at->diffForHumans(),
-                'url' => $guruId ? route('siswa.guru.show', $guruId) : route('siswa.riwayat'),
-            ]);
-        }
-
-        // Balasan langsung di tabel penilaian (jika ada balasan_guru dan belum masuk di thread)
-        $directReplies = \App\Models\Penilaian::where('siswa_id', $user->id)
-            ->whereNotNull('balasan_guru')
-            ->with('guru')
-            ->latest('updated_at')
-            ->take(2)
-            ->get();
-        foreach ($directReplies as $dr) {
-            if (!$guruThreadReplies->contains('penilaian_id', $dr->id)) {
-                $namaGuru = $dr->guru?->nama ?? 'Guru';
-                $notifs->push([
-                    'id' => 'direct_reply_' . $dr->id,
-                    'type' => 'primary',
-                    'icon' => 'bi-reply text-primary',
-                    'title' => "Guru {$namaGuru} Menanggapi Ulasan",
-                    'desc' => '"' . \Illuminate\Support\Str::limit($dr->balasan_guru, 65) . '"',
-                    'time' => $dr->updated_at->diffForHumans(),
-                    'url' => route('siswa.guru.show', $dr->guru_id),
-                ]);
-            }
-        }
-
-        // 4. Status Periode Penilaian (Reset / Aktif Baru)
-        if ($periode = \App\Models\Periode::where('status', 'aktif')->first()) {
-            $notifs->push([
-                'id' => 'periode_' . $periode->id,
-                'type' => 'success',
-                'icon' => 'bi-arrow-clockwise text-primary',
-                'title' => "Periode Baru: {$periode->nama_periode}",
-                'desc' => "Periode evaluasi {$periode->tahun_ajaran} (Semester {$periode->semester}) telah aktif/direset. Berikan evaluasi objektif!",
-                'time' => 'Periode Aktif',
-                'url' => route('siswa.guru.index'),
-            ]);
-        }
-
-        // 5. Balasan Pesan dari Admin (Fitur Chat Kontak)
-        $identifier = $user->nis;
-        $repliedChats = $identifier ? \App\Models\Kontak::where('identifier', $identifier)
-            ->whereNotNull('balasan')
-            ->latest('updated_at')
-            ->take(2)
-            ->get() : collect();
-        foreach ($repliedChats as $c) {
-            $notifs->push([
-                'id' => 'kontak_' . $c->id,
-                'type' => 'info',
-                'icon' => 'bi-headset text-primary',
-                'title' => 'Balasan dari Administrator',
-                'desc' => \Illuminate\Support\Str::limit($c->balasan, 65),
-                'time' => $c->updated_at->diffForHumans(),
-                'url' => route('siswa.pengaturan') . '#tabChat',
-            ]);
-        }
-    } elseif ($role === 'guru') {
-        $guruModel = $user->guru ?? \App\Models\Guru::where('nip', $user->nis)->first();
-
-        // 1. Status Periode Penilaian (Reset / Aktif Baru)
-        if ($periode = \App\Models\Periode::where('status', 'aktif')->first()) {
-            $notifs->push([
-                'id' => 'periode_' . $periode->id,
-                'type' => 'success',
-                'icon' => 'bi-arrow-clockwise text-primary',
-                'title' => "Periode Penilaian: {$periode->nama_periode}",
-                'desc' => "Periode {$periode->tahun_ajaran} Semester {$periode->semester} berjalan aktif. Seluruh statistik & leaderboard telah disinkronkan ke periode ini.",
-                'time' => 'Periode Aktif',
-                'url' => route('guru.dashboard'),
-            ]);
-        }
-
-        // 2. Notifikasi Ulasan Dibalas Kembali oleh Siswa
-        if ($guruModel) {
-            $siswaReplies = \App\Models\PenilaianBalasan::where('role', 'siswa')
-                ->whereHas('penilaian', function($q) use ($guruModel) {
-                    $q->where('guru_id', $guruModel->id);
-                })
-                ->with('penilaian')
-                ->latest()
-                ->take(3)
-                ->get();
-            foreach ($siswaReplies as $sr) {
-                $notifs->push([
-                    'id' => 'siswa_reply_' . $sr->id,
-                    'type' => 'primary',
-                    'icon' => 'bi-chat-left-text text-primary',
-                    'title' => 'Siswa Membalas Tanggapan Anda',
-                    'desc' => 'Tanggapan siswa: "' . \Illuminate\Support\Str::limit($sr->pesan, 65) . '"',
-                    'time' => $sr->created_at->diffForHumans(),
-                    'url' => route('guru.ulasan'),
-                ]);
-            }
-
-            // 3. Ulasan Baru dari Siswa
-            $recentReviews = \App\Models\Penilaian::where('guru_id', $guruModel->id)
-                ->where(function($q) {
-                    $q->where('is_censored', false)->orWhereNull('is_censored');
-                })
-                ->latest()
-                ->take(3)
-                ->get();
-            foreach ($recentReviews as $rev) {
-                $score = round(($rev->rata_rata_evaluasi / 5) * 100);
-                $notifs->push([
-                    'id' => 'guru_rev_' . $rev->id,
-                    'type' => 'info',
-                    'icon' => 'bi-star text-warning',
-                    'title' => "Penilaian Siswa Baru ({$score}%)",
-                    'desc' => $rev->kritik ?: ($rev->saran ?: 'Siswa memberikan penilaian performa pengajaran.'),
-                    'time' => $rev->created_at->diffForHumans(),
-                    'url' => route('guru.ulasan'),
-                ]);
-            }
-        }
-
-        // 4. Balasan Pesan dari Admin (Fitur Chat Kontak)
-        $identifier = $guruModel?->nip ?? $user->nis;
-        $repliedChats = $identifier ? \App\Models\Kontak::where('identifier', $identifier)
-            ->whereNotNull('balasan')
-            ->latest('updated_at')
-            ->take(2)
-            ->get() : collect();
-        foreach ($repliedChats as $c) {
-            $notifs->push([
-                'id' => 'guru_kontak_' . $c->id,
-                'type' => 'info',
-                'icon' => 'bi-headset text-primary',
-                'title' => 'Balasan dari Administrator',
-                'desc' => \Illuminate\Support\Str::limit($c->balasan, 65),
-                'time' => $c->updated_at->diffForHumans(),
-                'url' => route('guru.pengaturan') . '#tabChat',
-            ]);
-        }
+        $notifs = collect($notifList);
+        $totalCount = $notifs->count();
     }
-
-    $totalCount = $notifs->count();
 @endphp
 
-<div class="dropdown" id="userNotifContainer_{{ auth()->id() }}">
-    <button class="btn btn-light position-relative p-2 rounded-circle border shadow-sm" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false" title="Pusat Notifikasi">
+@php
+    $btnSizeClass = $btnClass ?? 'gk-topbar-btn';
+    $containerId = 'userNotifContainer_' . ($prefix ?? 'default') . '_' . (auth()->id() ?? 'guest');
+@endphp
+
+<style>
+.gk-topbar-btn {
+    width: 40px !important;
+    height: 40px !important;
+    min-width: 40px !important;
+    min-height: 40px !important;
+    max-width: 40px !important;
+    max-height: 40px !important;
+    aspect-ratio: 1 / 1 !important;
+    border-radius: 50% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-shrink: 0 !important;
+    line-height: 1 !important;
+    box-sizing: border-box !important;
+    text-decoration: none !important;
+}
+.gk-topbar-btn-sm {
+    width: 34px !important;
+    height: 34px !important;
+    min-width: 34px !important;
+    min-height: 34px !important;
+    max-width: 34px !important;
+    max-height: 34px !important;
+    aspect-ratio: 1 / 1 !important;
+    border-radius: 50% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-shrink: 0 !important;
+    line-height: 1 !important;
+    box-sizing: border-box !important;
+    text-decoration: none !important;
+}
+.gk-topbar-btn i { font-size: 1.15rem !important; line-height: 1 !important; }
+.gk-topbar-btn-sm i { font-size: 0.95rem !important; line-height: 1 !important; }
+.user-notif-item.has-link:hover {
+    background-color: rgba(0, 51, 102, 0.05) !important;
+}
+.user-notif-item.has-link:hover .notif-item-title {
+    color: var(--primary, #003366) !important;
+}
+.user-notif-item.has-link:hover .notif-action-text {
+    text-decoration: underline !important;
+}
+</style>
+
+<div class="dropdown" id="{{ $containerId }}">
+    <button class="btn btn-light position-relative border shadow-sm {{ $btnSizeClass }}" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false" title="Pusat Notifikasi">
         {{-- Ikon Lonceng: Kuning Pekat jika ada notif, Kuning Pudar jika 0 / sudah dicek --}}
-        <i class="bi bi-bell-fill gk-bell-icon {{ $totalCount > 0 ? 'has-unread' : 'no-unread' }} fs-5 user-bell-icon"></i>
+        <i class="bi bi-bell-fill gk-bell-icon {{ $totalCount > 0 ? 'has-unread' : 'no-unread' }} user-bell-icon"></i>
         
         {{-- Badge Notifikasi: Biru (Bukan Merah) --}}
         <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill gk-notif-badge user-notif-badge" style="font-size: 0.65rem; {{ $totalCount > 0 ? '' : 'display: none !important;' }}">
@@ -232,11 +318,16 @@
 
         <div class="user-notif-list" style="max-height: 320px; overflow-y: auto;">
             @forelse($notifs as $item)
-                <a href="{{ $item['url'] }}" 
+                @php
+                    $hasUrl = !empty($item['url']);
+                    $tag = $hasUrl ? 'a' : 'div';
+                @endphp
+                <{{ $tag }} 
+                   @if($hasUrl) href="{{ $item['url'] }}" @endif
                    data-notif-id="{{ $item['id'] }}" 
-                   class="dropdown-item p-3 border-bottom text-wrap d-flex align-items-start gap-2.5 user-notif-item" 
-                   style="white-space: normal; transition: background 0.15s;">
-                    <div class="rounded-circle p-2 d-flex align-items-center justify-content-center bg-light border flex-shrink-0" style="width: 34px; height: 34px;">
+                   class="dropdown-item p-3 border-bottom text-wrap d-flex align-items-start gap-2.5 user-notif-item {{ $hasUrl ? 'has-link' : 'no-link' }}" 
+                   style="white-space: normal; transition: all 0.15s ease; {{ $hasUrl ? 'cursor: pointer;' : 'cursor: default;' }}">
+                    <div class="rounded-circle p-2 d-flex align-items-center justify-content-center bg-light border flex-shrink-0" style="width: 36px; height: 36px;">
                         <i class="bi {{ $item['icon'] }} fs-6"></i>
                     </div>
                     <div class="flex-grow-1" style="min-width: 0;">
@@ -244,10 +335,19 @@
                             <strong class="text-dark small d-block text-truncate notif-item-title" style="font-size: 0.82rem;">{{ $item['title'] }}</strong>
                             <span class="badge bg-primary rounded-circle p-1 notif-unread-dot" style="display: none; width: 7px; height: 7px;"></span>
                         </div>
-                        <p class="text-muted mb-1 small" style="font-size: 0.76rem; line-height: 1.35;">{{ $item['desc'] }}</p>
-                        <small class="text-secondary font-mono d-block" style="font-size: 0.68rem;">{{ $item['time'] }}</small>
+                        <p class="text-muted mb-1.5 small" style="font-size: 0.76rem; line-height: 1.35;">{{ $item['desc'] }}</p>
+                        <div class="d-flex align-items-center justify-content-between pt-0.5">
+                            <small class="text-secondary font-mono d-block" style="font-size: 0.68rem;">
+                                <i class="bi bi-clock me-1"></i>{{ $item['time'] }}
+                            </small>
+                            @if($hasUrl)
+                                <span class="text-primary small fw-semibold d-inline-flex align-items-center notif-action-text" style="font-size: 0.72rem;">
+                                    {{ $item['action_label'] ?? 'Buka &rarr;' }}
+                                </span>
+                            @endif
+                        </div>
                     </div>
-                </a>
+                </{{ $tag }}>
             @empty
                 <div class="text-center py-4 px-3 text-muted">
                     <i class="bi bi-bell-slash fs-2 opacity-50 d-block mb-1"></i>
@@ -294,25 +394,28 @@
 
     function syncNotifUI() {
         const readList = getReadNotifs();
-        const container = document.getElementById('userNotifContainer_' + userId);
-        if (!container) return;
+        const containers = document.querySelectorAll('[id^="userNotifContainer_"]');
+        if (!containers.length) return;
 
-        const items = container.querySelectorAll('.user-notif-item');
         let unreadCount = 0;
 
-        items.forEach(el => {
-            const id = el.getAttribute('data-notif-id');
-            const dot = el.querySelector('.notif-unread-dot');
-            if (id && readList.includes(id)) {
-                el.style.opacity = '0.65';
-                el.classList.add('bg-light-subtle');
-                if (dot) dot.style.display = 'none';
-            } else {
-                unreadCount++;
-                el.style.opacity = '1';
-                el.classList.remove('bg-light-subtle');
-                if (dot) dot.style.display = 'inline-block';
-            }
+        containers.forEach(container => {
+            const items = container.querySelectorAll('.user-notif-item');
+            unreadCount = 0;
+            items.forEach(el => {
+                const id = el.getAttribute('data-notif-id');
+                const dot = el.querySelector('.notif-unread-dot');
+                if (id && readList.includes(id)) {
+                    el.style.opacity = '0.65';
+                    el.classList.add('bg-light-subtle');
+                    if (dot) dot.style.display = 'none';
+                } else {
+                    unreadCount++;
+                    el.style.opacity = '1';
+                    el.classList.remove('bg-light-subtle');
+                    if (dot) dot.style.display = 'inline-block';
+                }
+            });
         });
 
         // Update semua icon lonceng user

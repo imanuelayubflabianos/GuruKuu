@@ -16,7 +16,9 @@ class LandingController extends Controller
         
         $totalGuru = Guru::count();
         $totalSiswa = User::where('role', 'siswa')->count();
-        $totalPenilaian = Penilaian::count();
+        $totalPenilaian = $periodeAktif 
+            ? Penilaian::where('periode_id', $periodeAktif->id)->count() 
+            : Penilaian::count();
 
         // Leaderboard resmi menggunakan aturan standar sistem (minimal 5 ulasan)
         $leaderboard = Guru::leaderboardFor('rating', null, $periodeAktif?->id);

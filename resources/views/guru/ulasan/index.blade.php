@@ -86,7 +86,7 @@
 <div class="row g-3">
     @forelse($semuaUlasan as $review)
     <div class="col-12">
-        <div class="card-custom p-4 position-relative">
+        <div id="ulasan-{{ $review->id }}" class="card-custom p-4 position-relative" style="transition: all 0.3s ease;">
             <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-3 pb-2 border-bottom">
                 <div class="d-flex align-items-center gap-2 flex-wrap">
                     <span class="badge bg-secondary-subtle text-secondary border px-2 py-1" style="font-size: 0.75rem;">
@@ -211,4 +211,29 @@
         {{ $semuaUlasan->links() }}
     </div>
 @endif
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const hash = window.location.hash;
+    if (hash && hash.startsWith('#ulasan-')) {
+        const target = document.querySelector(hash);
+        if (target) {
+            setTimeout(() => {
+                target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                target.style.transition = 'box-shadow 0.4s ease, border-color 0.4s ease';
+                target.style.borderColor = '#003366';
+                target.style.boxShadow = '0 0 0 3px rgba(0, 51, 102, 0.25)';
+
+                const idNum = hash.replace('#ulasan-', '');
+                const discCollapse = document.getElementById('discussionDetail-' + idNum);
+                if (discCollapse && !discCollapse.classList.contains('show')) {
+                    const bsDisc = new bootstrap.Collapse(discCollapse, { toggle: true });
+                }
+            }, 350);
+        }
+    }
+});
+</script>
+@endpush
 @endsection

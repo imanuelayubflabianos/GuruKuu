@@ -31,7 +31,7 @@
             </ul>
         </div>
         <div class="btn-group shadow-sm">
-            <form action="{{ route('admin.sipintu.guru.sync-all') }}" method="POST" id="formSyncGuru" class="d-inline" onsubmit="return confirmSyncGuru(event)">
+            <form action="{{ route('admin.sipintu.guru.sync-all') }}" method="POST" id="formSyncGuru" class="d-inline" data-confirm="Tarik dan sinkronkan seluruh data guru dari SiPintu Gateway ke database lokal GuruKuu sekarang?" data-confirm-title="Sinkronkan Data Guru?" data-confirm-btn="Ya, Sinkronkan" data-confirm-type="info">
                 @csrf
                 <button type="submit" class="btn btn-primary-custom" id="btnSyncGuru" title="Tarik dan sinkronkan seluruh data guru dari SiPintu ke GuruKuu" style="border-top-right-radius: 0; border-bottom-right-radius: 0;">
                     <i class="bi bi-cloud-arrow-down me-1"></i> Tarik dari SiPintu
@@ -418,14 +418,23 @@ function openDeactivateGuruModal(id, name) {
 }
 
 function confirmSyncGuru(e) {
-    if (!confirm('Tarik dan sinkronkan seluruh data guru dari SiPintu Gateway ke database lokal GuruKuu sekarang?')) {
-        e.preventDefault();
-        return false;
-    }
-    const btn = document.getElementById('btnSyncGuru');
-    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> Menarik Data...';
-    btn.classList.add('disabled');
-    return true;
+    e.preventDefault();
+    window.gurukuuConfirm({
+        title: 'Sinkronkan Data Guru?',
+        text: 'Tarik dan sinkronkan seluruh data guru dari SiPintu Gateway ke database lokal GuruKuu sekarang?',
+        icon: 'question',
+        confirmButtonText: 'Ya, Sinkronkan',
+        type: 'info',
+        onConfirm: function() {
+            const btn = document.getElementById('btnSyncGuru');
+            if (btn) {
+                btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> Menarik Data...';
+                btn.classList.add('disabled');
+            }
+            document.getElementById('formSyncGuru').submit();
+        }
+    });
+    return false;
 }
 
 function toggleGuruDeactDuration() {

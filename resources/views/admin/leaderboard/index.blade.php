@@ -62,12 +62,8 @@
         <div class="row justify-content-center mb-4 mb-md-5">
             <div class="col-12 col-sm-10 col-md-8 col-lg-5">
                 <div class="gk-podium-card-revised is-first p-4 p-md-5 text-center d-flex flex-column justify-content-between shadow position-relative">
+                    @include('components.podium-laurel-badge', ['rank' => 1])
                     <div>
-                        <div class="mb-1">
-                            <span class="badge rounded-pill px-4 py-1.5 fw-bold" style="background: #fef08a; color: #854d0e; font-size: 0.9rem;">
-                                #1st
-                            </span>
-                        </div>
                         <div class="gk-podium-badges-row">
                             @foreach(($top1->penghargaan ?? []) as $penghargaan)
                                 @if($penghargaan->badge)
@@ -122,13 +118,9 @@
         <div class="row g-3 g-md-4 justify-content-center align-items-end mb-4 mb-md-5">
             {{-- #2 PERAK --}}
             <div class="col-6 col-md-5">
-                <div class="gk-podium-card-revised p-3.5 p-md-4 text-center h-100 d-flex flex-column justify-content-between shadow-sm">
+                <div class="gk-podium-card-revised p-3.5 p-md-4 text-center h-100 d-flex flex-column justify-content-between shadow-sm position-relative">
+                    @include('components.podium-laurel-badge', ['rank' => 2])
                     <div>
-                        <div class="mb-1">
-                            <span class="badge rounded-pill px-3 py-1.5 fw-bold" style="background: #f1f5f9; color: #475569; font-size: 0.8rem;">
-                                #2nd
-                            </span>
-                        </div>
                         <div class="gk-podium-badges-row">
                             @foreach(($top2->penghargaan ?? []) as $penghargaan)
                                 @if($penghargaan->badge)
@@ -175,12 +167,8 @@
             {{-- #1 EMAS --}}
             <div class="col-6 col-md-5">
                 <div class="gk-podium-card-revised is-first p-3.5 p-md-4 text-center h-100 d-flex flex-column justify-content-between shadow position-relative">
+                    @include('components.podium-laurel-badge', ['rank' => 1])
                     <div>
-                        <div class="mb-1">
-                            <span class="badge rounded-pill px-4 py-1.5 fw-bold" style="background: #fef08a; color: #854d0e; font-size: 0.9rem;">
-                                #1st
-                            </span>
-                        </div>
                         <div class="gk-podium-badges-row">
                             @foreach(($top1->penghargaan ?? []) as $penghargaan)
                                 @if($penghargaan->badge)
@@ -234,13 +222,9 @@
         <div class="row g-2 g-md-4 mb-4 mb-md-5 align-items-end justify-content-center gk-podium-row">
             {{-- #2 PERAK --}}
             <div class="col-12 col-md-4 order-2 order-md-1 gk-podium-col gk-podium-2">
-                <div class="gk-podium-card-revised p-3.5 p-md-4 text-center h-100 d-flex flex-column justify-content-between shadow-sm">
+                <div class="gk-podium-card-revised p-3.5 p-md-4 text-center h-100 d-flex flex-column justify-content-between shadow-sm position-relative">
+                    @include('components.podium-laurel-badge', ['rank' => 2])
                     <div>
-                        <div class="mb-1">
-                            <span class="badge rounded-pill px-3 py-1.5 fw-bold" style="background: #f1f5f9; color: #475569; font-size: 0.8rem;">
-                                #2nd
-                            </span>
-                        </div>
                         <div class="gk-podium-badges-row">
                             @foreach(($top2->penghargaan ?? []) as $penghargaan)
                                 @if($penghargaan->badge)
@@ -287,12 +271,8 @@
             {{-- #1 EMAS (CENTER PODIUM) --}}
             <div class="col-12 col-md-4 order-1 order-md-2 mb-3 mb-md-0 gk-podium-col gk-podium-1">
                 <div class="gk-podium-card-revised is-first p-4 p-md-5 text-center h-100 d-flex flex-column justify-content-between shadow position-relative">
+                    @include('components.podium-laurel-badge', ['rank' => 1])
                     <div>
-                        <div class="mb-1">
-                            <span class="badge rounded-pill px-4 py-1.5 fw-bold" style="background: #fef08a; color: #854d0e; font-size: 0.9rem;">
-                                #1st
-                            </span>
-                        </div>
                         <div class="gk-podium-badges-row">
                             @foreach(($top1->penghargaan ?? []) as $penghargaan)
                                 @if($penghargaan->badge)
@@ -338,13 +318,9 @@
 
             {{-- #3 PERUNGGU --}}
             <div class="col-12 col-md-4 order-3 order-md-3 gk-podium-col gk-podium-3">
-                <div class="gk-podium-card-revised p-3 p-md-3.5 text-center h-100 d-flex flex-column justify-content-between shadow-sm">
+                <div class="gk-podium-card-revised p-3 p-md-3.5 text-center h-100 d-flex flex-column justify-content-between shadow-sm position-relative">
+                    @include('components.podium-laurel-badge', ['rank' => 3])
                     <div>
-                        <div class="mb-1">
-                            <span class="badge rounded-pill px-2.5 py-1 fw-bold" style="background: #fed7aa; color: #9a3412; font-size: 0.75rem;">
-                                #3rd
-                            </span>
-                        </div>
                         <div class="gk-podium-badges-row">
                             @foreach(($top3->penghargaan ?? []) as $penghargaan)
                                 @if($penghargaan->badge)

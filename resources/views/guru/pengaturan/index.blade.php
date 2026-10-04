@@ -181,7 +181,10 @@
                                 <div class="d-flex justify-content-end mb-3">
                                     <div style="background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%); color: white; padding: 0.85rem 1.25rem; border-radius: 18px 18px 4px 18px; max-width: 75%; box-shadow: 0 4px 12px rgba(0,51,102,0.15); position: relative;">
                                         @if($chat->pesan === '[Pesan Dihapus]')
-                                            <p class="mb-1 fst-italic opacity-75"><i class="bi bi-trash me-1"></i>[Pesan Dihapus]</p>
+                                            <p class="mb-1 fst-italic d-flex align-items-center gap-1.5" style="font-size: 0.88rem; opacity: 0.8; color: rgba(255,255,255,0.85);">
+                                                <i class="bi bi-ban"></i>
+                                                <span>Pesan ini telah dihapus</span>
+                                            </p>
                                         @else
                                             <p class="mb-1" style="line-height: 1.5; word-wrap: break-word;">{{ $chat->pesan }}</p>
                                         @endif
@@ -196,7 +199,7 @@
                                                 <button type="button" class="btn btn-sm p-0 text-white border-0 ms-1" onclick="openEditModalGuru({{ $chat->id }}, '{{ addslashes($chat->pesan) }}')" title="Edit Pesan">
                                                     <i class="bi bi-pencil-fill" style="font-size: 0.72rem;"></i>
                                                 </button>
-                                                <form action="{{ route('guru.pengaturan.chat.destroy', $chat) }}" method="POST" class="d-inline" onsubmit="return confirm('Hapus pesan ini?')">
+                                                <form action="{{ route('guru.pengaturan.chat.destroy', $chat) }}" method="POST" class="d-inline" data-confirm="Hapus pesan ini?" data-confirm-title="Hapus Pesan?" data-confirm-btn="Ya, Hapus" data-confirm-type="danger">
                                                     @csrf @method('DELETE')
                                                     <button type="submit" class="btn btn-sm p-0 text-white border-0" title="Hapus Pesan">
                                                         <i class="bi bi-trash-fill" style="font-size: 0.72rem;"></i>
@@ -218,7 +221,14 @@
                                             <div class="fw-bold mb-1" style="color: var(--primary); font-size: 0.8rem;">
                                                 <i class="bi bi-patch-check-fill me-1 text-primary"></i> Administrator Sekolah
                                             </div>
-                                            <p class="mb-1" style="line-height: 1.5; word-wrap: break-word;">{{ $chat->balasan }}</p>
+                                            @if($chat->balasan === '[Pesan Dihapus]')
+                                                <p class="mb-1 fst-italic text-muted d-flex align-items-center gap-1.5" style="font-size: 0.88rem; opacity: 0.8;">
+                                                    <i class="bi bi-ban"></i>
+                                                    <span>Pesan ini telah dihapus</span>
+                                                </p>
+                                            @else
+                                                <p class="mb-1" style="line-height: 1.5; word-wrap: break-word;">{{ $chat->balasan }}</p>
+                                            @endif
                                             <div class="text-end" style="font-size: 0.7rem; color: var(--text-muted);">
                                                 {{ $chat->balasan_at ? \Carbon\Carbon::parse($chat->balasan_at)->format('H:i') : $chat->updated_at->format('H:i') }}
                                             </div>

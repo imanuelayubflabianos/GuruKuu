@@ -6,11 +6,22 @@ use App\Models\Pelanggaran;
 use App\Models\Penilaian;
 use App\Models\UlasanReport;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Schema;
 
 class UlasanReportController extends Controller
 {
     public function store(Request $request, Penilaian $penilaian)
     {
+        if (!Schema::hasTable('ulasan_reports')) {
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Fitur laporan sedang dalam pemeliharaan (tabel belum dimigrasi).',
+                ], 503);
+            }
+            return back()->with('error', 'Fitur laporan sedang dalam pemeliharaan.');
+        }
+
         $validated = $request->validate([
             'alasan' => 'required|string|in:kata_kasar,ujaran_kebencian,fitnah,spam,lainnya',
             'catatan' => 'nullable|string|max:255',

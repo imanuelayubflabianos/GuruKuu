@@ -20,7 +20,7 @@
             <i class="bi bi-mortarboard me-1"></i> Data Siswa Lokal
         </a>
         @if($result['success'] && $students->isNotEmpty())
-        <form action="{{ route('admin.sipintu.siswa.sync-all') }}" method="POST" onsubmit="return confirm('Sinkronkan seluruh data siswa aktif dari SiPintu ke database GuruKuu?')">
+        <form action="{{ route('admin.sipintu.siswa.sync-all') }}" method="POST" data-confirm="Sinkronkan seluruh data siswa aktif dari SiPintu ke database GuruKuu?" data-confirm-title="Sinkronkan Data Siswa?" data-confirm-btn="Ya, Sinkronkan" data-confirm-type="info">
             @csrf
             <button type="submit" class="btn btn-success">
                 <i class="bi bi-cloud-arrow-down-fill me-1"></i> Sinkronkan Semua Siswa Aktif

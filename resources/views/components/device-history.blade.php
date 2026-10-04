@@ -3,6 +3,7 @@
     $histories = \App\Models\LoginHistory::getHistoriesForUser(auth()->user(), $currentSessionId);
     $activeCount = collect($histories)->where('is_active_session', true)->count();
     $otherActiveCount = collect($histories)->where('is_active_session', true)->where('is_current', false)->count();
+    $inactiveCount = collect($histories)->where('is_active_session', false)->count();
 @endphp
 
 <div class="card-custom p-4 mb-4">
@@ -16,8 +17,17 @@
             </p>
         </div>
         <div class="d-flex align-items-center gap-2 flex-wrap">
+            @if($inactiveCount > 0)
+            <form action="{{ route('auth.device.clear-history') }}" method="POST" data-confirm="Bersihkan seluruh riwayat login perangkat yang sudah keluar agar tidak menumpuk?" data-confirm-title="Bersihkan Riwayat Perangkat?" data-confirm-btn="Ya, Bersihkan" data-confirm-type="warning">
+                @csrf
+                <button type="submit" class="btn btn-outline-secondary btn-sm fw-semibold" title="Bersihkan catatan riwayat perangkat yang sudah logout">
+                    <i class="bi bi-trash3 me-1"></i> Bersihkan Riwayat ({{ $inactiveCount }})
+                </button>
+            </form>
+            @endif
+
             @if($otherActiveCount > 0)
-            <form action="{{ route('auth.device.logout-others') }}" method="POST" onsubmit="return confirm('Keluarkan semua sesi di perangkat lain? Anda tetap login di perangkat ini.');">
+            <form action="{{ route('auth.device.logout-others') }}" method="POST" data-confirm="Keluarkan semua sesi di perangkat lain? Anda tetap login di perangkat ini." data-confirm-title="Keluarkan Sesi Perangkat Lain?" data-confirm-btn="Ya, Keluarkan" data-confirm-type="warning">
                 @csrf
                 <button type="submit" class="btn btn-outline-warning btn-sm fw-semibold">
                     <i class="bi bi-shield-slash me-1"></i> Keluarkan Perangkat Lain ({{ $otherActiveCount }})
@@ -25,7 +35,7 @@
             </form>
             @endif
 
-            <form action="{{ route('auth.device.logout-all') }}" method="POST" onsubmit="return confirm('Peringatan: Aksi ini akan mengeluarkan seluruh perangkat termasuk yang sedang Anda gunakan saat ini. Lanjutkan?');">
+            <form action="{{ route('auth.device.logout-all') }}" method="POST" data-confirm="Peringatan: Aksi ini akan mengeluarkan seluruh perangkat termasuk yang sedang Anda gunakan saat ini. Lanjutkan?" data-confirm-title="Keluarkan Seluruh Perangkat?" data-confirm-btn="Ya, Keluarkan Semua" data-confirm-type="danger">
                 @csrf
                 <button type="submit" class="btn btn-outline-danger btn-sm fw-semibold">
                     <i class="bi bi-box-arrow-right me-1"></i> Keluarkan Semua Perangkat
@@ -114,7 +124,7 @@
                                     </button>
                                     <ul class="dropdown-menu dropdown-menu-end shadow border-0 py-1" style="border-radius: 12px; font-size: 0.85rem; min-width: 175px; box-shadow: 0 10px 25px rgba(0,0,0,0.12) !important;">
                                         <li>
-                                            <form action="{{ route('auth.device.logout', $history->id ?: $history->session_id) }}" method="POST" onsubmit="return confirm('Keluarkan sesi pada perangkat {{ $history->device_name }}?');">
+                                            <form action="{{ route('auth.device.logout', $history->id ?: $history->session_id) }}" method="POST" data-confirm="Keluarkan sesi pada perangkat {{ $history->device_name }}?" data-confirm-title="Keluarkan Sesi Perangkat?" data-confirm-btn="Ya, Keluarkan" data-confirm-type="warning">
                                                 @csrf
                                                 <button type="submit" class="dropdown-item py-1.5 px-3 d-flex align-items-center gap-2 text-danger">
                                                     <i class="bi bi-box-arrow-right text-danger"></i>
@@ -125,7 +135,18 @@
                                     </ul>
                                 </div>
                             @else
-                                <span class="text-muted small fst-italic">Selesai</span>
+                                <div class="d-flex align-items-center justify-content-end gap-2">
+                                    <span class="text-muted small fst-italic">Selesai</span>
+                                    @if($history->id)
+                                    <form action="{{ route('auth.device.destroy', $history->id) }}" method="POST" data-confirm="Hapus catatan riwayat login perangkat ini?" data-confirm-title="Hapus Riwayat Perangkat?" data-confirm-btn="Ya, Hapus" data-confirm-type="danger">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-sm btn-outline-danger p-0 rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 26px; height: 26px;" title="Hapus dari riwayat">
+                                            <i class="bi bi-trash3" style="font-size: 0.72rem;"></i>
+                                        </button>
+                                    </form>
+                                    @endif
+                                </div>
                             @endif
                         </td>
                     </tr>
