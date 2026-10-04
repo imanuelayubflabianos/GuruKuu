@@ -25,6 +25,10 @@ class KontakController extends Controller
             return back()->withInput()->with('error', 'Balasan tidak boleh mengandung tautan / link URL luar demi keamanan.');
         }
 
+        if (!ProfanityFilterService::isClean($request->balasan)) {
+            return back()->withInput()->with('error', 'Balasan Anda mengandung kata yang melanggar etika moderasi bahasa.');
+        }
+
         $kontak->update([
             'balasan' => $request->balasan,
             'is_replied' => true,
@@ -41,6 +45,10 @@ class KontakController extends Controller
             return back()->withInput()->with('error', 'Balasan tidak boleh mengandung tautan / link URL luar demi keamanan.');
         }
 
+        if (!ProfanityFilterService::isClean($request->balasan)) {
+            return back()->withInput()->with('error', 'Balasan Anda mengandung kata yang melanggar etika moderasi bahasa.');
+        }
+
         $kontak->update(['balasan' => $request->balasan]);
         return back()->with('success', 'Balasan berhasil diperbarui!');
     }
@@ -55,8 +63,35 @@ class KontakController extends Controller
 
     public function destroy(Kontak $kontak)
     {
-        $kontak->update(['pesan' => '[Pesan Dihapus]']);
-        return back()->with('success', 'Pesan berhasil dihapus.');
+        $identifier = $kontak->identifier;
+        // Hapus seluruh pesan dalam percakapan pengirim ini agar bersih dari daftar pesan masuk
+        Kontak::where('identifier', $identifier)->delete();
+        return back()->with('success', 'Riwayat pesan percakapan berhasil dihapus.');
+    }
+
+    public function destroyAll()
+    {
+        Kontak::query()->delete();
+        return redirect()->route('admin.kontak.index')->with('success', 'Seluruh pesan masuk dan riwayat chat berhasil dihapus.');
+    }
+
+    public function destroyBatch(Request $request)
+    {
+        $ids = $request->input('ids', []);
+        if (empty($ids) || !is_array($ids)) {
+            return back()->with('error', 'Pilih minimal satu pesan untuk dihapus.');
+        }
+
+        $identifiers = Kontak::whereIn('id', $ids)->pluck('identifier')->unique();
+        Kontak::whereIn('identifier', $identifiers)->delete();
+
+        return back()->with('success', count($identifiers) . ' percakapan pesan masuk berhasil dihapus.');
+    }
+
+    public function destroyConversation(string $identifier)
+    {
+        Kontak::where('identifier', $identifier)->delete();
+        return redirect()->route('admin.kontak.index')->with('success', 'Seluruh riwayat percakapan ini berhasil dihapus.');
     }
 
     /**
@@ -116,6 +151,10 @@ class KontakController extends Controller
 
         if (ProfanityFilterService::containsLink($request->balasan)) {
             return back()->withInput()->with('error', 'Balasan tidak boleh mengandung tautan / link URL luar demi keamanan.');
+        }
+
+        if (!ProfanityFilterService::isClean($request->balasan)) {
+            return back()->withInput()->with('error', 'Balasan Anda mengandung kata yang melanggar etika moderasi bahasa.');
         }
 
         // Cek apakah ada pesan user di percakapan ini yang belum dibalas

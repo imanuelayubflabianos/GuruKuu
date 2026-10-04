@@ -1383,8 +1383,10 @@
 </form>
 
 <script>
-function padZero(number) { return number.toString().padStart(2, '0'); }
-function formatDatetimeLocal(date) { return `${date.getFullYear()}-${padZero(date.getMonth() + 1)}-${padZero(date.getDate())}T${padZero(date.getHours())}:${padZero(date.getMinutes())}:${padZero(date.getSeconds())}`; }
+function formatToDatetimeLocalInput(val) {
+    if (!val) return '';
+    return String(val).trim().substring(0, 19).replace(' ', 'T');
+}
 
 function editPeriode(periode) {
     document.getElementById('periodeIdInput').value = periode.id;
@@ -1392,13 +1394,16 @@ function editPeriode(periode) {
     document.getElementById('tahunAjaranInput').value = periode.tahun_ajaran || '';
     document.getElementById('semesterSelect').value = periode.semester || 'ganjil';
     document.getElementById('statusSelect').value = periode.status || 'aktif';
-    ['tanggal_mulai', 'tanggal_selesai'].forEach(function(field) {
-        if (!periode[field]) return;
-        const date = new Date(periode[field]);
-        document.getElementById(field === 'tanggal_mulai' ? 'tanggalMulaiInput' : 'tanggalSelesaiInput').value = isNaN(date) ? periode[field].substring(0, 19).replace(' ', 'T') : formatDatetimeLocal(date);
-    });
+    if (periode.tanggal_mulai) {
+        document.getElementById('tanggalMulaiInput').value = formatToDatetimeLocalInput(periode.tanggal_mulai);
+    }
+    if (periode.tanggal_selesai) {
+        document.getElementById('tanggalSelesaiInput').value = formatToDatetimeLocalInput(periode.tanggal_selesai);
+    }
+    const title = document.getElementById('formPeriodeTitle');
+    if (title) title.innerHTML = '<i class="bi bi-pencil-square me-2 text-warning"></i>Edit Periode: ' + (periode.nama_periode || '');
     const submit = document.getElementById('btnSimpanPeriode');
-    submit.innerHTML = '<i class="bi bi-check2 me-1"></i>Perbarui';
+    submit.innerHTML = '<i class="bi bi-check2 me-1"></i>Perbarui Periode';
     submit.className = 'btn btn-warning px-4';
     document.getElementById('formPeriode').scrollIntoView({ behavior: 'smooth', block: 'center' });
 }
@@ -1406,8 +1411,10 @@ function editPeriode(periode) {
 function resetPeriodeForm() {
     document.getElementById('formPeriode').reset();
     document.getElementById('periodeIdInput').value = '';
+    const title = document.getElementById('formPeriodeTitle');
+    if (title) title.innerHTML = '<i class="bi bi-calendar-plus me-2"></i>Tambah Periode Baru';
     const submit = document.getElementById('btnSimpanPeriode');
-    submit.innerHTML = '<i class="bi bi-check2 me-1"></i>Simpan';
+    submit.innerHTML = '<i class="bi bi-check2 me-1"></i>Simpan Periode';
     submit.className = 'btn btn-primary-custom px-4';
 }
 

@@ -753,7 +753,15 @@ class PengaturanController extends Controller
             'tanggal_mulai'   => 'required|date',
             'tanggal_selesai' => 'required|date|after:tanggal_mulai',
             'status'          => 'required|in:aktif,nonaktif',
+        ], [
+            'tanggal_selesai.after' => 'Tanggal selesai harus setelah tanggal mulai periode.',
         ]);
+
+        if (!\App\Services\ProfanityFilterService::isClean($request->nama_periode)) {
+            return redirect()->to(route('admin.pengaturan.index') . '#tabPeriode')
+                ->withInput()
+                ->with('error', 'Nama periode mengandung kata yang tidak pantas atau dilarang oleh filter moderasi.');
+        }
 
         $periodeId = $request->input('periode_id');
         if ($periodeId) {
@@ -780,12 +788,15 @@ class PengaturanController extends Controller
         if ($request->status === 'aktif') {
             Periode::where('id', '!=', $periode->id)->update(['status' => 'nonaktif']);
             Guru::recalculateAll($periode->id);
+            Setting::set('active_periode_changed_at', (string)now()->timestamp);
+            Setting::set('active_periode_id', (string)$periode->id);
+            Setting::set('active_periode_name', $periode->nama_periode);
             $pesan = 'Periode ' . $periode->nama_periode . ' berhasil diaktifkan! Statistik leaderboard semester baru kini berjalan aktif (data periode sebelumnya tersimpan rapi sebagai histori).';
         } else {
             $pesan = 'Pengaturan periode ' . $periode->nama_periode . ' berhasil disimpan!';
         }
 
-        return back()->with('success', $pesan);
+        return redirect()->to(route('admin.pengaturan.index') . '#tabPeriode')->with('success', $pesan);
     }
 
     public function aktifkanPeriode(Periode $periode)
@@ -793,8 +804,12 @@ class PengaturanController extends Controller
         Periode::where('id', '!=', $periode->id)->update(['status' => 'nonaktif']);
         $periode->update(['status' => 'aktif']);
         Guru::recalculateAll($periode->id);
+        Setting::set('active_periode_changed_at', (string)now()->timestamp);
+        Setting::set('active_periode_id', (string)$periode->id);
+        Setting::set('active_periode_name', $periode->nama_periode);
 
-        return back()->with('success', "Periode '{$periode->nama_periode}' sekarang aktif! Seluruh statistik & leaderboard telah disinkronkan ke periode ini.");
+        return redirect()->to(route('admin.pengaturan.index') . '#tabPeriode')
+            ->with('success', "Periode '{$periode->nama_periode}' sekarang aktif! Seluruh statistik & leaderboard telah disinkronkan ke periode ini.");
     }
 
     public function destroyPeriode(Periode $periode)

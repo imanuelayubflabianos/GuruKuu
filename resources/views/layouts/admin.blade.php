@@ -102,6 +102,9 @@
     <script src="{{ asset('js/gurukuu-theme.js') }}"></script>
 </head>
 <body class="role-admin" data-admin-cache-user="{{ auth()->id() }}">
+    @if(request()->routeIs('admin.dashboard'))
+        @include('components.page-loader')
+    @endif
     {{-- MOBILE TOPBAR HEADER (KHUSUS TAMPILAN HP) --}}
     <header class="gk-mobile-header shadow-sm">
         <div class="d-flex align-items-center gap-2">
@@ -319,6 +322,7 @@
     <script src="{{ asset('js/gurukuu-modal.js') }}"></script>
     <script src="{{ asset('js/admin-page-cache.js') }}"></script>
     @include('components.welcome-landing-modal')
+    @include('components.periode-notification-modal')
     @stack('scripts')
 </body>
 </html>

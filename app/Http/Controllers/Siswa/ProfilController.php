@@ -23,6 +23,10 @@ class ProfilController extends Controller
             'name' => 'required|string|max:255',
         ]);
 
+        if (!\App\Services\ProfanityFilterService::isClean($request->name)) {
+            return back()->withInput()->with('error', 'Nama profil tidak boleh mengandung kata yang melanggar etika atau dilarang oleh sistem moderasi.');
+        }
+
         $user = auth()->user();
         $user->update(['name' => $request->name]);
 

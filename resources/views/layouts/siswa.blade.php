@@ -134,6 +134,9 @@
     <script src="{{ asset('js/gurukuu-theme.js') }}"></script>
 </head>
 <body>
+    @if(request()->routeIs('siswa.dashboard'))
+        @include('components.page-loader')
+    @endif
     {{-- MOBILE HEADER BAR (KHUSUS HP) --}}
     <header class="gk-mobile-header shadow-sm">
         <div class="d-flex align-items-center gap-2">
@@ -344,6 +347,7 @@
         </script>
     @endif
     @include('components.welcome-landing-modal')
+    @include('components.periode-notification-modal')
     @stack('scripts')
 </body>
 </html>

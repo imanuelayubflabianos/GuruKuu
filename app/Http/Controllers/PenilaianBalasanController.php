@@ -35,8 +35,14 @@ class PenilaianBalasanController extends Controller
             return back()->with('error', $msg);
         }
 
-        // Cek Hak Akses Berdasarkan Role (Privasi: Hanya Siswa pembuat ulasan, Guru yang dinilai, atau Admin)
-        if ($user->role === 'guru') {
+        // Cek Hak Akses Berdasarkan Role (Privasi: Hanya Siswa pembuat ulasan dan Guru yang dinilai; Admin hanya memantau)
+        if ($user->role === 'admin') {
+            $msg = 'Administrator hanya berwenang memantau diskusi dan tidak dapat mengirim balasan.';
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => $msg], 403);
+            }
+            return back()->with('error', $msg);
+        } elseif ($user->role === 'guru') {
             $guru = Guru::where('nip', $user->nis)
                 ->orWhere('email', $user->email)
                 ->first();
@@ -56,7 +62,7 @@ class PenilaianBalasanController extends Controller
                 }
                 return back()->with('error', $msg);
             }
-        } elseif ($user->role !== 'admin') {
+        } else {
             $msg = 'Anda tidak memiliki hak akses untuk membalas ulasan ini.';
             if ($request->ajax() || $request->wantsJson()) {
                 return response()->json(['success' => false, 'message' => $msg], 403);

@@ -50,7 +50,15 @@ class PengaturanController extends Controller
 
         $defaultBio = 'Guru pengajar di SMK Negeri 1 Bangsri yang berdedikasi membimbing generasi muda.';
         $bio = trim((string) $request->bio);
-        if (empty($bio)) {
+
+        if (!empty($bio)) {
+            if (\App\Services\ProfanityFilterService::containsLink($bio)) {
+                return back()->withInput()->with('error', 'Deskripsi diri (bio) tidak boleh mengandung tautan / link URL luar demi keamanan.');
+            }
+            if (!\App\Services\ProfanityFilterService::isClean($bio)) {
+                return back()->withInput()->with('error', 'Deskripsi diri (bio) mengandung kata yang melanggar etika moderasi bahasa.');
+            }
+        } else {
             $bio = $guru->bio ?: $defaultBio;
         }
 

@@ -112,6 +112,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::patch('periode/{periode}/toggle', [PeriodeController::class, 'toggleStatus'])->name('periode.toggle');
     
     Route::get('/kritik-saran', [KritikSaranController::class, 'index'])->name('kritik-saran.index');
+    Route::delete('/kritik-saran/batch', [KritikSaranController::class, 'destroyBatch'])->name('kritik-saran.batch-destroy');
     Route::delete('/kritik-saran/{kritikSaran}', [KritikSaranController::class, 'destroy'])->name('kritik-saran.destroy');
     Route::post('/kritik-saran/{kritikSaran}/warn', [KritikSaranController::class, 'warn'])->name('kritik-saran.warn');
     Route::post('/kritik-saran/{kritikSaran}/unwarn', [KritikSaranController::class, 'unwarn'])->name('kritik-saran.unwarn');
@@ -154,6 +155,9 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::post('/pengaturan/faq/reset', [PengaturanController::class, 'resetFaq'])->name('pengaturan.faq.reset');
     
     Route::get('/kontak', [AdminKontakController::class, 'index'])->name('kontak.index');
+    Route::delete('/kontak/all', [AdminKontakController::class, 'destroyAll'])->name('kontak.destroy-all');
+    Route::delete('/kontak/batch', [AdminKontakController::class, 'destroyBatch'])->name('kontak.destroy-batch');
+    Route::delete('/kontak/chat/{identifier}/conversation', [AdminKontakController::class, 'destroyConversation'])->name('kontak.chat.destroy-conversation');
     Route::get('/kontak/chat/{identifier}', [AdminKontakController::class, 'chat'])->name('kontak.chat');
     Route::get('/kontak/chat/{identifier}/stream', [AdminKontakController::class, 'stream'])->name('kontak.chat.stream');
     Route::post('/kontak/chat/{identifier}', [AdminKontakController::class, 'sendChatMessage'])->name('kontak.chat.send');

@@ -132,6 +132,9 @@
     <script src="{{ asset('js/gurukuu-theme.js') }}"></script>
 </head>
 <body>
+    @if(request()->routeIs('guru.dashboard'))
+        @include('components.page-loader')
+    @endif
     {{-- MOBILE HEADER BAR (KHUSUS HP) --}}
     <header class="gk-mobile-header shadow-sm">
         <div class="d-flex align-items-center gap-2">
@@ -314,6 +317,7 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="{{ asset('js/gurukuu-modal.js') }}"></script>
     @include('components.welcome-landing-modal')
+    @include('components.periode-notification-modal')
     @stack('scripts')
 </body>
 </html>

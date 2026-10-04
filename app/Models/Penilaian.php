@@ -30,6 +30,18 @@ class Penilaian extends Model
         'cara_mengajar' => 0,
     ];
 
+    protected static function booted()
+    {
+        static::deleting(function ($penilaian) {
+            // Hapus semua riwayat percakapan diskusi/balasan ulasan ini
+            $penilaian->balasans()->delete();
+            // Hapus upvote / helpful ulasan ini
+            $penilaian->helpfuls()->delete();
+            // Hapus relasi log pelanggaran yang terkait ulasan ini jika ada
+            \App\Models\Pelanggaran::where('penilaian_id', $penilaian->id)->delete();
+        });
+    }
+
     // ==================== RELASI ====================
 
     public function siswa()

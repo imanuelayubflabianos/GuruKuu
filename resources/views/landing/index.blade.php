@@ -131,28 +131,17 @@
     transform: translateY(-6px);
 }
 
-/* 🌟 SEQUENTIAL LEADERBOARD PODIUM ENTRANCE (#1 DULU, LALU #2, LALU #3) */
+/* 🌟 SMOOTH ELEGANT LEADERBOARD PODIUM SCROLL ENTRANCE */
 .podium-anim-item {
     opacity: 0;
-    transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.85s cubic-bezier(0.34, 1.3, 0.64, 1);
+    transform: translateY(32px);
+    transition: opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1), transform 0.75s cubic-bezier(0.16, 1, 0.3, 1);
     will-change: transform, opacity;
 }
-.podium-anim-item.podium-rank-1 {
-    transform: scale(0.82) translateY(55px);
+.podium-anim-item.is-revealed {
+    opacity: 1 !important;
+    transform: translateY(0) !important;
 }
-.podium-anim-item.podium-rank-2 {
-    transform: translateX(-55px) translateY(35px);
-}
-.podium-anim-item.podium-rank-3 {
-    transform: translateX(55px) translateY(35px);
-}
-@media (min-width: 768px) {
-    .podium-anim-item.podium-rank-1.is-revealed,
-    .podium-anim-item.podium-rank-2.is-revealed,
-    .podium-anim-item.podium-rank-3.is-revealed {
-        opacity: 1 !important;
-        transform: none !important;
-    }
     .podium-anim-item.podium-rank-1 {
         z-index: 10;
     }
@@ -458,15 +447,23 @@
     transition: width 1.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 
-/* 🌟 GENERAL CARDS SCROLL REVEAL */
+/* 🌟 ULTRA-LIGHTWEIGHT HARDWARE-ACCELERATED SCROLL REVEAL */
 .gk-scroll-reveal {
     opacity: 0;
-    transform: translateY(30px);
-    transition: opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1), transform 0.75s cubic-bezier(0.16, 1, 0.3, 1);
+    transform: translateY(24px);
+    transition: opacity 0.62s cubic-bezier(0.16, 1, 0.3, 1), transform 0.62s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: opacity, transform;
 }
 .gk-scroll-reveal.is-revealed {
-    opacity: 1;
-    transform: translateY(0);
+    opacity: 1 !important;
+    transform: translateY(0) !important;
+}
+@media (prefers-reduced-motion: reduce) {
+    .gk-scroll-reveal {
+        opacity: 1 !important;
+        transform: none !important;
+        transition: none !important;
+    }
 }
 
 /* Smooth Public Dashboard Interactive Transitions & Refined Aesthetics */
@@ -1018,32 +1015,30 @@ document.addEventListener('DOMContentLoaded', function() {
         const rank2 = podiumRow.querySelector('.podium-rank-2');
         const rank3 = podiumRow.querySelector('.podium-rank-3');
 
-        // Urutan 1: Top 1 (Pemenang Pertama di tengah) muncul pertama
+        // Smooth subtle stagger (0ms, 90ms, 180ms) - glides in together gracefully without popping or blinking
         setTimeout(() => {
             if (rank1) {
                 rank1.classList.add('is-revealed');
                 const fill1 = rank1.querySelector('.gk-progress-pill-fill');
                 if (fill1) fill1.style.width = fill1.getAttribute('data-percentage') + '%';
             }
-        }, 120);
+        }, 50);
 
-        // Urutan 2: Top 2 (Perak di kiri) muncul berikutnya
         setTimeout(() => {
             if (rank2) {
                 rank2.classList.add('is-revealed');
                 const fill2 = rank2.querySelector('.gk-progress-pill-fill');
                 if (fill2) fill2.style.width = fill2.getAttribute('data-percentage') + '%';
             }
-        }, 600);
+        }, 140);
 
-        // Urutan 3: Top 3 (Perunggu di kanan) muncul terakhir
         setTimeout(() => {
             if (rank3) {
                 rank3.classList.add('is-revealed');
                 const fill3 = rank3.querySelector('.gk-progress-pill-fill');
                 if (fill3) fill3.style.width = fill3.getAttribute('data-percentage') + '%';
             }
-        }, 1080);
+        }, 230);
     }
 
     if (podiumRow && 'IntersectionObserver' in window) {
@@ -1059,21 +1054,39 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // 🌟 3. SMOOTH SCROLL REVEAL PADA ELEMEN LAINNYA DI BERANDA
-    const revealTargets = document.querySelectorAll('.tutorial-card, .gk-clean-card, .gk-feature-card, .teacher-card, .accordion-item');
+    const revealTargets = document.querySelectorAll(
+        '.section-label, .section-title, .section-title + p, section .text-center, .tutorial-card, .gk-clean-card, .gk-feature-card, .teacher-card, .gk-vm-card, .accordion-item, .card-custom, #leaderboardFilterWrapper, .table-responsive, .gk-panduan-slider-wrapper, [data-aos]'
+    );
     if ('IntersectionObserver' in window) {
-        const revealObserver = new IntersectionObserver((entries) => {
+        const revealObserver = new IntersectionObserver((entries, observer) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
                     entry.target.classList.add('is-revealed');
-                    revealObserver.unobserve(entry.target);
+                    observer.unobserve(entry.target);
                 }
             });
-        }, { threshold: 0.12 });
+        }, {
+            root: null,
+            rootMargin: '0px 0px -30px 0px',
+            threshold: 0.1
+        });
 
         revealTargets.forEach(el => {
+            if (el.closest('#leaderboardPodium') || el.classList.contains('stat-card-modern') || el.closest('#heroBgSlider')) return;
             el.classList.add('gk-scroll-reveal');
+
+            const col = el.closest('.col-12, .col-md-6, .col-md-4, .col-md-3, .col-6, .col-lg-6, .col-lg-4');
+            if (col && col.parentElement) {
+                const siblings = Array.from(col.parentElement.children);
+                const colIdx = siblings.indexOf(col);
+                if (colIdx > 0 && colIdx < 6) {
+                    el.style.transitionDelay = (colIdx * 0.08) + 's';
+                }
+            }
             revealObserver.observe(el);
         });
+    } else {
+        revealTargets.forEach(el => el.classList.add('is-revealed'));
     }
 });
 </script>

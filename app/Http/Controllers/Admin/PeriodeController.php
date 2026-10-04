@@ -25,6 +25,10 @@ class PeriodeController extends Controller
             'tanggal_selesai' => 'required|date|after:tanggal_mulai',
         ]);
 
+        if (!\App\Services\ProfanityFilterService::isClean($validated['nama_periode'])) {
+            return back()->withInput()->with('error', 'Nama periode mengandung kata yang tidak pantas atau dilarang oleh filter moderasi.');
+        }
+
         Periode::create($validated);
 
         return back()->with('success', 'Periode berhasil ditambahkan!');
@@ -40,7 +44,16 @@ class PeriodeController extends Controller
             'tanggal_selesai' => 'required|date|after:tanggal_mulai',
         ]);
 
+        if (!\App\Services\ProfanityFilterService::isClean($validated['nama_periode'])) {
+            return back()->withInput()->with('error', 'Nama periode mengandung kata yang tidak pantas atau dilarang oleh filter moderasi.');
+        }
+
         $periode->update($validated);
+
+        if ($periode->status === 'aktif') {
+            \App\Models\Setting::set('active_periode_name', $periode->nama_periode);
+            \App\Models\Setting::set('active_periode_changed_at', (string)now()->timestamp);
+        }
 
         return back()->with('success', 'Periode berhasil diperbarui!');
     }
@@ -52,9 +65,15 @@ class PeriodeController extends Controller
             Periode::where('id', '!=', $periode->id)->update(['status' => 'nonaktif']);
             $periode->update(['status' => 'aktif']);
             \App\Models\Guru::recalculateAll($periode->id);
+            \App\Models\Setting::set('active_periode_changed_at', (string)now()->timestamp);
+            \App\Models\Setting::set('active_periode_id', (string)$periode->id);
+            \App\Models\Setting::set('active_periode_name', $periode->nama_periode);
         } else {
             $periode->update(['status' => 'nonaktif']);
             \App\Models\Guru::recalculateAll();
+            \App\Models\Setting::set('active_periode_changed_at', (string)now()->timestamp);
+            \App\Models\Setting::set('active_periode_id', '0');
+            \App\Models\Setting::set('active_periode_name', 'Tidak Ada Periode Aktif');
         }
 
         return back()->with('success', 'Status periode ' . $periode->nama_periode . ' berhasil diubah menjadi ' . strtoupper($periode->status) . '!');

@@ -27,6 +27,17 @@ class UlasanReportController extends Controller
             'catatan' => 'nullable|string|max:255',
         ]);
 
+        if (!empty($validated['catatan'])) {
+            if (\App\Services\ProfanityFilterService::containsLink($validated['catatan'])) {
+                $err = 'Catatan laporan tidak boleh mengandung tautan / link URL luar.';
+                return $request->wantsJson() ? response()->json(['success' => false, 'message' => $err], 422) : back()->withInput()->with('error', $err);
+            }
+            if (!\App\Services\ProfanityFilterService::isClean($validated['catatan'])) {
+                $err = 'Catatan laporan mengandung kata yang melanggar etika moderasi bahasa.';
+                return $request->wantsJson() ? response()->json(['success' => false, 'message' => $err], 422) : back()->withInput()->with('error', $err);
+            }
+        }
+
         $userId = auth()->id();
         $ip = $request->ip();
 

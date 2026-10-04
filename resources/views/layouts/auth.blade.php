@@ -95,6 +95,7 @@
     <script src="{{ asset('js/gurukuu-theme.js') }}"></script>
 </head>
 <body class="auth-page">
+    @include('components.page-loader')
     <div class="auth-container-wrapper">
         @yield('content')
     </div>

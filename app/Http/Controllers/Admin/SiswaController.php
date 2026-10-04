@@ -84,6 +84,10 @@ class SiswaController extends Controller
             'badge_ids.*' => 'exists:badge,id',
         ]);
 
+        if (!\App\Services\ProfanityFilterService::isClean($request->name)) {
+            return back()->withInput()->with('error', 'Nama siswa mengandung kata yang melanggar etika moderasi bahasa.');
+        }
+
         $photoPath = null;
         if ($request->hasFile('photo')) {
             $photoPath = $request->file('photo')->store('siswa', 'public');
@@ -131,6 +135,10 @@ class SiswaController extends Controller
             'badge_ids' => 'nullable|array',
             'badge_ids.*' => 'exists:badge,id',
         ]);
+
+        if (!\App\Services\ProfanityFilterService::isClean($request->name)) {
+            return back()->withInput()->with('error', 'Nama siswa mengandung kata yang melanggar etika moderasi bahasa.');
+        }
 
         $data = [
             'name' => $request->name,

@@ -75,7 +75,14 @@
         <div class="page-label">KOMUNIKASI LANGSUNG</div>
         <h1 class="page-title fs-4 mb-0">Percakapan dengan {{ $senderName }}</h1>
     </div>
-    <div>
+    <div class="d-flex align-items-center gap-2">
+        <form action="{{ route('admin.kontak.chat.destroy-conversation', $identifier) }}" method="POST" class="d-inline" data-confirm="Apakah Anda yakin ingin menghapus SELURUH riwayat pesan dalam percakapan ini?" data-confirm-title="Hapus Percakapan Ini?" data-confirm-btn="Ya, Hapus Semua" data-confirm-type="danger">
+            @csrf
+            @method('DELETE')
+            <button type="submit" class="btn btn-sm btn-outline-danger d-inline-flex align-items-center gap-1.5 px-3 py-1.5 rounded-pill shadow-xs" title="Hapus Seluruh Percakapan">
+                <i class="bi bi-trash3"></i> Hapus Percakapan
+            </button>
+        </form>
         <a href="{{ route('admin.kontak.index') }}" class="gk-btn-back">
             <i class="bi bi-arrow-left"></i> Kembali ke Daftar Pesan
         </a>
@@ -120,7 +127,8 @@
                         </div>
                         <div>
                             <div class="bubble-user">
-                                <div class="d-flex justify-content-between align-items-center gap-2 mb-                                    <div class="fw-bold" style="color: var(--primary, #003366); font-size: 0.78rem;">
+                                <div class="d-flex justify-content-between align-items-center gap-2 mb-1">
+                                    <div class="fw-bold" style="color: var(--primary, #003366); font-size: 0.78rem;">
                                         {{ $item->display_pengirim }}
                                     </div>
                                     @if($item->pesan !== '[Pesan Dihapus]')

@@ -363,6 +363,7 @@
     <script src="{{ asset('js/gurukuu-theme.js') }}"></script>
 </head>
 <body>
+    @include('components.page-loader')
     <nav class="navbar navbar-expand-lg navbar-custom fixed-top">
         <div class="container">
             <a class="navbar-brand navbar-brand-custom d-flex align-items-center gap-2 m-0" href="{{ route('landing.index') }}">

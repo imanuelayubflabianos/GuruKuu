@@ -117,30 +117,48 @@
 </div>
 
 <div class="card-custom p-4">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <span class="small text-muted">Menampilkan {{ $feedbacks->firstItem() ?? 0 }}–{{ $feedbacks->lastItem() ?? 0 }} dari {{ $feedbacks->total() }} ulasan</span>
-        <span class="badge bg-light text-dark border">15 per halaman</span>
-    </div>
+    <form id="formBulkDeleteFeedback" action="{{ route('admin.kritik-saran.batch-destroy') }}" method="POST">
+        @csrf
+        @method('DELETE')
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+            <div class="d-flex align-items-center gap-3">
+                <span class="small text-muted">Menampilkan {{ $feedbacks->firstItem() ?? 0 }}–{{ $feedbacks->lastItem() ?? 0 }} dari {{ $feedbacks->total() }} ulasan</span>
+                <span class="badge bg-light text-dark border">15 per halaman</span>
+            </div>
+            <div id="bulkDeleteBar" class="d-none align-items-center gap-2">
+                <span class="small fw-bold text-danger"><span id="selectedCount">0</span> ulasan terpilih</span>
+                <button type="submit" class="btn btn-sm btn-danger d-inline-flex align-items-center gap-1.5 px-3 py-1.5 rounded-pill shadow-xs" data-confirm="Hapus seluruh ulasan terpilih secara permanen? Rating guru akan dihitung ulang secara otomatis." data-confirm-title="Hapus Ulasan Terpilih?" data-confirm-btn="Ya, Hapus Terpilih" data-confirm-type="danger">
+                    <i class="bi bi-trash3-fill"></i>
+                    <span>Hapus Terpilih</span>
+                </button>
+            </div>
+        </div>
 
-    <div class="table-responsive">
-        <table class="table table-custom align-middle mb-0" id="feedbackTable">
-            <thead>
-                <tr>
-                    <th style="width: 50px;">NO</th>
-                    <th style="min-width: 220px;">GURU</th>
-                    <th style="min-width: 200px;">SISWA & KELAS</th>
-                    <th style="min-width: 160px;">WAKTU & PERIODE</th>
-                    <th style="min-width: 120px;">STATUS</th>
-                    <th class="text-center" style="width: 120px;">AKSI MODERASI</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse($feedbacks as $index => $f)
-                @php
-                    $isCensored = $f->is_censored || str_contains($f->kritik ?? '', 'melanggar');
-                @endphp
-                <tr>
-                    <td class="text-muted font-mono">{{ $feedbacks->firstItem() + $index }}</td>
+        <div class="table-responsive">
+            <table class="table table-custom align-middle mb-0" id="feedbackTable">
+                <thead>
+                    <tr>
+                        <th style="width: 40px;" class="text-center">
+                            <input type="checkbox" id="checkAllFeedback" class="form-check-input" title="Pilih Semua Ulasan">
+                        </th>
+                        <th style="width: 50px;">NO</th>
+                        <th style="min-width: 220px;">GURU</th>
+                        <th style="min-width: 200px;">SISWA & KELAS</th>
+                        <th style="min-width: 160px;">WAKTU & PERIODE</th>
+                        <th style="min-width: 120px;">STATUS</th>
+                        <th class="text-center" style="width: 120px;">AKSI MODERASI</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($feedbacks as $index => $f)
+                    @php
+                        $isCensored = $f->is_censored || str_contains($f->kritik ?? '', 'melanggar');
+                    @endphp
+                    <tr>
+                        <td class="text-center">
+                            <input type="checkbox" name="ids[]" value="{{ $f->id }}" class="form-check-input feedback-checkbox">
+                        </td>
+                        <td class="text-muted font-mono">{{ $feedbacks->firstItem() + $index }}</td>
                     
                     {{-- TARGET GURU --}}
                     <td>
@@ -274,6 +292,7 @@
             </tbody>
         </table>
     </div>
+    </form>
 
     @if($feedbacks->hasPages())
         <div class="pt-3 mt-3 border-top d-flex justify-content-center">{{ $feedbacks->links() }}</div>
@@ -497,6 +516,21 @@
                             </div>
                         </div>
                     </div>
+
+                    {{-- THREAD DISKUSI & BALASAN SISWA - GURU --}}
+                    <div class="mt-4 pt-3 border-top">
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <h6 class="fw-bold text-dark mb-0" style="font-size: 0.95rem;">
+                                <i class="bi bi-chat-dots-fill text-primary me-1.5"></i>Ruang Diskusi & Balasan Ulasan
+                            </h6>
+                            <span class="badge rounded-pill bg-light text-muted border font-mono" style="font-size: 0.72rem;">
+                                {{ $f->balasans->count() }} Balasan
+                            </span>
+                        </div>
+                        <div class="bg-white p-3 rounded-3 border shadow-sm">
+                            @include('components.penilaian-thread', ['penilaian' => $f])
+                        </div>
+                    </div>
                 </div>
 
                 {{-- MODAL FOOTER --}}
@@ -509,5 +543,45 @@
         </div>
     </div>
 @endforeach
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const checkAll = document.getElementById('checkAllFeedback');
+    const checkboxes = document.querySelectorAll('.feedback-checkbox');
+    const bulkBar = document.getElementById('bulkDeleteBar');
+    const countSpan = document.getElementById('selectedCount');
+
+    function updateBulkBar() {
+        const checked = document.querySelectorAll('.feedback-checkbox:checked');
+        const count = checked.length;
+        if (countSpan) countSpan.textContent = count;
+        if (bulkBar) {
+            if (count > 0) {
+                bulkBar.classList.remove('d-none');
+                bulkBar.classList.add('d-flex');
+            } else {
+                bulkBar.classList.add('d-none');
+                bulkBar.classList.remove('d-flex');
+            }
+        }
+        if (checkAll) {
+            checkAll.checked = (count > 0 && count === checkboxes.length);
+        }
+    }
+
+    if (checkAll) {
+        checkAll.addEventListener('change', function() {
+            checkboxes.forEach(cb => cb.checked = checkAll.checked);
+            updateBulkBar();
+        });
+    }
+
+    checkboxes.forEach(cb => {
+        cb.addEventListener('change', updateBulkBar);
+    });
+});
+</script>
+@endpush
 @endsection
 

@@ -93,6 +93,10 @@ class GuruController extends Controller
             'badge_ids.*'=> 'exists:badge,id',
         ]);
 
+        if (!\App\Services\ProfanityFilterService::isClean($request->nama) || ($request->filled('bio') && !\App\Services\ProfanityFilterService::isClean($request->bio))) {
+            return back()->withInput()->with('error', 'Nama atau deskripsi diri guru mengandung kata yang melanggar etika moderasi bahasa.');
+        }
+
         $data = $request->except(['photo', 'badge_ids', 'kelas_ids']);
         $data['kategori'] = $request->input('kategori') ?: 'normada';
 
@@ -223,6 +227,10 @@ class GuruController extends Controller
             'badge_ids'  => 'nullable|array',
             'badge_ids.*'=> 'exists:badge,id',
         ]);
+
+        if (!\App\Services\ProfanityFilterService::isClean($request->nama) || ($request->filled('bio') && !\App\Services\ProfanityFilterService::isClean($request->bio))) {
+            return back()->withInput()->with('error', 'Nama atau deskripsi diri guru mengandung kata yang melanggar etika moderasi bahasa.');
+        }
 
         $data = $request->except(['photo', 'kelas_ids', 'badge_ids']);
         $data['kategori'] = $request->input('kategori') ?: ($guru->kategori ?: 'normada');

@@ -11,71 +11,154 @@
 </div>
 
 <div class="card-custom">
-    <div class="d-flex justify-content-between align-items-center px-3 px-md-4 py-3 border-bottom">
-        <span class="small text-muted">Menampilkan {{ $kontak->firstItem() ?? 0 }}–{{ $kontak->lastItem() ?? 0 }} dari {{ $kontak->total() }} pesan</span>
-        <span class="badge bg-light text-dark border">15 per halaman</span>
-    </div>
-    <div class="table-responsive">
-        <table class="table table-custom mb-0">
-            <thead>
-                <tr>
-                    <th>PENGIRIM</th>
-                    <th style="width: 200px;">WAKTU</th>
-                    <th class="text-center" style="width: 120px;">AKSI</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse($kontak as $k)
-                <tr>
-                    <td>
-                        <a href="{{ route('admin.kontak.chat', $k->identifier) }}" class="text-decoration-none d-flex align-items-center gap-3 p-2 rounded-3 hover-bg-light transition-all" style="cursor: pointer;" title="Klik untuk membuka ruang chat & membalas pesan">
-                            <div class="rounded-circle d-flex align-items-center justify-content-center text-white flex-shrink-0 fw-bold" style="width: 40px; height: 40px; background: linear-gradient(135deg, #003366, #0055a5); font-size: 0.95rem;">
-                                {{ strtoupper(substr($k->display_pengirim, 0, 1) ?: 'U') }}
-                            </div>
-                            <div>
-                                <div class="fw-bold text-dark d-flex align-items-center gap-1.5">
-                                    <span>{{ $k->display_pengirim }}</span>
-                                    <i class="bi bi-box-arrow-up-right text-primary small" style="font-size: 0.72rem;"></i>
-                                    @if(!$k->is_replied)
-                                        <span class="badge rounded-pill bg-danger-subtle text-danger border border-danger ms-1" style="font-size: 0.65rem;">Menunggu Balasan</span>
-                                    @else
-                                        <span class="badge rounded-pill bg-success-subtle text-success border border-success ms-1" style="font-size: 0.65rem;">Dibalas</span>
-                                    @endif
+    <form id="formBulkDeleteKontak" action="{{ route('admin.kontak.destroy-batch') }}" method="POST">
+        @csrf
+        @method('DELETE')
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 px-3 px-md-4 py-3 border-bottom">
+            <div class="d-flex align-items-center gap-3">
+                <span class="small text-muted">Menampilkan {{ $kontak->firstItem() ?? 0 }}–{{ $kontak->lastItem() ?? 0 }} dari {{ $kontak->total() }} pesan</span>
+                <span class="badge bg-light text-dark border">15 per halaman</span>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+                <div id="bulkDeleteKontakBar" class="d-none align-items-center gap-2">
+                    <span class="small fw-bold text-danger"><span id="selectedKontakCount">0</span> dipilih</span>
+                    <button type="submit" class="btn btn-sm btn-outline-danger d-inline-flex align-items-center gap-1.5 px-3 py-1.5 rounded-pill shadow-xs" data-confirm="Hapus seluruh pesan yang dipilih secara permanen?" data-confirm-title="Hapus Pesan Terpilih?" data-confirm-btn="Ya, Hapus Terpilih" data-confirm-type="danger">
+                        <i class="bi bi-trash"></i>
+                        <span>Hapus Terpilih</span>
+                    </button>
+                </div>
+                @if($kontak->total() > 0)
+                    <button type="button" class="btn btn-sm btn-danger d-inline-flex align-items-center gap-1.5 px-3 py-1.5 rounded-pill shadow-xs" onclick="document.getElementById('formDestroyAllKontak').submit();">
+                        <i class="bi bi-trash3-fill"></i>
+                        <span>Hapus Semua Pesan</span>
+                    </button>
+                @endif
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-custom mb-0">
+                <thead>
+                    <tr>
+                        <th style="width: 40px;" class="text-center">
+                            <input type="checkbox" id="checkAllKontak" class="form-check-input" title="Pilih Semua">
+                        </th>
+                        <th>PENGIRIM</th>
+                        <th style="width: 200px;">WAKTU</th>
+                        <th class="text-center" style="width: 120px;">AKSI</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($kontak as $k)
+                    <tr>
+                        <td class="text-center align-middle">
+                            <input type="checkbox" name="ids[]" value="{{ $k->id }}" class="form-check-input kontak-checkbox">
+                        </td>
+                        <td>
+                            <a href="{{ route('admin.kontak.chat', $k->identifier) }}" class="text-decoration-none d-flex align-items-center gap-3 p-2 rounded-3 hover-bg-light transition-all" style="cursor: pointer;" title="Klik untuk membuka ruang chat & membalas pesan">
+                                <div class="rounded-circle d-flex align-items-center justify-content-center text-white flex-shrink-0 fw-bold" style="width: 40px; height: 40px; background: linear-gradient(135deg, #003366, #0055a5); font-size: 0.95rem;">
+                                    {{ strtoupper(substr($k->display_pengirim, 0, 1) ?: 'U') }}
                                 </div>
-                                <small class="text-muted font-mono" style="font-size: 0.78rem;">
-                                    {{ $k->is_siswa ? 'Siswa (NIS: ' . $k->identifier . ')' : 'Pengguna / Tamu (' . (substr($k->display_pengirim, 6) ?: '-') . ')' }}
-                                </small>
-                            </div>
-                        </a>
-                    </td>
-                    <td class="font-mono small align-middle text-muted">
-                        <i class="bi bi-clock me-1"></i>{{ $k->created_at->format('d M Y, H:i') }}
-                    </td>
-                    <td class="text-center align-middle">
-                        <form action="{{ route('admin.kontak.destroy', $k) }}" method="POST" data-confirm="Hapus pesan ini secara permanen?" data-confirm-title="Hapus Pesan?" data-confirm-btn="Ya, Hapus" data-confirm-type="danger">
-                            @csrf @method('DELETE')
-                            <button type="submit" class="btn btn-sm btn-outline-danger d-inline-flex align-items-center gap-1.5 px-3 py-1.5 rounded-pill shadow-xs" title="Hapus Pesan">
+                                <div>
+                                    <div class="fw-bold text-dark d-flex align-items-center gap-1.5">
+                                        <span>{{ $k->display_pengirim }}</span>
+                                        <i class="bi bi-box-arrow-up-right text-primary small" style="font-size: 0.72rem;"></i>
+                                        @if(!$k->is_replied)
+                                            <span class="badge rounded-pill bg-danger-subtle text-danger border border-danger ms-1" style="font-size: 0.65rem;">Menunggu Balasan</span>
+                                        @else
+                                            <span class="badge rounded-pill bg-success-subtle text-success border border-success ms-1" style="font-size: 0.65rem;">Dibalas</span>
+                                        @endif
+                                    </div>
+                                    <small class="text-muted font-mono" style="font-size: 0.78rem;">
+                                        {{ $k->is_siswa ? 'Siswa (NIS: ' . $k->identifier . ')' : 'Pengguna / Tamu (' . (substr($k->display_pengirim, 6) ?: '-') . ')' }}
+                                    </small>
+                                </div>
+                            </a>
+                        </td>
+                        <td class="font-mono small align-middle text-muted">
+                            <i class="bi bi-clock me-1"></i>{{ $k->created_at->format('d M Y, H:i') }}
+                        </td>
+                        <td class="text-center align-middle">
+                            <button type="button" class="btn btn-sm btn-outline-danger d-inline-flex align-items-center gap-1.5 px-3 py-1.5 rounded-pill shadow-xs" title="Hapus Pesan" onclick="deleteSingleKontak({{ $k->id }})">
                                 <i class="bi bi-trash"></i>
                                 <span>Hapus</span>
                             </button>
-                        </form>
-                    </td>
-                </tr>
-                @empty
-                <tr>
-                    <td colspan="3" class="text-center py-5 text-muted">
-                        <i class="bi bi-inbox fs-1 d-block mb-3"></i>
-                        Belum ada pesan masuk.
-                    </td>
-                </tr>
-                @endforelse
-            </tbody>
-        </table>
-    </div>
+                        </td>
+                    </tr>
+                    @empty
+                    <tr>
+                        <td colspan="4" class="text-center py-5 text-muted">
+                            <i class="bi bi-inbox fs-1 d-block mb-3"></i>
+                            Belum ada pesan masuk.
+                        </td>
+                    </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </form>
     @if($kontak->hasPages())
         <div class="px-3 px-md-4 py-3 border-top d-flex justify-content-center">{{ $kontak->links() }}</div>
     @endif
 </div>
+
+{{-- FORM DELETE ALL --}}
+<form id="formDestroyAllKontak" action="{{ route('admin.kontak.destroy-all') }}" method="POST" class="d-none" data-confirm="Apakah Anda yakin ingin menghapus SEMUA pesan masuk dan riwayat percakapan? Tindakan ini permanen dan tidak dapat dibatalkan!" data-confirm-title="Hapus Semua Pesan?" data-confirm-btn="Ya, Hapus Semua" data-confirm-type="danger">
+    @csrf
+    @method('DELETE')
+</form>
+
+{{-- FORM DELETE SINGLE --}}
+<form id="formDestroySingleKontak" method="POST" class="d-none" data-confirm="Hapus seluruh riwayat percakapan pengguna ini?" data-confirm-title="Hapus Percakapan?" data-confirm-btn="Ya, Hapus" data-confirm-type="danger">
+    @csrf
+    @method('DELETE')
+</form>
+
+@push('scripts')
+<script>
+function deleteSingleKontak(id) {
+    const form = document.getElementById('formDestroySingleKontak');
+    form.action = '/admin/kontak/' + id;
+    form.requestSubmit();
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const checkAll = document.getElementById('checkAllKontak');
+    const checkboxes = document.querySelectorAll('.kontak-checkbox');
+    const bulkBar = document.getElementById('bulkDeleteKontakBar');
+    const countSpan = document.getElementById('selectedKontakCount');
+
+    function updateKontakBulkBar() {
+        const checked = document.querySelectorAll('.kontak-checkbox:checked');
+        const count = checked.length;
+        if (countSpan) countSpan.textContent = count;
+        if (bulkBar) {
+            if (count > 0) {
+                bulkBar.classList.remove('d-none');
+                bulkBar.classList.add('d-flex');
+            } else {
+                bulkBar.classList.add('d-none');
+                bulkBar.classList.remove('d-flex');
+            }
+        }
+        if (checkAll) {
+            checkAll.checked = (count > 0 && count === checkboxes.length);
+        }
+    }
+
+    if (checkAll) {
+        checkAll.addEventListener('change', function() {
+            checkboxes.forEach(cb => cb.checked = checkAll.checked);
+            updateKontakBulkBar();
+        });
+    }
+
+    checkboxes.forEach(cb => {
+        cb.addEventListener('change', updateKontakBulkBar);
+    });
+});
+</script>
+@endpush
 
 {{-- MODAL BALAS PESAN (DI LUAR TABEL & DI LUAR CARD UNTUK MENCEGAH FLICKER / BACKDROP BLINKING) --}}
 <div class="modal fade" id="modalBalasKontak" tabindex="-1" aria-hidden="true">

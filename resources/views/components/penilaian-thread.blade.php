@@ -23,14 +23,11 @@
 
     // Diskusi bersifat privat: hanya admin, siswa pembuat ulasan, dan guru yang bersangkutan
     $canAccessDiscussion = $isAdmin || $isAuthorStudent || $isTargetGuru;
-    $canReply = $canAccessDiscussion;
+    $canReply = !$isAdmin && ($isAuthorStudent || $isTargetGuru);
 
     $replyPlaceholder = 'Tulis balasan...';
     $senderBadge = '';
-    if ($isAdmin) {
-        $replyPlaceholder = 'Tulis tanggapan sebagai Administrator...';
-        $senderBadge = 'Admin';
-    } elseif ($isTargetGuru) {
+    if ($isTargetGuru) {
         $replyPlaceholder = 'Tulis tanggapan profesional kepada siswa...';
         $senderBadge = 'Guru';
     } elseif ($isAuthorStudent) {
@@ -68,14 +65,21 @@
         </div>
     @endif
 @else
-    {{-- TAMPILAN PRIVAT UNTUK SISWA PEMBUAT ULASAN, GURU TERKAIT, & ADMIN --}}
+    {{-- TAMPILAN PRIVAT UNTUK SISWA PEMBUAT ULASAN, GURU TERKAIT, & ADMIN (ADMIN HANYA MEMANTAU) --}}
     <div class="mt-3 pt-3 border-top border-light-subtle thread-container" id="thread-container-{{ $penilaian->id }}">
         {{-- HEADER STATUS PRIVASI & THREAD --}}
         <div class="d-flex align-items-center justify-content-between mb-2">
-            <span class="badge bg-secondary-subtle text-secondary border rounded-pill d-inline-flex align-items-center gap-1.5 py-1 px-2.5" style="font-size: 0.72rem;">
-                <i class="bi bi-shield-lock-fill text-primary"></i>
-                <span>Diskusi Privat (Hanya Anda & {{ $user->role === 'siswa' ? 'Guru' : 'Siswa Penilai' }})</span>
-            </span>
+            @if($isAdmin)
+                <span class="badge bg-primary-subtle text-primary border rounded-pill d-inline-flex align-items-center gap-1.5 py-1 px-2.5" style="font-size: 0.72rem;">
+                    <i class="bi bi-eye-fill"></i>
+                    <span>Mode Pemantauan Administrator (Diskusi Guru & Siswa)</span>
+                </span>
+            @else
+                <span class="badge bg-secondary-subtle text-secondary border rounded-pill d-inline-flex align-items-center gap-1.5 py-1 px-2.5" style="font-size: 0.72rem;">
+                    <i class="bi bi-shield-lock-fill text-primary"></i>
+                    <span>Diskusi Privat (Hanya Anda & {{ $user->role === 'siswa' ? 'Guru' : 'Siswa Penilai' }})</span>
+                </span>
+            @endif
 
             @if($totalBalasans > 0)
                 <span class="badge bg-primary-subtle text-primary rounded-pill font-mono px-2 py-0.5" style="font-size: 0.7rem;">
@@ -104,27 +108,33 @@
                     {{ $penilaian->balasan_guru }}
                 </div>
             </div>
+        @elseif($isAdmin)
+            <div class="small text-muted py-2 fst-italic">
+                <i class="bi bi-chat-left-dots me-1"></i>Belum ada percakapan atau balasan antara guru dan siswa pada ulasan ini.
+            </div>
         @endif
 
         {{-- 2. TOMBOL BUKA DETAIL DISKUSI --}}
-        @php
-            $btnLabel = $moreReplies->count() > 0 
-                ? 'Lihat Detail Diskusi (' . $moreReplies->count() . ' balasan)' 
-                : ($totalBalasans > 0 ? 'Balas Diskusi' : 'Buka Diskusi / Beri Tanggapan');
-        @endphp
-        <div class="my-1.5">
-            <button class="btn btn-sm btn-light border border-light-subtle text-primary fw-semibold px-3 py-1 rounded-pill d-inline-flex align-items-center gap-1.5 shadow-xs btn-toggle-more-replies"
-                    type="button"
-                    data-bs-toggle="collapse"
-                    data-bs-target="#discussionDetail-{{ $penilaian->id }}"
-                    data-original-label="{{ $btnLabel }}"
-                    aria-expanded="false"
-                    style="font-size: 0.75rem;">
-                <i class="bi bi-chat-dots-fill"></i>
-                <span class="toggle-text">{{ $btnLabel }}</span>
-                <i class="bi bi-chevron-down toggle-arrow ms-1" style="font-size: 0.7rem; transition: transform 0.2s ease;"></i>
-            </button>
-        </div>
+        @if($totalBalasans > 1 || (!$isAdmin && ($totalBalasans > 0 || $canReply)))
+            @php
+                $btnLabel = $moreReplies->count() > 0 
+                    ? 'Lihat Detail Diskusi (' . $moreReplies->count() . ' balasan)' 
+                    : ($totalBalasans > 0 ? ($isAdmin ? 'Lihat Riwayat Diskusi' : 'Balas Diskusi') : 'Buka Diskusi / Beri Tanggapan');
+            @endphp
+            <div class="my-1.5">
+                <button class="btn btn-sm btn-light border border-light-subtle text-primary fw-semibold px-3 py-1 rounded-pill d-inline-flex align-items-center gap-1.5 shadow-xs btn-toggle-more-replies"
+                        type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#discussionDetail-{{ $penilaian->id }}"
+                        data-original-label="{{ $btnLabel }}"
+                        aria-expanded="false"
+                        style="font-size: 0.75rem;">
+                    <i class="bi bi-chat-dots-fill"></i>
+                    <span class="toggle-text">{{ $btnLabel }}</span>
+                    <i class="bi bi-chevron-down toggle-arrow ms-1" style="font-size: 0.7rem; transition: transform 0.2s ease;"></i>
+                </button>
+            </div>
+        @endif
 
         {{-- 3. AREA DETAIL DISKUSI (TERSEMBUNYI SECARA DEFAULT, BARU NAMPIL KETIKA TOMBOL DIPENCET) --}}
         <div class="collapse" id="discussionDetail-{{ $penilaian->id }}">
@@ -135,7 +145,7 @@
                 @endforeach
             </div>
 
-            {{-- FORM BALAS CEPAT DENGAN DISCORD-STYLE SLOWMODE --}}
+            {{-- FORM BALAS CEPAT DENGAN DISCORD-STYLE SLOWMODE (HANYA UNTUK GURU & SISWA TERKAIT, ADMIN HANYA MEMANTAU) --}}
             @if($canReply)
                 <div class="p-2.5 rounded-3 border bg-white shadow-xs mt-2 reply-box-container">
                     <form action="{{ route('penilaian.balasan.store', $penilaian) }}" 

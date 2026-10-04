@@ -11,7 +11,7 @@ class KritikSaranController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Penilaian::with(['guru.jurusan', 'siswa', 'kelas', 'periode']);
+        $query = Penilaian::with(['guru.jurusan', 'siswa', 'kelas', 'periode', 'balasans.user']);
 
         // Filter cakupan data (default: hanya yang memiliki kritik atau saran tertulis)
         if ($request->get('cakupan') !== 'semua') {
@@ -149,5 +149,38 @@ class KritikSaranController extends Controller
         ]);
 
         return back()->with('success', 'Status sensor ulasan berhasil dibatalkan.');
+    }
+
+    public function destroyBatch(Request $request)
+    {
+        $ids = $request->input('ids', []);
+        if (empty($ids) || !is_array($ids)) {
+            return back()->with('error', 'Pilih minimal satu ulasan untuk dihapus.');
+        }
+
+        $penilaians = Penilaian::with('guru')->whereIn('id', $ids)->get();
+        if ($penilaians->isEmpty()) {
+            return back()->with('error', 'Tidak ada data ulasan yang ditemukan.');
+        }
+
+        $guruIds = [];
+        DB::transaction(function () use ($penilaians, $ids, &$guruIds) {
+            \App\Models\PenilaianBalasan::whereIn('penilaian_id', $ids)->delete();
+            \App\Models\PenilaianHelpful::whereIn('penilaian_id', $ids)->delete();
+            \App\Models\Pelanggaran::whereIn('penilaian_id', $ids)->delete();
+
+            foreach ($penilaians as $p) {
+                if ($p->guru_id && !in_array($p->guru_id, $guruIds)) {
+                    $guruIds[] = $p->guru_id;
+                }
+                $p->delete();
+            }
+        });
+
+        foreach ($guruIds as $gid) {
+            \App\Models\Guru::find($gid)?->updateRataRata();
+        }
+
+        return back()->with('success', count($penilaians) . ' ulasan berhasil dihapus permanen.');
     }
 }
