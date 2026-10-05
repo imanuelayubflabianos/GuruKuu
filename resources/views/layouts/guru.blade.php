@@ -248,17 +248,27 @@
 
                 {{-- USER BADGE DROPDOWN (PERSIS SEPERTI ADMIN) --}}
                 <div class="dropdown border-start ps-3 ms-2">
-                    <button class="btn btn-light d-flex align-items-center gap-2 p-1.5 px-2.5 rounded-pill border shadow-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <div class="rounded-circle text-white d-flex align-items-center justify-content-center fw-bold" style="width: 28px; height: 28px; background: #003366; font-size: 0.75rem;">
-                            {{ $guruInitials ?: 'G' }}
+                    @php
+                        $guruName = auth()->user()->name ?? 'Guru';
+                        $nameParts = array_values(array_filter(explode(' ', trim($guruName))));
+                        if (count($nameParts) >= 2) {
+                            $guruInitials = strtoupper(mb_substr($nameParts[0], 0, 1) . mb_substr(end($nameParts), 0, 1));
+                        } elseif (count($nameParts) === 1 && mb_strlen($nameParts[0]) > 0) {
+                            $guruInitials = strtoupper(mb_substr($nameParts[0], 0, 1));
+                        } else {
+                            $guruInitials = 'G';
+                        }
+                    @endphp
+                    <button class="btn btn-light d-flex align-items-center gap-1.5 p-1 pe-2 rounded-pill border shadow-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="height: 36px; background: #f8fafc; border-color: #e2e8f0 !important; cursor: pointer;" title="{{ $guruName }}">
+                        <div class="rounded-circle text-white d-flex align-items-center justify-content-center fw-bold shadow-sm flex-shrink-0" style="width: 28px; height: 28px; background: linear-gradient(135deg, #0d6efd, #003366); font-size: 0.75rem; letter-spacing: 0.5px;">
+                            {{ $guruInitials }}
                         </div>
-                        <span class="d-none d-sm-inline small fw-bold text-dark">{{ auth()->user()->name ?? 'Guru' }}</span>
-                        <i class="bi bi-chevron-down text-muted small"></i>
+                        <i class="bi bi-chevron-down text-secondary" style="font-size: 0.72rem; margin-left: 2px;"></i>
                     </button>
                     <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 p-2 mt-2" style="border-radius: 12px; min-width: 190px;">
                         <li class="px-2 py-1 mb-1 border-bottom">
-                            <small class="text-muted d-block" style="font-size: 0.7rem;">MASUK SEBAGAI</small>
-                            <span class="fw-bold small text-dark">Guru ({{ auth()->user()->nis ?? '-' }})</span>
+                            <div class="fw-bold small text-dark text-truncate">{{ auth()->user()->name ?? 'Guru' }}</div>
+                            <small class="text-muted d-block" style="font-size: 0.7rem;">Guru ({{ auth()->user()->nis ?? auth()->user()->nip ?? '-' }})</small>
                         </li>
                         <li>
                             <a class="dropdown-item rounded py-1.5 small" href="{{ route('guru.pengaturan') }}">
@@ -278,6 +288,28 @@
                 </div>
             </div>
         </div>
+
+        @php
+            $mInfoGuru = \App\Services\MaintenanceService::getSiswaMaintenanceInfo();
+        @endphp
+
+        {{-- BANNER INFORMASI MODE PEMELIHARAAN --}}
+        @if($mInfoGuru['is_active'])
+            <div class="alert alert-warning border-0 shadow-sm d-flex align-items-center justify-content-between p-3 mb-4 rounded-3" style="background: #fff8e6; border-left: 5px solid #f59e0b !important;" role="alert">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="rounded-circle bg-warning bg-opacity-25 d-flex align-items-center justify-content-center text-warning-emphasis flex-shrink-0" style="width: 42px; height: 42px;">
+                        <i class="bi bi-tools fs-5"></i>
+                    </div>
+                    <div>
+                        <h6 class="fw-bold mb-0 text-dark">Mode Pemeliharaan (Maintenance) Sedang Aktif</h6>
+                        <p class="mb-0 small text-muted">
+                            Sistem sedang dalam masa pemeliharaan berkala untuk peningkatan performa.
+                            <span class="text-primary-emphasis fw-semibold">({{ $mInfoGuru['schedule_text'] }})</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        @endif
 
         @if(session('success')) <div class="alert alert-success border-0 shadow-sm">{{ session('success') }}</div> @endif
         @if(session('error')) <div class="alert alert-danger border-0 shadow-sm">{{ session('error') }}</div> @endif

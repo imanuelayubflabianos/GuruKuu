@@ -546,7 +546,7 @@
                 </div>
             </div>
 
-            {{-- FITUR MODE PEMELIHARAAN (MAINTENANCE) SISWA --}}
+            {{-- FITUR MODE PEMELIHARAAN (MAINTENANCE) SISWA & GURU --}}
             <div class="settings-card mb-4 border-warning border-opacity-50 shadow-sm" style="background: linear-gradient(to bottom, #ffffff, #fffdfa);">
                 <input type="hidden" name="maintenance_siswa_submitted" value="1">
                 <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
@@ -555,8 +555,8 @@
                             <i class="bi bi-tools fs-5"></i>
                         </div>
                         <div>
-                            <h2 class="settings-heading mb-0">Mode Pemeliharaan (Maintenance) Siswa</h2>
-                            <p class="settings-muted mb-0">Batasi aksi pemberian nilai dan pengiriman pesan siswa saat sistem dalam pemeliharaan.</p>
+                            <h2 class="settings-heading mb-0">Mode Pemeliharaan (Maintenance) Siswa & Guru</h2>
+                            <p class="settings-muted mb-0">Batasi akses penilaian dan aktivitas sistem untuk siswa & guru saat dalam pemeliharaan.</p>
                         </div>
                     </div>
                     <div>
@@ -578,10 +578,10 @@
                         <input class="form-check-input ms-0" type="checkbox" name="maintenance_siswa_enabled" value="1" id="maintenanceEnabledSwitch" {{ ($settings['maintenance_siswa_enabled'] ?? '0') === '1' ? 'checked' : '' }} style="width: 2.8rem; height: 1.4rem; cursor: pointer;">
                         <div>
                             <label class="form-check-label fw-bold text-dark cursor-pointer mb-0" for="maintenanceEnabledSwitch" style="font-size: 0.95rem;">
-                                Aktifkan Mode Pemeliharaan (Kunci Input Siswa)
+                                Aktifkan Mode Pemeliharaan (Kunci Akses Siswa & Guru)
                             </label>
                             <div class="text-muted small">
-                                Siswa tetap bisa membuka beranda, profil guru, riwayat, dan leaderboard, namun seluruh form/tombol penilaian & chat diblokir dengan pop-up pemberitahuan maintenance.
+                                Siswa & Guru tetap bisa melihat dashboard, profil, riwayat, dan leaderboard, namun aksi pengisian penilaian serta interaksi tertentu dibatasi dengan pop-up pemberitahuan maintenance.
                             </div>
                         </div>
                     </div>
@@ -615,7 +615,7 @@
                                     </strong>
                                 </div>
                                 <p class="text-muted small mb-0 ps-4">
-                                    Tentukan waktu mulai hingga waktu selesai. Waktu selesai akan ditampilkan kepada siswa dan maintenance berhenti otomatis.
+                                    Tentukan waktu mulai hingga waktu selesai. Waktu selesai akan ditampilkan kepada siswa & guru dan maintenance berhenti otomatis.
                                 </p>
                             </label>
                         </div>
@@ -636,19 +636,19 @@
                                     <i class="bi bi-calendar-check me-1 text-success"></i>Waktu Selesai Pemeliharaan:
                                 </label>
                                 <input type="datetime-local" name="maintenance_siswa_end" id="mEndInput" class="form-control" value="{{ !empty($settings['maintenance_siswa_end']) ? \Carbon\Carbon::parse($settings['maintenance_siswa_end'])->format('Y-m-d\TH:i') : '' }}">
-                                <div class="text-muted small mt-1">Estimasi waktu pemeliharaan selesai (ditampilkan ke siswa).</div>
+                                <div class="text-muted small mt-1">Estimasi waktu pemeliharaan selesai (ditampilkan ke siswa & guru).</div>
                             </div>
                         </div>
                     </div>
 
-                    {{-- PESAN KHUSUS UNTUK SISWA --}}
+                    {{-- PESAN KHUSUS UNTUK SISWA & GURU --}}
                     <div class="mb-3">
                         <label class="form-label fw-bold mb-1" for="maintenanceMessageInput">
-                            <i class="bi bi-chat-left-dots me-1 text-primary"></i>Pesan Penjelasan untuk Siswa (Opsional):
+                            <i class="bi bi-chat-left-dots me-1 text-primary"></i>Pesan Penjelasan untuk Siswa & Guru (Opsional):
                         </label>
                         <textarea name="maintenance_siswa_message" id="maintenanceMessageInput" class="form-control" rows="2" placeholder="Sistem sedang dalam pemeliharaan berkala untuk peningkatan performa. Silakan cek kembali nanti.">{{ $settings['maintenance_siswa_message'] }}</textarea>
                         <div class="text-muted small mt-1">
-                            Pesan ini akan ditampilkan pada pop-up modal saat siswa mencoba mengakses form penilaian atau mengirim pesan.
+                            Pesan ini akan ditampilkan pada banner atau pop-up modal saat siswa & guru mengakses sistem.
                         </div>
                     </div>
 
@@ -657,7 +657,7 @@
                         <div class="d-flex align-items-center gap-2">
                             <i class="bi {{ $maintenanceInfo['is_active'] ? 'bi-exclamation-circle-fill text-warning fs-4' : 'bi-shield-check text-success fs-4' }}"></i>
                             <div>
-                                <strong class="text-dark small d-block">Status Yang Ditampilkan Kepada Siswa:</strong>
+                                <strong class="text-dark small d-block">Status Yang Ditampilkan Kepada Siswa & Guru:</strong>
                                 <span class="text-muted small">{{ $maintenanceInfo['schedule_text'] }}</span>
                             </div>
                         </div>
@@ -1879,6 +1879,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 modal.show();
             }
         });
+    });
+
     // Maintenance Mode Toggle Handlers
     document.querySelectorAll('input[name="maintenance_siswa_type"]').forEach(r => {
         r.addEventListener('change', function() {

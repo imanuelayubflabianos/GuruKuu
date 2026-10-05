@@ -2,6 +2,32 @@
 @section('title', 'Pengaturan Profil & Akun')
 
 @section('content')
+<style>
+    @media (max-width: 767.98px) {
+        #guruPengaturanTabs {
+            display: flex !important;
+            flex-wrap: nowrap !important;
+            overflow-x: auto !important;
+            -webkit-overflow-scrolling: touch;
+            padding-bottom: 0.4rem;
+            gap: 0.45rem;
+            scrollbar-width: none;
+        }
+        #guruPengaturanTabs::-webkit-scrollbar {
+            display: none;
+        }
+        #guruPengaturanTabs .nav-item {
+            flex: 0 0 auto;
+        }
+        #guruPengaturanTabs .nav-link {
+            white-space: nowrap !important;
+            padding: 0.55rem 0.9rem;
+            font-size: 0.84rem;
+            border-radius: 0.65rem;
+        }
+    }
+</style>
+
 <div class="page-header d-flex justify-content-between align-items-center flex-wrap gap-3 mb-3">
     <div>
         <h1 class="page-title mb-1">Pengaturan Profil & Akun</h1>
