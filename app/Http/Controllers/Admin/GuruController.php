@@ -15,15 +15,45 @@ class GuruController extends Controller
     public function index(Request $request)
     {
         $query = Guru::with('jurusan');
+
+        // Pencarian nama, NIP, atau email
+        if ($request->filled('search')) {
+            $s = trim($request->search);
+            $query->where(function ($q) use ($s) {
+                $q->where('nama', 'like', "%{$s}%")
+                  ->orWhere('nip', 'like', "%{$s}%")
+                  ->orWhere('email', 'like', "%{$s}%");
+            });
+        }
         
+        // Filter kategori (normada / produktif)
         if ($request->filled('kategori')) {
             $query->where('kategori', $request->kategori);
         }
         
-        if ($request->filled('kelas_id')) {
-            $query->whereHas('kelas', function ($kelas) use ($request) {
-                $kelas->whereKey($request->kelas_id);
+        // Filter kelas yang diajar
+        $kelasId = $request->input('kelas_id', $request->input('kelas'));
+        if (!empty($kelasId)) {
+            $query->whereHas('kelas', function ($kelas) use ($kelasId) {
+                $kelas->whereKey($kelasId);
             });
+        }
+
+        // Filter status akun aktif / nonaktif
+        if ($request->filled('status')) {
+            if ($request->status === 'aktif') {
+                $activeNips = User::where('role', 'guru')->where('is_active', true)->pluck('nis')->filter()->toArray();
+                $activeEmails = User::where('role', 'guru')->where('is_active', true)->pluck('email')->filter()->toArray();
+                $query->where(function ($q) use ($activeNips, $activeEmails) {
+                    $q->whereIn('nip', $activeNips)->orWhereIn('email', $activeEmails);
+                });
+            } elseif ($request->status === 'nonaktif') {
+                $inactiveNips = User::where('role', 'guru')->where('is_active', false)->pluck('nis')->filter()->toArray();
+                $inactiveEmails = User::where('role', 'guru')->where('is_active', false)->pluck('email')->filter()->toArray();
+                $query->where(function ($q) use ($inactiveNips, $inactiveEmails) {
+                    $q->whereIn('nip', $inactiveNips)->orWhereIn('email', $inactiveEmails);
+                });
+            }
         }
         
         $guru = $query->with('kelas.jurusan')->latest()->paginate(15)->withQueryString();

@@ -54,12 +54,13 @@ class SiPintuController extends Controller
             $params['refresh'] = true;
         }
 
-        // Status filter: default only active teachers
-        $onlyActive = true;
+        // Status filter: default to showing ALL 71 genuine teachers from SiPintu!
+        // Options: 'all' (71 Guru), 'aktif' (65 Guru), 'nonaktif' (6 Guru)
+        $status = $request->get('status', 'all');
         if ($request->has('only_active')) {
-            $onlyActive = filter_var($request->only_active, FILTER_VALIDATE_BOOLEAN);
+            $status = filter_var($request->only_active, FILTER_VALIDATE_BOOLEAN) ? 'aktif' : 'all';
         }
-        $params['only_active'] = $onlyActive;
+        $params['status'] = $status;
 
         $result = $this->siPintu->getTeachers($params);
         $allTeachers = $result['data'] ?? [];
@@ -75,7 +76,7 @@ class SiPintuController extends Controller
         $localNips = Guru::pluck('nip')->filter()->toArray();
         $jurusans = Jurusan::orderBy('nama_jurusan')->get();
 
-        return view('admin.sipintu.teachers', compact('result', 'teachers', 'localNips', 'jurusans', 'onlyActive'));
+        return view('admin.sipintu.teachers', compact('result', 'teachers', 'localNips', 'jurusans', 'status'));
     }
 
     /**
@@ -90,16 +91,19 @@ class SiPintuController extends Controller
         if ($request->filled('search')) {
             $params['search'] = trim($request->search);
         }
+        if ($request->filled('kelas')) {
+            $params['kelas'] = trim($request->kelas);
+        }
         if ($request->has('refresh')) {
             $params['refresh'] = true;
         }
         
-        // Status filter: default only active students
-        $onlyActive = true;
+        // Status filter: default only active students in school (1.160 siswa)
+        $status = $request->get('status', 'aktif');
         if ($request->has('only_active')) {
-            $onlyActive = filter_var($request->only_active, FILTER_VALIDATE_BOOLEAN);
+            $status = filter_var($request->only_active, FILTER_VALIDATE_BOOLEAN) ? 'aktif' : 'all';
         }
-        $params['only_active'] = $onlyActive;
+        $params['status'] = $status;
 
         $result = $this->siPintu->getStudents($params);
         $allStudents = $result['data'] ?? [];
@@ -115,7 +119,7 @@ class SiPintuController extends Controller
         $localNisList = User::where('role', 'siswa')->pluck('nis')->filter()->toArray();
         $kelasList = Kelas::orderBy('tingkat')->orderBy('nama_kelas')->get();
 
-        return view('admin.sipintu.students', compact('result', 'students', 'localNisList', 'kelasList', 'onlyActive'));
+        return view('admin.sipintu.students', compact('result', 'students', 'localNisList', 'kelasList', 'status'));
     }
 
     /**
@@ -257,7 +261,7 @@ class SiPintuController extends Controller
         @set_time_limit(0);
         @ini_set('memory_limit', '512M');
 
-        $onlyActive = true;
+        $onlyActive = false;
         if ($request->has('only_active')) {
             $onlyActive = filter_var($request->only_active, FILTER_VALIDATE_BOOLEAN);
         }

@@ -1,9 +1,7 @@
 @extends('layouts.admin')
 @section('title', 'Data Siswa SiPintu')
 
-@push('styles')
-<link href="https://cdn.datatables.net/1.13.8/css/dataTables.bootstrap5.min.css" rel="stylesheet">
-@endpush
+
 
 @section('content')
 <div class="page-header d-flex justify-content-between align-items-center">
@@ -46,44 +44,71 @@
 
 {{-- FILTER & SEARCH BOX --}}
 <div class="card-custom p-3 mb-4">
-    <form method="GET" action="{{ route('admin.sipintu.siswa') }}" class="row g-3 align-items-end">
-        <div class="col-md-3">
-            <label class="form-label small fw-bold text-muted">Cari Nama / NIS / Email</label>
+    <form method="GET" action="{{ route('admin.sipintu.siswa') }}" class="row g-2 align-items-center">
+        <div class="col-md-4">
             <div class="input-group">
-                <span class="input-group-text bg-white"><i class="bi bi-search text-muted"></i></span>
-                <input type="text" name="search" value="{{ request('search') }}" class="form-control" placeholder="Kata kunci...">
+                <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-search"></i></span>
+                <input type="text" name="search" value="{{ request('search') }}" class="form-control border-start-0" placeholder="Cari nama, NIS, atau email...">
             </div>
         </div>
-        <div class="col-md-2">
-            <label class="form-label small fw-bold text-muted">Filter NIS</label>
-            <input type="text" name="nis" value="{{ request('nis') }}" class="form-control" placeholder="NIS siswa...">
-        </div>
         <div class="col-md-3">
-            <label class="form-label small fw-bold text-muted">Status Siswa</label>
-            <select name="only_active" class="form-select" onchange="this.form.submit()">
-                <option value="1" {{ ($onlyActive ?? true) ? 'selected' : '' }}>Hanya Siswa Aktif (Punya Kelas)</option>
-                <option value="0" {{ !($onlyActive ?? true) ? 'selected' : '' }}>Semua Siswa (Termasuk Alumni/Nonaktif)</option>
+            <select name="kelas" class="form-select" onchange="this.form.submit()">
+                <option value="">Semua Kelas</option>
+                @foreach($kelasList as $k)
+                    <option value="{{ $k->nama_kelas }}" {{ request('kelas') == $k->nama_kelas ? 'selected' : '' }}>
+                        {{ $k->nama_kelas }} (Kelas {{ $k->tingkat }})
+                    </option>
+                @endforeach
             </select>
         </div>
-        <div class="col-md-4 d-flex gap-2">
-            <button type="submit" class="btn btn-primary-custom flex-grow-1">
-                <i class="bi bi-funnel me-1"></i> Cari
+        <div class="col-md-2">
+            <select name="status" class="form-select" onchange="this.form.submit()">
+                <option value="all" {{ ($status ?? 'all') === 'all' ? 'selected' : '' }}>Semua Status</option>
+                <option value="aktif" {{ ($status ?? '') === 'aktif' ? 'selected' : '' }}>Aktif</option>
+                <option value="nonaktif" {{ ($status ?? '') === 'nonaktif' ? 'selected' : '' }}>Tidak Aktif</option>
+            </select>
+        </div>
+        <div class="col-md-3 d-flex gap-2 justify-content-md-end align-items-center">
+            <button type="submit" class="btn btn-primary-custom px-3">
+                <i class="bi bi-funnel me-1"></i> Filter
             </button>
-            <a href="{{ route('admin.sipintu.siswa', ['refresh' => 1]) }}" class="btn btn-outline-success" title="Segarkan Data dari Server SiPintu">
-                <i class="bi bi-arrow-repeat"></i> Segarkan
-            </a>
-            <a href="{{ route('admin.sipintu.siswa') }}" class="btn btn-outline-custom" title="Reset Filter">
-                <i class="bi bi-arrow-counterclockwise"></i>
-            </a>
-            <span class="badge bg-light text-dark border align-self-center px-3 py-2">
-                Total: <strong>{{ $students->total() }}</strong> siswa
-            </span>
+            <div class="dropdown">
+                <button class="btn btn-outline-custom d-flex align-items-center justify-content-center" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="width: 38px; height: 38px; border-radius: 8px;" title="Pilihan Lainnya">
+                    <i class="bi bi-three-dots-vertical"></i>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 py-1" style="border-radius: 10px; font-size: 0.88rem; min-width: 210px;">
+                    <li>
+                        <a class="dropdown-item py-2 px-3 d-flex align-items-center gap-2" href="{{ route('admin.sipintu.siswa', ['refresh' => 1, 'status' => request('status', 'aktif')]) }}">
+                            <i class="bi bi-arrow-repeat text-success"></i>
+                            <span>Segarkan Data SiPintu</span>
+                        </a>
+                    </li>
+                    @if(request()->hasAny(['search', 'nis', 'kelas', 'status']))
+                    <li><hr class="dropdown-divider my-1"></li>
+                    <li>
+                        <a class="dropdown-item py-2 px-3 d-flex align-items-center gap-2 text-danger" href="{{ route('admin.sipintu.siswa') }}">
+                            <i class="bi bi-arrow-counterclockwise"></i>
+                            <span>Reset Filter & Pencarian</span>
+                        </a>
+                    </li>
+                    @endif
+                </ul>
+            </div>
+            @if(request()->hasAny(['search', 'nis', 'kelas', 'status']))
+                <a href="{{ route('admin.sipintu.siswa') }}" class="btn btn-outline-custom" title="Reset Filter">
+                    <i class="bi bi-arrow-counterclockwise"></i>
+                </a>
+            @endif
         </div>
     </form>
 </div>
 
 {{-- DATA TABLE SISWA --}}
 <div class="card-custom">
+    <div class="d-flex justify-content-between align-items-center px-3 px-md-4 py-3 border-bottom">
+        <span class="small text-muted">Menampilkan {{ $students->firstItem() ?? 0 }}–{{ $students->lastItem() ?? 0 }} dari {{ $students->total() }} siswa</span>
+        <span class="badge bg-light text-dark border font-mono">Total: {{ number_format($students->total(), 0, ',', '.') }} Siswa</span>
+    </div>
     <div class="table-responsive">
         <table class="table table-custom mb-0" id="sipintuSiswaTable">
             <thead>
@@ -337,9 +362,7 @@
 @endsection
 
 @push('scripts')
-<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-<script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/1.13.8/js/dataTables.bootstrap5.min.js"></script>
+
 <script>
 let currentStudent = null;
 
@@ -407,15 +430,5 @@ function openImportModal(student) {
     const modal = new bootstrap.Modal(document.getElementById('modalImportStudent'));
     modal.show();
 }
-
-$(document).ready(function() {
-    @if(count($students) > 0)
-    $('#sipintuSiswaTable').DataTable({
-        language: { url: '//cdn.datatables.net/plug-ins/1.13.8/i18n/id.json' },
-        ordering: false,
-        pageLength: 10
-    });
-    @endif
-});
 </script>
 @endpush

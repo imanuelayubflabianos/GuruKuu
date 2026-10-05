@@ -89,19 +89,41 @@
     </div>
 @endif
 
+{{-- FILTER BERDASARKAN KELAS, STATUS, & PENCARIAN GURU --}}
 <div class="card-custom p-3 mb-4">
-    <form method="GET" action="{{ route('admin.guru.index') }}" class="row g-3 align-items-end">
-        <div class="col-md-10">
-            <label class="form-label small fw-bold text-muted">Filter Kelas yang Diajar</label>
-            <select name="kelas_id" class="form-select" style="border-radius: 8px;" onchange="this.form.submit()">
-                <option value="">Semua Kelas</option>
+    <form method="GET" action="{{ route('admin.guru.index') }}" class="row g-2 align-items-center">
+        <div class="col-md-4">
+            <div class="input-group">
+                <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-search"></i></span>
+                <input type="text" name="search" class="form-control border-start-0" placeholder="Cari nama, NIP, atau email..." value="{{ request('search') }}">
+            </div>
+        </div>
+        <div class="col-md-3">
+            <select name="kelas_id" class="form-select" onchange="this.form.submit()">
+                <option value="">Semua Kelas Diajar</option>
                 @foreach($kelasList as $kelas)
-                    <option value="{{ $kelas->id }}" {{ request('kelas_id') == $kelas->id ? 'selected' : '' }}>{{ $kelas->label_singkat }}</option>
+                    <option value="{{ $kelas->id }}" {{ (request('kelas_id') == $kelas->id || request('kelas') == $kelas->id) ? 'selected' : '' }}>
+                        {{ $kelas->nama_kelas }} Kelas {{ $kelas->tingkat }}
+                    </option>
                 @endforeach
             </select>
         </div>
-        <div class="col-md-2 d-flex gap-2">
-            <a href="{{ route('admin.guru.index') }}" class="btn btn-outline-custom w-100" title="Reset filter" aria-label="Reset filter"><i class="bi bi-arrow-counterclockwise"></i></a>
+        <div class="col-md-2">
+            <select name="status" class="form-select" onchange="this.form.submit()">
+                <option value="">Semua Status</option>
+                <option value="aktif" {{ request('status') === 'aktif' ? 'selected' : '' }}>Aktif</option>
+                <option value="nonaktif" {{ request('status') === 'nonaktif' ? 'selected' : '' }}>Tidak Aktif</option>
+            </select>
+        </div>
+        <div class="col-md-3 d-flex gap-2 justify-content-md-end">
+            <button type="submit" class="btn btn-primary-custom px-3">
+                <i class="bi bi-funnel me-1"></i> Filter
+            </button>
+            @if(request()->hasAny(['search', 'kelas_id', 'kelas', 'status', 'kategori']))
+                <a href="{{ route('admin.guru.index') }}" class="btn btn-outline-custom" title="Reset Filter">
+                    <i class="bi bi-arrow-counterclockwise"></i>
+                </a>
+            @endif
         </div>
     </form>
 </div>
@@ -109,7 +131,7 @@
 <div class="card-custom">
     <div class="d-flex justify-content-between align-items-center px-3 px-md-4 py-3 border-bottom">
         <span class="small text-muted">Menampilkan {{ $guru->firstItem() ?? 0 }}–{{ $guru->lastItem() ?? 0 }} dari {{ $guru->total() }} guru</span>
-        <span class="badge bg-light text-dark border">15 per halaman</span>
+        <span class="badge bg-light text-dark border font-mono">Total: {{ $guru->total() }} Guru</span>
     </div>
     <div class="table-responsive">
         <table class="table table-custom mb-0">

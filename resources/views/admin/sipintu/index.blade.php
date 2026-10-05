@@ -194,7 +194,7 @@
                     </button>
                 </form>
                 <div class="mt-2 text-muted small">
-                    <i class="bi bi-info-circle me-1"></i> Menarik seluruh 65 Guru Aktif dan 1.130 Siswa Aktif langsung ke database lokal.
+                    <i class="bi bi-info-circle me-1"></i> Menarik seluruh 71 Guru dan 1.160 Siswa Aktif langsung ke database lokal.
                 </div>
             </div>
 

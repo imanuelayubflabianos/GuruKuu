@@ -62,8 +62,8 @@
         <div class="col-md-2">
             <select name="status" class="form-select" onchange="this.form.submit()">
                 <option value="">Semua Status</option>
-                <option value="aktif" {{ request('status') === 'aktif' ? 'selected' : '' }}>✅ Aktif</option>
-                <option value="nonaktif" {{ request('status') === 'nonaktif' ? 'selected' : '' }}>⛔ Dinonaktifkan</option>
+                <option value="aktif" {{ request('status') === 'aktif' ? 'selected' : '' }}>Aktif</option>
+                <option value="nonaktif" {{ request('status') === 'nonaktif' ? 'selected' : '' }}>Tidak Aktif</option>
             </select>
         </div>
         <div class="col-md-3 d-flex gap-2 justify-content-md-end">

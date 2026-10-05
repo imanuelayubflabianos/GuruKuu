@@ -344,7 +344,10 @@ class SiPintuService
                 $rawTeachers = $this->extractDataArray($response->json(), 'teachers');
             }
 
-            $onlyActive = !isset($params['only_active']) || filter_var($params['only_active'], FILTER_VALIDATE_BOOLEAN);
+            $statusFilter = $params['status'] ?? null;
+            if ($statusFilter === null && isset($params['only_active'])) {
+                $statusFilter = filter_var($params['only_active'], FILTER_VALIDATE_BOOLEAN) ? 'aktif' : 'all';
+            }
 
             $teachers = [];
             foreach ($rawTeachers as $t) {
@@ -352,7 +355,10 @@ class SiPintuService
                 $isDeleted = !empty($t['deleted_at']);
                 $isActive = ($status === 1 && !$isDeleted);
 
-                if ($onlyActive && !$isActive) {
+                if ($statusFilter === 'aktif' && !$isActive) {
+                    continue;
+                }
+                if ($statusFilter === 'nonaktif' && $isActive) {
                     continue;
                 }
 
@@ -431,7 +437,13 @@ class SiPintuService
                 $rawStudents = $this->extractDataArray($response->json(), 'students');
             }
 
-            $onlyActive = !isset($params['only_active']) || filter_var($params['only_active'], FILTER_VALIDATE_BOOLEAN);
+            $statusFilter = $params['status'] ?? null;
+            if ($statusFilter === null && isset($params['only_active'])) {
+                $statusFilter = filter_var($params['only_active'], FILTER_VALIDATE_BOOLEAN) ? 'aktif' : 'all';
+            }
+            if ($statusFilter === null) {
+                $statusFilter = 'aktif';
+            }
             $students = [];
 
             foreach ($rawStudents as $s) {
@@ -458,8 +470,10 @@ class SiPintuService
                     elseif (preg_match('/(AKL|AK)/i', $kelasName)) $jurusanName = 'Akuntansi dan Keuangan Lembaga';
                 }
 
-                $isActive = !empty($classroomId) && !empty($classroom) && $classroomStatus === 1 && empty($s['deleted_at']);
-                if ($onlyActive && !$isActive) continue;
+                // Siswa aktif adalah siswa yang memiliki kelas dan belum dihapus (deleted_at kosong)
+                $isActive = (!empty($classroomId) || !empty($classroom)) && empty($s['deleted_at']);
+                if ($statusFilter === 'aktif' && !$isActive) continue;
+                if ($statusFilter === 'nonaktif' && $isActive) continue;
 
                 $photo = $s['photo'] ?? $s['foto'] ?? "https://ui-avatars.com/api/?name=" . urlencode($nama) . "&background=00A86B&color=fff";
 
@@ -479,12 +493,21 @@ class SiPintuService
                 $students = array_values(array_filter($students, fn($s) => str_contains($s['nis'], $nisSearch)));
             }
 
+            if (!empty($params['kelas'])) {
+                $kelasSearch = strtolower(trim((string) $params['kelas']));
+                $students = array_values(array_filter($students, function ($s) use ($kelasSearch) {
+                    return strtolower($s['kelas'] ?? '') === $kelasSearch ||
+                           (string) ($s['classroom_id'] ?? '') === $kelasSearch;
+                }));
+            }
+
             if (!empty($params['search'])) {
                 $query = strtolower(trim((string) $params['search']));
                 $students = array_values(array_filter($students, function ($s) use ($query) {
                     return str_contains(strtolower($s['nama'] ?? ''), $query) ||
                            str_contains(strtolower($s['nis'] ?? ''), $query) ||
-                           str_contains(strtolower($s['kelas'] ?? ''), $query);
+                           str_contains(strtolower($s['kelas'] ?? ''), $query) ||
+                           str_contains(strtolower($s['email'] ?? ''), $query);
                 }));
             }
 
@@ -757,8 +780,8 @@ class SiPintuService
 
         $this->ensureDefaultJurusans();
 
-        // 1. Ambil data guru dari SiPintu (default hanya guru aktif)
-        $teachersRes = $this->getTeachers(['only_active' => $onlyActive, 'refresh' => true]);
+        // 1. Ambil data seluruh 71 guru dari SiPintu
+        $teachersRes = $this->getTeachers(['refresh' => true]);
         $teachers = $teachersRes['data'] ?? [];
 
         // 2. Ambil data siswa aktif dari SiPintu
