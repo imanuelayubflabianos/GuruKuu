@@ -2,11 +2,24 @@
 @section('title', 'Riwayat Penilaian')
 
 @section('content')
+<style>
+.card-custom {
+    background: #ffffff;
+    border-radius: 16px !important;
+    border: 1px solid rgba(0, 51, 102, 0.09) !important;
+    box-shadow: 0 10px 28px -4px rgba(0, 51, 102, 0.10), 0 3px 8px -1px rgba(0, 0, 0, 0.04) !important;
+    transition: transform 0.22s ease, box-shadow 0.22s ease;
+}
+.card-custom:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 16px 36px -4px rgba(0, 51, 102, 0.14), 0 6px 12px rgba(0, 0, 0, 0.05) !important;
+}
+</style>
+
 <div class="page-header">
     <div>
-        <div class="page-label">RIWAYAT</div>
-        <h1 class="page-title">Riwayat Penilaian Anda</h1>
-        <p class="page-subtitle">Daftar guru yang telah Anda nilai. Anda dapat menghapusnya jika diperlukan.</p>
+        <h1 class="page-title mb-1">Riwayat Penilaian Anda</h1>
+        <p class="page-subtitle mb-0">Daftar guru yang telah Anda nilai. Anda dapat menghapusnya jika diperlukan.</p>
     </div>
 </div>
 

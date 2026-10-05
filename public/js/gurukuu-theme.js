@@ -117,9 +117,19 @@
             }
         });
 
-        // Close sidebar when clicking links on mobile
-        document.querySelectorAll('.sidebar .sidebar-link, .sidebar .sidebar-menu a').forEach(link => {
-            link.addEventListener('click', function() {
+        // Close sidebar when clicking actual navigation links on mobile (exclude collapse/dropdown toggles)
+        document.querySelectorAll('.sidebar .sidebar-link, .sidebar .sidebar-menu a, .sidebar .sidebar-submenu a').forEach(link => {
+            link.addEventListener('click', function(e) {
+                // Jangan tutup sidebar jika ini adalah tombol toggle accordion / dropdown
+                if (this.hasAttribute('data-bs-toggle') || 
+                    this.closest('[data-bs-toggle]') ||
+                    this.tagName.toLowerCase() !== 'a' ||
+                    !this.getAttribute('href') ||
+                    this.getAttribute('href').startsWith('#') ||
+                    this.getAttribute('href').startsWith('javascript:')) {
+                    return;
+                }
+
                 if (window.innerWidth < 992) {
                     GuruKuuTheme.closeSidebar();
                 }

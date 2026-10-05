@@ -4,8 +4,7 @@
 @section('content')
 <div class="page-header">
     <div>
-        <div class="page-label">AKUN SAYA</div>
-        <h1 class="page-title">Profil Siswa</h1>
+        <h1 class="page-title mb-0">Profil Siswa</h1>
     </div>
 </div>
 

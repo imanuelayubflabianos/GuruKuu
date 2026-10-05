@@ -288,6 +288,32 @@
 .user-notif-item.has-link:hover .notif-action-text {
     text-decoration: underline !important;
 }
+.user-notif-badge {
+    background-color: #003366 !important;
+    color: #ffffff !important;
+    border: 1.5px solid #ffffff !important;
+    font-size: 0.62rem !important;
+    font-weight: 700 !important;
+    min-width: 18px !important;
+    height: 18px !important;
+    padding: 0 4px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 999px !important;
+    box-sizing: border-box !important;
+    text-align: center !important;
+    line-height: 1 !important;
+}
+.user-notif-badge .user-notif-count {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    line-height: 1 !important;
+    transform: translateY(1px) !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
 </style>
 
 <div class="dropdown" id="{{ $containerId }}">

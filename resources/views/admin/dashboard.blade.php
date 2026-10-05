@@ -48,7 +48,7 @@
 
     <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3 w-100">
         <div>
-            <div class="page-label text-primary fw-bold" style="font-size: 0.75rem; letter-spacing: 1px;">RINGKASAN</div>
+            <div class="page-label text-primary fw-bold" style="font-size: 0.75rem; letter-spacing: 1px;">PORTAL ADMIN</div>
             <h2 class="h5 mb-0 fw-bold text-dark">Data Sistem</h2>
         </div>
         <span class="badge {{ $periodeAktif ? 'bg-success' : 'bg-secondary' }} px-3 py-2 rounded-pill">

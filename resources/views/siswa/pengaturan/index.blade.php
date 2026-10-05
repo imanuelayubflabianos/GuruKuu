@@ -2,11 +2,10 @@
 @section('title', 'Pengaturan Akun Siswa')
 
 @section('content')
-<div class="page-header d-flex justify-content-between align-items-center flex-wrap gap-3">
+<div class="page-header d-flex justify-content-between align-items-center flex-wrap gap-3 mb-3">
     <div>
-        <div class="page-label">MANAJEMEN AKUN</div>
-        <h1 class="page-title">Pengaturan Akun Siswa</h1>
-        <p class="page-subtitle">Kelola informasi data diri, perbarui kata sandi, komunikasi bantuan dengan admin, dan sesi akun Anda.</p>
+        <h1 class="page-title mb-1">Pengaturan Akun Siswa</h1>
+        <p class="page-subtitle mb-0">Kelola data diri dan keamanan akun Anda.</p>
     </div>
 </div>
 

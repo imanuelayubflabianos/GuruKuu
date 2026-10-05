@@ -154,8 +154,7 @@
 <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
     <div>
         <div class="page-label text-uppercase" style="color: #003366; font-weight: 700; letter-spacing: 1.2px; font-size: 0.75rem;">PORTAL GURU</div>
-        <h1 class="page-title mb-1" style="color: #003366; font-weight: 800; font-size: 1.75rem;">Selamat Datang, {{ $guru->nama }}! 👋</h1>
-        <p class="text-muted mb-0 small">Berikut ringkasan evaluasi kinerja dan aspirasi siswa pada periode aktif: <strong class="text-dark">{{ $periodeAktif->nama_periode ?? 'Aktif' }}</strong>.</p>
+        <h1 class="page-title mb-0" style="color: #003366; font-weight: 800; font-size: 1.75rem;">Selamat Datang, {{ $guru->nama }}! 👋</h1>
     </div>
     <div>
         <a href="{{ route('guru.leaderboard') }}" class="gk-dash-btn-outline">
@@ -192,74 +191,80 @@
                 </div>
             </div>
 
-            {{-- GRID KARTU METRIK: RATA-RATA & TOTAL EVALUASI --}}
-            <div class="row g-3">
+            {{-- GRID KARTU METRIK: 3 KOLOM SEJAJAR (RATA-RATA, TOTAL EVALUASI, ASPIRASI & MASUKAN) --}}
+            <div class="row g-2 g-md-3">
                 {{-- Kartu 1: Rata-Rata Nilai --}}
-                <div class="col-12 col-sm-6">
-                    <div class="gk-metric-card h-100 d-flex flex-column justify-content-between">
+                <div class="col-4">
+                    <div class="gk-metric-card h-100 d-flex flex-column justify-content-between" style="padding: clamp(0.7rem, 1.8vw, 1.25rem);">
                         <div>
-                            <div class="d-flex align-items-center justify-content-between mb-2">
-                                <span class="fw-bold text-uppercase" style="font-size: 0.72rem; letter-spacing: 0.8px; color: #b45309;">RATA-RATA EVALUASI</span>
+                            <div class="d-flex align-items-center justify-content-between mb-1.5 flex-wrap gap-1">
+                                <span class="fw-bold text-uppercase" style="font-size: clamp(0.55rem, 1.5vw, 0.72rem); letter-spacing: 0.5px; color: #b45309;">RATA-RATA</span>
                                 @php $pctKepuasan = round((($guru->rata_rata_nilai ?? 0) / 5) * 100); @endphp
-                                <span class="badge rounded-pill px-2.5 py-1" style="background: rgba(245, 158, 11, 0.12); color: #b45309; font-weight: 700; font-size: 0.75rem; border: 1px solid rgba(245, 158, 11, 0.2);">
-                                    {{ $pctKepuasan }}% Kepuasan
+                                <span class="badge rounded-pill px-1.5 px-sm-2 py-0.5" style="background: rgba(245, 158, 11, 0.12); color: #b45309; font-weight: 700; font-size: clamp(0.58rem, 1.4vw, 0.72rem); border: 1px solid rgba(245, 158, 11, 0.2);">
+                                    {{ $pctKepuasan }}%
                                 </span>
                             </div>
-                            <div class="d-flex align-items-baseline gap-1 mt-2">
-                                <h2 class="fw-bold mb-0 text-dark" style="font-feature-settings: 'tnum'; font-size: 2.1rem; line-height: 1;">{{ number_format($guru->rata_rata_nilai ?? 0, 2) }}</h2>
-                                <span class="text-muted fs-6">/ 5.0</span>
+                            <div class="d-flex align-items-baseline gap-1 mt-1">
+                                <h2 class="fw-bold mb-0 text-dark" style="font-feature-settings: 'tnum'; font-size: clamp(1.15rem, 3vw, 2rem); line-height: 1;">{{ number_format($guru->rata_rata_nilai ?? 0, 2) }}</h2>
+                                <span class="text-muted" style="font-size: clamp(0.65rem, 1.5vw, 0.85rem);">/ 5.0</span>
                             </div>
                         </div>
-                        <div class="mt-3 pt-1">
-                            <div class="progress" style="height: 6px; border-radius: 10px; background: #e2e8f0;">
+                        <div class="mt-2 pt-1">
+                            <div class="progress" style="height: 5px; border-radius: 10px; background: #e2e8f0;">
                                 <div class="progress-bar rounded-pill" style="width: {{ $pctKepuasan }}%; background: linear-gradient(90deg, #f59e0b, #d97706);"></div>
                             </div>
-                            <div class="text-muted small mt-1.5" style="font-size: 0.75rem;">Skor kumulatif penilaian siswa</div>
+                            <div class="text-muted text-truncate mt-1" style="font-size: clamp(0.58rem, 1.4vw, 0.72rem);">Kepuasan Siswa</div>
                         </div>
                     </div>
                 </div>
 
                 {{-- Kartu 2: Total Penilaian Siswa --}}
-                <div class="col-12 col-sm-6">
-                    <div class="gk-metric-card h-100 d-flex flex-column justify-content-between">
+                <div class="col-4">
+                    <div class="gk-metric-card h-100 d-flex flex-column justify-content-between" style="padding: clamp(0.7rem, 1.8vw, 1.25rem);">
                         <div>
-                            <div class="d-flex align-items-center justify-content-between mb-2">
-                                <span class="fw-bold text-uppercase" style="font-size: 0.72rem; letter-spacing: 0.8px; color: #003366;">TOTAL EVALUASI</span>
-                                <span class="badge rounded-pill px-2.5 py-1" style="background: rgba(0, 51, 102, 0.08); color: #003366; font-weight: 700; font-size: 0.75rem; border: 1px solid rgba(0, 51, 102, 0.12);">
+                            <div class="d-flex align-items-center justify-content-between mb-1.5 flex-wrap gap-1">
+                                <span class="fw-bold text-uppercase" style="font-size: clamp(0.55rem, 1.5vw, 0.72rem); letter-spacing: 0.5px; color: #003366;">EVALUASI</span>
+                                <span class="badge rounded-pill px-1.5 px-sm-2 py-0.5" style="background: rgba(0, 51, 102, 0.08); color: #003366; font-weight: 700; font-size: clamp(0.58rem, 1.4vw, 0.72rem); border: 1px solid rgba(0, 51, 102, 0.12);">
                                     Responden
                                 </span>
                             </div>
-                            <div class="d-flex align-items-baseline gap-1 mt-2">
-                                <h2 class="fw-bold mb-0 text-dark" style="font-feature-settings: 'tnum'; font-size: 2.1rem; line-height: 1;">{{ $guru->total_penilaian ?? 0 }}</h2>
-                                <span class="text-muted fs-6">Siswa</span>
+                            <div class="d-flex align-items-baseline gap-1 mt-1">
+                                <h2 class="fw-bold mb-0 text-dark" style="font-feature-settings: 'tnum'; font-size: clamp(1.15rem, 3vw, 2rem); line-height: 1;">{{ $guru->total_penilaian ?? 0 }}</h2>
+                                <span class="text-muted" style="font-size: clamp(0.65rem, 1.5vw, 0.85rem);">Siswa</span>
                             </div>
                         </div>
-                        <div class="mt-3 pt-1">
-                            <div class="text-muted small" style="font-size: 0.78rem; line-height: 1.4;">
-                                Siswa yang telah selesai mengisi evaluasi pengajaran pada periode ini.
+                        <div class="mt-2 pt-1">
+                            <div class="progress" style="height: 5px; border-radius: 10px; background: #e2e8f0;">
+                                <div class="progress-bar rounded-pill" style="width: 100%; background: linear-gradient(90deg, #003366, #1e40af);"></div>
                             </div>
+                            <div class="text-muted text-truncate mt-1" style="font-size: clamp(0.58rem, 1.4vw, 0.72rem);">Selesai Menilai</div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            {{-- Kartu 3: Total Aspirasi & Masukan Tertulis --}}
-            <div class="gk-metric-card">
-                <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2">
-                    <div>
-                        <span class="fw-bold text-uppercase" style="font-size: 0.72rem; letter-spacing: 0.8px; color: #0284c7;">ASPIRASI & MASUKAN</span>
-                        <div class="d-flex align-items-baseline gap-2 mt-1">
-                            <h3 class="fw-bold mb-0 text-dark" style="font-size: 1.85rem; line-height: 1;">{{ $totalUlasanCount ?? ($ulasanTerbaru->total() ?? 0) }}</h3>
-                            <span class="text-muted small">Ulasan Masuk</span>
+                {{-- Kartu 3: Total Aspirasi & Masukan Tertulis --}}
+                <div class="col-4">
+                    <div class="gk-metric-card h-100 d-flex flex-column justify-content-between" style="padding: clamp(0.7rem, 1.8vw, 1.25rem);">
+                        <div>
+                            <div class="d-flex align-items-center justify-content-between mb-1.5 flex-wrap gap-1">
+                                <span class="fw-bold text-uppercase" style="font-size: clamp(0.55rem, 1.5vw, 0.72rem); letter-spacing: 0.5px; color: #0284c7;">MASUKAN</span>
+                                <span class="badge rounded-pill px-1.5 px-sm-2 py-0.5" style="background: rgba(2, 132, 199, 0.1); color: #0284c7; font-weight: 700; font-size: clamp(0.58rem, 1.4vw, 0.72rem); border: 1px solid rgba(2, 132, 199, 0.2);">
+                                    Ulasan
+                                </span>
+                            </div>
+                            <div class="d-flex align-items-baseline gap-1 mt-1">
+                                <h2 class="fw-bold mb-0 text-dark" style="font-feature-settings: 'tnum'; font-size: clamp(1.15rem, 3vw, 2rem); line-height: 1;">{{ $totalUlasanCount ?? ($ulasanTerbaru->total() ?? 0) }}</h2>
+                                <span class="text-muted" style="font-size: clamp(0.65rem, 1.5vw, 0.85rem);">Masuk</span>
+                            </div>
+                        </div>
+                        <div class="mt-2 pt-1">
+                            <div class="progress" style="height: 5px; border-radius: 10px; background: #e2e8f0;">
+                                <div class="progress-bar rounded-pill" style="width: 100%; background: linear-gradient(90deg, #0284c7, #38bdf8);"></div>
+                            </div>
+                            <div class="text-muted text-truncate mt-1" style="font-size: clamp(0.58rem, 1.4vw, 0.72rem);">Aspirasi Anonim</div>
                         </div>
                     </div>
-                    <span class="badge rounded-pill px-3 py-1.5" style="background: rgba(2, 132, 199, 0.1); color: #0284c7; font-weight: 700; font-size: 0.75rem; border: 1px solid rgba(2, 132, 199, 0.2);">
-                        Kritik & Saran Tertulis
-                    </span>
                 </div>
-                <p class="text-muted small mb-0 mt-2" style="font-size: 0.8rem; line-height: 1.5;">
-                    Ulasan siswa disampaikan secara 100% anonim dan objektif demi menjaga kenyamanan proses refleksi serta peningkatan kualitas pengajaran Anda.
-                </p>
             </div>
         </div>
     </div>

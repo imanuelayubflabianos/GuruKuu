@@ -66,7 +66,7 @@
         .page-title { font-size: 2rem; font-weight: 800; color: var(--text-dark); margin: 0; }
         .page-subtitle { color: var(--text-muted); font-size: 0.95rem; margin: 0; }
 
-        .card-custom { background: white; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+        .card-custom { background: white; border-radius: 16px; border: 1px solid rgba(0, 51, 102, 0.09); box-shadow: 0 10px 28px -4px rgba(0, 51, 102, 0.10), 0 3px 8px -1px rgba(0, 0, 0, 0.04); }
         .btn-primary-custom { background: var(--primary); color: white; border: none; padding: 0.6rem 1.25rem; border-radius: 8px; font-weight: 600; text-decoration: none; display: inline-block; }
         .btn-primary-custom:hover { background: var(--primary-light); color: white; }
         .btn-outline-custom { background: white; color: var(--primary); border: 1px solid var(--border); padding: 0.6rem 1.25rem; border-radius: 8px; font-weight: 600; text-decoration: none; display: inline-block; }
@@ -180,7 +180,7 @@
         </a>
         <a href="{{ route('siswa.pengaturan') }}" class="gk-bottom-nav-item {{ request()->routeIs('siswa.pengaturan*') ? 'active' : '' }}">
             <i class="bi {{ request()->routeIs('siswa.pengaturan*') ? 'bi-gear-fill' : 'bi-gear' }}"></i>
-            <span>Akun</span>
+            <span>Pengaturan</span>
         </a>
     </nav>
 

@@ -706,19 +706,22 @@
         align-items: stretch !important;
         justify-content: space-between !important;
         gap: 8px !important;
-        margin-top: 0.25rem !important;
+        margin-top: 1rem !important;
     }
     .gk-feature-pillar-card {
         flex: 1 1 0% !important;
         width: 0 !important;
         min-width: 0 !important;
-        padding: 0.8rem 0.45rem !important;
-        border-radius: 12px !important;
+        padding: 0.85rem 0.5rem !important;
+        border-radius: 14px !important;
         text-align: center !important;
         display: flex !important;
         flex-direction: column !important;
         justify-content: flex-start !important;
         align-items: center !important;
+        background: #ffffff !important;
+        border: 1px solid rgba(0, 51, 102, 0.09) !important;
+        box-shadow: 0 6px 16px -2px rgba(0, 51, 102, 0.09), 0 2px 6px rgba(0, 0, 0, 0.03) !important;
     }
     .gk-feature-pillar-header {
         display: flex !important;
@@ -776,34 +779,41 @@
 /* REFINED PODIUM CARDS & SHADOWS (BACK SHADOW JELAS & BORDER BERSIH TANPA GLOW) */
 .gk-clean-card {
     background: #ffffff;
-    border-radius: 22px;
-    border: 1px solid rgba(15, 23, 42, 0.08) !important;
-    box-shadow: 0 10px 25px -4px rgba(15, 23, 42, 0.08), 0 4px 10px -2px rgba(15, 23, 42, 0.04) !important;
+    border-radius: 20px;
+    border: 1px solid rgba(0, 51, 102, 0.09) !important;
+    box-shadow: 0 10px 28px -4px rgba(0, 51, 102, 0.10), 0 3px 10px -1px rgba(0, 0, 0, 0.04) !important;
     transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease;
 }
 .gk-clean-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 20px 35px -6px rgba(15, 23, 42, 0.12), 0 8px 16px -3px rgba(15, 23, 42, 0.06) !important;
-    border-color: rgba(15, 23, 42, 0.14) !important;
+    transform: translateY(-4px);
+    box-shadow: 0 18px 36px -4px rgba(0, 51, 102, 0.15), 0 6px 16px -2px rgba(0, 0, 0, 0.06) !important;
+    border-color: rgba(0, 51, 102, 0.16) !important;
 }
 .gk-podium-card-revised {
     background: #ffffff;
     border-radius: 22px;
-    border: none !important;
-    box-shadow: 0 10px 25px -4px rgba(15, 23, 42, 0.08), 0 4px 10px -2px rgba(15, 23, 42, 0.04) !important;
+    box-shadow: 0 10px 25px -4px rgba(15, 23, 42, 0.08), 0 4px 10px -2px rgba(15, 23, 42, 0.04);
     position: relative;
     transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .gk-podium-card-revised:hover {
     transform: translateY(-6px);
-    box-shadow: 0 20px 35px -6px rgba(15, 23, 42, 0.12), 0 8px 16px -3px rgba(15, 23, 42, 0.06) !important;
-    border: none !important;
+    box-shadow: 0 20px 35px -6px rgba(15, 23, 42, 0.12), 0 8px 16px -3px rgba(15, 23, 42, 0.06);
 }
-.gk-podium-card-revised.is-first {
+/* 🌟 GARIS TEPI EMAS & CAHAYA EMAS UNTUK TOP 1 (MOBILE & DESKTOP) */
+.gk-podium-card-revised.is-first,
+.podium-rank-1 .gk-podium-card-revised,
+.gk-podium-1 .gk-podium-card-revised {
     border-radius: 26px;
-    border: none !important;
-    box-shadow: 0 16px 36px -6px rgba(15, 23, 42, 0.11), 0 6px 14px -3px rgba(15, 23, 42, 0.05) !important;
-    z-index: 2;
+    border: 1.8px solid #f59e0b !important;
+    box-shadow: 0 14px 36px -4px rgba(245, 158, 11, 0.42), 0 0 24px rgba(251, 191, 36, 0.30) !important;
+    z-index: 10;
+}
+.gk-podium-card-revised.is-first:hover,
+.podium-rank-1:hover .gk-podium-card-revised,
+.gk-podium-1:hover .gk-podium-card-revised {
+    border: 1.8px solid #f59e0b !important;
+    box-shadow: 0 22px 50px -6px rgba(245, 158, 11, 0.52), 0 0 32px rgba(251, 191, 36, 0.40) !important;
 }
 .gk-avatar-red-wrap,
 .gk-avatar-clean-wrap {
@@ -1983,9 +1993,9 @@ document.addEventListener('DOMContentLoaded', function() {
         </div>
 
         {{-- 2-COLUMN LAYOUT: VISI & MISI DI KIRI POL, FITUR DI SAMPING KANANNYA --}}
-        <div class="row g-4 align-items-stretch">
+        <div class="row g-3 g-md-4 align-items-stretch">
             {{-- SISI KIRI POL: VISI & MISI KAMI --}}
-            <div class="col-lg-6 d-flex flex-column gap-4" data-aos="fade-right">
+            <div class="col-lg-6 d-flex flex-column gap-3 gap-md-4" data-aos="fade-right">
                 {{-- VISI KAMI --}}
                 <div class="gk-clean-card p-4 p-md-5 flex-grow-1">
                     <div class="d-flex align-items-center gap-3 mb-3">

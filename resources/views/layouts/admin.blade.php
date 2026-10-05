@@ -125,7 +125,7 @@
             <div class="dropdown">
                 <button class="btn btn-light border position-relative rounded-circle shadow-sm gk-topbar-btn-sm" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false" title="Pusat Notifikasi">
                     <i class="bi bi-bell-fill gk-bell-icon {{ $totalNotif > 0 ? 'has-unread' : 'no-unread' }} admin-bell-icon"></i>
-                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill gk-notif-badge admin-notif-badge" id="adminNotifBadgeMobile" style="font-size: 0.6rem; padding: 0.2em 0.45em; {{ $totalNotif > 0 ? '' : 'display: none !important;' }}">
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill gk-notif-badge admin-notif-badge" id="adminNotifBadgeMobile" style="font-size: 0.6rem; {{ $totalNotif > 0 ? '' : 'display: none !important;' }}">
                         <span class="admin-notif-count">{{ $totalNotif }}</span>
                     </span>
                 </button>

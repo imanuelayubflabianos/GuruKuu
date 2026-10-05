@@ -2,11 +2,10 @@
 @section('title', 'Pengaturan Profil & Akun')
 
 @section('content')
-<div class="page-header d-flex justify-content-between align-items-center flex-wrap gap-3">
+<div class="page-header d-flex justify-content-between align-items-center flex-wrap gap-3 mb-3">
     <div>
-        <div class="page-label">MANAJEMEN GURU</div>
-        <h1 class="page-title">Pengaturan Profil & Akun</h1>
-        <p class="page-subtitle">Kelola informasi publik, foto pengajar, deskripsi diri, keamanan akun, dan komunikasi dengan admin.</p>
+        <h1 class="page-title mb-1">Pengaturan Profil & Akun</h1>
+        <p class="page-subtitle mb-0">Kelola profil dan keamanan akun Anda.</p>
     </div>
 </div>
 

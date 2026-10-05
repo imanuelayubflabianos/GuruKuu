@@ -4,49 +4,48 @@
 @section('content')
 <div class="page-header">
     <div>
-        <div class="page-label">EVALUASI & ASPIRASI SISWA</div>
-        <h1 class="page-title">Riwayat Ulasan Siswa</h1>
-        <p class="page-subtitle">Daftar lengkap kritik, saran, dan evaluasi pengajaran dari siswa. Anda dapat menanggapi ulasan secara profesional.</p>
+        <h1 class="page-title mb-1">Riwayat Ulasan Siswa</h1>
+        <p class="page-subtitle mb-0">Daftar lengkap kritik, saran, dan evaluasi pengajaran dari siswa. Anda dapat menanggapi ulasan secara profesional.</p>
     </div>
-    <div class="d-flex gap-2">
+    <div class="d-none d-md-flex gap-2">
         <a href="{{ route('guru.dashboard') }}" class="gk-btn-back">
             <i class="bi bi-arrow-left"></i> Kembali ke Dashboard
         </a>
     </div>
 </div>
 
-{{-- STATS SUMMARY WIDGET (3 KOLOM SEJAJAR TIDAK BUANG RUANG) --}}
+{{-- STATS SUMMARY WIDGET (3 KOLOM SEJAJAR TIDAK BUANG RUANG & RAPI PROPORSI JARAKNYA) --}}
 <div class="row g-2 g-md-3 mb-4">
     <div class="col-4">
-        <div class="card-custom p-2 p-md-3 d-flex flex-column flex-md-row align-items-center align-items-md-center gap-1.5 gap-md-3 text-center text-md-start h-100 shadow-sm">
-            <div class="rounded-3 p-2 p-md-3 text-primary flex-shrink-0" style="background: rgba(0, 51, 102, 0.08); font-size: clamp(1.1rem, 2vw, 1.6rem);">
+        <div class="card-custom p-2.5 p-sm-3 d-flex flex-column flex-md-row align-items-center gap-1.5 gap-md-3 text-center text-md-start h-100 shadow-sm">
+            <div class="rounded-3 text-primary flex-shrink-0 d-inline-flex align-items-center justify-content-center mb-1.5 mb-md-0" style="background: rgba(0, 51, 102, 0.08); font-size: clamp(1rem, 2vw, 1.4rem); width: clamp(34px, 8vw, 44px); height: clamp(34px, 8vw, 44px);">
                 <i class="bi bi-chat-quote-fill"></i>
             </div>
-            <div class="min-w-0">
-                <div class="text-muted fw-semibold text-uppercase font-mono" style="font-size: clamp(0.55rem, 1.8vw, 0.75rem); line-height: 1.2;">Total Ulasan Masuk</div>
-                <h3 class="fw-bold mb-0 text-dark" style="font-size: clamp(1rem, 2.5vw, 1.5rem);">{{ $totalUlasan }}</h3>
+            <div class="min-w-0 w-100">
+                <div class="text-muted fw-semibold text-uppercase font-mono mb-1" style="font-size: clamp(0.55rem, 1.6vw, 0.72rem); line-height: 1.25;">Total Ulasan</div>
+                <h3 class="fw-bold mb-0 text-dark" style="font-size: clamp(1.1rem, 2.8vw, 1.6rem); line-height: 1;">{{ $totalUlasan }}</h3>
             </div>
         </div>
     </div>
     <div class="col-4">
-        <div class="card-custom p-2 p-md-3 d-flex flex-column flex-md-row align-items-center align-items-md-center gap-1.5 gap-md-3 text-center text-md-start h-100 shadow-sm">
-            <div class="rounded-3 p-2 p-md-3 text-success flex-shrink-0" style="background: rgba(16, 185, 129, 0.1); font-size: clamp(1.1rem, 2vw, 1.6rem);">
+        <div class="card-custom p-2.5 p-sm-3 d-flex flex-column flex-md-row align-items-center gap-1.5 gap-md-3 text-center text-md-start h-100 shadow-sm">
+            <div class="rounded-3 text-success flex-shrink-0 d-inline-flex align-items-center justify-content-center mb-1.5 mb-md-0" style="background: rgba(16, 185, 129, 0.1); font-size: clamp(1rem, 2vw, 1.4rem); width: clamp(34px, 8vw, 44px); height: clamp(34px, 8vw, 44px);">
                 <i class="bi bi-check2-circle"></i>
             </div>
-            <div class="min-w-0">
-                <div class="text-muted fw-semibold text-uppercase font-mono" style="font-size: clamp(0.55rem, 1.8vw, 0.75rem); line-height: 1.2;">Sudah Dibalas</div>
-                <h3 class="fw-bold mb-0 text-success" style="font-size: clamp(1rem, 2.5vw, 1.5rem);">{{ $totalDibalas }}</h3>
+            <div class="min-w-0 w-100">
+                <div class="text-muted fw-semibold text-uppercase font-mono mb-1" style="font-size: clamp(0.55rem, 1.6vw, 0.72rem); line-height: 1.25;">Sudah Dibalas</div>
+                <h3 class="fw-bold mb-0 text-success" style="font-size: clamp(1.1rem, 2.8vw, 1.6rem); line-height: 1;">{{ $totalDibalas }}</h3>
             </div>
         </div>
     </div>
     <div class="col-4">
-        <div class="card-custom p-2 p-md-3 d-flex flex-column flex-md-row align-items-center align-items-md-center gap-1.5 gap-md-3 text-center text-md-start h-100 shadow-sm">
-            <div class="rounded-3 p-2 p-md-3 text-warning flex-shrink-0" style="background: rgba(245, 158, 11, 0.1); font-size: clamp(1.1rem, 2vw, 1.6rem);">
+        <div class="card-custom p-2.5 p-sm-3 d-flex flex-column flex-md-row align-items-center gap-1.5 gap-md-3 text-center text-md-start h-100 shadow-sm">
+            <div class="rounded-3 text-warning flex-shrink-0 d-inline-flex align-items-center justify-content-center mb-1.5 mb-md-0" style="background: rgba(245, 158, 11, 0.1); font-size: clamp(1rem, 2vw, 1.4rem); width: clamp(34px, 8vw, 44px); height: clamp(34px, 8vw, 44px);">
                 <i class="bi bi-hourglass-split"></i>
             </div>
-            <div class="min-w-0">
-                <div class="text-muted fw-semibold text-uppercase font-mono" style="font-size: clamp(0.55rem, 1.8vw, 0.75rem); line-height: 1.2;">Belum Dibalas</div>
-                <h3 class="fw-bold mb-0 text-warning" style="font-size: clamp(1rem, 2.5vw, 1.5rem);">{{ $totalBelumDibalas }}</h3>
+            <div class="min-w-0 w-100">
+                <div class="text-muted fw-semibold text-uppercase font-mono mb-1" style="font-size: clamp(0.55rem, 1.6vw, 0.72rem); line-height: 1.25;">Belum Dibalas</div>
+                <h3 class="fw-bold mb-0 text-warning" style="font-size: clamp(1.1rem, 2.8vw, 1.6rem); line-height: 1;">{{ $totalBelumDibalas }}</h3>
             </div>
         </div>
     </div>

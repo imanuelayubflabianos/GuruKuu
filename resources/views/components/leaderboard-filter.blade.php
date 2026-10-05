@@ -517,7 +517,8 @@ document.addEventListener('DOMContentLoaded', function() {
         position: relative !important;
     }
     .podium-rank-1 .gk-podium-card-revised,
-    .gk-podium-1 .gk-podium-card-revised {
+    .gk-podium-1 .gk-podium-card-revised,
+    .gk-podium-card-revised.is-first {
         min-height: 242px !important;
         padding: 1.05rem 4px 0.55rem !important;
         border: 1.8px solid #f59e0b !important;

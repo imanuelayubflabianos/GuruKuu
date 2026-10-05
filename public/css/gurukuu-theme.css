@@ -1499,7 +1499,9 @@ img.rounded-circle,
     align-items: center !important;
     justify-content: center !important;
     line-height: 1 !important;
-    margin-top: 0.5px !important;
+    transform: translateY(1px) !important;
+    margin: 0 !important;
+    padding: 0 !important;
 }
 [data-theme="dark"] .gk-notif-badge {
     background-color: #0284c7 !important;
@@ -1931,7 +1933,8 @@ img.rounded-circle,
         position: relative !important;
     }
     .gk-podium-1 .gk-podium-card-revised,
-    .podium-rank-1 .gk-podium-card-revised {
+    .podium-rank-1 .gk-podium-card-revised,
+    .gk-podium-card-revised.is-first {
         min-height: 242px !important;
         padding: 1.05rem 4px 0.55rem !important;
         border: 1.8px solid #f59e0b !important;

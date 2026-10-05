@@ -4,8 +4,7 @@
 @section('content')
 <div class="page-header d-flex justify-content-between align-items-center flex-wrap gap-3">
     <div>
-        <div class="page-label">EVALUASI GURU</div>
-        <h1 class="page-title">Daftar Guru</h1>
+        <h1 class="page-title mb-1">Daftar Guru</h1>
         <p class="page-subtitle mb-0">
             Pilih guru yang mengajar kelas Anda atau lihat seluruh guru sekolah.
             @if($kelasAktif)

@@ -4,9 +4,8 @@
 @section('content')
 <div class="page-header">
     <div>
-        <div class="page-label">PUSAT BANTUAN</div>
-        <h1 class="page-title">Hubungi Admin</h1>
-        <p class="page-subtitle">Sampaikan kendala, permohonan pembukaan akun, atau pertanyaan langsung kepada Admin.</p>
+        <h1 class="page-title mb-1">Hubungi Admin</h1>
+        <p class="page-subtitle mb-0">Sampaikan kendala, permohonan pembukaan akun, atau pertanyaan langsung kepada Admin.</p>
     </div>
 </div>
 
