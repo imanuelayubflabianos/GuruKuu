@@ -103,7 +103,11 @@ class PengaturanController extends Controller
         ];
 
         $maintenanceInfo = \App\Services\MaintenanceService::getSiswaMaintenanceInfo();
-        $allBadWords = \App\Services\ProfanityFilterService::getBadWords();
+        
+        // Moderasi data kata
+        $defaultBadWords = \App\Services\ProfanityFilterService::getDefaultBadWords();
+        $customBadWords  = \App\Services\ProfanityFilterService::getCustomBadWords();
+        $allBadWords     = \App\Services\ProfanityFilterService::getBadWords();
 
         // FAQ data
         $faqs = \App\Services\FaqService::all();
