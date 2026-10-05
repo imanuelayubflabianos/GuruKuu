@@ -20,8 +20,9 @@
             <i class="bi bi-person-check me-1"></i> Data Guru Lokal
         </a>
         @if($result['success'] && $teachers->isNotEmpty())
-        <form action="{{ route('admin.sipintu.guru.sync-all') }}" method="POST" data-confirm="Sinkronkan seluruh data guru dari SiPintu ke database GuruKuu?" data-confirm-title="Sinkronkan Data Guru?" data-confirm-btn="Ya, Sinkronkan" data-confirm-type="info">
+        <form action="{{ route('admin.sipintu.guru.sync-all') }}" method="POST" data-confirm="Sinkronkan seluruh data guru {{ ($onlyActive ?? true) ? 'aktif' : '' }} dari SiPintu ke database GuruKuu?" data-confirm-title="Sinkronkan Data Guru?" data-confirm-btn="Ya, Sinkronkan" data-confirm-type="info">
             @csrf
+            <input type="hidden" name="only_active" value="{{ ($onlyActive ?? true) ? '1' : '0' }}">
             <button type="submit" class="btn btn-success">
                 <i class="bi bi-cloud-arrow-down-fill me-1"></i> Sinkronkan Semua Guru
             </button>
@@ -47,22 +48,29 @@
 {{-- FILTER & SEARCH BOX --}}
 <div class="card-custom p-3 mb-4">
     <form method="GET" action="{{ route('admin.sipintu.guru') }}" class="row g-3 align-items-end">
-        <div class="col-md-4">
+        <div class="col-md-3">
             <label class="form-label small fw-bold text-muted">Cari Nama / Email / NIP</label>
             <div class="input-group">
                 <span class="input-group-text bg-white"><i class="bi bi-search text-muted"></i></span>
-                <input type="text" name="search" value="{{ request('search') }}" class="form-control" placeholder="Masukkan kata kunci...">
+                <input type="text" name="search" value="{{ request('search') }}" class="form-control" placeholder="Kata kunci...">
             </div>
         </div>
-        <div class="col-md-3">
-            <label class="form-label small fw-bold text-muted">Filter Berdasarkan NIP</label>
-            <input type="text" name="nip" value="{{ request('nip') }}" class="form-control" placeholder="Contoh: 19850101...">
+        <div class="col-md-2">
+            <label class="form-label small fw-bold text-muted">Filter NIP</label>
+            <input type="text" name="nip" value="{{ request('nip') }}" class="form-control" placeholder="NIP guru...">
         </div>
-        <div class="col-md-5 d-flex gap-2">
+        <div class="col-md-3">
+            <label class="form-label small fw-bold text-muted">Status Guru</label>
+            <select name="only_active" class="form-select" onchange="this.form.submit()">
+                <option value="1" {{ ($onlyActive ?? true) ? 'selected' : '' }}>Hanya Guru Aktif</option>
+                <option value="0" {{ !($onlyActive ?? true) ? 'selected' : '' }}>Semua Guru (Termasuk Pensiun/Nonaktif)</option>
+            </select>
+        </div>
+        <div class="col-md-4 d-flex gap-2">
             <button type="submit" class="btn btn-primary-custom flex-grow-1">
-                <i class="bi bi-funnel me-1"></i> Cari di SiPintu
+                <i class="bi bi-funnel me-1"></i> Cari
             </button>
-            <a href="{{ route('admin.sipintu.guru', ['refresh' => 1]) }}" class="btn btn-outline-success" title="Segarkan Cache Data SiPintu">
+            <a href="{{ route('admin.sipintu.guru', ['refresh' => 1, 'only_active' => request('only_active', 1)]) }}" class="btn btn-outline-success" title="Segarkan Data dari Server SiPintu">
                 <i class="bi bi-arrow-repeat"></i> Segarkan
             </a>
             <a href="{{ route('admin.sipintu.guru') }}" class="btn btn-outline-custom" title="Reset Filter">
@@ -88,6 +96,7 @@
                     <th>NO. KONTAK / HP</th>
                     <th>KATEGORI</th>
                     <th>JURUSAN / KEAHLIAN</th>
+                    <th class="text-center">STATUS SIPINTU</th>
                     <th>STATUS LOKAL</th>
                     <th class="text-center" style="width: 140px;">AKSI</th>
                 </tr>
@@ -133,6 +142,17 @@
                     </td>
                     <td>
                         <span class="text-muted">{{ $jurusan !== '-' ? $jurusan : ($t['mapel'] ?? '-') }}</span>
+                    </td>
+                    <td class="text-center">
+                        @if(($t['status'] ?? 1) == 1)
+                            <span class="badge bg-success-subtle text-success border border-success">
+                                <i class="bi bi-check-circle-fill me-1"></i> Aktif
+                            </span>
+                        @else
+                            <span class="badge bg-danger-subtle text-danger border border-danger">
+                                <i class="bi bi-x-circle-fill me-1"></i> Nonaktif / Pensiun
+                            </span>
+                        @endif
                     </td>
                     <td>
                         @if($isLocal)

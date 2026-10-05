@@ -130,13 +130,52 @@ class OAuthController extends Controller
             }
         }
 
-        // 7. Jika user lokal TIDAK ditemukan, tolak login SSO
+        // 7. Jika user lokal TIDAK ditemukan, lakukan auto-provisioning dari SiPintu
         if (!$user) {
             $identitas = $nis ?: ($email ?: ($username ?: 'Pengguna SiPintu'));
-            Log::info("SSO SiPintu: Pengguna [{$identitas}] tidak terdaftar di database lokal GuruKuu.");
-            return redirect()->route('login')->withErrors([
-                'nis' => "Akun SiPintu Anda ({$identitas}) belum terdaftar pada aplikasi GuruKuu. Silakan hubungi Administrator sekolah.",
-            ]);
+            Log::info("SSO SiPintu: Pengguna [{$identitas}] belum ada di lokal, mencoba sinkronisasi otomatis...");
+
+            $isStudent = !empty($userData['classroom']) || !empty($userData['classroom_id']) || !empty($userData['nis']) || !empty($userData['nisn']) || (!empty($userData['role']) && strtolower($userData['role']) === 'siswa');
+            $isTeacher = !empty($userData['nip']) || (!empty($userData['role']) && in_array(strtolower($userData['role']), ['guru', 'teacher']));
+
+            if ($isStudent) {
+                $syncRes = $this->siPintu->syncStudentToLocal($userData);
+                if ($syncRes['success'] ?? false) {
+                    $user = User::where('nis', (string) $nis)->orWhere('email', (string) $email)->first();
+                }
+            } elseif ($isTeacher) {
+                $syncRes = $this->siPintu->syncTeacherToLocal($userData);
+                if ($syncRes['success'] ?? false) {
+                    $user = User::where('nis', (string) $nis)->orWhere('email', (string) $email)->first();
+                }
+            }
+
+            // Fallback: coba cari di gateway dengan NIS / NIP
+            if (!$user && !empty($nis)) {
+                $studentData = $this->siPintu->getStudentByNis((string) $nis);
+                if ($studentData) {
+                    $syncRes = $this->siPintu->syncStudentToLocal($studentData);
+                    if ($syncRes['success'] ?? false) {
+                        $user = User::where('nis', (string) $nis)->first();
+                    }
+                }
+                if (!$user) {
+                    $teacherData = $this->siPintu->getTeacherByNip((string) $nis);
+                    if ($teacherData) {
+                        $syncRes = $this->siPintu->syncTeacherToLocal($teacherData);
+                        if ($syncRes['success'] ?? false) {
+                            $user = User::where('nis', (string) $nis)->first();
+                        }
+                    }
+                }
+            }
+
+            if (!$user) {
+                Log::info("SSO SiPintu: Pengguna [{$identitas}] tidak terdaftar dan gagal di-provisioning.");
+                return redirect()->route('login')->withErrors([
+                    'nis' => "Akun SiPintu Anda ({$identitas}) belum terdaftar pada aplikasi GuruKuu. Silakan hubungi Administrator sekolah.",
+                ]);
+            }
         }
 
         // 8. Cek status aktif akun (apakah disuspensi / nonaktif)

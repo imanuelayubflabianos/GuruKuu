@@ -54,6 +54,13 @@ class SiPintuController extends Controller
             $params['refresh'] = true;
         }
 
+        // Status filter: default only active teachers
+        $onlyActive = true;
+        if ($request->has('only_active')) {
+            $onlyActive = filter_var($request->only_active, FILTER_VALIDATE_BOOLEAN);
+        }
+        $params['only_active'] = $onlyActive;
+
         $result = $this->siPintu->getTeachers($params);
         $allTeachers = $result['data'] ?? [];
         $teachers = new LengthAwarePaginator(
@@ -68,7 +75,7 @@ class SiPintuController extends Controller
         $localNips = Guru::pluck('nip')->filter()->toArray();
         $jurusans = Jurusan::orderBy('nama_jurusan')->get();
 
-        return view('admin.sipintu.teachers', compact('result', 'teachers', 'localNips', 'jurusans'));
+        return view('admin.sipintu.teachers', compact('result', 'teachers', 'localNips', 'jurusans', 'onlyActive'));
     }
 
     /**
@@ -247,7 +254,15 @@ class SiPintuController extends Controller
      */
     public function syncAllTeachers(Request $request)
     {
-        $result = $this->siPintu->getTeachers();
+        @set_time_limit(0);
+        @ini_set('memory_limit', '512M');
+
+        $onlyActive = true;
+        if ($request->has('only_active')) {
+            $onlyActive = filter_var($request->only_active, FILTER_VALIDATE_BOOLEAN);
+        }
+
+        $result = $this->siPintu->getTeachers(['only_active' => $onlyActive, 'refresh' => true]);
         if (!$result['success'] || empty($result['data'])) {
             return back()->with('error', 'Tidak ada data guru yang dapat ditarik dari SiPintu.');
         }
@@ -260,7 +275,8 @@ class SiPintuController extends Controller
             }
         }
 
-        return back()->with('success', "Berhasil menyinkronkan {$count} data guru dari SiPintu ke database GuruKuu.");
+        $typeLabel = $onlyActive ? 'aktif ' : '';
+        return back()->with('success', "Berhasil menyinkronkan {$count} data guru {$typeLabel}dari SiPintu ke database GuruKuu.");
     }
 
     /**
@@ -268,20 +284,50 @@ class SiPintuController extends Controller
      */
     public function syncAllStudents(Request $request)
     {
-        $result = $this->siPintu->getStudents(['only_active' => true]);
+        @set_time_limit(0);
+        @ini_set('memory_limit', '512M');
+
+        $onlyActive = true;
+        if ($request->has('only_active')) {
+            $onlyActive = filter_var($request->only_active, FILTER_VALIDATE_BOOLEAN);
+        }
+
+        $result = $this->siPintu->getStudents(['only_active' => $onlyActive, 'refresh' => true]);
         if (!$result['success'] || empty($result['data'])) {
-            return back()->with('error', 'Tidak ada data siswa aktif yang dapat ditarik dari SiPintu.');
+            return back()->with('error', 'Tidak ada data siswa yang dapat ditarik dari SiPintu.');
+        }
+
+        // Siapkan lookup map Kelas in-memory untuk efisiensi maksimal tanpa ribuan query
+        $kelasMap = [];
+        foreach (Kelas::all() as $k) {
+            $kelasMap[strtoupper($k->tingkat . '_' . $k->nama_kelas)] = $k->id;
+            $kelasMap[strtoupper($k->nama_kelas)] = $k->id;
         }
 
         $count = 0;
         foreach ($result['data'] as $s) {
-            $res = $this->siPintu->syncStudentToLocal($s);
+            $rawKelas = null;
+            if (!empty($s['classroom'])) {
+                $rawKelas = is_array($s['classroom']) ? ($s['classroom']['name'] ?? null) : $s['classroom'];
+            } elseif (!empty($s['kelas'])) {
+                $rawKelas = is_array($s['kelas']) ? ($s['kelas']['nama_kelas'] ?? null) : $s['kelas'];
+            }
+
+            $kelasId = null;
+            if ($rawKelas) {
+                $parsed = $this->siPintu->parseClassroomString($rawKelas);
+                $key = strtoupper($parsed['tingkat'] . '_' . $parsed['nama_kelas']);
+                $kelasId = $kelasMap[$key] ?? ($kelasMap[strtoupper($parsed['nama_kelas'])] ?? null);
+            }
+
+            $res = $this->siPintu->syncStudentToLocal($s, $kelasId);
             if ($res['success']) {
                 $count++;
             }
         }
 
-        return back()->with('success', "Berhasil menyinkronkan {$count} data siswa aktif dari SiPintu ke database GuruKuu.");
+        $typeLabel = $onlyActive ? 'aktif ' : '';
+        return back()->with('success', "Berhasil menyinkronkan {$count} data siswa {$typeLabel}dari SiPintu ke database GuruKuu.");
     }
 
     /**

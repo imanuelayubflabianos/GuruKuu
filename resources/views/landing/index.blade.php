@@ -645,6 +645,22 @@
     background: #003366;
     border-radius: 20px;
 }
+[data-bs-theme="dark"] .gk-panduan-nav-btn {
+    background: #1e293b;
+    color: #f8fafc;
+    border-color: rgba(255, 255, 255, 0.12);
+}
+[data-bs-theme="dark"] .gk-panduan-nav-btn:hover {
+    background: #3b82f6;
+    border-color: #3b82f6;
+    color: #ffffff;
+}
+[data-bs-theme="dark"] .gk-panduan-dot {
+    background: #475569;
+}
+[data-bs-theme="dark"] .gk-panduan-dot.active {
+    background: #38bdf8;
+}
 .gk-pill-btn-dark {
     display: inline-flex;
     align-items: center;
@@ -1072,7 +1088,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
 
         revealTargets.forEach(el => {
-            if (el.closest('#leaderboardPodium') || el.classList.contains('stat-card-modern') || el.closest('#heroBgSlider')) return;
+            if (el.closest('#leaderboardPodium') || el.classList.contains('stat-card-modern') || el.closest('#heroBgSlider') || (el.closest('.gk-panduan-slider-wrapper') && !el.classList.contains('gk-panduan-slider-wrapper'))) return;
             el.classList.add('gk-scroll-reveal');
 
             const col = el.closest('.col-12, .col-md-6, .col-md-4, .col-md-3, .col-6, .col-lg-6, .col-lg-4');
@@ -1789,7 +1805,9 @@ document.addEventListener('DOMContentLoaded', function () {
     let currentIndex = 0;
     const totalSlides = slides.length;
     let autoplayTimer = null;
-    const AUTOPLAY_DELAY = 3600; // 3.6 detik jeda waktu
+    let idleTimer = null;
+    const AUTOPLAY_DELAY = 4000;      // 4 detik jeda geser otomatis berkala (sama dengan dashboard siswa)
+    const RESUME_IDLE_DELAY = 4500;   // 4.5 detik jeda setelah interaksi user sebelum geser otomatis lagi
 
     function updateSlide(animate = true) {
         if (!animate) {
@@ -1801,11 +1819,7 @@ document.addEventListener('DOMContentLoaded', function () {
         track.style.transform = `translateX(-${currentIndex * 100}%)`;
 
         slides.forEach((slide, idx) => {
-            if (idx === currentIndex) {
-                slide.classList.add('is-active');
-            } else {
-                slide.classList.remove('is-active');
-            }
+            slide.classList.toggle('is-active', idx === currentIndex);
         });
 
         dots.forEach((dot, idx) => {
@@ -1828,10 +1842,6 @@ document.addEventListener('DOMContentLoaded', function () {
         currentIndex = index;
         updateSlide(true);
     }
-
-    let idleTimer = null;
-    const AUTOPLAY_DELAY = 4000;
-    const RESUME_IDLE_DELAY = 4500;
 
     function startAutoplay() {
         stopAutoplay();
@@ -1959,6 +1969,7 @@ document.addEventListener('DOMContentLoaded', function () {
         isMouseDown = true;
         mouseStartX = e.clientX;
         mouseCurrentX = mouseStartX;
+        viewport.style.cursor = 'grabbing';
         stopAutoplay();
         e.preventDefault();
     });
@@ -1977,6 +1988,7 @@ document.addEventListener('DOMContentLoaded', function () {
     window.addEventListener('mouseup', function () {
         if (!isMouseDown) return;
         isMouseDown = false;
+        viewport.style.cursor = 'grab';
         const diffX = mouseCurrentX - mouseStartX;
         track.style.transition = 'transform 0.65s cubic-bezier(0.22, 1, 0.36, 1)';
         if (Math.abs(diffX) > 40) {

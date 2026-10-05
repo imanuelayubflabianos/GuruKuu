@@ -193,11 +193,12 @@ class SiPintuService
 
     protected function client()
     {
+        $timeout = $this->timeout > 0 ? $this->timeout : 60;
         $http = Http::withHeaders([
             'X-Client-ID'     => $this->clientId,
             'X-Client-Secret' => $this->clientSecret,
             'Accept'          => 'application/json',
-        ])->connectTimeout(5)->timeout(min($this->timeout, 15));
+        ])->connectTimeout(10)->timeout($timeout);
 
         if (!$this->verifySsl) {
             $http = $http->withoutVerifying();
@@ -221,7 +222,7 @@ class SiPintuService
         $startTime = microtime(true);
 
         try {
-            $pingTimeout = min($this->timeout, 3);
+            $pingTimeout = min(max($this->timeout, 10), 30);
             $http = Http::timeout($pingTimeout)->acceptJson();
             if (!$this->verifySsl) {
                 $http = $http->withoutVerifying();
@@ -343,7 +344,18 @@ class SiPintuService
                 $rawTeachers = $this->extractDataArray($response->json(), 'teachers');
             }
 
-            $teachers = array_map(function ($t) {
+            $onlyActive = !isset($params['only_active']) || filter_var($params['only_active'], FILTER_VALIDATE_BOOLEAN);
+
+            $teachers = [];
+            foreach ($rawTeachers as $t) {
+                $status = (int) ($t['status'] ?? 1);
+                $isDeleted = !empty($t['deleted_at']);
+                $isActive = ($status === 1 && !$isDeleted);
+
+                if ($onlyActive && !$isActive) {
+                    continue;
+                }
+
                 $nip = (string) ($t['nip'] ?? $t['nik'] ?? $t['nip_guru'] ?? '');
                 $nama = $t['nama'] ?? $t['name'] ?? $t['nama_guru'] ?? 'Tanpa Nama';
                 $email = $t['user']['email'] ?? $t['email'] ?? null;
@@ -355,14 +367,14 @@ class SiPintuService
                 $alamat = $t['alamat'] ?? null;
                 $kategori = strtolower($t['kategori'] ?? $t['category'] ?? 'normada');
                 $photo = $t['photo'] ?? $t['foto'] ?? "https://ui-avatars.com/api/?name=" . urlencode($nama) . "&background=003366&color=fff";
-                $status = (int) ($t['status'] ?? 1);
 
-                return array_merge($t, [
+                $teachers[] = array_merge($t, [
                     'nip' => $nip, 'nama' => $nama, 'name' => $nama, 'email' => $email,
                     'phone' => $phone, 'hp' => $phone, 'bio' => $bio, 'alamat' => $alamat,
                     'kategori' => $kategori, 'photo' => $photo, 'status' => $status,
+                    'is_active' => $isActive,
                 ]);
-            }, $rawTeachers);
+            }
 
             if (!empty($params['nip'])) {
                 $nipSearch = trim((string) $params['nip']);
@@ -485,22 +497,33 @@ class SiPintuService
 
     public function getTeacherByNip(string $nip): ?array
     {
-        $result = $this->getTeachers(['nip' => $nip]);
+        $searchKey = trim($nip);
+        $result = $this->getTeachers(['only_active' => false]);
         if (!$result['success'] || empty($result['data'])) return null;
         foreach ($result['data'] as $item) {
-            if ((string)($item['nip'] ?? '') === (string)$nip) return $item;
+            if ((string)($item['nip'] ?? '') === $searchKey ||
+                strtolower($item['email'] ?? '') === strtolower($searchKey) ||
+                strtolower($item['user']['email'] ?? '') === strtolower($searchKey)) {
+                return $item;
+            }
         }
-        return $result['data'][0] ?? null;
+        return null;
     }
 
     public function getStudentByNis(string $nis): ?array
     {
-        $result = $this->getStudents(['nis' => $nis, 'only_active' => false]);
+        $searchKey = trim($nis);
+        $result = $this->getStudents(['only_active' => false]);
         if (!$result['success'] || empty($result['data'])) return null;
         foreach ($result['data'] as $item) {
-            if ((string)($item['nis'] ?? '') === (string)$nis) return $item;
+            if ((string)($item['nis'] ?? '') === $searchKey ||
+                (string)($item['nisn'] ?? '') === $searchKey ||
+                strtolower($item['email'] ?? '') === strtolower($searchKey) ||
+                strtolower($item['user']['email'] ?? '') === strtolower($searchKey)) {
+                return $item;
+            }
         }
-        return $result['data'][0] ?? null;
+        return null;
     }
 
     protected function extractDataArray($payload, string $singularKey = 'data'): array
@@ -734,8 +757,8 @@ class SiPintuService
 
         $this->ensureDefaultJurusans();
 
-        // 1. Ambil data guru dari SiPintu
-        $teachersRes = $this->getTeachers(['refresh' => true]);
+        // 1. Ambil data guru dari SiPintu (default hanya guru aktif)
+        $teachersRes = $this->getTeachers(['only_active' => $onlyActive, 'refresh' => true]);
         $teachers = $teachersRes['data'] ?? [];
 
         // 2. Ambil data siswa aktif dari SiPintu
