@@ -272,7 +272,31 @@
                     </ul>
                 </div>
             </div>
-        </div>
+        @php
+            $mInfo = \App\Services\MaintenanceService::getSiswaMaintenanceInfo();
+        @endphp
+
+        {{-- BANNER INFORMASI MODE PEMELIHARAAN --}}
+        @if($mInfo['is_active'])
+            <div class="alert alert-warning border-0 shadow-sm d-flex align-items-center justify-content-between p-3 mb-4 rounded-3" style="background: #fff8e6; border-left: 5px solid #f59e0b !important;" role="alert">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="rounded-circle bg-warning bg-opacity-25 d-flex align-items-center justify-content-center text-warning-emphasis flex-shrink-0" style="width: 42px; height: 42px;">
+                        <i class="bi bi-tools fs-5"></i>
+                    </div>
+                    <div>
+                        <h6 class="fw-bold mb-0 text-dark">Mode Pemeliharaan (Maintenance) Sedang Aktif</h6>
+                        <p class="mb-0 small text-muted">
+                            Siswa dapat melihat dashboard, leaderboard, dan data guru, namun aksi pemberian penilaian & pengiriman pesan dinonaktifkan sementara.
+                            <span class="text-primary-emphasis fw-semibold">({{ $mInfo['schedule_text'] }})</span>
+                        </p>
+                    </div>
+                </div>
+                <button type="button" class="btn btn-sm btn-outline-warning text-dark fw-bold text-nowrap ms-2" onclick="showMaintenanceModal()">
+                    <i class="bi bi-info-circle me-1"></i> Rincian
+                </button>
+            </div>
+        @endif
+
         @if(session('success') && !request()->routeIs('siswa.guru.show'))
             <div class="alert alert-primary border-0 shadow-sm d-flex align-items-center gap-2 mb-4" style="background: rgba(37, 99, 235, 0.08); border-left: 4px solid var(--primary) !important; color: #1d4ed8; border-radius: 8px;">
                 <i class="bi bi-info-circle-fill text-primary fs-5"></i>
@@ -348,6 +372,68 @@
     @endif
     @include('components.welcome-landing-modal')
     @include('components.periode-notification-modal')
+
+    {{-- MODAL POPUP MAINTENANCE SISWA --}}
+    <div class="modal fade" id="modalMaintenanceSiswa" tabindex="-1" aria-labelledby="modalMaintenanceTitle" aria-hidden="true" style="z-index: 1060;">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg" style="border-radius: 20px; overflow: hidden;">
+                <div class="modal-body text-center p-4 p-md-5">
+                    <div class="d-inline-flex align-items-center justify-content-center rounded-circle mb-3" style="width: 80px; height: 80px; background: #fff8e6; color: #d97706; margin: 0 auto;">
+                        <i class="bi bi-tools" style="font-size: 2.5rem;"></i>
+                    </div>
+                    <h4 class="fw-bold text-dark mb-2" id="modalMaintenanceTitle">Server Sedang Dalam Pemeliharaan</h4>
+                    <p class="text-muted small mb-4" id="modalMaintenanceMsg" style="line-height: 1.6;">
+                        {{ $mInfo['message'] }}
+                    </p>
+
+                    <div class="p-3 rounded-3 text-start border mb-4" style="background: #f8fafc;">
+                        <div class="d-flex align-items-center gap-2 mb-1">
+                            <i class="bi bi-clock-history text-primary"></i>
+                            <strong class="text-dark small">Jadwal / Durasi Pemeliharaan:</strong>
+                        </div>
+                        <p class="text-primary-emphasis small mb-0 fw-semibold ps-4" id="modalMaintenanceSchedule">
+                            {{ $mInfo['schedule_text'] }}
+                        </p>
+                    </div>
+
+                    <div class="p-2.5 rounded bg-light text-muted small text-start mb-4">
+                        <i class="bi bi-info-circle text-info me-1"></i>
+                        Anda tetap dapat melihat beranda, profil guru, riwayat ulasan, dan leaderboard seperti biasa. Fitur pemberian penilaian dan kirim pesan akan aktif kembali setelah pemeliharaan selesai.
+                    </div>
+
+                    <button type="button" class="btn btn-primary-custom w-100 py-2.5 rounded-3 fw-bold" data-bs-dismiss="modal">
+                        Mengerti & Lanjutkan Melihat
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showMaintenanceModal(msg, schedule) {
+            if (msg) {
+                const msgEl = document.getElementById('modalMaintenanceMsg');
+                if (msgEl) msgEl.textContent = msg;
+            }
+            if (schedule) {
+                const schEl = document.getElementById('modalMaintenanceSchedule');
+                if (schEl) schEl.textContent = schedule;
+            }
+            const modalEl = document.getElementById('modalMaintenanceSiswa');
+            if (modalEl) {
+                const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+                modal.show();
+            }
+        }
+        window.showMaintenanceModal = showMaintenanceModal;
+
+        @if(session('maintenance_popup'))
+            document.addEventListener('DOMContentLoaded', function() {
+                @php $popInfo = session('maintenance_popup'); @endphp
+                showMaintenanceModal(@json($popInfo['message'] ?? null), @json($popInfo['schedule_text'] ?? null));
+            });
+        @endif
+    </script>
     @stack('scripts')
 </body>
 </html>

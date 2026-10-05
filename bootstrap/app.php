@@ -21,6 +21,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'role' => RoleMiddleware::class,
             'periode.active' => CheckPeriodeActive::class,
+            'siswa.maintenance' => \App\Http\Middleware\CheckSiswaMaintenance::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

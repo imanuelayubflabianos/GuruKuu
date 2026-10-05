@@ -93,11 +93,16 @@ class PengaturanController extends Controller
             'kebijakan_privasi' => Setting::get('kebijakan_privasi', "1. Pengumpulan Data\nKami hanya mengumpulkan data yang diperlukan untuk proses penilaian, yaitu NIS, nama, dan kelas siswa. Data pribadi seperti tanggal lahir hanya digunakan untuk verifikasi identitas saat login.\n\n2. Anonimitas Penilaian\nSeluruh penilaian yang diberikan siswa bersifat anonim. Guru dan pihak lain tidak dapat mengetahui identitas siswa yang memberikan nilai tertentu. Ini menjamin kejujuran dan objektivitas dalam setiap penilaian.\n\n3. Penyimpanan Data\nSemua data disimpan di server yang aman dengan enkripsi standar industri. Password pengguna di-hash menggunakan algoritma bcrypt yang tidak dapat dibaca kembali.\n\n4. Penggunaan Data\nData penilaian hanya digunakan untuk keperluan internal sekolah, seperti evaluasi kinerja guru dan pengambilan keputusan oleh manajemen. Data tidak akan dibagikan kepada pihak ketiga tanpa persetujuan."),
             'syarat_ketentuan'  => Setting::get('syarat_ketentuan', "1. Eligibilitas\nPlatform ini hanya dapat digunakan oleh siswa dan guru yang terdaftar resmi di sekolah. Akun harus diaktifkan oleh administrator sekolah sebelum dapat digunakan.\n\n2. Tanggung Jawab Pengguna\nSiswa wajib memberikan penilaian secara jujur dan objektif. Dilarang memberikan penilaian berdasarkan dendam pribadi, SARA, atau konten yang tidak pantas.\n\n3. Keamanan Akun\nPengguna bertanggung jawab penuh atas kerahasiaan password akun mereka. Dilarang membagikan password kepada orang lain.\n\n4. Kontak & Pengaduan\nJika Anda menemukan pelanggaran atau memiliki keluhan, silakan hubungi administrator sekolah melalui fitur Chat Admin yang tersedia di footer website ini."),
             'profanity_words'   => Setting::get('profanity_words', ''),
+
+            // Mode Maintenance Siswa
+            'maintenance_siswa_enabled' => Setting::get('maintenance_siswa_enabled', '0'),
+            'maintenance_siswa_type'    => Setting::get('maintenance_siswa_type', 'manual'),
+            'maintenance_siswa_start'   => Setting::get('maintenance_siswa_start', ''),
+            'maintenance_siswa_end'     => Setting::get('maintenance_siswa_end', ''),
+            'maintenance_siswa_message' => Setting::get('maintenance_siswa_message', ''),
         ];
 
-        // Moderasi data kata
-        $defaultBadWords = \App\Services\ProfanityFilterService::getDefaultBadWords();
-        $customBadWords = \App\Services\ProfanityFilterService::getCustomBadWords();
+        $maintenanceInfo = \App\Services\MaintenanceService::getSiswaMaintenanceInfo();
         $allBadWords = \App\Services\ProfanityFilterService::getBadWords();
 
         // FAQ data
@@ -149,7 +154,8 @@ class PengaturanController extends Controller
             'allBadWords',
             'faqs',
             'badges',
-            'systemStats'
+            'systemStats',
+            'maintenanceInfo'
         ));
     }
 
@@ -225,6 +231,13 @@ class PengaturanController extends Controller
             'kebijakan_privasi' => 'nullable|string',
             'syarat_ketentuan'  => 'nullable|string',
             'profanity_words'   => 'nullable|string|max:10000',
+
+            // Mode Maintenance Siswa
+            'maintenance_siswa_enabled' => 'nullable|in:0,1',
+            'maintenance_siswa_type'    => 'nullable|in:manual,scheduled',
+            'maintenance_siswa_start'   => 'nullable|string|max:50',
+            'maintenance_siswa_end'     => 'nullable|string|max:50',
+            'maintenance_siswa_message' => 'nullable|string|max:1000',
         ], [
             'site_logo_file.mimes' => 'Format file logo harus berupa JPG, PNG, WEBP, atau SVG.',
             'site_logo_file.max'   => 'Ukuran file logo maksimal adalah 10 MB.',
@@ -376,6 +389,23 @@ class PengaturanController extends Controller
 
             // Jalankan sensor retroaktif untuk pesan-pesan lama di database
             \App\Services\ProfanityFilterService::retroactiveFilter();
+        }
+
+        // Simpan Konfigurasi Mode Pemeliharaan (Maintenance) Siswa
+        if ($request->has('maintenance_siswa_submitted')) {
+            Setting::set('maintenance_siswa_enabled', $request->input('maintenance_siswa_enabled') === '1' ? '1' : '0');
+            if ($request->has('maintenance_siswa_type')) {
+                Setting::set('maintenance_siswa_type', in_array($request->input('maintenance_siswa_type'), ['manual', 'scheduled']) ? $request->input('maintenance_siswa_type') : 'manual');
+            }
+            if ($request->has('maintenance_siswa_start')) {
+                Setting::set('maintenance_siswa_start', $request->input('maintenance_siswa_start'));
+            }
+            if ($request->has('maintenance_siswa_end')) {
+                Setting::set('maintenance_siswa_end', $request->input('maintenance_siswa_end'));
+            }
+            if ($request->has('maintenance_siswa_message')) {
+                Setting::set('maintenance_siswa_message', trim((string)$request->input('maintenance_siswa_message')));
+            }
         }
 
         // Bersihkan cache aplikasi & view

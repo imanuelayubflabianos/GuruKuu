@@ -161,6 +161,10 @@
                                 @endif
                             </div>
                         </div>
+                    @elseif(isset($mInfo) && $mInfo['is_active'])
+                        <button type="button" class="btn btn-warning w-100 py-2 fs-6 fw-semibold text-dark shadow-sm" onclick="showMaintenanceModal()">
+                            <i class="bi bi-tools me-1"></i> Mode Pemeliharaan (Maintenance)
+                        </button>
                     @else
                         <a href="{{ route('siswa.penilaian.create', $guru) }}" class="btn btn-primary-custom w-100 py-2 fs-6 fw-semibold">
                             <i class="bi bi-pencil-square me-1"></i> Beri Penilaian untuk Guru Ini

@@ -545,6 +545,128 @@
                     <textarea name="profanity_words" id="profanityWordsInput" class="form-control font-mono" rows="3" maxlength="10000" placeholder="Ketik kata baru di sini... contoh: kata_baru, frasa baru"></textarea>
                 </div>
             </div>
+
+            {{-- FITUR MODE PEMELIHARAAN (MAINTENANCE) SISWA --}}
+            <div class="settings-card mb-4 border-warning border-opacity-50 shadow-sm" style="background: linear-gradient(to bottom, #ffffff, #fffdfa);">
+                <input type="hidden" name="maintenance_siswa_submitted" value="1">
+                <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="p-2 rounded-circle bg-warning bg-opacity-25 text-warning-emphasis d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                            <i class="bi bi-tools fs-5"></i>
+                        </div>
+                        <div>
+                            <h2 class="settings-heading mb-0">Mode Pemeliharaan (Maintenance) Siswa</h2>
+                            <p class="settings-muted mb-0">Batasi aksi pemberian nilai dan pengiriman pesan siswa saat sistem dalam pemeliharaan.</p>
+                        </div>
+                    </div>
+                    <div>
+                        @if($maintenanceInfo['is_active'])
+                            <span class="badge bg-warning text-dark py-2 px-3 fw-bold shadow-xs">
+                                <i class="bi bi-exclamation-triangle-fill me-1"></i> Mode Maintenance Aktif
+                            </span>
+                        @else
+                            <span class="badge bg-success-subtle text-success border border-success py-2 px-3 fw-semibold">
+                                <i class="bi bi-check-circle-fill me-1"></i> Normal (Input Terbuka)
+                            </span>
+                        @endif
+                    </div>
+                </div>
+
+                {{-- TOGGLE SAKLAR UTAMA --}}
+                <div class="p-3 bg-white rounded-3 border mb-3">
+                    <div class="form-check form-switch d-flex align-items-center gap-3 ps-0 mb-0">
+                        <input class="form-check-input ms-0" type="checkbox" name="maintenance_siswa_enabled" value="1" id="maintenanceEnabledSwitch" {{ ($settings['maintenance_siswa_enabled'] ?? '0') === '1' ? 'checked' : '' }} style="width: 2.8rem; height: 1.4rem; cursor: pointer;">
+                        <div>
+                            <label class="form-check-label fw-bold text-dark cursor-pointer mb-0" for="maintenanceEnabledSwitch" style="font-size: 0.95rem;">
+                                Aktifkan Mode Pemeliharaan (Kunci Input Siswa)
+                            </label>
+                            <div class="text-muted small">
+                                Siswa tetap bisa membuka beranda, profil guru, riwayat, dan leaderboard, namun seluruh form/tombol penilaian & chat diblokir dengan pop-up pemberitahuan maintenance.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- OPSI DURASI MAINTENANCE --}}
+                <div id="maintenanceDetailsWrap">
+                    <label class="form-label fw-bold mb-2">
+                        <i class="bi bi-clock-history me-1 text-primary"></i>Pilihan Durasi Pemeliharaan:
+                    </label>
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="p-3 border rounded-3 bg-white h-100 d-block cursor-pointer" for="optManual" style="transition: all 0.2s;">
+                                <div class="form-check mb-1">
+                                    <input class="form-check-input" type="radio" name="maintenance_siswa_type" id="optManual" value="manual" {{ ($settings['maintenance_siswa_type'] ?? 'manual') === 'manual' ? 'checked' : '' }}>
+                                    <strong class="form-check-label text-dark" for="optManual">
+                                        1. Aktif hingga dinonaktifkan kembali
+                                    </strong>
+                                </div>
+                                <p class="text-muted small mb-0 ps-4">
+                                    Pemeliharaan akan terus aktif tanpa batas waktu sampai admin mematikan saklar ini secara manual.
+                                </p>
+                            </label>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="p-3 border rounded-3 bg-white h-100 d-block cursor-pointer" for="optScheduled" style="transition: all 0.2s;">
+                                <div class="form-check mb-1">
+                                    <input class="form-check-input" type="radio" name="maintenance_siswa_type" id="optScheduled" value="scheduled" {{ ($settings['maintenance_siswa_type'] ?? '') === 'scheduled' ? 'checked' : '' }}>
+                                    <strong class="form-check-label text-dark" for="optScheduled">
+                                        2. Berdasarkan rentang waktu (Jadwal)
+                                    </strong>
+                                </div>
+                                <p class="text-muted small mb-0 ps-4">
+                                    Tentukan waktu mulai hingga waktu selesai. Waktu selesai akan ditampilkan kepada siswa dan maintenance berhenti otomatis.
+                                </p>
+                            </label>
+                        </div>
+                    </div>
+
+                    {{-- INPUT RENTANG WAKTU --}}
+                    <div id="maintenanceScheduleInputs" class="p-3 bg-light rounded-3 border mb-3 {{ ($settings['maintenance_siswa_type'] ?? 'manual') === 'scheduled' ? '' : 'd-none' }}">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold" for="mStartInput">
+                                    <i class="bi bi-calendar-event me-1 text-primary"></i>Waktu Mulai Pemeliharaan:
+                                </label>
+                                <input type="datetime-local" name="maintenance_siswa_start" id="mStartInput" class="form-control" value="{{ !empty($settings['maintenance_siswa_start']) ? \Carbon\Carbon::parse($settings['maintenance_siswa_start'])->format('Y-m-d\TH:i') : '' }}">
+                                <div class="text-muted small mt-1">Waktu mulai pemeliharaan (WIB).</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold" for="mEndInput">
+                                    <i class="bi bi-calendar-check me-1 text-success"></i>Waktu Selesai Pemeliharaan:
+                                </label>
+                                <input type="datetime-local" name="maintenance_siswa_end" id="mEndInput" class="form-control" value="{{ !empty($settings['maintenance_siswa_end']) ? \Carbon\Carbon::parse($settings['maintenance_siswa_end'])->format('Y-m-d\TH:i') : '' }}">
+                                <div class="text-muted small mt-1">Estimasi waktu pemeliharaan selesai (ditampilkan ke siswa).</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- PESAN KHUSUS UNTUK SISWA --}}
+                    <div class="mb-3">
+                        <label class="form-label fw-bold mb-1" for="maintenanceMessageInput">
+                            <i class="bi bi-chat-left-dots me-1 text-primary"></i>Pesan Penjelasan untuk Siswa (Opsional):
+                        </label>
+                        <textarea name="maintenance_siswa_message" id="maintenanceMessageInput" class="form-control" rows="2" placeholder="Sistem sedang dalam pemeliharaan berkala untuk peningkatan performa. Silakan cek kembali nanti.">{{ $settings['maintenance_siswa_message'] }}</textarea>
+                        <div class="text-muted small mt-1">
+                            Pesan ini akan ditampilkan pada pop-up modal saat siswa mencoba mengakses form penilaian atau mengirim pesan.
+                        </div>
+                    </div>
+
+                    {{-- RINGKASAN STATUS LIVE --}}
+                    <div class="p-3 rounded-3 border bg-white d-flex align-items-center justify-content-between flex-wrap gap-2">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="bi {{ $maintenanceInfo['is_active'] ? 'bi-exclamation-circle-fill text-warning fs-4' : 'bi-shield-check text-success fs-4' }}"></i>
+                            <div>
+                                <strong class="text-dark small d-block">Status Yang Ditampilkan Kepada Siswa:</strong>
+                                <span class="text-muted small">{{ $maintenanceInfo['schedule_text'] }}</span>
+                            </div>
+                        </div>
+                        <span class="badge {{ $maintenanceInfo['is_active'] ? 'bg-warning text-dark' : 'bg-secondary' }}">
+                            {{ $maintenanceInfo['is_active'] ? 'STATUS: SEDANG AKTIF' : 'STATUS: TIDAK AKTIF' }}
+                        </span>
+                    </div>
+                </div>
+            </div>
         </section>
 
         <div id="landingSaveBar" class="settings-save">
@@ -1755,6 +1877,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 const modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('modalEditBadge'));
                 modal.show();
+            }
+        });
+    // Maintenance Mode Toggle Handlers
+    document.querySelectorAll('input[name="maintenance_siswa_type"]').forEach(r => {
+        r.addEventListener('change', function() {
+            const scheduleWrap = document.getElementById('maintenanceScheduleInputs');
+            if (scheduleWrap) {
+                scheduleWrap.classList.toggle('d-none', this.value !== 'scheduled');
             }
         });
     });

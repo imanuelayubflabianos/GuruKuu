@@ -193,7 +193,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 });
 
 // ==================== 5. SISWA ROUTES ====================
-Route::middleware(['auth', 'role:siswa'])->prefix('siswa')->name('siswa.')->group(function () {
+Route::middleware(['auth', 'role:siswa', 'siswa.maintenance'])->prefix('siswa')->name('siswa.')->group(function () {
     Route::get('/dashboard', [SiswaDashboardController::class, 'index'])->name('dashboard');
     Route::get('/guru', [SiswaGuruController::class, 'index'])->name('guru.index');
     Route::get('/guru/{guru}', [SiswaGuruController::class, 'show'])->name('guru.show');

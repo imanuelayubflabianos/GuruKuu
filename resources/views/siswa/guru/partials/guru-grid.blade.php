@@ -80,6 +80,10 @@
                             <a href="{{ route('siswa.guru.show', $g) }}" class="btn btn-secondary flex-grow-1 btn-sm disabled">
                                 <i class="bi bi-check2 me-1"></i> Selesai
                             </a>
+                        @elseif(isset($mInfo) && $mInfo['is_active'])
+                            <button type="button" class="btn btn-warning flex-grow-1 btn-sm text-dark fw-semibold" onclick="showMaintenanceModal()">
+                                <i class="bi bi-tools me-1"></i> Nilai
+                            </button>
                         @else
                             <a href="{{ route('siswa.penilaian.create', $g) }}" class="btn btn-primary-custom flex-grow-1 btn-sm">
                                 <i class="bi bi-pencil-square me-1"></i> Nilai
