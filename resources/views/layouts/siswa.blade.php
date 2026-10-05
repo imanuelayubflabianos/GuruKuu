@@ -25,7 +25,7 @@
         }
         * { font-family: 'Inter', sans-serif; }
         .font-mono { font-family: 'JetBrains Mono', monospace; }
-        body { background: var(--bg-light); color: var(--text-dark); }
+        body { background: var(--bg-light); color: var(--text-dark); overflow-x: hidden; }
 
         .sidebar { 
             width: 280px; 
@@ -78,7 +78,7 @@
         @media (max-width: 992px) {
             .sidebar { transform: translateX(-100%); transition: transform 0.3s; }
             .sidebar.show { transform: translateX(0); }
-            .main-content { margin-left: 0; }
+            .main-content { margin-left: 0; padding: 1.25rem 0.85rem !important; }
         }
 
         /* CIRCULAR TOPBAR ACTION BUTTONS */
@@ -272,6 +272,8 @@
                     </ul>
                 </div>
             </div>
+        </div>
+
         @php
             $mInfo = \App\Services\MaintenanceService::getSiswaMaintenanceInfo();
         @endphp
