@@ -16,8 +16,8 @@
         {{-- HEADER CHAT PREMIUM --}}
         <div class="card-custom mb-3" style="overflow: hidden;">
             <div class="p-3 d-flex align-items-center gap-3" style="background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%); color: white;">
-                <div class="d-flex align-items-center justify-content-center rounded-circle" style="width: 50px; height: 50px; background: rgba(255,255,255,0.2); backdrop-filter: blur(10px);">
-                    <i class="bi bi-headset-fill fs-4"></i>
+                <div class="d-flex align-items-center justify-content-center rounded-circle" style="width: 50px; height: 50px; background: rgba(255,255,255,0.2); backdrop-filter: blur(10px); flex-shrink: 0;">
+                    <i class="bi bi-headset fs-4 text-white"></i>
                 </div>
                 <div class="flex-grow-1">
                     <h6 class="fw-bold mb-0">Admin Sekolah</h6>

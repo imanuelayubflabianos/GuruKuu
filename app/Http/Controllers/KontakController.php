@@ -74,7 +74,7 @@ class KontakController extends Controller
                 ]);
             } catch (\Throwable $e) {}
 
-            return back()->withInput()->with('error', $profanity['message']);
+            return back()->with('violation_popup', $profanity['message']);
         }
         
         $cleanId = preg_replace('/[^a-zA-Z0-9]/', '', (string)$deviceId);
@@ -198,7 +198,7 @@ class KontakController extends Controller
                 ]);
             } catch (\Throwable $e) {}
 
-            return back()->withInput()->with('error', $profanity['message']);
+            return back()->with('violation_popup', $profanity['message']);
         }
 
         $user = Auth::user();

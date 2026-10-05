@@ -497,7 +497,7 @@
                 <div class="text-center mt-3 pt-3 border-top" style="border-color: var(--border) !important;">
                     <span class="text-muted d-block small mb-1" style="font-size: 0.8rem;">Ada kendala masuk?</span>
                     <a href="{{ route('kontak.guest.page') }}" class="text-decoration-none fw-semibold small d-inline-flex align-items-center gap-1.5" style="color: var(--primary);">
-                        <i class="bi bi-chat-dots-fill"></i>
+                        <i class="bi bi-headset"></i>
                         <span>Hubungi Admin</span>
                     </a>
 

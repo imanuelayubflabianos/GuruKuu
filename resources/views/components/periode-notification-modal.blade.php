@@ -130,6 +130,19 @@
         border-color: #475569 !important;
         color: #e2e8f0 !important;
     }
+
+    /* Efek bayangan gelap (dimmed backdrop shadow) agar pop-up periode tidak nyatu dengan background */
+    .modal-backdrop {
+        background-color: #0f172a !important;
+        backdrop-filter: blur(5px) !important;
+        -webkit-backdrop-filter: blur(5px) !important;
+    }
+    .modal-backdrop.show {
+        opacity: 0.65 !important;
+    }
+    #modalPeriodeNotification .modal-content {
+        box-shadow: 0 25px 60px -12px rgba(15, 23, 42, 0.4), 0 0 0 1px rgba(15, 23, 42, 0.08) !important;
+    }
 </style>
 
 <script>
@@ -142,6 +155,20 @@
         } catch (e) {}
     };
 
+    function showPeriodePopupNow() {
+        const modalEl = document.getElementById('modalPeriodeNotification');
+        if (!modalEl || typeof bootstrap === 'undefined') return;
+
+        // Bersihkan sisa backdrop modal sebelumnya jika ada
+        document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
+        document.body.classList.remove('modal-open');
+        document.body.style.removeProperty('overflow');
+        document.body.style.removeProperty('padding-right');
+
+        const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+        modal.show();
+    }
+
     document.addEventListener('DOMContentLoaded', function() {
         const modalEl = document.getElementById('modalPeriodeNotification');
         if (!modalEl || typeof bootstrap === 'undefined') return;
@@ -151,11 +178,27 @@
             return;
         }
 
-        // Tampilkan modal pop-up setelah jeda singkat (agar transisi loading selesai dulu)
-        setTimeout(function() {
-            const modal = new bootstrap.Modal(modalEl);
-            modal.show();
-        }, 600);
+        // Cek apakah ada pop-up Selamat Datang (Welcome Landing) yang sedang aktif atau antre
+        const welcomeEl = document.getElementById('welcomeLandingPromptModal');
+        const welcomeKey = 'gk_sso_welcomed_' + "{{ $user ? $user->id : 'guest' }}";
+        const isWelcomeActive = welcomeEl && (window.gkWelcomeModalActive === true || !sessionStorage.getItem(welcomeKey));
+
+        if (isWelcomeActive) {
+            // BERGILIR: Jangan muncul bersamaan (antre di belakang pop-up selamat datang)
+            let handled = false;
+            window.addEventListener('gk:welcomeModalClosed', function onWelcomeClosed() {
+                if (handled) return;
+                handled = true;
+                window.removeEventListener('gk:welcomeModalClosed', onWelcomeClosed);
+
+                // Jeda halus 400ms setelah modal selamat datang tertutup sempurna
+                setTimeout(showPeriodePopupNow, 400);
+            });
+            return;
+        }
+
+        // Jika tidak ada modal selamat datang yang aktif, munculkan setelah jeda singkat
+        setTimeout(showPeriodePopupNow, 500);
     });
 })();
 </script>

@@ -198,9 +198,9 @@
             $pct2 = round(($top2->rata_rata_nilai / 5) * 100);
             $pct3 = round(($top3->rata_rata_nilai / 5) * 100);
         @endphp
-        <div class="row g-2 g-md-4 mb-4 mb-md-5 align-items-end justify-content-center gk-podium-row">
+        <div class="row g-1 g-md-4 mb-4 mb-md-5 align-items-end justify-content-center gk-podium-row">
             {{-- #2 PERAK (NORMAL) --}}
-            <div class="col-12 col-md-4 order-2 order-md-1 gk-podium-col gk-podium-2">
+            <div class="col-4 col-md-4 order-1 podium-anim-item podium-rank-2 gk-podium-col gk-podium-2 px-1">
                 <div class="gk-podium-card-revised p-3.5 p-md-4 text-center h-100 d-flex flex-column justify-content-between shadow-sm position-relative">
                     @include('components.podium-laurel-badge', ['rank' => 2])
                     <div>
@@ -248,7 +248,7 @@
             </div>
 
             {{-- #1 EMAS (CENTER PODIUM - BESAR) --}}
-            <div class="col-12 col-md-4 order-1 order-md-2 mb-3 mb-md-0 gk-podium-col gk-podium-1">
+            <div class="col-4 col-md-4 order-2 mb-0 podium-anim-item podium-rank-1 gk-podium-col gk-podium-1 px-1">
                 <div class="gk-podium-card-revised is-first p-4 p-md-5 text-center h-100 d-flex flex-column justify-content-between shadow position-relative">
                     @include('components.podium-laurel-badge', ['rank' => 1])
                     <div>
@@ -296,7 +296,7 @@
             </div>
 
             {{-- #3 PERUNGGU (KECIL) --}}
-            <div class="col-12 col-md-4 order-3 order-md-3 gk-podium-col gk-podium-3">
+            <div class="col-4 col-md-4 order-3 podium-anim-item podium-rank-3 gk-podium-col gk-podium-3 px-1">
                 <div class="gk-podium-card-revised p-3 p-md-3.5 text-center h-100 d-flex flex-column justify-content-between shadow-sm position-relative">
                     @include('components.podium-laurel-badge', ['rank' => 3])
                     <div>

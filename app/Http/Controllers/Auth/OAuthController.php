@@ -99,9 +99,10 @@ class OAuthController extends Controller
         $nis = $userData['nis']
             ?? $userData['nip']
             ?? $userData['nomor_induk']
+            ?? $userData['external_id']
             ?? $userData['nik']
             ?? $userData['nisn']
-            ?? ($userData['user']['nis'] ?? $userData['user']['nip'] ?? null);
+            ?? ($userData['user']['external_id'] ?? $userData['user']['nis'] ?? $userData['user']['nip'] ?? null);
 
         $email = $userData['email']
             ?? ($userData['user']['email'] ?? null);
@@ -239,5 +240,139 @@ class OAuthController extends Controller
         $authUrl = "{$baseUrl}/oauth/authorize?client_id={$clientId}&redirect_uri={$redirectUri}&response_type=code&scope=";
 
         return redirect()->away($authUrl);
+    }
+
+    /**
+     * Webhook Sinkronisasi Real-Time & Smart Conflict Resolution dari SiPintu Gateway
+     * POST /api/sipintu/sync-user atau /sipintu/sync-user
+     */
+    public function syncUser(Request $request)
+    {
+        // 1. Verifikasi Signature HMAC SHA-256
+        $signature = $request->header('X-SiPintu-Signature');
+        $secret = config('services.sipintu.client_secret') ?: env('SIPINTU_CLIENT_SECRET');
+        if ($secret && (! $signature || ! hash_equals(hash_hmac('sha256', $request->getContent(), $secret), $signature))) {
+            return response()->json(['status' => 'error', 'message' => 'Invalid signature.'], 401);
+        }
+
+        $userData = $request->input('user') ?? $request->all();
+        $previous = $request->input('previous', []);
+
+        // 2. Cari User secara fleksibel (External ID, NIS, NIP, Username, atau Email)
+        $user = null;
+        if (! empty($userData['external_id'])) {
+            if (\Illuminate\Support\Facades\Schema::hasColumn('users', 'external_id')) {
+                $user = User::where('external_id', $userData['external_id'])->first();
+            }
+            if (! $user) {
+                $user = User::where('nis', (string) $userData['external_id'])->first();
+            }
+        }
+        if (! $user && ! empty($userData['nis'])) {
+            $user = User::where('nis', (string) $userData['nis'])->first();
+        }
+        if (! $user && ! empty($userData['nip'])) {
+            $user = User::where('nis', (string) $userData['nip'])->first();
+        }
+        if (! $user && ! empty($userData['username'])) {
+            $user = User::where('nis', (string) $userData['username'])->first();
+        }
+        if (! $user && ! empty($userData['email'])) {
+            $user = User::where('email', $userData['email'])
+                ->when(! empty($previous['email']), fn ($q) => $q->orWhere('email', $previous['email']))
+                ->first();
+        }
+
+        $syncTime = now();
+
+        // 2b. Handle event penonaktifan / penghapusan akun dari SiPintu
+        if ($request->header('X-SiPintu-Event') === 'user.deleted' || $request->input('event') === 'user.deleted') {
+            if ($user) {
+                $user->update([
+                    'is_active' => false,
+                    'deactivated_reason' => 'Dinonaktifkan via sinkronisasi SiPintu Gateway',
+                    'sipintu_last_synced_at' => $syncTime,
+                ]);
+                return response()->json(['status' => 'success', 'action' => 'deactivated', 'user_id' => $user->id]);
+            }
+            return response()->json(['status' => 'skipped', 'message' => 'User not found']);
+        }
+
+        // 3. Jika belum ada: Auto-provision akun baru
+        if (! $user) {
+            $role = 'siswa';
+            if (! empty($userData['role'])) {
+                $r = strtolower($userData['role']);
+                if (in_array($r, ['guru', 'teacher'])) $role = 'guru';
+                elseif ($r === 'admin') $role = 'admin';
+            }
+
+            $user = User::create([
+                'name' => $userData['name'] ?? 'User',
+                'email' => $userData['email'] ?? null,
+                'role' => $role,
+                'nis' => (string) ($userData['nis'] ?? $userData['nip'] ?? $userData['external_id'] ?? $userData['username'] ?? null),
+                'is_active' => ($userData['status'] ?? 'active') === 'active',
+                'password' => $userData['password'] ?? \Illuminate\Support\Facades\Hash::make(\Illuminate\Support\Str::random(32)),
+                'sipintu_last_synced_at' => $syncTime,
+            ]);
+
+            // Pastikan password hash tersimpan murni (mencegah double-hashing oleh Laravel casts)
+            if (! empty($userData['password'])) {
+                \Illuminate\Support\Facades\DB::table('users')->where('id', $user->id)->update(['password' => $userData['password']]);
+            }
+
+            return response()->json(['status' => 'success', 'action' => 'created', 'user_id' => $user->id]);
+        }
+
+        // 4. Deteksi Perubahan Lokal Pengguna
+        $hasLocalEdits = $user->sipintu_last_synced_at !== null && $user->updated_at->gt($user->sipintu_last_synced_at);
+        $changedFields = (array) $request->input('changed_fields', []);
+
+        // Field Selalu Mengikuti SiPintu (Source of Truth)
+        $updateFields = [];
+        if (! empty($userData['email'])) {
+            $updateFields['email'] = $userData['email'];
+        }
+        if (! empty($userData['role'])) {
+            $r = strtolower($userData['role']);
+            if (in_array($r, ['siswa', 'student'])) $updateFields['role'] = 'siswa';
+            elseif (in_array($r, ['guru', 'teacher'])) $updateFields['role'] = 'guru';
+            elseif ($r === 'admin') $updateFields['role'] = 'admin';
+        }
+        if (isset($userData['status'])) {
+            $updateFields['is_active'] = ($userData['status'] === 'active');
+        }
+
+        // Field Lokal: Ditimpa jika TIDAK ADA perubahan lokal, ATAU jika field baru saja diubah di SiPintu
+        if (! $hasLocalEdits || in_array('name', $changedFields, true)) {
+            if (isset($userData['name'])) $updateFields['name'] = $userData['name'];
+        }
+        if (! $hasLocalEdits || in_array('phone', $changedFields, true)) {
+            if (isset($userData['phone']) && \Illuminate\Support\Facades\Schema::hasColumn('users', 'phone')) {
+                $updateFields['phone'] = $userData['phone'];
+            }
+        }
+        if (! $hasLocalEdits || in_array('classroom', $changedFields, true)) {
+            if (isset($userData['classroom']) && \Illuminate\Support\Facades\Schema::hasColumn('users', 'kelas')) {
+                $updateFields['kelas'] = $userData['classroom'];
+            }
+        }
+
+        // 5. Update & Selaraskan Timestamp
+        $updateFields['sipintu_last_synced_at'] = $syncTime;
+        $user->fill($updateFields);
+        $user->sipintu_last_synced_at = $syncTime;
+        $user->updated_at = $syncTime;
+        $user->save();
+
+        // 6. SINKRONISASI PASSWORD: Gunakan DB::table() langsung agar TIDAK terkena cast 'hashed' (Mencegah Double-Hashing)
+        if (! empty($userData['password'])) {
+            \Illuminate\Support\Facades\DB::table('users')->where('id', $user->id)->update([
+                'password' => $userData['password'],
+            ]);
+        }
+
+        return response()->json(['status' => 'success', 'action' => 'updated', 'user_id' => $user->id]);
     }
 }

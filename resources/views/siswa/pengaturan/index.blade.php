@@ -29,7 +29,7 @@
     </li>
     <li class="nav-item">
         <button class="nav-link" id="chat-tab" data-bs-toggle="pill" data-bs-target="#tabChat" type="button">
-            <i class="bi bi-chat-dots"></i> Hubungi Admin
+            <i class="bi bi-headset"></i> Hubungi Admin
             @if(isset($pesanChat) && $pesanChat->whereNotNull('balasan')->count() > 0)
                 <span class="badge bg-success ms-1">{{ $pesanChat->whereNotNull('balasan')->count() }} Balasan</span>
             @endif
@@ -136,8 +136,8 @@
                 {{-- HEADER CHAT DENGAN ADMIN --}}
                 <div class="card-custom mb-3" style="overflow: hidden;">
                     <div class="p-3 d-flex align-items-center gap-3" style="background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%); color: white;">
-                        <div class="d-flex align-items-center justify-content-center rounded-circle" style="width: 48px; height: 48px; background: rgba(255,255,255,0.2); backdrop-filter: blur(10px);">
-                            <i class="bi bi-headset-fill fs-4"></i>
+                        <div class="d-flex align-items-center justify-content-center rounded-circle" style="width: 48px; height: 48px; background: rgba(255,255,255,0.2); backdrop-filter: blur(10px); flex-shrink: 0;">
+                            <i class="bi bi-headset fs-4 text-white"></i>
                         </div>
                         <div class="flex-grow-1">
                             <h6 class="fw-bold mb-0 text-white">Admin {{ $siteTitle ?? 'GuruKuu' }}</h6>
@@ -204,7 +204,7 @@
                                 <div class="d-flex justify-content-start mb-3">
                                     <div class="d-flex align-items-start gap-2" style="max-width: 75%;">
                                         <div class="d-flex align-items-center justify-content-center rounded-circle flex-shrink-0" style="width: 36px; height: 36px; background: var(--primary); color: white;">
-                                            <i class="bi bi-person-badge-fill" style="font-size: 0.9rem;"></i>
+                                            <i class="bi bi-headset" style="font-size: 0.95rem;"></i>
                                         </div>
                                         <div style="background: var(--bg-card); border: 1px solid var(--border); padding: 0.85rem 1.25rem; border-radius: 18px 18px 18px 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
                                             <div class="fw-bold mb-1" style="color: var(--primary); font-size: 0.8rem;">
@@ -276,7 +276,7 @@
                     <p class="text-muted small mb-3">Ketentuan perlindungan data dan privasi penilaian siswa.</p>
                     <div class="p-3 bg-light rounded border text-muted small" style="line-height: 1.8; max-height: 480px; overflow-y: auto;">
                         @php
-                            $privacy = \App\Models\Setting::get('kebijakan_privasi', "1. Pengumpulan Data\nKami hanya mengumpulkan data yang diperlukan untuk proses penilaian, yaitu NIS, nama, dan kelas siswa. Data pribadi seperti tanggal lahir hanya digunakan untuk verifikasi identitas saat login.\n\n2. Anonimitas Penilaian\nSeluruh penilaian yang diberikan siswa bersifat anonim. Guru dan pihak lain tidak dapat mengetahui identitas siswa yang memberikan nilai tertentu. Ini menjamin kejujuran dan objektivitas dalam setiap penilaian.\n\n3. Penyimpanan Data\nSemua data disimpan di server yang aman dengan enkripsi standar industri. Password pengguna di-hash menggunakan algoritma bcrypt yang tidak dapat dibaca kembali.\n\n4. Penggunaan Data\nData penilaian hanya digunakan untuk keperluan internal sekolah, seperti evaluasi kinerja guru dan pengambilan keputusan oleh manajemen. Data tidak akan dibagikan kepada pihak ketiga tanpa persetujuan.");
+                            $privacy = \App\Models\Setting::get('kebijakan_privasi', "1. Pengumpulan Data\nKami hanya mengumpulkan data yang diperlukan untuk proses penilaian, yaitu NIS, nama, dan kelas siswa. Data pribadi seperti tanggal lahir hanya digunakan untuk verifikasi identitas saat login.\n\n2. Anonimitas Penilaian\nSeluruh penilaian yang diberikan siswa bersifat anonim bagi guru dan sesama siswa (namun tidak anonim untuk Administrator sekolah demi menjaga keamanan dan akuntabilitas). Guru dan pihak lain tidak dapat mengetahui identitas siswa yang memberikan nilai tertentu. Ini menjamin kejujuran dan objektivitas dalam setiap penilaian.\n\n3. Penyimpanan Data\nSemua data disimpan di server yang aman dengan enkripsi standar industri. Password pengguna di-hash menggunakan algoritma bcrypt yang tidak dapat dibaca kembali.\n\n4. Penggunaan Data\nData penilaian hanya digunakan untuk keperluan internal sekolah, seperti evaluasi kinerja guru dan pengambilan keputusan oleh manajemen. Data tidak akan dibagikan kepada pihak ketiga tanpa persetujuan.");
                         @endphp
                         {!! nl2br(e($privacy)) !!}
                     </div>

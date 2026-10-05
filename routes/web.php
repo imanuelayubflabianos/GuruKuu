@@ -55,6 +55,7 @@ Route::post('/login', [LoginController::class, 'login'])->name('login.post');
 // SSO SiPintu OAuth Routes
 Route::get('/login/sipintu', [OAuthController::class, 'redirectToSiPintu'])->name('login.sipintu');
 Route::get('/oauth/callback', [OAuthController::class, 'callback'])->name('oauth.callback');
+Route::post('/sipintu/sync-user', [OAuthController::class, 'syncUser'])->name('sipintu.sync-user');
 
 // KONTAK GUEST
 Route::get('/hubungi-admin', [KontakController::class, 'guestPage'])->name('kontak.guest.page');

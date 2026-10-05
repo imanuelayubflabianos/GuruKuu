@@ -25,6 +25,7 @@ class User extends Authenticatable
         'warning_count',
         'deactivated_reason',
         'photo',
+        'sipintu_last_synced_at',
     ];
 
     protected $hidden = [
@@ -38,6 +39,7 @@ class User extends Authenticatable
         'password' => 'hashed',
         'is_active' => 'boolean',
         'deactivated_until' => 'datetime',
+        'sipintu_last_synced_at' => 'datetime',
     ];
 
     public function isDeactivated(): bool

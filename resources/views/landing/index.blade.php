@@ -153,17 +153,14 @@
     }
 
     .podium-rank-1 .gk-podium-card-revised {
-        min-height: 335px !important;
         border: 1.8px solid #f59e0b !important;
         box-shadow: 0 14px 36px -6px rgba(245, 158, 11, 0.32), 0 0 22px rgba(251, 191, 36, 0.22) !important;
     }
     .podium-rank-2 .gk-podium-card-revised {
-        min-height: 305px !important;
         border: 1.8px solid #94a3b8 !important;
         box-shadow: 0 12px 30px -6px rgba(148, 163, 184, 0.3), 0 0 18px rgba(203, 213, 225, 0.24) !important;
     }
     .podium-rank-3 .gk-podium-card-revised {
-        min-height: 285px !important;
         border: 1.8px solid #cd7f32 !important;
         box-shadow: 0 10px 28px -6px rgba(205, 127, 50, 0.28), 0 0 16px rgba(217, 119, 6, 0.18) !important;
     }
@@ -278,156 +275,14 @@
         filter: drop-shadow(0 4px 10px rgba(205, 127, 50, 0.45));
     }
 
-    /* Sizing & Spacing inside Podium */
-    .gk-podium-row {
-        margin-bottom: 1.5rem !important;
-    }
-    .gk-podium-card-revised,
-    .podium-rank-1 .gk-podium-card-revised,
-    .podium-rank-2 .gk-podium-card-revised,
-    .podium-rank-3 .gk-podium-card-revised {
-        width: 275px !important;
-        max-width: 275px !important;
-        min-width: 275px !important;
-        margin-left: auto !important;
-        margin-right: auto !important;
-        box-sizing: border-box !important;
-        padding-left: 0.95rem !important;
-        padding-right: 0.95rem !important;
-    }
-    .podium-rank-1 .gk-podium-card-revised {
-        min-height: 415px !important;
-        padding-top: 1.85rem !important;
-        padding-bottom: 1.15rem !important;
-    }
-    .podium-rank-2 .gk-podium-card-revised {
-        min-height: 355px !important;
-        padding-top: 1.65rem !important;
-        padding-bottom: 1rem !important;
-    }
-    .podium-rank-3 .gk-podium-card-revised {
-        min-height: 310px !important;
-        padding-top: 1.45rem !important;
-        padding-bottom: 0.95rem !important;
-    }
-
-    .gk-podium-row .gk-avatar-clean-wrap {
-        margin: 0 auto 0.55rem !important;
-    }
-    .podium-rank-1 .gk-avatar-clean-wrap {
-        width: 84px !important;
-        height: 84px !important;
-    }
-    .podium-rank-2 .gk-avatar-clean-wrap {
-        width: 72px !important;
-        height: 72px !important;
-    }
-    .podium-rank-3 .gk-avatar-clean-wrap {
-        width: 64px !important;
-        height: 64px !important;
-    }
-    .gk-podium-row h4,
-    .gk-podium-row h5 {
-        font-size: 0.98rem !important;
-        margin-bottom: 0.2rem !important;
-        line-height: 1.25 !important;
-    }
-    .podium-rank-1 h4 {
-        font-size: 1.12rem !important;
-    }
-    .gk-podium-row .text-muted.small {
-        margin-bottom: 0.25rem !important;
-        font-size: 0.74rem !important;
-    }
-    .gk-podium-row .gk-podium-badges-row {
-        margin: 0.15rem auto 0.45rem !important;
-        min-height: 24px !important;
-        gap: 5px !important;
-    }
-    .gk-podium-row .text-warning {
-        margin-bottom: 0.45rem !important;
-        font-size: 0.88rem !important;
-    }
-    .podium-rank-1 .text-warning {
-        font-size: 1rem !important;
-    }
-    .gk-podium-row .gk-progress-pill {
-        height: 22px !important;
-        line-height: 22px !important;
-        font-size: 0.76rem !important;
-        min-width: 110px !important;
-    }
-    .gk-podium-row small.text-muted.font-mono {
-        margin-bottom: 0.5rem !important;
-        font-size: 0.74rem !important;
-    }
-    .gk-podium-row .gk-btn-podium-profile {
-        padding: 0.26rem 0.95rem !important;
-        font-size: 0.8rem !important;
-        margin-bottom: 0.15rem !important;
-        margin-top: 0.45rem !important;
-    }
-    .gk-podium-row .gk-podium-card-revised:hover .gk-laurel-bottom-branch,
-    .gk-podium-row .is-touch-focused .gk-laurel-bottom-branch {
-        filter: drop-shadow(0 6px 16px currentColor);
-    }
-    .gk-podium-row .gk-podium-card-revised:hover .gk-laurel-bottom-left,
-    .gk-podium-row .is-touch-focused .gk-laurel-bottom-left {
-        transform: scale(1.06);
-    }
-    .gk-podium-row .gk-podium-card-revised:hover .gk-laurel-bottom-right,
-    .gk-podium-row .is-touch-focused .gk-laurel-bottom-right {
-        transform: scaleX(-1) scale(1.06);
-    }
-
-    /* 🌟 Interaksi Fokus & Buram (Top 1 Jelas 100%, Top 2 Sedang 0.4px, Top 3 Paling Blur 1.4px) */
-    .gk-podium-card-revised {
-        transition: transform 0.38s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.38s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease, filter 0.35s ease !important;
-    }
-    .gk-podium-row:not(:hover) .podium-rank-1 .gk-podium-card-revised {
-        opacity: 1 !important;
-        filter: none !important;
-    }
-    .gk-podium-row:not(:hover) .podium-rank-2 .gk-podium-card-revised {
-        opacity: 0.88 !important;
-        filter: blur(0.4px) !important;
-    }
-    .gk-podium-row:not(:hover) .podium-rank-3 .gk-podium-card-revised {
-        opacity: 0.60 !important;
-        filter: blur(1.4px) !important;
-    }
-    .gk-podium-row:hover .gk-podium-card-revised {
-        opacity: 0.48 !important;
-        filter: blur(1.5px) !important;
-        transform: scale(0.985);
-    }
-    .gk-podium-row .podium-anim-item:hover .gk-podium-card-revised,
-    .gk-podium-row .gk-podium-card-revised:hover,
-    .gk-podium-row .podium-anim-item.is-touch-focused .gk-podium-card-revised {
-        opacity: 1 !important;
-        filter: none !important;
-        transform: translateY(-8px) scale(1.025) !important;
-        z-index: 35 !important;
-    }
-    .gk-podium-row .podium-rank-1:hover .gk-podium-card-revised,
-    .gk-podium-row .podium-rank-1.is-touch-focused .gk-podium-card-revised {
-        box-shadow: 0 24px 55px -6px rgba(245, 158, 11, 0.45), 0 0 32px rgba(251, 191, 36, 0.35) !important;
-    }
-    .gk-podium-row .podium-rank-2:hover .gk-podium-card-revised,
-    .gk-podium-row .podium-rank-2.is-touch-focused .gk-podium-card-revised {
-        box-shadow: 0 20px 48px -6px rgba(148, 163, 184, 0.45), 0 0 28px rgba(203, 213, 225, 0.38) !important;
-    }
-    .gk-podium-row .podium-rank-3:hover .gk-podium-card-revised,
-    .gk-podium-row .podium-rank-3.is-touch-focused .gk-podium-card-revised {
-        box-shadow: 0 18px 42px -6px rgba(205, 127, 50, 0.45), 0 0 26px rgba(217, 119, 6, 0.32) !important;
-    }
-
+    /* 🌟 SIZING & SPACING INSIDE PODIUM (DESKTOP) */
     @media (min-width: 768px) {
         .gk-podium-row {
             display: flex !important;
             align-items: flex-end !important;
             justify-content: center !important;
-            gap: 1.65rem !important; /* Jarak renggang antar kartu */
+            gap: 1.65rem !important;
+            margin-bottom: 1.5rem !important;
         }
         .podium-anim-item {
             flex: 0 0 275px !important;
@@ -435,16 +290,463 @@
             max-width: 275px !important;
             min-width: 275px !important;
         }
+        .gk-podium-card-revised,
+        .podium-rank-1 .gk-podium-card-revised,
+        .podium-rank-2 .gk-podium-card-revised,
+        .podium-rank-3 .gk-podium-card-revised {
+            width: 275px !important;
+            max-width: 275px !important;
+            min-width: 275px !important;
+            margin-left: auto !important;
+            margin-right: auto !important;
+            box-sizing: border-box !important;
+            padding-left: 0.95rem !important;
+            padding-right: 0.95rem !important;
+        }
+        .podium-rank-1 .gk-podium-card-revised {
+            min-height: 415px !important;
+            padding-top: 1.85rem !important;
+            padding-bottom: 1.15rem !important;
+        }
+        .podium-rank-2 .gk-podium-card-revised {
+            min-height: 355px !important;
+            padding-top: 1.65rem !important;
+            padding-bottom: 1rem !important;
+        }
+        .podium-rank-3 .gk-podium-card-revised {
+            min-height: 310px !important;
+            padding-top: 1.45rem !important;
+            padding-bottom: 0.95rem !important;
+        }
+        .gk-podium-row .gk-avatar-clean-wrap {
+            margin: 0 auto 0.55rem !important;
+        }
+        .podium-rank-1 .gk-avatar-clean-wrap {
+            width: 84px !important;
+            height: 84px !important;
+        }
+        .podium-rank-2 .gk-avatar-clean-wrap {
+            width: 72px !important;
+            height: 72px !important;
+        }
+        .podium-rank-3 .gk-avatar-clean-wrap {
+            width: 64px !important;
+            height: 64px !important;
+        }
+        .gk-podium-row h4,
+        .gk-podium-row h5 {
+            font-size: 0.98rem !important;
+            margin-bottom: 0.2rem !important;
+            line-height: 1.25 !important;
+        }
+        .podium-rank-1 h4 {
+            font-size: 1.12rem !important;
+        }
+        .gk-podium-row .text-muted.small {
+            margin-bottom: 0.25rem !important;
+            font-size: 0.74rem !important;
+        }
+        .gk-podium-row .gk-podium-badges-row {
+            margin: 0.15rem auto 0.45rem !important;
+            min-height: 24px !important;
+            gap: 5px !important;
+        }
+        .gk-podium-row .text-warning {
+            margin-bottom: 0.45rem !important;
+            font-size: 0.88rem !important;
+        }
+        .podium-rank-1 .text-warning {
+            font-size: 1rem !important;
+        }
+        .gk-podium-row .gk-progress-pill {
+            height: 22px !important;
+            line-height: 22px !important;
+            font-size: 0.76rem !important;
+            min-width: 110px !important;
+        }
+        .gk-podium-row small.text-muted.font-mono {
+            margin-bottom: 0.5rem !important;
+            font-size: 0.74rem !important;
+        }
+        .gk-podium-row .gk-btn-podium-profile {
+            padding: 0.26rem 0.95rem !important;
+            font-size: 0.8rem !important;
+            margin-bottom: 0.15rem !important;
+            margin-top: 0.45rem !important;
+        }
+        .gk-podium-row .gk-podium-card-revised:hover .gk-laurel-bottom-branch,
+        .gk-podium-row .is-touch-focused .gk-laurel-bottom-branch {
+            filter: drop-shadow(0 6px 16px currentColor);
+        }
+        .gk-podium-row .gk-podium-card-revised:hover .gk-laurel-bottom-left,
+        .gk-podium-row .is-touch-focused .gk-laurel-bottom-left {
+            transform: scale(1.06);
+        }
+        .gk-podium-row .gk-podium-card-revised:hover .gk-laurel-bottom-right,
+        .gk-podium-row .is-touch-focused .gk-laurel-bottom-right {
+            transform: scaleX(-1) scale(1.06);
+        }
+
+        /* Desktop Focus & Blur */
+        .gk-podium-card-revised {
+            transition: transform 0.38s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.38s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease, filter 0.35s ease !important;
+        }
+        .gk-podium-row:not(:hover) .podium-rank-1 .gk-podium-card-revised {
+            opacity: 1 !important;
+            filter: none !important;
+        }
+        .gk-podium-row:not(:hover) .podium-rank-2 .gk-podium-card-revised {
+            opacity: 0.88 !important;
+            filter: blur(0.4px) !important;
+        }
+        .gk-podium-row:not(:hover) .podium-rank-3 .gk-podium-card-revised {
+            opacity: 0.60 !important;
+            filter: blur(1.4px) !important;
+        }
+        .gk-podium-row:hover .gk-podium-card-revised {
+            opacity: 0.48 !important;
+            filter: blur(1.5px) !important;
+            transform: scale(0.985);
+        }
+        .gk-podium-row .podium-anim-item:hover .gk-podium-card-revised,
+        .gk-podium-row .gk-podium-card-revised:hover,
+        .gk-podium-row .podium-anim-item.is-touch-focused .gk-podium-card-revised {
+            opacity: 1 !important;
+            filter: none !important;
+            transform: translateY(-8px) scale(1.025) !important;
+            z-index: 35 !important;
+        }
+        .gk-podium-row .podium-rank-1:hover .gk-podium-card-revised,
+        .gk-podium-row .podium-rank-1.is-touch-focused .gk-podium-card-revised {
+            box-shadow: 0 24px 55px -6px rgba(245, 158, 11, 0.45), 0 0 32px rgba(251, 191, 36, 0.35) !important;
+        }
+        .gk-podium-row .podium-rank-2:hover .gk-podium-card-revised,
+        .gk-podium-row .podium-rank-2.is-touch-focused .gk-podium-card-revised {
+            box-shadow: 0 20px 48px -6px rgba(148, 163, 184, 0.45), 0 0 28px rgba(203, 213, 225, 0.38) !important;
+        }
+        .gk-podium-row .podium-rank-3:hover .gk-podium-card-revised,
+        .gk-podium-row .podium-rank-3.is-touch-focused .gk-podium-card-revised {
+            box-shadow: 0 18px 42px -6px rgba(205, 127, 50, 0.45), 0 0 26px rgba(217, 119, 6, 0.32) !important;
+        }
     }
-}
-@media (max-width: 767.98px) {
-    .podium-anim-item.is-revealed {
-        opacity: 1 !important;
-        transform: none !important;
+
+    /* 🌟 SIZING & SPACING INSIDE PODIUM (MOBILE: PERSIS DESKTOP DENGAN MAHKOTA DAUN & PROPORSI ELEGAN) */
+    @media (max-width: 767.98px) {
+        .gk-podium-row {
+            display: flex !important;
+            flex-direction: row !important;
+            flex-wrap: nowrap !important;
+            align-items: flex-end !important;
+            justify-content: center !important;
+            gap: 10px !important;
+            margin-left: 0 !important;
+            margin-right: 0 !important;
+            padding: 0 8px !important;
+            margin-bottom: 1.5rem !important;
+        }
+        .podium-anim-item,
+        .gk-podium-col {
+            flex: 1 1 0% !important;
+            width: 0 !important;
+            max-width: 33.333% !important;
+            min-width: 0 !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            display: flex !important;
+            flex-direction: column !important;
+            justify-content: flex-end !important;
+            opacity: 1 !important;
+            transform: none !important;
+        }
+        .gk-podium-card-revised {
+            width: 100% !important;
+            max-width: 100% !important;
+            min-width: 0 !important;
+            display: flex !important;
+            flex-direction: column !important;
+            justify-content: space-between !important;
+            border-radius: 14px !important;
+            box-sizing: border-box !important;
+            margin: 0 !important;
+            transform: none !important;
+            opacity: 1 !important;
+            filter: none !important;
+            background: #ffffff !important;
+            position: relative !important;
+        }
+        .podium-rank-1 .gk-podium-card-revised {
+            min-height: 242px !important;
+            padding: 1.05rem 4px 0.55rem !important;
+            border: 1.8px solid #f59e0b !important;
+            box-shadow: 0 10px 25px -4px rgba(245, 158, 11, 0.40), 0 0 16px rgba(251, 191, 36, 0.28) !important;
+        }
+        .podium-rank-2 .gk-podium-card-revised {
+            min-height: 220px !important;
+            padding: 0.95rem 4px 0.55rem !important;
+            border: 1.8px solid #94a3b8 !important;
+            box-shadow: 0 8px 20px -4px rgba(148, 163, 184, 0.32), 0 0 12px rgba(203, 213, 225, 0.22) !important;
+        }
+        .podium-rank-3 .gk-podium-card-revised {
+            min-height: 202px !important;
+            padding: 0.90rem 4px 0.55rem !important;
+            border: 1.8px solid #cd7f32 !important;
+            box-shadow: 0 8px 18px -4px rgba(205, 127, 50, 0.30), 0 0 10px rgba(217, 119, 6, 0.20) !important;
+        }
+        .gk-podium-card-revised:hover,
+        .podium-anim-item.is-touch-focused .gk-podium-card-revised,
+        .gk-podium-col.is-touch-focused .gk-podium-card-revised {
+            transform: none !important;
+            opacity: 1 !important;
+            filter: none !important;
+        }
+        .gk-avatar-clean-wrap img,
+        .gk-avatar-red-wrap img,
+        .gk-podium-row .gk-avatar-clean-wrap img {
+            width: 100% !important;
+            height: 100% !important;
+            max-width: 100% !important;
+            max-height: 100% !important;
+            object-fit: cover !important;
+        }
+        .podium-rank-1 .gk-avatar-clean-wrap {
+            width: 44px !important;
+            height: 44px !important;
+            margin: 0 auto 0.2rem !important;
+            border: 2px solid #f59e0b !important;
+            border-radius: 50% !important;
+        }
+        .podium-rank-2 .gk-avatar-clean-wrap {
+            width: 38px !important;
+            height: 38px !important;
+            margin: 0 auto 0.2rem !important;
+            border: 2px solid #94a3b8 !important;
+            border-radius: 50% !important;
+        }
+        .podium-rank-3 .gk-avatar-clean-wrap {
+            width: 34px !important;
+            height: 34px !important;
+            margin: 0 auto 0.2rem !important;
+            border: 2px solid #cd7f32 !important;
+            border-radius: 50% !important;
+        }
+        .gk-podium-row h4,
+        .gk-podium-row h5 {
+            font-size: 0.66rem !important;
+            font-weight: 700 !important;
+            line-height: 1.15 !important;
+            height: 1.55rem !important;
+            overflow: hidden !important;
+            display: -webkit-box !important;
+            -webkit-line-clamp: 2 !important;
+            -webkit-box-orient: vertical !important;
+            margin-bottom: 2px !important;
+            text-align: center !important;
+            word-break: break-word !important;
+        }
+        .podium-rank-1 h4,
+        .podium-rank-1 h5 {
+            font-size: 0.72rem !important;
+        }
+        .gk-podium-row .text-muted.small,
+        .gk-podium-row .small.text-muted {
+            font-size: 0.50rem !important;
+            height: 0.68rem !important;
+            line-height: 1.1 !important;
+            margin-bottom: 2px !important;
+            white-space: nowrap !important;
+            overflow: hidden !important;
+            text-overflow: ellipsis !important;
+            text-align: center !important;
+            display: block !important;
+        }
+        .gk-podium-row .gk-podium-badges-row {
+            display: flex !important;
+            justify-content: center !important;
+            gap: 2px !important;
+            min-height: 14px !important;
+            margin: 0 auto 2px !important;
+        }
+        .gk-badge-mini-icon {
+            width: 14px !important;
+            height: 14px !important;
+            font-size: 0.55rem !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+        }
+        .gk-podium-row .text-warning {
+            font-size: 0.54rem !important;
+            height: 0.68rem !important;
+            line-height: 1 !important;
+            letter-spacing: 0.3px !important;
+            margin-bottom: 2px !important;
+            text-align: center !important;
+            white-space: nowrap !important;
+            display: block !important;
+        }
+        .gk-podium-row .mb-2,
+        .gk-podium-row .mb-3 {
+            margin-bottom: 2px !important;
+        }
+        .gk-podium-row .gk-progress-pill {
+            width: 86% !important;
+            max-width: 62px !important;
+            min-width: 0 !important;
+            height: 16px !important;
+            line-height: 16px !important;
+            font-size: 0.58rem !important;
+            padding: 0 2px !important;
+            margin: 0 auto 2px !important;
+            border-radius: 50px !important;
+        }
+        .gk-podium-row small.text-muted.font-mono {
+            font-size: 0.50rem !important;
+            height: 0.68rem !important;
+            line-height: 1 !important;
+            margin-bottom: 0.15rem !important;
+            display: block !important;
+            text-align: center !important;
+        }
+        .gk-podium-row .mt-3,
+        .gk-podium-row .mt-2 {
+            margin-top: 0.15rem !important;
+            margin-bottom: 0 !important;
+        }
+        .gk-podium-row .gk-btn-podium-profile {
+            padding: 2px 4px !important;
+            font-size: 0.62rem !important;
+            line-height: 1.2 !important;
+            margin: 0 auto !important;
+            width: 88% !important;
+            border-radius: 6px !important;
+            white-space: nowrap !important;
+        }
+        .gk-podium-header-badge {
+            position: absolute !important;
+            top: 0 !important;
+            left: 50% !important;
+            transform: translate(-50%, -50%) !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            line-height: 1 !important;
+            z-index: 25 !important;
+        }
+        .gk-podium-header-badge .gk-rank-badge-pill,
+        .gk-rank-badge-pill {
+            transform: none !important;
+            margin: 0 !important;
+            padding: 0.16rem 0.65rem !important;
+            font-size: 0.68rem !important;
+            letter-spacing: 0.3px !important;
+            line-height: 1 !important;
+        }
+        .podium-rank-1 .gk-podium-header-badge .gk-rank-badge-pill {
+            padding: 0.20rem 0.75rem !important;
+            font-size: 0.74rem !important;
+        }
+        /* 🌿 Bottom Roman Laurel Wreath Cradle (Mahkota Daun Romawi persis Desktop) */
+        .gk-laurel-bottom-cradle {
+            display: block !important;
+            position: absolute !important;
+            bottom: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            pointer-events: none !important;
+            z-index: 12 !important;
+            overflow: visible !important;
+        }
+        .gk-laurel-bottom-branch {
+            display: block !important;
+            position: absolute !important;
+            bottom: -5px !important;
+            width: 24px !important;
+            height: 62px !important;
+            pointer-events: none !important;
+        }
+        .gk-laurel-bottom-left {
+            left: -7px !important;
+        }
+        .gk-laurel-bottom-right {
+            right: -7px !important;
+            transform: scaleX(-1) !important;
+        }
+        .gk-laurel-bottom-center {
+            display: block !important;
+            position: absolute !important;
+            bottom: -3px !important;
+            left: 50% !important;
+            transform: translateX(-50%) !important;
+            width: 26px !important;
+            height: 10px !important;
+            opacity: 0.92 !important;
+            pointer-events: none !important;
+        }
+        .podium-rank-1 .gk-laurel-bottom-cradle {
+            color: #f59e0b !important;
+            filter: drop-shadow(0 2px 6px rgba(245, 158, 11, 0.5)) !important;
+        }
+        .podium-rank-2 .gk-laurel-bottom-cradle {
+            color: #94a3b8 !important;
+            filter: drop-shadow(0 2px 5px rgba(148, 163, 184, 0.45)) !important;
+        }
+        .podium-rank-3 .gk-laurel-bottom-cradle {
+            color: #cd7f32 !important;
+            filter: drop-shadow(0 2px 5px rgba(205, 127, 50, 0.45)) !important;
+        }
     }
-}
 .gk-progress-pill-fill {
     transition: width 1.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+/* 🌟 RESPONSIVE FEATURE PILLARS (ANONIMITAS, DATA, KOLABORATIF): 3 KOLOM SEJAJAR DI HP */
+@media (max-width: 991.98px) {
+    .gk-feature-pillars-wrap {
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: stretch !important;
+        justify-content: space-between !important;
+        gap: 8px !important;
+        margin-top: 0.25rem !important;
+    }
+    .gk-feature-pillar-card {
+        flex: 1 1 0% !important;
+        width: 0 !important;
+        min-width: 0 !important;
+        padding: 0.8rem 0.45rem !important;
+        border-radius: 12px !important;
+        text-align: center !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: flex-start !important;
+        align-items: center !important;
+    }
+    .gk-feature-pillar-header {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 0.3rem !important;
+        margin-bottom: 0.35rem !important;
+        text-align: center !important;
+    }
+    .gk-feature-pillar-header i {
+        font-size: 1.4rem !important;
+        line-height: 1 !important;
+        display: block !important;
+    }
+    .gk-feature-pillar-header h6 {
+        font-size: 0.74rem !important;
+        font-weight: 700 !important;
+        line-height: 1.2 !important;
+        text-align: center !important;
+        white-space: nowrap !important;
+    }
+    .gk-feature-pillar-desc {
+        font-size: 0.60rem !important;
+        line-height: 1.35 !important;
+        text-align: center !important;
+        color: var(--text-muted) !important;
+    }
 }
 
 /* 🌟 ULTRA-LIGHTWEIGHT HARDWARE-ACCELERATED SCROLL REVEAL */
@@ -761,7 +1063,7 @@
     </div>
 
     {{-- Content Overlay --}}
-    <div class="container position-relative" style="z-index: 2; padding: 160px 0 110px;">
+    <div class="container position-relative hero-content-container" style="z-index: 2; padding: 160px 0 110px;">
         <div class="row">
             <div class="col-lg-9 col-xl-8">
                 <div class="hero-glass-badge hero-anim-badge">
@@ -1384,9 +1686,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     $pct2 = round(($top2->rata_rata_nilai / 5) * 100);
                     $pct3 = round(($top3->rata_rata_nilai / 5) * 100);
                 @endphp
-                <div class="row g-3 g-lg-4 justify-content-center align-items-end mb-5 gk-podium-row" id="leaderboardPodium">
+                <div class="row g-1 g-md-4 justify-content-center align-items-end mb-5 gk-podium-row" id="leaderboardPodium">
                     {{-- #2 PERAK (KIRI - NORMAL) --}}
-                    <div class="col-11 col-sm-8 col-md-4 order-2 order-md-1 podium-anim-item podium-rank-2 gk-podium-2">
+                    <div class="col-4 col-md-4 order-1 podium-anim-item podium-rank-2 gk-podium-2 px-1">
                         <div class="gk-podium-card-revised p-3.5 p-md-4 text-center h-100 d-flex flex-column justify-content-between position-relative">
                             @include('components.podium-laurel-badge', ['rank' => 2])
                             <div>
@@ -1444,7 +1746,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     </div>
 
                     {{-- #1 EMAS (TENGAH - BESAR) --}}
-                    <div class="col-11 col-sm-8 col-md-4 order-1 order-md-2 podium-anim-item podium-rank-1 gk-podium-1">
+                    <div class="col-4 col-md-4 order-2 podium-anim-item podium-rank-1 gk-podium-1 px-1">
                         <div class="gk-podium-card-revised is-first p-4 p-md-5 text-center h-100 d-flex flex-column justify-content-between position-relative">
                             @include('components.podium-laurel-badge', ['rank' => 1])
                             <div>
@@ -1502,7 +1804,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     </div>
 
                     {{-- #3 PERUNGGU (KANAN - KECIL) --}}
-                    <div class="col-11 col-sm-8 col-md-4 order-3 order-md-3 podium-anim-item podium-rank-3 gk-podium-3">
+                    <div class="col-4 col-md-4 order-3 podium-anim-item podium-rank-3 gk-podium-3 px-1">
                         <div class="gk-podium-card-revised p-3 p-md-3.5 text-center h-100 d-flex flex-column justify-content-between position-relative">
                             @include('components.podium-laurel-badge', ['rank' => 3])
                             <div>
@@ -1575,9 +1877,6 @@ document.addEventListener('DOMContentLoaded', function() {
 <section id="panduan" class="section-padding" style="background: #ffffff; padding: 5rem 0;">
     <div class="container">
         <div class="text-center mb-4 mb-md-5" data-aos="fade-up">
-            <div class="small fw-semibold text-muted mb-1" style="font-size: 0.85rem; letter-spacing: 0.8px; text-transform: uppercase;">
-                {{ \App\Models\Setting::get('panduan_label', 'PANDUAN PENGGUNAAN') }}
-            </div>
             <h2 class="fw-bold mb-2 text-dark" style="font-size: clamp(1.6rem, 3.5vw, 2.2rem);">
                 {{ \App\Models\Setting::get('panduan_title', 'Bagaimana Cara Memberi Penilaian?') }}
             </h2>
@@ -1717,33 +2016,33 @@ document.addEventListener('DOMContentLoaded', function() {
             </div>
 
             {{-- SISI KANAN: FITUR UTAMA (ANONIMITAS, BERBASIS DATA, KOLABORATIF) --}}
-            <div class="col-lg-6 d-flex flex-column gap-3" data-aos="fade-left">
-                <div class="gk-clean-card p-4 flex-grow-1 d-flex flex-column justify-content-center">
-                    <div class="d-flex align-items-center gap-2.5 mb-2">
+            <div class="col-lg-6 gk-feature-pillars-wrap d-flex flex-column gap-3" data-aos="fade-left">
+                <div class="gk-clean-card gk-feature-pillar-card p-4 flex-grow-1 d-flex flex-column justify-content-center">
+                    <div class="gk-feature-pillar-header d-flex align-items-center gap-2.5 mb-2">
                         <i class="bi bi-shield-check fs-3 text-dark"></i>
-                        <h6 class="fw-bold mb-0 text-dark" style="font-size: 1.05rem;">{{ \App\Models\Setting::get('feature1_title', 'Anonimitas') }}</h6>
+                        <h6 class="fw-bold mb-0 text-dark">{{ \App\Models\Setting::get('feature1_title', 'Anonimitas') }}</h6>
                     </div>
-                    <p class="text-secondary mb-0 small" style="line-height: 1.55; font-size: 0.88rem;">
+                    <p class="text-secondary mb-0 small gk-feature-pillar-desc" style="line-height: 1.55; font-size: 0.88rem;">
                         {{ \App\Models\Setting::get('feature1_desc', 'Identitas siswa aman dengan enkripsi tanpa tekanan.') }}
                     </p>
                 </div>
 
-                <div class="gk-clean-card p-4 flex-grow-1 d-flex flex-column justify-content-center">
-                    <div class="d-flex align-items-center gap-2.5 mb-2">
+                <div class="gk-clean-card gk-feature-pillar-card p-4 flex-grow-1 d-flex flex-column justify-content-center">
+                    <div class="gk-feature-pillar-header d-flex align-items-center gap-2.5 mb-2">
                         <i class="bi bi-journal-text fs-3 text-dark"></i>
-                        <h6 class="fw-bold mb-0 text-dark" style="font-size: 1.05rem;">{{ \App\Models\Setting::get('feature2_title', 'Berbasis Data') }}</h6>
+                        <h6 class="fw-bold mb-0 text-dark">{{ \App\Models\Setting::get('feature2_title', 'Berbasis Data') }}</h6>
                     </div>
-                    <p class="text-secondary mb-0 small" style="line-height: 1.55; font-size: 0.88rem;">
+                    <p class="text-secondary mb-0 small gk-feature-pillar-desc" style="line-height: 1.55; font-size: 0.88rem;">
                         {{ \App\Models\Setting::get('feature2_desc', 'Data statistik valid & terukur untuk setiap apresiasi.') }}
                     </p>
                 </div>
 
-                <div class="gk-clean-card p-4 flex-grow-1 d-flex flex-column justify-content-center">
-                    <div class="d-flex align-items-center gap-2.5 mb-2">
+                <div class="gk-clean-card gk-feature-pillar-card p-4 flex-grow-1 d-flex flex-column justify-content-center">
+                    <div class="gk-feature-pillar-header d-flex align-items-center gap-2.5 mb-2">
                         <i class="bi bi-people fs-3 text-dark"></i>
-                        <h6 class="fw-bold mb-0 text-dark" style="font-size: 1.05rem;">{{ \App\Models\Setting::get('feature3_title', 'Kolaboratif') }}</h6>
+                        <h6 class="fw-bold mb-0 text-dark">{{ \App\Models\Setting::get('feature3_title', 'Kolaboratif') }}</h6>
                     </div>
-                    <p class="text-secondary mb-0 small" style="line-height: 1.55; font-size: 0.88rem;">
+                    <p class="text-secondary mb-0 small gk-feature-pillar-desc" style="line-height: 1.55; font-size: 0.88rem;">
                         {{ \App\Models\Setting::get('feature3_desc', 'Membangun komunikasi positif siswa, guru, & sekolah.') }}
                     </p>
                 </div>

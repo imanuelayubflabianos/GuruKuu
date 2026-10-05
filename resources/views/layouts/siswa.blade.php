@@ -137,15 +137,12 @@
     @if(request()->routeIs('siswa.dashboard'))
         @include('components.page-loader')
     @endif
-    {{-- MOBILE HEADER BAR (KHUSUS HP) --}}
+    {{-- MOBILE HEADER BAR (KHUSUS HP - BERSIH TANPA TOMBOL BURGER MENU) --}}
     <header class="gk-mobile-header shadow-sm">
         <div class="d-flex align-items-center gap-2">
-            <button class="btn btn-light border p-1 px-2.5 rounded-3" type="button" onclick="GuruKuuTheme.toggleSidebar()" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Menu Sidebar" aria-label="Buka Menu">
-                <i class="bi bi-list fs-4"></i>
-            </button>
             <a href="{{ route('siswa.dashboard') }}" class="text-decoration-none d-flex align-items-center gap-2" style="font-size: 1.1rem;">
                 @if(!empty($siteLogo))
-                    <img src="{{ $siteLogo }}" alt="{{ $siteTitle ?? 'GuruKuu' }}" style="height: 28px; max-width: 36px; object-fit: contain;">
+                    <img src="{{ $siteLogo }}" alt="{{ $siteTitle ?? 'GuruKuu' }}" style="height: 30px; max-width: 38px; object-fit: contain;">
                 @else
                     <i class="bi bi-mortarboard-fill fs-4" style="color: {{ $siteTitleColor1 ?? '#003366' }};"></i>
                 @endif
@@ -155,20 +152,37 @@
             </a>
         </div>
         <div class="d-flex align-items-center gap-2">
-            {{-- PORTAL SIPINTU MOBILE --}}
-            <a href="{{ config('services.sipintu.base_url', 'https://sipintu.smkn1bangsri.sch.id') }}" target="_blank" class="btn btn-light border rounded-circle shadow-sm gk-topbar-btn-sm" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Portal SiPintu">
-                <img src="{{ asset('images/sipintu-logo.png') }}" alt="SiPintu">
-            </a>
-
-            {{-- NOTIFIKASI MOBILE --}}
+            {{-- NOTIFIKASI MOBILE (DISAMPING TITIK TIGA) --}}
             @include('components.user-notif-dropdown', ['prefix' => 'mobile', 'btnClass' => 'gk-topbar-btn-sm'])
 
-            {{-- BERANDA PUBLIK MOBILE --}}
-            <a href="{{ url('/') }}" target="_blank" class="btn btn-light border rounded-circle shadow-sm gk-topbar-btn-sm" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Kembali ke Beranda Publik" aria-label="Kembali ke Beranda Publik">
-                <i class="bi bi-globe2 text-primary"></i>
-            </a>
+            {{-- MENU TITIK TIGA (BERANDA PUBLIK & SIPINTU) --}}
+            @include('components.mobile-more-menu')
         </div>
     </header>
+
+    {{-- MOBILE BOTTOM NAVIGATION BAR (KHUSUS SISWA) --}}
+    <nav class="gk-bottom-nav d-lg-none" aria-label="Navigasi Bawah Siswa">
+        <a href="{{ route('siswa.dashboard') }}" class="gk-bottom-nav-item {{ request()->routeIs('siswa.dashboard') ? 'active' : '' }}">
+            <i class="bi {{ request()->routeIs('siswa.dashboard') ? 'bi-grid-fill' : 'bi-grid' }}"></i>
+            <span>Dashboard</span>
+        </a>
+        <a href="{{ route('siswa.guru.index') }}" class="gk-bottom-nav-item {{ request()->routeIs('siswa.guru.*') ? 'active' : '' }}">
+            <i class="bi {{ request()->routeIs('siswa.guru.*') ? 'bi-person-badge-fill' : 'bi-person-badge' }}"></i>
+            <span>Guru</span>
+        </a>
+        <a href="{{ route('siswa.riwayat') }}" class="gk-bottom-nav-item {{ request()->routeIs('siswa.riwayat') ? 'active' : '' }}">
+            <i class="bi bi-clock-history"></i>
+            <span>Riwayat</span>
+        </a>
+        <a href="{{ route('siswa.leaderboard.index') }}" class="gk-bottom-nav-item {{ request()->routeIs('siswa.leaderboard.*') ? 'active' : '' }}">
+            <i class="bi {{ request()->routeIs('siswa.leaderboard.*') ? 'bi-trophy-fill' : 'bi-trophy' }}"></i>
+            <span>Peringkat</span>
+        </a>
+        <a href="{{ route('siswa.pengaturan') }}" class="gk-bottom-nav-item {{ request()->routeIs('siswa.pengaturan*') ? 'active' : '' }}">
+            <i class="bi {{ request()->routeIs('siswa.pengaturan*') ? 'bi-gear-fill' : 'bi-gear' }}"></i>
+            <span>Akun</span>
+        </a>
+    </nav>
 
     <aside class="sidebar">
         <div class="sidebar-brand">
@@ -340,7 +354,7 @@
 
             <div class="d-flex flex-column gap-2">
                 <a href="{{ route('siswa.pengaturan') }}#tabChat" class="btn btn-primary-custom py-2 fw-semibold">
-                    <i class="bi bi-chat-dots-fill me-1"></i> Hubungi Admin
+                    <i class="bi bi-headset me-1"></i> Hubungi Admin
                 </a>
 
                 <form action="{{ route('logout') }}" method="POST">

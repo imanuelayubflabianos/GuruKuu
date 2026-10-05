@@ -904,6 +904,7 @@
                 <div id="boxDurasiBerkala" class="mb-3 d-none">
                     <label class="form-label fw-bold text-dark small">Pilih Durasi Nonaktif Sementara:</label>
                     <select name="duration_days" class="form-select form-select-sm">
+                        <option value="5_hours">5 Jam</option>
                         <option value="1">1 Hari</option>
                         <option value="3" selected>3 Hari</option>
                         <option value="7">7 Hari (1 Minggu)</option>

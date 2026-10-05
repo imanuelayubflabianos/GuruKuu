@@ -356,7 +356,9 @@ class GuruController extends Controller
             $deactivatedUntil = null;
 
             if ($deactivationType === 'berkala') {
-                if ($request->filled('custom_until')) {
+                if ($request->input('duration_days') === '5_hours') {
+                    $deactivatedUntil = now()->addHours(5);
+                } elseif ($request->filled('custom_until')) {
                     $deactivatedUntil = \Carbon\Carbon::parse($request->input('custom_until'))->endOfDay();
                 } else {
                     $days = (int) $request->input('duration_days', 3);

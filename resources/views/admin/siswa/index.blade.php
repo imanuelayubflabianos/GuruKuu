@@ -270,6 +270,7 @@
                     <div id="siswaDeactDurationBox" class="p-3 rounded-3 bg-light border mb-3 d-none">
                         <label class="form-label small fw-bold text-dark mb-1">Pilih Durasi Suspensi:</label>
                         <select name="duration_days" class="form-select form-select-sm rounded-3 mb-2">
+                            <option value="5_hours">5 Jam</option>
                             <option value="1">1 Hari (24 Jam)</option>
                             <option value="3" selected>3 Hari</option>
                             <option value="7">7 Hari (1 Minggu)</option>

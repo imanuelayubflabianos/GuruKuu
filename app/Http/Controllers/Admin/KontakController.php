@@ -26,7 +26,7 @@ class KontakController extends Controller
         }
 
         if (!ProfanityFilterService::isClean($request->balasan)) {
-            return back()->withInput()->with('error', 'Balasan Anda mengandung kata yang melanggar etika moderasi bahasa.');
+            return back()->withInput()->with('violation_popup', 'Balasan Anda diblokir karena mengandung kata yang melanggar etika moderasi bahasa.');
         }
 
         $kontak->update([
@@ -46,7 +46,7 @@ class KontakController extends Controller
         }
 
         if (!ProfanityFilterService::isClean($request->balasan)) {
-            return back()->withInput()->with('error', 'Balasan Anda mengandung kata yang melanggar etika moderasi bahasa.');
+            return back()->withInput()->with('violation_popup', 'Balasan Anda diblokir karena mengandung kata yang melanggar etika moderasi bahasa.');
         }
 
         $kontak->update(['balasan' => $request->balasan]);
@@ -154,7 +154,7 @@ class KontakController extends Controller
         }
 
         if (!ProfanityFilterService::isClean($request->balasan)) {
-            return back()->withInput()->with('error', 'Balasan Anda mengandung kata yang melanggar etika moderasi bahasa.');
+            return back()->withInput()->with('violation_popup', 'Pesan balasan Anda diblokir karena mengandung kata yang melanggar etika moderasi bahasa.');
         }
 
         // Cek apakah ada pesan user di percakapan ini yang belum dibalas

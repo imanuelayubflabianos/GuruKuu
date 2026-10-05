@@ -125,29 +125,236 @@
         box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.08) !important;
     }
 
-    /* PROGRESS PILL HITAM/NAVY MIRIP PUBLIK */
+    /* 🏆 KARTU PODIUM DASHBOARD RESPONSIVE & ELEGAN */
+    .gk-dash-podium-card {
+        padding: 0.75rem 0.45rem !important;
+        position: relative;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    @media (min-width: 576px) {
+        .gk-dash-podium-card {
+            padding: 1rem 0.75rem !important;
+        }
+    }
+    @media (min-width: 992px) {
+        .gk-dash-podium-card {
+            padding: 1.35rem 0.95rem !important;
+        }
+    }
+    .gk-dash-podium-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px -4px rgba(15, 23, 42, 0.08);
+    }
+    .gk-dash-podium-card.is-podium-1 {
+        border: 1.5px solid rgba(234, 179, 8, 0.45) !important;
+        box-shadow: 0 4px 18px -2px rgba(234, 179, 8, 0.15) !important;
+    }
+    .gk-dash-podium-card.is-podium-2 {
+        border: 1.5px solid rgba(148, 163, 184, 0.4) !important;
+    }
+    .gk-dash-podium-card.is-podium-3 {
+        border: 1.5px solid rgba(217, 119, 6, 0.35) !important;
+    }
+
+    .gk-dash-podium-avatar {
+        width: 52px !important;
+        height: 52px !important;
+        margin: 0 auto 0.45rem !important;
+    }
+    .is-podium-1 .gk-dash-podium-avatar {
+        width: 58px !important;
+        height: 58px !important;
+    }
+    @media (min-width: 576px) {
+        .gk-dash-podium-avatar {
+            width: 62px !important;
+            height: 62px !important;
+            margin-bottom: 0.65rem !important;
+        }
+        .is-podium-1 .gk-dash-podium-avatar {
+            width: 70px !important;
+            height: 70px !important;
+        }
+    }
+    @media (min-width: 992px) {
+        .gk-dash-podium-avatar {
+            width: 72px !important;
+            height: 72px !important;
+            margin-bottom: 0.75rem !important;
+        }
+        .is-podium-1 .gk-dash-podium-avatar {
+            width: 80px !important;
+            height: 80px !important;
+        }
+    }
+
+    .gk-dash-podium-name {
+        font-size: 0.78rem;
+    }
+    .gk-dash-podium-sub {
+        font-size: 0.62rem;
+    }
+    .gk-dash-podium-stars {
+        font-size: 0.70rem;
+        letter-spacing: 0.5px;
+    }
+    .gk-dash-podium-ulasan {
+        font-size: 0.66rem;
+    }
+    .gk-dash-podium-btn {
+        font-size: 0.70rem !important;
+    }
+    @media (min-width: 576px) {
+        .gk-dash-podium-name { font-size: 0.84rem; }
+        .gk-dash-podium-sub { font-size: 0.66rem; }
+        .gk-dash-podium-stars { font-size: 0.78rem; letter-spacing: 1px; }
+        .gk-dash-podium-ulasan { font-size: 0.70rem; }
+        .gk-dash-podium-btn { font-size: 0.74rem !important; }
+    }
+    @media (min-width: 992px) {
+        .gk-dash-podium-name { font-size: 0.88rem; }
+        .gk-dash-podium-sub { font-size: 0.68rem; }
+        .gk-dash-podium-stars { font-size: 0.84rem; letter-spacing: 1.5px; }
+        .gk-dash-podium-ulasan { font-size: 0.72rem; }
+        .gk-dash-podium-btn { font-size: 0.76rem !important; }
+    }
+
+    /* PROGRESS PILL HITAM/NAVY TERUKUR & DIJAMIN TIDAK MELUBER */
     .gk-progress-pill {
         background: #0f172a !important;
-        border-radius: 50px;
+        border-radius: 50px !important;
         color: #ffffff !important;
         font-weight: 800;
-        font-size: 0.82rem;
-        padding: 0.25rem 0.85rem;
-        display: inline-block;
-        min-width: 110px;
+        font-size: 0.68rem;
+        padding: 0 0.35rem;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        width: 100% !important;
+        max-width: 76px !important;
+        min-width: 0 !important;
+        height: 21px !important;
+        line-height: 21px !important;
+        margin: 0 auto;
         text-align: center;
         position: relative;
-        overflow: hidden;
-        box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15);
+        overflow: hidden !important;
+        box-shadow: 0 2px 6px rgba(15, 23, 42, 0.15);
+        box-sizing: border-box !important;
+    }
+    .gk-dash-podium-card .gk-progress-pill {
+        width: 100% !important;
+        max-width: 74px !important;
+        min-width: 0 !important;
+        height: 20px !important;
+        line-height: 20px !important;
+        font-size: 0.66rem !important;
+        padding: 0 0.2rem !important;
+        margin: 0 auto !important;
+    }
+    @media (min-width: 576px) {
+        .gk-dash-podium-card .gk-progress-pill {
+            max-width: 90px !important;
+            height: 22px !important;
+            line-height: 22px !important;
+            font-size: 0.72rem !important;
+        }
+    }
+    @media (min-width: 992px) {
+        .gk-progress-pill,
+        .gk-dash-podium-card .gk-progress-pill {
+            font-size: 0.80rem !important;
+            padding: 0 0.6rem !important;
+            max-width: 120px !important;
+            height: 25px !important;
+            line-height: 25px !important;
+        }
     }
     .gk-progress-pill-fill {
         position: absolute;
         top: 0;
         left: 0;
+        bottom: 0;
         height: 100%;
         border-radius: 50px;
         background: linear-gradient(90deg, #0284c7, #38bdf8) !important;
         transition: width 1s ease;
+    }
+
+    /* 📊 KARTU METRIK DASHBOARD LEGA & BERNAFAS (TIDAK KEDEMPETAN) */
+    .gk-metric-clean-card {
+        background: #ffffff;
+        border-radius: 16px !important;
+        border: 1px solid rgba(15, 23, 42, 0.08) !important;
+        box-shadow: 0 4px 14px -3px rgba(15, 23, 42, 0.04) !important;
+        padding: 0.85rem 0.65rem !important;
+        min-height: 96px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .gk-metric-clean-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px -4px rgba(15, 23, 42, 0.08) !important;
+    }
+    @media (min-width: 576px) {
+        .gk-metric-clean-card {
+            padding: 1rem 0.85rem !important;
+            min-height: 104px;
+        }
+    }
+    @media (min-width: 992px) {
+        .gk-metric-clean-card {
+            padding: 1.25rem 1.15rem !important;
+            min-height: 115px;
+            border-radius: 18px !important;
+        }
+    }
+    .gk-metric-label {
+        font-size: 0.58rem !important;
+        letter-spacing: 0.3px;
+        line-height: 1.2;
+    }
+    @media (min-width: 576px) {
+        .gk-metric-label { font-size: 0.64rem !important; letter-spacing: 0.5px; }
+    }
+    @media (min-width: 992px) {
+        .gk-metric-label { font-size: 0.72rem !important; letter-spacing: 0.6px; }
+    }
+    .gk-metric-icon {
+        width: 24px !important;
+        height: 24px !important;
+        font-size: 0.76rem !important;
+    }
+    @media (min-width: 576px) {
+        .gk-metric-icon { width: 28px !important; height: 28px !important; font-size: 0.85rem !important; }
+    }
+    @media (min-width: 992px) {
+        .gk-metric-icon { width: 34px !important; height: 34px !important; font-size: 0.95rem !important; }
+    }
+    .gk-metric-value {
+        font-size: 1.30rem !important;
+        line-height: 1 !important;
+    }
+    @media (min-width: 576px) {
+        .gk-metric-value { font-size: 1.45rem !important; }
+    }
+    @media (min-width: 992px) {
+        .gk-metric-value { font-size: 1.65rem !important; }
+    }
+    .gk-metric-unit {
+        font-size: 0.68rem !important;
+    }
+    @media (min-width: 992px) {
+        .gk-metric-unit { font-size: 0.75rem !important; }
+    }
+    .gk-metric-pct {
+        font-size: 0.62rem !important;
+        padding: 0.15rem 0.4rem !important;
+    }
+    @media (min-width: 992px) {
+        .gk-metric-pct { font-size: 0.72rem !important; padding: 0.2rem 0.55rem !important; }
     }
 
     /* TOMBOL PILL HITAM LIHAT SELENGKAPNYA */
@@ -158,20 +365,20 @@
         background: #000000;
         color: #ffffff !important;
         font-weight: 700;
-        font-size: 0.85rem;
-        padding: 0.55rem 2rem;
+        font-size: 0.82rem;
+        padding: 0.5rem 1.8rem;
         border-radius: 50px;
         text-decoration: none;
         transition: all 0.25s ease;
-        box-shadow: 0 6px 16px -4px rgba(0,0,0,0.3);
+        box-shadow: 0 4px 14px -3px rgba(0,0,0,0.3);
     }
     .gk-pill-btn-dark:hover {
         background: #1e293b;
         transform: translateY(-2px);
-        box-shadow: 0 10px 20px -4px rgba(0,0,0,0.4);
+        box-shadow: 0 8px 18px -4px rgba(0,0,0,0.4);
     }
 
-    /* SCROLL FEED RIWAYAT TERAKHIR (TINGGI VERTIKAL MIRIP DASHBOARD GURU) */
+    /* SCROLL FEED RIWAYAT TERAKHIR */
     .gk-feed-scroll::-webkit-scrollbar {
         width: 5px;
     }
@@ -188,13 +395,15 @@
     }
 
     .gk-history-item {
-        background: var(--bg-card, #ffffff);
-        border: 1px solid rgba(15, 23, 42, 0.08) !important;
-        border-radius: 16px;
-        padding: 0.9rem 1.1rem;
+        background: #f8fafc;
+        border: 1px solid rgba(0, 51, 102, 0.08) !important;
+        border-radius: 14px;
+        padding: 0.85rem 1rem;
+        margin-bottom: 0.75rem;
         transition: all 0.2s ease-in-out;
     }
     .gk-history-item:hover {
+        background: #ffffff;
         transform: translateY(-1px);
         border-color: rgba(0, 51, 102, 0.2) !important;
         box-shadow: 0 4px 12px rgba(0, 51, 102, 0.05);
@@ -277,9 +486,6 @@
 
 {{-- 1. PANDUAN PENGGUNAAN (CAROUSEL SLIDER MIRIP DASHBOARD PUBLIK) --}}
 <div class="text-center mb-3">
-    <div class="small fw-semibold text-muted mb-1" style="font-size: 0.78rem; letter-spacing: 0.8px; text-transform: uppercase;">
-        {{ \App\Models\Setting::get('panduan_label', 'PANDUAN PENGGUNAAN') }}
-    </div>
     <h3 class="fw-bold mb-0 text-dark" style="font-size: clamp(1.3rem, 2.5vw, 1.75rem);">
         {{ \App\Models\Setting::get('panduan_title', 'Bagaimana Cara Memberi Penilaian?') }}
     </h3>
@@ -369,43 +575,43 @@
 </div>
 
 {{-- 2. GRID UTAMA 2 KOLOM: METRIK & TOP GURU (KIRI) vs RIWAYAT TERAKHIR TINGGI (KANAN) --}}
-<div class="row g-4 align-items-stretch">
+<div class="row g-4 align-items-stretch mb-5 pb-4">
     {{-- KOLOM KIRI (7 Kolom): METRIK KOMPAK + TOP GURU SEKOLAH SEJAJAR & RAPI --}}
     <div class="col-lg-7 d-flex flex-column justify-content-between">
         <div>
-            {{-- KARTU METRIK KOMPAK (SEJAJAR PERSIS DENGAN 3 KARTU GURU DI BAWAHNYA) --}}
-            <div class="row g-3 mb-4">
+            {{-- KARTU METRIK KOMPAK (LEGA, BERNAFAS, TIDAK KEDEMPETAN) --}}
+            <div class="row g-2 g-sm-3 mb-4">
                 {{-- 1. Total Guru --}}
                 <div class="col-4">
-                    <div class="gk-clean-card p-3 h-100 d-flex flex-column justify-content-between">
-                        <div class="d-flex align-items-center justify-content-between mb-2">
-                            <span class="text-muted fw-bold text-uppercase" style="font-size: 0.68rem; letter-spacing: 0.6px;">TOTAL GURU</span>
-                            <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 32px; height: 32px; background: rgba(0, 51, 102, 0.08); color: #003366;">
-                                <i class="bi bi-people-fill" style="font-size: 0.95rem;"></i>
+                    <div class="gk-metric-clean-card h-100">
+                        <div class="d-flex align-items-center justify-content-between mb-1.5 gap-1">
+                            <span class="text-muted fw-bold text-uppercase gk-metric-label">TOTAL GURU</span>
+                            <div class="rounded-circle gk-metric-icon d-flex align-items-center justify-content-center flex-shrink-0" style="background: rgba(0, 51, 102, 0.08); color: #003366;">
+                                <i class="bi bi-people-fill"></i>
                             </div>
                         </div>
-                        <div class="d-flex align-items-baseline gap-1 mt-1">
-                            <h3 class="fw-bold text-dark mb-0 font-mono" style="font-size: 1.55rem; line-height: 1;">{{ $totalGuru }}</h3>
-                            <span class="text-muted small" style="font-size: 0.75rem;">Guru</span>
+                        <div class="d-flex align-items-baseline gap-1 mt-auto">
+                            <h3 class="fw-bold text-dark mb-0 font-mono gk-metric-value">{{ $totalGuru }}</h3>
+                            <span class="text-muted gk-metric-unit">Guru</span>
                         </div>
                     </div>
                 </div>
 
                 {{-- 2. Sudah Dinilai --}}
                 <div class="col-4">
-                    <div class="gk-clean-card p-3 h-100 d-flex flex-column justify-content-between">
-                        <div class="d-flex align-items-center justify-content-between mb-2">
-                            <span class="text-muted fw-bold text-uppercase" style="font-size: 0.68rem; letter-spacing: 0.6px;">SUDAH DINILAI</span>
-                            <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 32px; height: 32px; background: rgba(16, 185, 129, 0.12); color: #059669;">
-                                <i class="bi bi-check2-circle" style="font-size: 0.95rem;"></i>
+                    <div class="gk-metric-clean-card h-100">
+                        <div class="d-flex align-items-center justify-content-between mb-1.5 gap-1">
+                            <span class="text-muted fw-bold text-uppercase gk-metric-label">SUDAH DINILAI</span>
+                            <div class="rounded-circle gk-metric-icon d-flex align-items-center justify-content-center flex-shrink-0" style="background: rgba(16, 185, 129, 0.12); color: #059669;">
+                                <i class="bi bi-check2-circle"></i>
                             </div>
                         </div>
-                        <div class="d-flex align-items-baseline justify-content-between mt-1 flex-wrap gap-1">
+                        <div class="d-flex align-items-baseline justify-content-between flex-wrap gap-1 mt-auto">
                             <div class="d-flex align-items-baseline gap-1">
-                                <h3 class="fw-bold text-dark mb-0 font-mono" style="font-size: 1.55rem; line-height: 1;">{{ $jumlahSudah }}</h3>
-                                <span class="text-muted small" style="font-size: 0.75rem;">Guru</span>
+                                <h3 class="fw-bold text-dark mb-0 font-mono gk-metric-value">{{ $jumlahSudah }}</h3>
+                                <span class="text-muted gk-metric-unit">Guru</span>
                             </div>
-                            <span class="badge rounded-pill px-2 py-0.5" style="background: rgba(16, 185, 129, 0.12); color: #059669; font-size: 0.72rem; font-weight: 700;">
+                            <span class="badge rounded-pill gk-metric-pct font-mono fw-bold" style="background: rgba(16, 185, 129, 0.12); color: #059669;">
                                 {{ $pctSelesai }}%
                             </span>
                         </div>
@@ -414,16 +620,16 @@
 
                 {{-- 3. Sisa Penilaian --}}
                 <div class="col-4">
-                    <div class="gk-clean-card p-3 h-100 d-flex flex-column justify-content-between">
-                        <div class="d-flex align-items-center justify-content-between mb-2">
-                            <span class="text-muted fw-bold text-uppercase" style="font-size: 0.68rem; letter-spacing: 0.6px;">SISA PENILAIAN</span>
-                            <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 32px; height: 32px; background: rgba(245, 158, 11, 0.12); color: #d97706;">
-                                <i class="bi bi-hourglass-split" style="font-size: 0.95rem;"></i>
+                    <div class="gk-metric-clean-card h-100">
+                        <div class="d-flex align-items-center justify-content-between mb-1.5 gap-1">
+                            <span class="text-muted fw-bold text-uppercase gk-metric-label">SISA PENILAIAN</span>
+                            <div class="rounded-circle gk-metric-icon d-flex align-items-center justify-content-center flex-shrink-0" style="background: rgba(245, 158, 11, 0.12); color: #d97706;">
+                                <i class="bi bi-hourglass-split"></i>
                             </div>
                         </div>
-                        <div class="d-flex align-items-baseline gap-1 mt-1">
-                            <h3 class="fw-bold text-dark mb-0 font-mono" style="font-size: 1.55rem; line-height: 1;">{{ max(0, $totalGuru - $jumlahSudah) }}</h3>
-                            <span class="text-muted small" style="font-size: 0.75rem;">Guru</span>
+                        <div class="d-flex align-items-baseline gap-1 mt-auto">
+                            <h3 class="fw-bold text-dark mb-0 font-mono gk-metric-value">{{ max(0, $totalGuru - $jumlahSudah) }}</h3>
+                            <span class="text-muted gk-metric-unit">Guru</span>
                         </div>
                     </div>
                 </div>
@@ -455,63 +661,8 @@
                     $g2 = $topGuru->get(1);
                     $g3 = $topGuru->get(2);
                 @endphp
-                <div class="row g-3 align-items-stretch mb-3.5">
-                    {{-- #1st (KIRI - SEJAJAR PERSIS DENGAN TOTAL GURU) --}}
-                    @if($g1)
-                    @php
-                        $score1 = (float)($g1->rata_rata_nilai ?? 0);
-                        $pct1 = round(($score1 / 5) * 100);
-                        $stars1 = round($score1 * 2) / 2;
-                    @endphp
-                    <div class="col-4">
-                        <div class="gk-clean-card p-3.5 text-center h-100 d-flex flex-column justify-content-between">
-                            <div>
-                                <div class="mb-2">
-                                    <span class="badge rounded-pill px-3 py-1 fw-bold" style="background: #fef08a; color: #854d0e; font-size: 0.75rem;">
-                                        #1st
-                                    </span>
-                                </div>
-                                <div class="gk-avatar-clean-wrap mb-2.5" style="width: 76px; height: 76px;">
-                                    <img src="{{ $g1->photo_url }}" width="76" height="76" alt="{{ $g1->nama }}">
-                                </div>
-                                <h6 class="fw-bold mb-0.5 text-dark text-truncate" title="{{ $g1->nama }}" style="font-size: 0.88rem;">{{ $g1->nama }}</h6>
-                                <div class="text-muted small mb-2 text-truncate font-mono" style="font-size: 0.68rem;">
-                                    {{ strtoupper($g1->jurusan?->nama_jurusan ?? $g1->kategori_label ?? 'GURU NORMADA') }}
-                                </div>
-
-                                {{-- BINTANG EMAS --}}
-                                <div class="text-warning mb-2" style="font-size: 0.82rem; letter-spacing: 1.5px;">
-                                    @for($i = 1; $i <= 5; $i++)
-                                        @if($stars1 >= $i)
-                                            <i class="bi bi-star-fill"></i>
-                                        @elseif($stars1 >= ($i - 0.5))
-                                            <i class="bi bi-star-half"></i>
-                                        @else
-                                            <i class="bi bi-star text-muted opacity-25"></i>
-                                        @endif
-                                    @endfor
-                                </div>
-
-                                {{-- PROGRESS PILL PERSENTASE --}}
-                                <div class="mb-1.5">
-                                    <div class="gk-progress-pill mx-auto">
-                                        <div class="gk-progress-pill-fill" style="width: {{ $pct1 }}%;"></div>
-                                        <span class="position-relative text-white" style="z-index: 2; text-shadow: 0 1px 2px rgba(0,0,0,0.6);">{{ $pct1 }}%</span>
-                                    </div>
-                                </div>
-                                <small class="text-muted font-mono d-block mb-3" style="font-size: 0.72rem;">{{ $g1->penilaian_count ?? $g1->total_penilaian ?? 0 }} ulasan</small>
-                            </div>
-
-                            <div>
-                                <a href="{{ route('siswa.guru.show', $g1) }}" class="btn btn-sm btn-outline-primary w-100 rounded-pill py-1.5 fw-semibold" style="font-size: 0.75rem; border-color: rgba(0, 51, 102, 0.25); color: #003366;">
-                                    <i class="bi bi-eye me-1"></i> Profil
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                    @endif
-
-                    {{-- #2nd (TENGAH - SEJAJAR PERSIS DENGAN SUDAH DINILAI) --}}
+                <div class="row g-2 g-md-3 align-items-stretch mb-3">
+                    {{-- #2nd (KIRI - PERAK) --}}
                     @if($g2)
                     @php
                         $score2 = (float)($g2->rata_rata_nilai ?? 0);
@@ -519,23 +670,23 @@
                         $stars2 = round($score2 * 2) / 2;
                     @endphp
                     <div class="col-4">
-                        <div class="gk-clean-card p-3.5 text-center h-100 d-flex flex-column justify-content-between">
+                        <div class="gk-clean-card gk-dash-podium-card is-podium-2 text-center h-100 d-flex flex-column justify-content-between">
                             <div>
-                                <div class="mb-2">
-                                    <span class="badge rounded-pill px-3 py-1 fw-bold" style="background: #e0f2fe; color: #0369a1; font-size: 0.75rem;">
+                                <div class="mb-1.5">
+                                    <span class="badge rounded-pill px-2 py-0.5 px-md-3 py-md-1 fw-bold" style="background: #e0f2fe; color: #0369a1; font-size: 0.72rem;">
                                         #2nd
                                     </span>
                                 </div>
-                                <div class="gk-avatar-clean-wrap mb-2.5" style="width: 72px; height: 72px;">
-                                    <img src="{{ $g2->photo_url }}" width="72" height="72" alt="{{ $g2->nama }}">
+                                <div class="gk-avatar-clean-wrap gk-dash-podium-avatar">
+                                    <img src="{{ $g2->photo_url }}" alt="{{ $g2->nama }}" class="w-100 h-100">
                                 </div>
-                                <h6 class="fw-bold mb-0.5 text-dark text-truncate" title="{{ $g2->nama }}" style="font-size: 0.86rem;">{{ $g2->nama }}</h6>
-                                <div class="text-muted small mb-2 text-truncate font-mono" style="font-size: 0.68rem;">
+                                <h6 class="fw-bold mb-0.5 text-dark text-truncate gk-dash-podium-name" title="{{ $g2->nama }}">{{ $g2->nama }}</h6>
+                                <div class="text-muted small mb-1.5 text-truncate font-mono gk-dash-podium-sub">
                                     {{ strtoupper($g2->jurusan?->nama_jurusan ?? $g2->kategori_label ?? 'GURU NORMADA') }}
                                 </div>
 
                                 {{-- BINTANG EMAS --}}
-                                <div class="text-warning mb-2" style="font-size: 0.82rem; letter-spacing: 1.5px;">
+                                <div class="text-warning mb-1.5 gk-dash-podium-stars">
                                     @for($i = 1; $i <= 5; $i++)
                                         @if($stars2 >= $i)
                                             <i class="bi bi-star-fill"></i>
@@ -548,17 +699,17 @@
                                 </div>
 
                                 {{-- PROGRESS PILL PERSENTASE --}}
-                                <div class="mb-1.5">
+                                <div class="mb-1">
                                     <div class="gk-progress-pill mx-auto">
                                         <div class="gk-progress-pill-fill" style="width: {{ $pct2 }}%;"></div>
                                         <span class="position-relative text-white" style="z-index: 2; text-shadow: 0 1px 2px rgba(0,0,0,0.6);">{{ $pct2 }}%</span>
                                     </div>
                                 </div>
-                                <small class="text-muted font-mono d-block mb-3" style="font-size: 0.72rem;">{{ $g2->penilaian_count ?? $g2->total_penilaian ?? 0 }} ulasan</small>
+                                <small class="text-muted font-mono d-block mb-2.5 gk-dash-podium-ulasan">{{ $g2->penilaian_count ?? $g2->total_penilaian ?? 0 }} ulasan</small>
                             </div>
 
                             <div>
-                                <a href="{{ route('siswa.guru.show', $g2) }}" class="btn btn-sm btn-outline-primary w-100 rounded-pill py-1.5 fw-semibold" style="font-size: 0.75rem; border-color: rgba(0, 51, 102, 0.25); color: #003366;">
+                                <a href="{{ route('siswa.guru.show', $g2) }}" class="btn btn-sm btn-outline-primary w-100 rounded-pill py-1 py-md-1.5 fw-semibold gk-dash-podium-btn" style="border-color: rgba(0, 51, 102, 0.25); color: #003366;">
                                     <i class="bi bi-eye me-1"></i> Profil
                                 </a>
                             </div>
@@ -566,7 +717,62 @@
                     </div>
                     @endif
 
-                    {{-- #3rd (KANAN - SEJAJAR PERSIS DENGAN SISA PENILAIAN) --}}
+                    {{-- #1st (TENGAH - EMAS UTAMA) --}}
+                    @if($g1)
+                    @php
+                        $score1 = (float)($g1->rata_rata_nilai ?? 0);
+                        $pct1 = round(($score1 / 5) * 100);
+                        $stars1 = round($score1 * 2) / 2;
+                    @endphp
+                    <div class="col-4">
+                        <div class="gk-clean-card gk-dash-podium-card is-podium-1 text-center h-100 d-flex flex-column justify-content-between">
+                            <div>
+                                <div class="mb-1.5">
+                                    <span class="badge rounded-pill px-2 py-0.5 px-md-3 py-md-1 fw-bold" style="background: #fef08a; color: #854d0e; font-size: 0.74rem;">
+                                        #1st
+                                    </span>
+                                </div>
+                                <div class="gk-avatar-clean-wrap gk-dash-podium-avatar">
+                                    <img src="{{ $g1->photo_url }}" alt="{{ $g1->nama }}" class="w-100 h-100">
+                                </div>
+                                <h6 class="fw-bold mb-0.5 text-dark text-truncate gk-dash-podium-name" title="{{ $g1->nama }}">{{ $g1->nama }}</h6>
+                                <div class="text-muted small mb-1.5 text-truncate font-mono gk-dash-podium-sub">
+                                    {{ strtoupper($g1->jurusan?->nama_jurusan ?? $g1->kategori_label ?? 'GURU NORMADA') }}
+                                </div>
+
+                                {{-- BINTANG EMAS --}}
+                                <div class="text-warning mb-1.5 gk-dash-podium-stars">
+                                    @for($i = 1; $i <= 5; $i++)
+                                        @if($stars1 >= $i)
+                                            <i class="bi bi-star-fill"></i>
+                                        @elseif($stars1 >= ($i - 0.5))
+                                            <i class="bi bi-star-half"></i>
+                                        @else
+                                            <i class="bi bi-star text-muted opacity-25"></i>
+                                        @endif
+                                    @endfor
+                                </div>
+
+                                {{-- PROGRESS PILL PERSENTASE --}}
+                                <div class="mb-1">
+                                    <div class="gk-progress-pill mx-auto">
+                                        <div class="gk-progress-pill-fill" style="width: {{ $pct1 }}%;"></div>
+                                        <span class="position-relative text-white" style="z-index: 2; text-shadow: 0 1px 2px rgba(0,0,0,0.6);">{{ $pct1 }}%</span>
+                                    </div>
+                                </div>
+                                <small class="text-muted font-mono d-block mb-2.5 gk-dash-podium-ulasan">{{ $g1->penilaian_count ?? $g1->total_penilaian ?? 0 }} ulasan</small>
+                            </div>
+
+                            <div>
+                                <a href="{{ route('siswa.guru.show', $g1) }}" class="btn btn-sm btn-outline-primary w-100 rounded-pill py-1 py-md-1.5 fw-semibold gk-dash-podium-btn" style="border-color: rgba(0, 51, 102, 0.25); color: #003366;">
+                                    <i class="bi bi-eye me-1"></i> Profil
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    @endif
+
+                    {{-- #3rd (KANAN - PERUNGGU) --}}
                     @if($g3)
                     @php
                         $score3 = (float)($g3->rata_rata_nilai ?? 0);
@@ -574,23 +780,23 @@
                         $stars3 = round($score3 * 2) / 2;
                     @endphp
                     <div class="col-4">
-                        <div class="gk-clean-card p-3.5 text-center h-100 d-flex flex-column justify-content-between">
+                        <div class="gk-clean-card gk-dash-podium-card is-podium-3 text-center h-100 d-flex flex-column justify-content-between">
                             <div>
-                                <div class="mb-2">
-                                    <span class="badge rounded-pill px-3 py-1 fw-bold" style="background: #fed7aa; color: #9a3412; font-size: 0.75rem;">
+                                <div class="mb-1.5">
+                                    <span class="badge rounded-pill px-2 py-0.5 px-md-3 py-md-1 fw-bold" style="background: #fed7aa; color: #9a3412; font-size: 0.72rem;">
                                         #3rd
                                     </span>
                                 </div>
-                                <div class="gk-avatar-clean-wrap mb-2.5" style="width: 72px; height: 72px;">
-                                    <img src="{{ $g3->photo_url }}" width="72" height="72" alt="{{ $g3->nama }}">
+                                <div class="gk-avatar-clean-wrap gk-dash-podium-avatar">
+                                    <img src="{{ $g3->photo_url }}" alt="{{ $g3->nama }}" class="w-100 h-100">
                                 </div>
-                                <h6 class="fw-bold mb-0.5 text-dark text-truncate" title="{{ $g3->nama }}" style="font-size: 0.86rem;">{{ $g3->nama }}</h6>
-                                <div class="text-muted small mb-2 text-truncate font-mono" style="font-size: 0.68rem;">
+                                <h6 class="fw-bold mb-0.5 text-dark text-truncate gk-dash-podium-name" title="{{ $g3->nama }}">{{ $g3->nama }}</h6>
+                                <div class="text-muted small mb-1.5 text-truncate font-mono gk-dash-podium-sub">
                                     {{ strtoupper($g3->jurusan?->nama_jurusan ?? $g3->kategori_label ?? 'GURU NORMADA') }}
                                 </div>
 
                                 {{-- BINTANG EMAS --}}
-                                <div class="text-warning mb-2" style="font-size: 0.82rem; letter-spacing: 1.5px;">
+                                <div class="text-warning mb-1.5 gk-dash-podium-stars">
                                     @for($i = 1; $i <= 5; $i++)
                                         @if($stars3 >= $i)
                                             <i class="bi bi-star-fill"></i>
@@ -603,17 +809,17 @@
                                 </div>
 
                                 {{-- PROGRESS PILL PERSENTASE --}}
-                                <div class="mb-1.5">
+                                <div class="mb-1">
                                     <div class="gk-progress-pill mx-auto">
                                         <div class="gk-progress-pill-fill" style="width: {{ $pct3 }}%;"></div>
                                         <span class="position-relative text-white" style="z-index: 2; text-shadow: 0 1px 2px rgba(0,0,0,0.6);">{{ $pct3 }}%</span>
                                     </div>
                                 </div>
-                                <small class="text-muted font-mono d-block mb-3" style="font-size: 0.72rem;">{{ $g3->penilaian_count ?? $g3->total_penilaian ?? 0 }} ulasan</small>
+                                <small class="text-muted font-mono d-block mb-2.5 gk-dash-podium-ulasan">{{ $g3->penilaian_count ?? $g3->total_penilaian ?? 0 }} ulasan</small>
                             </div>
 
                             <div>
-                                <a href="{{ route('siswa.guru.show', $g3) }}" class="btn btn-sm btn-outline-primary w-100 rounded-pill py-1.5 fw-semibold" style="font-size: 0.75rem; border-color: rgba(0, 51, 102, 0.25); color: #003366;">
+                                <a href="{{ route('siswa.guru.show', $g3) }}" class="btn btn-sm btn-outline-primary w-100 rounded-pill py-1 py-md-1.5 fw-semibold gk-dash-podium-btn" style="border-color: rgba(0, 51, 102, 0.25); color: #003366;">
                                     <i class="bi bi-eye me-1"></i> Profil
                                 </a>
                             </div>
@@ -623,7 +829,7 @@
                 </div>
 
                 {{-- TOMBOL PILL HITAM LIHAT SELENGKAPNYA MIRIP PUBLIK --}}
-                <div class="text-center pt-1 mb-2">
+                <div class="text-center pt-2 mb-4">
                     <a href="{{ route('siswa.leaderboard.index') }}" class="gk-pill-btn-dark">
                         Lihat selengkapnya
                     </a>
@@ -632,9 +838,9 @@
         </div>
     </div>
 
-    {{-- KOLOM KANAN (5 Kolom): RIWAYAT PENILAIAN TERAKHIR (VERTIKAL TINGGI MIRIP DASHBOARD GURU) --}}
-    <div class="col-lg-5 d-flex flex-column">
-        <div class="gk-clean-card p-3.5 p-md-4 h-100 d-flex flex-column justify-content-between" style="min-height: 540px;">
+    {{-- KOLOM KANAN (5 Kolom): RIWAYAT PENILAIAN TERAKHIR (DENGAN JARAK RESPONSIF) --}}
+    <div class="col-lg-5 d-flex flex-column mt-4 mt-lg-0">
+        <div class="gk-clean-card p-3.5 p-md-4 h-100 d-flex flex-column justify-content-between mb-4 mb-lg-0" style="min-height: 520px;">
             <div>
                 {{-- Header Riwayat --}}
                 <div class="d-flex justify-content-between align-items-center mb-3.5">

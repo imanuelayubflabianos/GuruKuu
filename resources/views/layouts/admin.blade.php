@@ -105,15 +105,12 @@
     @if(request()->routeIs('admin.dashboard'))
         @include('components.page-loader')
     @endif
-    {{-- MOBILE TOPBAR HEADER (KHUSUS TAMPILAN HP) --}}
+    {{-- MOBILE TOPBAR HEADER (KHUSUS TAMPILAN HP - BERSIH TANPA BURGER MENU) --}}
     <header class="gk-mobile-header shadow-sm">
         <div class="d-flex align-items-center gap-2">
-            <button class="btn btn-light border p-1 px-2.5 rounded-3" type="button" onclick="GuruKuuTheme.toggleSidebar()" aria-label="Menu Utama">
-                <i class="bi bi-list fs-4"></i>
-            </button>
             <a href="{{ route('admin.dashboard') }}" class="text-decoration-none d-flex align-items-center gap-2" style="font-size: 1.1rem;">
                 @if(!empty($siteLogo))
-                    <img src="{{ $siteLogo }}" alt="{{ $siteTitle ?? 'GuruKuu' }}" style="height: 28px; max-width: 36px; object-fit: contain;">
+                    <img src="{{ $siteLogo }}" alt="{{ $siteTitle ?? 'GuruKuu' }}" style="height: 30px; max-width: 38px; object-fit: contain;">
                 @else
                     <i class="bi bi-mortarboard-fill fs-4" style="color: {{ $siteTitleColor1 ?? '#003366' }};"></i>
                 @endif
@@ -123,11 +120,6 @@
             </a>
         </div>
         <div class="d-flex align-items-center gap-2">
-            {{-- KEMBALI KE SIPINTU MOBILE --}}
-            <a href="{{ config('services.sipintu.base_url', 'https://sipintu.smkn1bangsri.sch.id') }}" target="_blank" class="btn btn-light border rounded-circle shadow-sm gk-topbar-btn-sm" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Portal SiPintu">
-                <img src="{{ asset('images/sipintu-logo.png') }}" alt="SiPintu">
-            </a>
-
             {{-- NOTIFIKASI GABUNGAN MOBILE (PELANGGARAN & CHAT) --}}
             @php $totalNotif = ($unreadPelanggaranCount ?? 0) + ($unreadChatCount ?? 0); @endphp
             <div class="dropdown">
@@ -142,12 +134,34 @@
                 </ul>
             </div>
 
-            {{-- BERANDA PUBLIK MOBILE --}}
-            <a href="{{ url('/') }}" target="_blank" class="btn btn-light border rounded-circle shadow-sm gk-topbar-btn-sm" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Kembali ke Beranda Publik" aria-label="Kembali ke Beranda Publik">
-                <i class="bi bi-globe2 text-primary"></i>
-            </a>
+            {{-- MENU TITIK TIGA (BERANDA PUBLIK & SIPINTU) --}}
+            @include('components.mobile-more-menu')
         </div>
     </header>
+
+    {{-- MOBILE BOTTOM NAVIGATION BAR (KHUSUS ADMINISTRATOR) --}}
+    <nav class="gk-bottom-nav d-lg-none" aria-label="Navigasi Bawah Admin">
+        <a href="{{ route('admin.dashboard') }}" class="gk-bottom-nav-item {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
+            <i class="bi {{ request()->routeIs('admin.dashboard') ? 'bi-grid-fill' : 'bi-grid' }}"></i>
+            <span>Dashboard</span>
+        </a>
+        <a href="{{ route('admin.guru.index') }}" class="gk-bottom-nav-item {{ request()->routeIs('admin.guru.*') ? 'active' : '' }}">
+            <i class="bi {{ request()->routeIs('admin.guru.*') ? 'bi-person-badge-fill' : 'bi-person-badge' }}"></i>
+            <span>Guru</span>
+        </a>
+        <a href="{{ route('admin.siswa.index') }}" class="gk-bottom-nav-item {{ request()->routeIs('admin.siswa.*') ? 'active' : '' }}">
+            <i class="bi {{ request()->routeIs('admin.siswa.*') ? 'bi-mortarboard-fill' : 'bi-mortarboard' }}"></i>
+            <span>Siswa</span>
+        </a>
+        <a href="{{ route('admin.leaderboard.index') }}" class="gk-bottom-nav-item {{ request()->routeIs('admin.leaderboard.*') ? 'active' : '' }}">
+            <i class="bi {{ request()->routeIs('admin.leaderboard.*') ? 'bi-trophy-fill' : 'bi-trophy' }}"></i>
+            <span>Peringkat</span>
+        </a>
+        <button type="button" class="gk-bottom-nav-item border-0 bg-transparent p-0" onclick="GuruKuuTheme.toggleSidebar()" title="Buka Menu Lengkap">
+            <i class="bi bi-three-dots"></i>
+            <span>Lainnya</span>
+        </button>
+    </nav>
 
     <div class="sidebar">
         <div class="sidebar-brand">
@@ -322,7 +336,18 @@
     <script src="{{ asset('js/gurukuu-modal.js') }}"></script>
     <script src="{{ asset('js/admin-page-cache.js') }}"></script>
     @include('components.welcome-landing-modal')
-    @include('components.periode-notification-modal')
+    @if(session('violation_popup'))
+        <script>
+            Swal.fire({
+                icon: 'error',
+                title: 'Anda Melakukan Pelanggaran',
+                text: @json(session('violation_popup')),
+                confirmButtonText: 'Saya Mengerti',
+                confirmButtonColor: '#003366',
+                allowOutsideClick: false
+            });
+        </script>
+    @endif
     @stack('scripts')
 </body>
 </html>

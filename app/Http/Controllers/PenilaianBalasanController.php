@@ -120,7 +120,11 @@ class PenilaianBalasanController extends Controller
             $user->increment('warning_count');
 
             $wordList = implode(', ', $detectedWords);
-            return back()->with('error', "Balasan Anda diblokir karena mengandung kata yang melanggar etika dan tata tertib: \"{$wordList}\". Pelanggaran ini telah dicatat dalam sistem dan dilaporkan ke Admin.");
+            $msg = "Balasan Anda diblokir karena mengandung kata yang melanggar etika dan tata tertib: \"{$wordList}\". Pelanggaran ini telah dicatat dalam sistem dan dilaporkan ke Admin.";
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => $msg, 'violation' => true], 422);
+            }
+            return back()->with('violation_popup', $msg);
         }
 
         // Simpan balasan

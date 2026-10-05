@@ -31,7 +31,7 @@
         $replyPlaceholder = 'Tulis tanggapan profesional kepada siswa...';
         $senderBadge = 'Guru';
     } elseif ($isAuthorStudent) {
-        $replyPlaceholder = 'Balas tanggapan guru (Identitas Anda tetap 100% Anonim)...';
+        $replyPlaceholder = 'Balas tanggapan guru (Identitas anonim bagi guru, terpantau admin)...';
         $senderBadge = 'Penulis Ulasan (Anonim)';
     }
 
@@ -197,7 +197,7 @@
                                     <span class="text-muted font-mono d-flex align-items-center gap-2" style="font-size: 0.7rem;">
                                         <span>
                                             @if($user->role === 'siswa')
-                                                <i class="bi bi-shield-check text-success me-0.5"></i> Identitas Anda tetap anonim
+                                                <i class="bi bi-shield-check text-success me-0.5"></i> Identitas anonim bagi guru (terpantau admin)
                                             @else
                                                 <i class="bi bi-pen me-0.5"></i> Balas sebagai {{ $senderBadge }}
                                             @endif
@@ -359,12 +359,35 @@ document.addEventListener('DOMContentLoaded', function () {
                 } else if (status === 429) {
                     // Slowmode terpicu dari server
                     const remaining = data.remaining || 25;
-                    alert(data.message || `Mode lambat (Slowmode) aktif! Harap tunggu ${remaining} detik.`);
+                    if (typeof Swal !== 'undefined') {
+                        Swal.fire({ icon: 'warning', title: 'Mode Lambat Aktif', text: data.message || `Harap tunggu ${remaining} detik.` });
+                    } else {
+                        alert(data.message || `Mode lambat (Slowmode) aktif! Harap tunggu ${remaining} detik.`);
+                    }
                     startSlowmodeCountdown(btn, remaining);
                 } else {
-                    alert(data.message || 'Terjadi kesalahan saat mengirim balasan.');
                     btn.disabled = false;
                     btn.innerHTML = originalBtnHtml;
+                    if (data.violation || status === 422) {
+                        textarea.value = '';
+                        updateThreadCounter(textarea);
+                        if (typeof Swal !== 'undefined') {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Anda Melakukan Pelanggaran',
+                                text: data.message || 'Pesan Anda mengandung kata yang dilarang dan telah dikosongkan.',
+                                confirmButtonColor: '#003366'
+                            });
+                        } else {
+                            alert(data.message || 'Pesan Anda mengandung kata yang dilarang dan telah dikosongkan.');
+                        }
+                    } else {
+                        if (typeof Swal !== 'undefined') {
+                            Swal.fire({ icon: 'error', title: 'Gagal Mengirim', text: data.message || 'Terjadi kesalahan saat mengirim balasan.' });
+                        } else {
+                            alert(data.message || 'Terjadi kesalahan saat mengirim balasan.');
+                        }
+                    }
                 }
             })
             .catch(err => {

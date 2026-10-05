@@ -15,38 +15,38 @@
     </div>
 </div>
 
-{{-- STATS SUMMARY WIDGET --}}
-<div class="row g-3 mb-4">
-    <div class="col-md-4">
-        <div class="card-custom p-3 d-flex align-items-center gap-3">
-            <div class="rounded-3 p-3 text-primary" style="background: rgba(0, 51, 102, 0.08); font-size: 1.75rem;">
+{{-- STATS SUMMARY WIDGET (3 KOLOM SEJAJAR TIDAK BUANG RUANG) --}}
+<div class="row g-2 g-md-3 mb-4">
+    <div class="col-4">
+        <div class="card-custom p-2 p-md-3 d-flex flex-column flex-md-row align-items-center align-items-md-center gap-1.5 gap-md-3 text-center text-md-start h-100 shadow-sm">
+            <div class="rounded-3 p-2 p-md-3 text-primary flex-shrink-0" style="background: rgba(0, 51, 102, 0.08); font-size: clamp(1.1rem, 2vw, 1.6rem);">
                 <i class="bi bi-chat-quote-fill"></i>
             </div>
-            <div>
-                <div class="text-muted small fw-semibold text-uppercase font-mono">Total Ulasan Masuk</div>
-                <h3 class="fw-bold mb-0 text-dark">{{ $totalUlasan }}</h3>
+            <div class="min-w-0">
+                <div class="text-muted fw-semibold text-uppercase font-mono" style="font-size: clamp(0.55rem, 1.8vw, 0.75rem); line-height: 1.2;">Total Ulasan Masuk</div>
+                <h3 class="fw-bold mb-0 text-dark" style="font-size: clamp(1rem, 2.5vw, 1.5rem);">{{ $totalUlasan }}</h3>
             </div>
         </div>
     </div>
-    <div class="col-md-4">
-        <div class="card-custom p-3 d-flex align-items-center gap-3">
-            <div class="rounded-3 p-3 text-success" style="background: rgba(16, 185, 129, 0.1); font-size: 1.75rem;">
+    <div class="col-4">
+        <div class="card-custom p-2 p-md-3 d-flex flex-column flex-md-row align-items-center align-items-md-center gap-1.5 gap-md-3 text-center text-md-start h-100 shadow-sm">
+            <div class="rounded-3 p-2 p-md-3 text-success flex-shrink-0" style="background: rgba(16, 185, 129, 0.1); font-size: clamp(1.1rem, 2vw, 1.6rem);">
                 <i class="bi bi-check2-circle"></i>
             </div>
-            <div>
-                <div class="text-muted small fw-semibold text-uppercase font-mono">Sudah Dibalas</div>
-                <h3 class="fw-bold mb-0 text-success">{{ $totalDibalas }}</h3>
+            <div class="min-w-0">
+                <div class="text-muted fw-semibold text-uppercase font-mono" style="font-size: clamp(0.55rem, 1.8vw, 0.75rem); line-height: 1.2;">Sudah Dibalas</div>
+                <h3 class="fw-bold mb-0 text-success" style="font-size: clamp(1rem, 2.5vw, 1.5rem);">{{ $totalDibalas }}</h3>
             </div>
         </div>
     </div>
-    <div class="col-md-4">
-        <div class="card-custom p-3 d-flex align-items-center gap-3">
-            <div class="rounded-3 p-3 text-warning" style="background: rgba(245, 158, 11, 0.1); font-size: 1.75rem;">
+    <div class="col-4">
+        <div class="card-custom p-2 p-md-3 d-flex flex-column flex-md-row align-items-center align-items-md-center gap-1.5 gap-md-3 text-center text-md-start h-100 shadow-sm">
+            <div class="rounded-3 p-2 p-md-3 text-warning flex-shrink-0" style="background: rgba(245, 158, 11, 0.1); font-size: clamp(1.1rem, 2vw, 1.6rem);">
                 <i class="bi bi-hourglass-split"></i>
             </div>
-            <div>
-                <div class="text-muted small fw-semibold text-uppercase font-mono">Belum Dibalas</div>
-                <h3 class="fw-bold mb-0 text-warning">{{ $totalBelumDibalas }}</h3>
+            <div class="min-w-0">
+                <div class="text-muted fw-semibold text-uppercase font-mono" style="font-size: clamp(0.55rem, 1.8vw, 0.75rem); line-height: 1.2;">Belum Dibalas</div>
+                <h3 class="fw-bold mb-0 text-warning" style="font-size: clamp(1rem, 2.5vw, 1.5rem);">{{ $totalBelumDibalas }}</h3>
             </div>
         </div>
     </div>
@@ -110,7 +110,7 @@
                 </div>
             </div>
 
-            {{-- DETAIL SKOR 6 ASPEK --}}
+            {{-- DETAIL SKOR 5 ASPEK --}}
             <div class="mb-3 p-3 rounded bg-light border">
                 <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
                     @php $revPct = round(($review->rata_rata_evaluasi / 5) * 100); @endphp
@@ -128,33 +128,48 @@
                 </div>
                 <div class="row g-2 text-center" style="font-size: 0.78rem;">
                     <div class="col-4 col-md">
-                        <div class="p-1 bg-white rounded border">
+                        <div class="p-1.5 bg-white rounded border">
                             <span class="text-muted d-block text-truncate" title="Ketepatan Waktu">Waktu</span>
-                            <strong class="text-primary">{{ $review->kedisiplinan }}/5</strong>
+                            <div class="text-warning mt-0.5 d-flex align-items-center justify-content-center gap-1">
+                                <i class="bi bi-star-fill" style="font-size: 0.7rem;"></i>
+                                <span class="fw-bold font-mono text-dark" style="font-size: 0.76rem;">{{ $review->kedisiplinan }}<span class="text-muted fw-normal" style="font-size: 0.65rem;">/5</span></span>
+                            </div>
                         </div>
                     </div>
                     <div class="col-4 col-md">
-                        <div class="p-1 bg-white rounded border">
+                        <div class="p-1.5 bg-white rounded border">
                             <span class="text-muted d-block text-truncate" title="Kehadiran di Kelas">Kehadiran</span>
-                            <strong class="text-primary">{{ $review->tanggung_jawab }}/5</strong>
+                            <div class="text-warning mt-0.5 d-flex align-items-center justify-content-center gap-1">
+                                <i class="bi bi-star-fill" style="font-size: 0.7rem;"></i>
+                                <span class="fw-bold font-mono text-dark" style="font-size: 0.76rem;">{{ $review->tanggung_jawab }}<span class="text-muted fw-normal" style="font-size: 0.65rem;">/5</span></span>
+                            </div>
                         </div>
                     </div>
                     <div class="col-4 col-md">
-                        <div class="p-1 bg-white rounded border">
+                        <div class="p-1.5 bg-white rounded border">
                             <span class="text-muted d-block text-truncate" title="Penyampaian Materi">Materi</span>
-                            <strong class="text-primary">{{ $review->komunikasi }}/5</strong>
+                            <div class="text-warning mt-0.5 d-flex align-items-center justify-content-center gap-1">
+                                <i class="bi bi-star-fill" style="font-size: 0.7rem;"></i>
+                                <span class="fw-bold font-mono text-dark" style="font-size: 0.76rem;">{{ $review->komunikasi }}<span class="text-muted fw-normal" style="font-size: 0.65rem;">/5</span></span>
+                            </div>
                         </div>
                     </div>
                     <div class="col-4 col-md">
-                        <div class="p-1 bg-white rounded border">
+                        <div class="p-1.5 bg-white rounded border">
                             <span class="text-muted d-block text-truncate" title="Interaksi dengan Siswa">Interaksi</span>
-                            <strong class="text-primary">{{ $review->keramahan }}/5</strong>
+                            <div class="text-warning mt-0.5 d-flex align-items-center justify-content-center gap-1">
+                                <i class="bi bi-star-fill" style="font-size: 0.7rem;"></i>
+                                <span class="fw-bold font-mono text-dark" style="font-size: 0.76rem;">{{ $review->keramahan }}<span class="text-muted fw-normal" style="font-size: 0.65rem;">/5</span></span>
+                            </div>
                         </div>
                     </div>
                     <div class="col-4 col-md">
-                        <div class="p-1 bg-white rounded border">
+                        <div class="p-1.5 bg-white rounded border">
                             <span class="text-muted d-block text-truncate" title="Keterlibatan & Suasana Belajar">Suasana</span>
-                            <strong class="text-primary">{{ $review->kreativitas }}/5</strong>
+                            <div class="text-warning mt-0.5 d-flex align-items-center justify-content-center gap-1">
+                                <i class="bi bi-star-fill" style="font-size: 0.7rem;"></i>
+                                <span class="fw-bold font-mono text-dark" style="font-size: 0.76rem;">{{ $review->kreativitas }}<span class="text-muted fw-normal" style="font-size: 0.65rem;">/5</span></span>
+                            </div>
                         </div>
                     </div>
                 </div>

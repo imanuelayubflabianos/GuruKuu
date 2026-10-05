@@ -107,7 +107,7 @@ class PengaturanController extends Controller
 
         $profanity = \App\Services\ProfanityFilterService::check($pesanTeks);
         if (!$profanity['clean']) {
-            return redirect()->to(route('guru.pengaturan') . '#tabChat')->withInput()->withErrors(['pesan' => $profanity['message']]);
+            return redirect()->to(route('guru.pengaturan') . '#tabChat')->with('violation_popup', $profanity['message']);
         }
 
         $user = Auth::user();
@@ -144,7 +144,7 @@ class PengaturanController extends Controller
 
         $profanity = \App\Services\ProfanityFilterService::check($pesanTeks);
         if (!$profanity['clean']) {
-            return redirect()->to(route('guru.pengaturan') . '#tabChat')->withInput()->withErrors(['pesan' => $profanity['message']]);
+            return redirect()->to(route('guru.pengaturan') . '#tabChat')->with('violation_popup', $profanity['message']);
         }
 
         $kontak->update(['pesan' => $pesanTeks]);

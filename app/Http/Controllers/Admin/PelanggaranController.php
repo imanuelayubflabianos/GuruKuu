@@ -178,10 +178,12 @@ class PelanggaranController extends Controller
                     ]);
                     $successMessage = 'Akun ' . $siswa->name . ' berhasil dinonaktifkan secara permanen. Siswa harus menghubungi Admin / Operator Sekolah untuk pengaktifan kembali.';
                 } elseif ($actionType === 'nonaktif_berkala') {
-                    $days = (int) $request->input('duration_days', 3);
-                    if ($request->filled('custom_until')) {
+                    if ($request->input('duration_days') === '5_hours') {
+                        $deactivatedUntil = now()->addHours(5);
+                    } elseif ($request->filled('custom_until')) {
                         $deactivatedUntil = \Carbon\Carbon::parse($request->custom_until)->endOfDay();
                     } else {
+                        $days = (int) $request->input('duration_days', 3);
                         $deactivatedUntil = now()->addDays($days);
                     }
 
@@ -298,10 +300,14 @@ class PelanggaranController extends Controller
             ]);
             $msg = "Akun {$targetRole} {$user->name} berhasil dinonaktifkan secara permanen.";
         } elseif ($actionType === 'nonaktif_berkala') {
-            $days = (int) $request->input('duration_days', 3);
-            $deactivatedUntil = $request->filled('custom_until')
-                ? \Carbon\Carbon::parse($request->custom_until)->endOfDay()
-                : now()->addDays($days);
+            if ($request->input('duration_days') === '5_hours') {
+                $deactivatedUntil = now()->addHours(5);
+            } elseif ($request->filled('custom_until')) {
+                $deactivatedUntil = \Carbon\Carbon::parse($request->custom_until)->endOfDay();
+            } else {
+                $days = (int) $request->input('duration_days', 3);
+                $deactivatedUntil = now()->addDays($days);
+            }
 
             $user->update([
                 'is_active' => false,

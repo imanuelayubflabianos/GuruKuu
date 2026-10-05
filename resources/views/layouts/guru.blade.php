@@ -135,15 +135,12 @@
     @if(request()->routeIs('guru.dashboard'))
         @include('components.page-loader')
     @endif
-    {{-- MOBILE HEADER BAR (KHUSUS HP) --}}
+    {{-- MOBILE HEADER BAR (KHUSUS HP - BERSIH TANPA BURGER MENU) --}}
     <header class="gk-mobile-header shadow-sm">
         <div class="d-flex align-items-center gap-2">
-            <button class="btn btn-light border p-1 px-2.5 rounded-3" type="button" onclick="GuruKuuTheme.toggleSidebar()" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Menu Sidebar" aria-label="Buka Menu">
-                <i class="bi bi-list fs-4"></i>
-            </button>
             <a href="{{ route('guru.dashboard') }}" class="text-decoration-none d-flex align-items-center gap-2" style="font-size: 1.1rem;">
                 @if(!empty($siteLogo))
-                    <img src="{{ $siteLogo }}" alt="{{ $siteTitle ?? 'GuruKuu' }}" style="height: 28px; max-width: 36px; object-fit: contain;">
+                    <img src="{{ $siteLogo }}" alt="{{ $siteTitle ?? 'GuruKuu' }}" style="height: 30px; max-width: 38px; object-fit: contain;">
                 @else
                     <i class="bi bi-mortarboard-fill fs-4" style="color: {{ $siteTitleColor1 ?? '#003366' }};"></i>
                 @endif
@@ -153,20 +150,33 @@
             </a>
         </div>
         <div class="d-flex align-items-center gap-2">
-            {{-- PORTAL SIPINTU MOBILE --}}
-            <a href="{{ config('services.sipintu.base_url', 'https://sipintu.smkn1bangsri.sch.id') }}" target="_blank" class="btn btn-light border rounded-circle shadow-sm gk-topbar-btn-sm" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Portal SiPintu">
-                <img src="{{ asset('images/sipintu-logo.png') }}" alt="SiPintu">
-            </a>
-
-            {{-- NOTIFIKASI MOBILE --}}
+            {{-- NOTIFIKASI MOBILE (DISAMPING TITIK TIGA) --}}
             @include('components.user-notif-dropdown', ['prefix' => 'mobile', 'btnClass' => 'gk-topbar-btn-sm'])
 
-            {{-- BERANDA PUBLIK MOBILE --}}
-            <a href="{{ url('/') }}" target="_blank" class="btn btn-light border rounded-circle shadow-sm gk-topbar-btn-sm" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Kembali ke Beranda Publik" aria-label="Kembali ke Beranda Publik">
-                <i class="bi bi-globe2 text-primary"></i>
-            </a>
+            {{-- MENU TITIK TIGA (BERANDA PUBLIK & SIPINTU) --}}
+            @include('components.mobile-more-menu')
         </div>
     </header>
+
+    {{-- MOBILE BOTTOM NAVIGATION BAR (KHUSUS GURU) --}}
+    <nav class="gk-bottom-nav d-lg-none" aria-label="Navigasi Bawah Guru">
+        <a href="{{ route('guru.dashboard') }}" class="gk-bottom-nav-item {{ request()->routeIs('guru.dashboard') ? 'active' : '' }}">
+            <i class="bi {{ request()->routeIs('guru.dashboard') ? 'bi-grid-fill' : 'bi-grid' }}"></i>
+            <span>Dashboard</span>
+        </a>
+        <a href="{{ route('guru.ulasan') }}" class="gk-bottom-nav-item {{ request()->routeIs('guru.ulasan*') ? 'active' : '' }}">
+            <i class="bi {{ request()->routeIs('guru.ulasan*') ? 'bi-chat-square-quote-fill' : 'bi-chat-square-quote' }}"></i>
+            <span>Ulasan</span>
+        </a>
+        <a href="{{ route('guru.leaderboard') }}" class="gk-bottom-nav-item {{ request()->routeIs('guru.leaderboard*') ? 'active' : '' }}">
+            <i class="bi {{ request()->routeIs('guru.leaderboard*') ? 'bi-trophy-fill' : 'bi-trophy' }}"></i>
+            <span>Peringkat</span>
+        </a>
+        <a href="{{ route('guru.pengaturan') }}" class="gk-bottom-nav-item {{ request()->routeIs('guru.pengaturan*') ? 'active' : '' }}">
+            <i class="bi {{ request()->routeIs('guru.pengaturan*') ? 'bi-gear-fill' : 'bi-gear' }}"></i>
+            <span>Akun</span>
+        </a>
+    </nav>
 
     <aside class="sidebar">
         <div class="sidebar-brand">
@@ -318,6 +328,18 @@
     <script src="{{ asset('js/gurukuu-modal.js') }}"></script>
     @include('components.welcome-landing-modal')
     @include('components.periode-notification-modal')
+    @if(session('violation_popup'))
+        <script>
+            Swal.fire({
+                icon: 'error',
+                title: 'Anda Melakukan Pelanggaran',
+                text: @json(session('violation_popup')),
+                confirmButtonText: 'Saya Mengerti',
+                confirmButtonColor: '#003366',
+                allowOutsideClick: false
+            });
+        </script>
+    @endif
     @stack('scripts')
 </body>
 </html>

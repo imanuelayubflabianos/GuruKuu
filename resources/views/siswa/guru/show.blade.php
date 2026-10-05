@@ -2,20 +2,10 @@
 @section('title', 'Detail Guru - ' . $guru->nama)
 
 @section('content')
-<div class="page-header mb-4">
-    <div>
-        <a href="{{ route('siswa.guru.index') }}" class="gk-btn-back mb-3">
-            <i class="bi bi-arrow-left"></i> Kembali ke Daftar Guru
-        </a>
-        <h1 class="page-title mt-1">{{ $guru->nama }}</h1>
-        <p class="page-subtitle mb-0">
-            @if($guru->jurusan)
-                <span class="badge bg-primary text-white">{{ $guru->jurusan->nama_jurusan }}</span>
-            @else
-                <span class="badge bg-secondary text-white">Guru Pengajar</span>
-            @endif
-        </p>
-    </div>
+<div class="mb-3">
+    <a href="{{ route('siswa.guru.index') }}" class="gk-btn-back">
+        <i class="bi bi-arrow-left"></i> Kembali ke Daftar Guru
+    </a>
 </div>
 
 <div class="row g-4 mb-4">
@@ -100,9 +90,6 @@
                         </div>
                     </div>
                     @endforeach
-                </div>
-                <div class="mt-3 p-2 rounded text-center" style="background: var(--bg-light); border: 1px solid var(--border);">
-                    <small class="text-muted">Total <strong>{{ $stats['total_penilaian'] }} siswa</strong> telah memberikan penilaian pada semester aktif ini</small>
                 </div>
                 @else
                 <div class="text-center py-5 text-muted">

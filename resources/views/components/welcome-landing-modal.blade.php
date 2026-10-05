@@ -79,6 +79,19 @@
         border-color: #475569 !important;
         color: #e2e8f0 !important;
     }
+
+    /* Efek bayangan gelap (dimmed backdrop shadow) agar pop-up tidak nyatu dengan background */
+    .modal-backdrop {
+        background-color: #0f172a !important;
+        backdrop-filter: blur(5px) !important;
+        -webkit-backdrop-filter: blur(5px) !important;
+    }
+    .modal-backdrop.show {
+        opacity: 0.65 !important;
+    }
+    #welcomeLandingPromptModal .modal-content {
+        box-shadow: 0 25px 60px -12px rgba(15, 23, 42, 0.4), 0 0 0 1px rgba(15, 23, 42, 0.08) !important;
+    }
 </style>
 
 <script>
@@ -91,14 +104,26 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Mencegah pop-up muncul kembali jika token SSO ini sudah pernah ditampilkan/ditangani (misal user bolak-balik web / refresh)
     if (sessionStorage.getItem(storageKey) === currentToken) {
+        window.gkWelcomeModalActive = false;
         return;
     }
 
-    const modal = new bootstrap.Modal(modalEl);
+    // Set flag bahwa modal selamat datang sedang aktif (untuk mencegah dobel pop-up dengan modal periode)
+    window.gkWelcomeModalActive = true;
+
+    const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
     modal.show();
 
     // Segera simpan bahwa pop-up untuk sesi SSO ini sudah tampil
     sessionStorage.setItem(storageKey, currentToken);
+
+    // Event saat modal selamat datang selesai ditutup: aktifkan modal berikutnya (bergilir)
+    modalEl.addEventListener('hidden.bs.modal', function() {
+        window.gkWelcomeModalActive = false;
+        sessionStorage.setItem(storageKey, currentToken);
+        // Berikan sinyal ke modal lain (misal modal periode) bahwa modal pertama sudah selesai
+        window.dispatchEvent(new CustomEvent('gk:welcomeModalClosed'));
+    });
 
     // Tandai saat tombol apapun di dalam modal diklik
     modalEl.querySelectorAll('a, button').forEach(btn => {

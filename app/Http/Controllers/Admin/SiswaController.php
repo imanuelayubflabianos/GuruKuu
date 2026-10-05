@@ -181,10 +181,14 @@ class SiswaController extends Controller
             $customReason = trim($request->input('deactivated_reason', ''));
 
             if ($deactType === 'berkala') {
-                $days = (int) $request->input('duration_days', 3);
-                $deactivatedUntil = $request->filled('custom_until') 
-                    ? \Carbon\Carbon::parse($request->custom_until)->endOfDay() 
-                    : now()->addDays($days);
+                if ($request->input('duration_days') === '5_hours') {
+                    $deactivatedUntil = now()->addHours(5);
+                } elseif ($request->filled('custom_until')) {
+                    $deactivatedUntil = \Carbon\Carbon::parse($request->custom_until)->endOfDay();
+                } else {
+                    $days = (int) $request->input('duration_days', 3);
+                    $deactivatedUntil = now()->addDays($days);
+                }
 
                 $reason = $customReason ?: 'Dinonaktifkan sementara oleh Admin / Operator Sekolah hingga ' . $deactivatedUntil->translatedFormat('d F Y') . ' karena evaluasi tata tertib.';
                 $siswa->update([

@@ -26,7 +26,7 @@
                     <i class="bi bi-eye-slash-fill me-1"></i> Anonimitas 100% Terjamin
                 </div>
                 <div class="small opacity-90" style="line-height: 1.4;">
-                    Identitas Anda (Nama & NIS) <strong>tidak pernah ditampilkan</strong> kepada guru maupun siswa lain. Nilai dan saran Anda murni untuk evaluasi mutu sekolah.
+                    Identitas Anda (Nama & NIS) <strong>tidak pernah ditampilkan</strong> kepada guru maupun siswa lain (namun tidak anonim untuk Administrator demi pemantauan etika & keamanan sistem). Nilai dan saran Anda murni untuk evaluasi mutu sekolah.
                 </div>
             </div>
         </div>
@@ -125,7 +125,7 @@
                                     @for($i = 1; $i <= 5; $i++)
                                         <i class="bi bi-star-fill star" data-value="{{ $i }}" style="font-size: 1.65rem; cursor: pointer; color: #cbd5e1; margin-right: 4px; transition: transform 0.12s, color 0.12s; display: inline-block;"></i>
                                     @endfor
-                                    <input type="hidden" name="{{ $key }}" class="rating-input" id="input-{{ $key }}" value="0" required>
+                                    <input type="hidden" name="{{ $key }}" class="rating-input" id="input-{{ $key }}" value="{{ old($key, 0) }}" required>
                                 </div>
                                 <span class="badge sentiment-badge" id="sentiment-{{ $key }}" style="background: #e2e8f0; color: #64748b; font-size: 0.72rem;">
                                     Belum Dinilai
@@ -398,7 +398,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
         container.addEventListener('touchend', endTouchHandler);
         container.addEventListener('touchcancel', endTouchHandler);
+
+        // Inisialisasi nilai lama (jika ada nilai bintang sebelumnya / redirect setelah toxic review)
+        const initialVal = parseInt(input.value) || 0;
+        if (initialVal > 0) {
+            setRating(initialVal, false);
+        }
     });
+
+    // Jalankan update overall score saat halaman dimuat
+    updateOverallScore();
 
     function paintStars(stars, value, color) {
         stars.forEach(s => {

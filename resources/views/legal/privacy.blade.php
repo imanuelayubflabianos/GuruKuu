@@ -21,7 +21,7 @@
                         </div>
                         <div class="mb-4">
                             <h5 class="fw-bold mb-3"><i class="bi bi-eye-slash me-2" style="color: var(--primary);"></i>2. Anonimitas Penilaian</h5>
-                            <p class="text-muted mb-0">Seluruh penilaian yang diberikan siswa bersifat <strong>anonim</strong>. Guru dan pihak lain tidak dapat mengetahui identitas siswa yang memberikan nilai tertentu. Ini menjamin kejujuran dan objektivitas dalam setiap penilaian.</p>
+                            <p class="text-muted mb-0">Seluruh penilaian yang diberikan siswa bersifat <strong>anonim</strong> bagi guru dan sesama siswa (namun tidak anonim untuk Administrator sekolah demi menjaga keamanan, akuntabilitas, dan etika komunikasi). Guru dan pihak lain tidak dapat mengetahui identitas siswa yang memberikan nilai tertentu. Ini menjamin kejujuran dan objektivitas dalam setiap penilaian.</p>
                         </div>
                         <div class="mb-4">
                             <h5 class="fw-bold mb-3"><i class="bi bi-database me-2" style="color: var(--primary);"></i>3. Penyimpanan Data</h5>

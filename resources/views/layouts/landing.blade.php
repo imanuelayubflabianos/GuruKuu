@@ -350,6 +350,55 @@
         .btn-primary-custom { background: var(--primary); color: white; padding: 0.75rem 1.5rem; border-radius: 8px; font-weight: 600; border: none; text-decoration: none; display: inline-block; }
         .btn-primary-custom:hover { background: var(--primary-light); color: white; }
 
+        @media (max-width: 991.98px) {
+            .navbar-custom {
+                padding-top: calc(1.15rem + env(safe-area-inset-top, 0px)) !important;
+                padding-bottom: 0.95rem !important;
+            }
+            .navbar-custom .container {
+                display: flex !important;
+                align-items: center !important;
+                justify-content: space-between !important;
+                min-height: 40px !important;
+            }
+            .navbar-brand-custom {
+                margin: 0 !important;
+                display: inline-flex !important;
+                align-items: center !important;
+                gap: 0.55rem !important;
+                line-height: 1 !important;
+            }
+            .navbar-brand-custom img {
+                height: 34px !important;
+                width: auto !important;
+                object-fit: contain !important;
+            }
+            .navbar-brand-custom span {
+                line-height: 1 !important;
+                display: inline-flex !important;
+                align-items: center !important;
+            }
+            .navbar-custom .gk-topbar-btn {
+                width: 38px !important;
+                height: 38px !important;
+                min-width: 38px !important;
+                min-height: 38px !important;
+            }
+            .navbar-custom .btn-masuk,
+            .navbar-custom .btn-dashboard {
+                height: 38px !important;
+                min-height: 38px !important;
+                padding: 0 1.15rem !important;
+                border-radius: 8px !important;
+                display: inline-flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                font-size: 0.85rem !important;
+                line-height: 1 !important;
+                box-sizing: border-box !important;
+            }
+        }
+
         @media (max-width: 768px) {
             .hero-title { font-size: 1.75rem; }
             .nav-menu-center { flex-direction: column; gap: 0.75rem; align-items: flex-start; padding-left: 0.75rem; }
@@ -365,7 +414,7 @@
 <body>
     @include('components.page-loader')
     <nav class="navbar navbar-expand-lg navbar-custom fixed-top">
-        <div class="container">
+        <div class="container d-flex align-items-center justify-content-between">
             <a class="navbar-brand navbar-brand-custom d-flex align-items-center gap-2 m-0" href="{{ route('landing.index') }}">
                 @if(!empty($siteLogo))
                     <img src="{{ $siteLogo }}" alt="{{ $siteTitle ?? 'GuruKuu' }}" style="height: 36px; max-width: 45px; object-fit: contain;">
@@ -376,58 +425,75 @@
                     <span style="color: {{ $siteTitleColor1 ?? '#003366' }} !important;">{{ $siteTitlePart1 ?? 'Guru' }}</span><span style="color: {{ $siteTitleColor2 ?? '#FFC107' }} !important;">{{ $siteTitlePart2 ?? 'Kuu' }}</span>
                 </span>
             </a>
-            <button class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navMenu"><span class="navbar-toggler-icon"></span></button>
-            <div class="collapse navbar-collapse" id="navMenu">
+
+            {{-- DESKTOP CENTER NAVIGATION LINKS --}}
+            <div class="collapse navbar-collapse d-none d-lg-flex" id="navMenu">
                 <div class="nav-menu-center">
                     <a class="nav-link nav-link-custom {{ request()->routeIs('landing.index') ? 'active' : '' }}" data-nav-target="home" href="{{ route('landing.index') }}#home">Beranda</a>
                     <a class="nav-link nav-link-custom" data-nav-target="guru" href="{{ route('landing.index') }}#guru">Guru</a>
                     <a class="nav-link nav-link-custom" data-nav-target="panduan" href="{{ route('landing.index') }}#panduan">Panduan</a>
                     <a class="nav-link nav-link-custom" data-nav-target="tentang" href="{{ route('landing.index') }}#tentang">Tentang</a>
                 </div>
-                <div class="nav-actions d-flex align-items-center gap-2">
-                    <a href="{{ config('services.sipintu.base_url', 'https://sipintu.smkn1bangsri.sch.id') }}" 
-                       target="_blank" rel="noopener noreferrer"
-                       class="btn btn-light border rounded-circle shadow-sm gk-topbar-btn"
-                       title="Portal SiPintu">
-                        <img src="{{ asset('images/sipintu-logo.png') }}" alt="SiPintu">
+            </div>
+
+            {{-- TOPBAR ACTIONS (DESKTOP & MOBILE LANGSUNG MUNCUL DI POJOK KANAN TANPA BURGER MENU) --}}
+            <div class="d-flex align-items-center gap-2 ms-auto ms-lg-0">
+                <a href="{{ config('services.sipintu.base_url', 'https://sipintu.smkn1bangsri.sch.id') }}" 
+                   target="_blank" rel="noopener noreferrer"
+                   class="btn btn-light border rounded-circle shadow-sm gk-topbar-btn gk-topbar-btn-sm"
+                   title="Portal SiPintu">
+                    <img src="{{ asset('images/sipintu-logo.png') }}" alt="SiPintu">
+                </a>
+                @auth
+                    @php
+                        $userRole = Auth::user()->role;
+                        $dashboardUrl = match($userRole) {
+                            'admin' => route('admin.dashboard'),
+                            'guru' => route('guru.dashboard'),
+                            'siswa' => route('siswa.dashboard'),
+                            default => route('landing.index')
+                        };
+                        $dashboardLabel = match($userRole) {
+                            'admin' => 'Dashboard',
+                            'guru' => 'Dashboard',
+                            'siswa' => 'Dashboard',
+                            default => 'Dashboard'
+                        };
+                    @endphp
+                    
+                    <a href="{{ $dashboardUrl }}" class="btn btn-dashboard py-1.5 px-3" style="font-size: 0.84rem;">
+                        <i class="bi bi-speedometer2 me-1"></i> <span>{{ $dashboardLabel }}</span>
                     </a>
-                    @auth
-                        @php
-                            $userRole = Auth::user()->role;
-                            $dashboardUrl = match($userRole) {
-                                'admin' => route('admin.dashboard'),
-                                'guru' => route('guru.dashboard'),
-                                'siswa' => route('siswa.dashboard'),
-                                default => route('landing.index')
-                            };
-                            $dashboardLabel = match($userRole) {
-                                'admin' => 'Dashboard Admin',
-                                'guru' => 'Dashboard Guru',
-                                'siswa' => 'Dashboard Siswa',
-                                default => 'Dashboard'
-                            };
-                        @endphp
-                        
-                        <a href="{{ $dashboardUrl }}" class="btn btn-dashboard">
-                            <i class="bi bi-speedometer2 me-1"></i> {{ $dashboardLabel }}
-                        </a>
-                        
-                        <form action="{{ route('logout') }}" method="POST" class="d-inline" data-confirm="Apakah Anda yakin ingin keluar dari sistem?" data-confirm-title="Konfirmasi Logout" data-confirm-btn="Ya, Logout" data-confirm-type="danger">
-                            @csrf
-                            <button type="submit" class="btn-logout">
-                                <i class="bi bi-box-arrow-right"></i>
-                                <span>Logout</span>
-                            </button>
-                        </form>
-                    @else
-                        <a href="{{ route('login') }}" class="btn-masuk">
-                            <i class="bi bi-box-arrow-in-right"></i>
-                            <span>Masuk</span>
-                        </a>
-                    @endauth
-                </div>
+                    
+
+                @else
+                    <a href="{{ route('login') }}" class="btn-masuk py-1.5 px-3" style="font-size: 0.85rem;">
+                        <i class="bi bi-box-arrow-in-right me-1"></i>
+                        <span>Masuk</span>
+                    </a>
+                @endauth
             </div>
         </div>
+    </nav>
+
+    {{-- MOBILE BOTTOM NAVIGATION BAR KHUSUS BERANDA/LANDING (REFERENSI GAMBAR HP) --}}
+    <nav class="gk-bottom-nav d-lg-none" aria-label="Navigasi Bawah">
+        <a href="{{ route('landing.index') }}#home" class="gk-bottom-nav-item active" data-nav-target="home">
+            <i class="bi bi-house-door-fill"></i>
+            <span>Beranda</span>
+        </a>
+        <a href="{{ route('landing.index') }}#guru" class="gk-bottom-nav-item" data-nav-target="guru">
+            <i class="bi bi-person-badge"></i>
+            <span>Guru</span>
+        </a>
+        <a href="{{ route('landing.index') }}#panduan" class="gk-bottom-nav-item" data-nav-target="panduan">
+            <i class="bi bi-book"></i>
+            <span>Panduan</span>
+        </a>
+        <a href="{{ route('landing.index') }}#tentang" class="gk-bottom-nav-item" data-nav-target="tentang">
+            <i class="bi bi-info-circle"></i>
+            <span>Tentang</span>
+        </a>
     </nav>
 
     @yield('content')
@@ -534,7 +600,7 @@
     
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const navLinks = document.querySelectorAll('.nav-link-custom');
+            const navLinks = document.querySelectorAll('.nav-link-custom, .gk-bottom-nav-item');
             const navbar = document.querySelector('.navbar-custom');
             const navbarHeight = navbar ? navbar.offsetHeight : 80;
             
@@ -649,6 +715,18 @@
     </script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="{{ asset('js/gurukuu-modal.js') }}"></script>
+    @if(session('violation_popup'))
+        <script>
+            Swal.fire({
+                icon: 'error',
+                title: 'Anda Melakukan Pelanggaran',
+                text: @json(session('violation_popup')),
+                confirmButtonText: 'Saya Mengerti',
+                confirmButtonColor: '#003366',
+                allowOutsideClick: false
+            });
+        </script>
+    @endif
     @stack('scripts')
 </body>
 </html>

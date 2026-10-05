@@ -86,7 +86,8 @@ class PenilaianController extends Controller
 
             return redirect()
                 ->route('siswa.penilaian.create', $guru)
-                ->with('violation_popup', 'Anda melakukan pelanggaran etika. Penilaian dibatalkan dan belum disimpan. Silakan isi ulang rating serta tulis kritik dan saran dengan bahasa yang sopan.');
+                ->withInput($request->except(['kritik', 'saran']))
+                ->with('violation_popup', 'Ulasan Anda mengandung kata yang dilarang dan teks masukan telah dikosongkan. Nilai bintang Anda tetap tersimpan, silakan perbaiki kritik dan saran dengan bahasa yang sopan.');
         }
 
         $periodeAktif = Periode::where('status', 'aktif')->first();
