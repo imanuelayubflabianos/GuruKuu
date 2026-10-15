@@ -20,16 +20,18 @@
                 @csrf
                 @method('PUT')
                 <div class="row g-3">
-                    <div class="col-12 text-center mb-3">
-                        <label class="form-label font-mono small fw-bold text-muted">FOTO PROFIL</label>
+                    <div class="col-12 text-center mb-4">
+                        <label class="form-label d-block text-center font-mono small fw-bold text-muted mb-2">FOTO PROFIL</label>
                         @if($siswa->photo)
-                            <div class="mb-2">
-                                <img src="{{ asset('storage/' . $siswa->photo) }}" class="rounded-circle" style="width: 100px; height: 100px; object-fit: cover; border: 3px solid var(--border);">
+                            <div class="mb-2 d-flex justify-content-center">
+                                <img src="{{ asset('storage/' . $siswa->photo) }}" class="rounded-circle shadow-sm" style="width: 100px; height: 100px; object-fit: cover; border: 3px solid var(--border);">
                             </div>
                         @endif
-                        <input type="file" name="photo" class="form-control" style="border-radius: 8px; max-width: 400px; margin: 0 auto;" accept="image/*">
-                        <small class="text-muted">Biarkan kosong jika tidak ingin mengubah foto.</small>
-                        @error('photo')<div class="text-danger small">{{ $message }}</div>@enderror
+                        <div class="d-flex justify-content-center">
+                            <input type="file" name="photo" class="form-control" style="border-radius: 8px; max-width: 380px;" accept="image/*">
+                        </div>
+                        <small class="text-muted d-block mt-1.5" style="font-size: 0.8rem;">Biarkan kosong jika tidak ingin mengubah foto.</small>
+                        @error('photo')<div class="text-danger small mt-1">{{ $message }}</div>@enderror
                     </div>
                     <div class="col-md-6">
                         <label class="form-label font-mono small fw-bold text-muted">NIS <span class="text-danger">*</span></label>

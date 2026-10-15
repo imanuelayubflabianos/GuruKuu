@@ -133,6 +133,17 @@ class GuruController extends Controller
         if ($request->hasFile('photo')) {
             $path = $request->file('photo')->store('guru', 'public');
             $data['photo'] = $path;
+
+            try {
+                $publicGuruDir = public_path('storage/guru');
+                if (!\Illuminate\Support\Facades\File::exists($publicGuruDir)) {
+                    @\Illuminate\Support\Facades\File::makeDirectory($publicGuruDir, 0775, true, true);
+                }
+                $src = storage_path('app/public/' . $path);
+                if (\Illuminate\Support\Facades\File::exists($src) && is_dir($publicGuruDir) && is_writable($publicGuruDir)) {
+                    @copy($src, public_path('storage/' . $path));
+                }
+            } catch (\Throwable $e) {}
         }
 
         $guru = Guru::create($data);
@@ -190,6 +201,226 @@ class GuruController extends Controller
             \Illuminate\Support\Facades\Log::error('Import Jadwal Guru Error: ' . $e->getMessage());
             return redirect()->back()->with('error', 'Terjadi kesalahan saat memproses file Excel: ' . $e->getMessage());
         }
+    }
+
+    /**
+     * Download Template Spreadsheet (.xlsx) Matriks Pembagian Kelas Mengajar Guru
+     * Format matriks SK Kurikulum Sekolah (NO, KODE GURU, NAMA GURU, MATA PELAJARAN, Kolom Kelas Mengajar)
+     */
+    public function downloadTemplateJadwal()
+    {
+        $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setTitle('Matriks Pembagian Mengajar');
+
+        // 🏫 Ambil seluruh rombel kelas terdaftar di database sekolah
+        $allKelas = Kelas::orderBy('tingkat')->orderBy('nama_kelas')->get();
+        if ($allKelas->isEmpty()) {
+            $sampleClassNames = [
+                'X TO 1', 'X TO 2', 'XI TO 1', 'XI TO 2', 'XII TO 1', 'XII TO 2',
+                'X PPLG 1', 'X PPLG 2', 'XI PPLG 1', 'XI PPLG 2', 'XII PPLG 1', 'XII PPLG 2',
+                'X MPLB 1', 'X MPLB 2', 'X MPLB 3', 'XI MPLB 1', 'XI MPLB 2', 'XI MPLB 3', 'XII MPLB 1', 'XII MPLB 2', 'XII MPLB 3',
+                'X PM 1', 'X PM 2', 'XI PM 1', 'XI PM 2', 'XII PM 1', 'XII PM 2',
+                'X AKL 1', 'X AKL 2', 'XI AKL 1', 'XI AKL 2', 'XII AKL 1', 'XII AKL 2'
+            ];
+            $classList = collect($sampleClassNames)->map(fn($n) => (object)['id' => null, 'nama_lengkap' => $n]);
+        } else {
+            $classList = $allKelas->map(function($k) {
+                $fullName = str_starts_with(strtoupper($k->nama_kelas), $k->tingkat)
+                    ? $k->nama_kelas
+                    : $k->tingkat . ' ' . $k->nama_kelas;
+                return (object)['id' => $k->id, 'nama_lengkap' => $fullName];
+            });
+        }
+
+        $totalKelas = $classList->count();
+        $lastColLetter = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex(4 + $totalKelas);
+
+        // 🌟 1. Judul Header Dokumen SK (Langsung mulai dari Baris 1, efisien tanpa membuang ruang atas)
+        $sheet->setCellValue('A1', 'PEMBAGIAN KELAS BELAJAR MENGAJAR');
+        $sheet->setCellValue('A2', 'SMK NEGERI 1 BANGSRI - TAHUN AJARAN 2026/2027');
+
+        $sheet->mergeCells("A1:{$lastColLetter}1");
+        $sheet->mergeCells("A2:{$lastColLetter}2");
+
+        $titleStyle = [
+            'font' => ['bold' => true, 'size' => 12, 'color' => ['rgb' => '003366']],
+            'alignment' => [
+                'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
+                'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
+            ]
+        ];
+        $sheet->getStyle('A1:A2')->applyFromArray($titleStyle);
+        $sheet->getRowDimension(1)->setRowHeight(24);
+        $sheet->getRowDimension(2)->setRowHeight(20);
+        $sheet->getRowDimension(3)->setRowHeight(8); // Spacer row
+
+        // 🌟 2. Header Tabel Matriks (Baris 4 & 5)
+        $sheet->mergeCells('A4:A5')->setCellValue('A4', 'NO');
+        $sheet->mergeCells('B4:B5')->setCellValue('B4', 'KODE GURU / NIP');
+        $sheet->mergeCells('C4:C5')->setCellValue('C4', 'NAMA GURU');
+        $sheet->mergeCells('D4:D5')->setCellValue('D4', 'MATA PELAJARAN');
+
+        // Merged header di atas kolom rombel kelas (Tanpa kolom kalkulasi jam kurikulum)
+        $sheet->mergeCells("E4:{$lastColLetter}4")->setCellValue('E4', 'PEMBAGIAN KELAS MENGAJAR (Cukup beri angka 1 pada kelas yang diajar)');
+
+        // Baris 5: Nama-nama rombel kelas
+        $cIndex = 5;
+        foreach ($classList as $cls) {
+            $colLetter = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($cIndex);
+            $sheet->setCellValue($colLetter . '5', $cls->nama_lengkap);
+            $sheet->getColumnDimension($colLetter)->setWidth(11);
+            $cIndex++;
+        }
+
+        // Header Style Utama (Baris 4)
+        $headerTableStyle = [
+            'font' => ['bold' => true, 'color' => ['rgb' => 'FFFFFF'], 'size' => 10],
+            'fill' => [
+                'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                'startColor' => ['rgb' => '003366']
+            ],
+            'alignment' => [
+                'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
+                'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
+                'wrapText' => true,
+            ],
+        ];
+        $sheet->getStyle("A4:{$lastColLetter}4")->applyFromArray($headerTableStyle);
+        $sheet->getStyle('A4:D5')->applyFromArray($headerTableStyle);
+
+        // Subheader Rombel Kelas (Baris 5)
+        $classHeaderStyle = [
+            'font' => ['bold' => true, 'color' => ['rgb' => 'FFFFFF'], 'size' => 9],
+            'fill' => [
+                'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                'startColor' => ['rgb' => '0284C7']
+            ],
+            'alignment' => [
+                'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
+                'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
+            ],
+        ];
+        $sheet->getStyle("E5:{$lastColLetter}5")->applyFromArray($classHeaderStyle);
+
+        $sheet->getRowDimension(4)->setRowHeight(26);
+        $sheet->getRowDimension(5)->setRowHeight(28);
+
+        // Lebar kolom utama
+        $sheet->getColumnDimension('A')->setWidth(6);
+        $sheet->getColumnDimension('B')->setWidth(22); // Lebar cukup untuk NIP 18 digit
+        $sheet->getColumnDimension('C')->setWidth(34);
+        $sheet->getColumnDimension('D')->setWidth(26);
+
+        // 🌟 3. Data Baris Guru (Mulai Baris 6)
+        $teachers = Guru::with('kelas')->orderBy('nama')->get();
+        $startRow = 6;
+
+        if ($teachers->isNotEmpty()) {
+            foreach ($teachers as $idx => $g) {
+                $currRow = $startRow + $idx;
+                $nipStr = (string)($g->nip ?: ('G' . str_pad($idx + 1, 2, '0', STR_PAD_LEFT)));
+
+                $sheet->setCellValue('A' . $currRow, $idx + 1);
+                // Set explicit text agar NIP 18 digit tidak diubah menjadi notasi ilmiah (e.g. 1.97803E+17)
+                $sheet->setCellValueExplicit('B' . $currRow, $nipStr, \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
+                $sheet->setCellValue('C' . $currRow, $g->nama);
+                $sheet->setCellValue('D' . $currRow, $g->kategori ? ucfirst($g->kategori) : 'Produktif / Normada');
+
+                $guruClassIds = $g->kelas->pluck('id')->toArray();
+                $colIdx = 5;
+                foreach ($classList as $cls) {
+                    $colLetter = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($colIdx);
+                    if ($cls->id && in_array($cls->id, $guruClassIds)) {
+                        $sheet->setCellValue($colLetter . $currRow, 1);
+                        $sheet->getStyle($colLetter . $currRow)->getFont()->setBold(true);
+                    }
+                    $colIdx++;
+                }
+                $sheet->getRowDimension($currRow)->setRowHeight(22);
+            }
+            $endRow = $startRow + $teachers->count() - 1;
+        } else {
+            // Contoh baris guru sesuai format SK mengajar di screenshot
+            $sampleData = [
+                ['BG', 'Muhammad Tsiqotuddin, S.Pd.I', 'Pendidikan Agama Islam', [0, 1]],
+                ['BM', 'Rosma Azizah, S.Pd.I', 'Pendidikan Agama Islam', [2, 6]],
+                ['BN', "M. Ni'amir Rohman, S.Pd.I", 'Pendidikan Pancasila', [6, 9]],
+                ['CM', 'Harsoyo, S.Pd.I', 'Pendidikan Agama Islam', [12, 13]],
+                ['AF', 'Devitta Nia Wulandari, S.Pd', 'Bahasa Indonesia', [6, 7]],
+            ];
+
+            foreach ($sampleData as $idx => $row) {
+                $currRow = $startRow + $idx;
+                $sheet->setCellValue('A' . $currRow, $idx + 1);
+                $sheet->setCellValueExplicit('B' . $currRow, (string)$row[0], \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
+                $sheet->setCellValue('C' . $currRow, $row[1]);
+                $sheet->setCellValue('D' . $currRow, $row[2]);
+
+                foreach ($row[3] as $targetIndex) {
+                    if ($targetIndex < $totalKelas) {
+                        $colLetter = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex(5 + $targetIndex);
+                        $sheet->setCellValue($colLetter . $currRow, 1);
+                        $sheet->getStyle($colLetter . $currRow)->getFont()->setBold(true);
+                    }
+                }
+                $sheet->getRowDimension($currRow)->setRowHeight(22);
+            }
+            $endRow = $startRow + count($sampleData) - 1;
+        }
+
+        // Format kolom NIP/Kode Guru sebagai Text murni
+        $sheet->getStyle("B4:B{$endRow}")->getNumberFormat()->setFormatCode(\PhpOffice\PhpSpreadsheet\Style\NumberFormat::FORMAT_TEXT);
+
+        // Alignment kolom NO, Kode Guru, dan seluruh sel kelas di tengah (Center)
+        $sheet->getStyle("A6:B{$endRow}")->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle("E6:{$lastColLetter}{$endRow}")->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+
+        // Border tipis seluruh tabel
+        $borderStyle = [
+            'borders' => [
+                'allBorders' => [
+                    'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                    'color' => ['rgb' => 'CBD5E1'],
+                ],
+            ],
+        ];
+        $sheet->getStyle("A4:{$lastColLetter}{$endRow}")->applyFromArray($borderStyle);
+
+        // Freeze pane di E6 sehingga kolom NO, Kode, Nama Guru, dan Mapel tetap tampak saat digeser
+        $sheet->freezePane('E6');
+
+        // 🌟 Sheet 2: Petunjuk Format Pengisian
+        $sheetHelp = $spreadsheet->createSheet();
+        $sheetHelp->setTitle('Petunjuk Format');
+        $sheetHelp->setCellValue('A1', 'PETUNJUK FORMAT PEMBAGIAN KELAS MENGAJAR GURUKUU');
+        $sheetHelp->mergeCells('A1:C1');
+        $sheetHelp->getStyle('A1')->getFont()->setBold(true)->setSize(12)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('003366'));
+
+        $instructions = [
+            '1. Template ini menggunakan format Matriks SK Jadwal / Pembagian Kelas Mengajar.',
+            '2. Cukup berikan angka 1 (atau tanda v) pada kolom kelas yang diajar oleh guru yang bersangkutan.',
+            '3. Kolom kelas yang tidak diajar oleh guru cukup dibiarkan kosong.',
+            '4. Bagian jumlah jam pelajaran mingguan / total jam tidak perlu diisi (cukup penandaan kelas).',
+            '5. Gelar akademik guru (S.Pd, M.Pd, S.T, dll) otomatis dibersihkan saat pencocokan ke database GuruKuu.',
+        ];
+
+        foreach ($instructions as $hIdx => $text) {
+            $sheetHelp->setCellValue('A' . ($hIdx + 3), $text);
+        }
+        $sheetHelp->getColumnDimension('A')->setWidth(90);
+
+        $spreadsheet->setActiveSheetIndex(0);
+
+        $fileName = 'Template_SK_Pembagian_Kelas_Mengajar_' . date('Ymd') . '.xlsx';
+
+        return response()->streamDownload(function() use ($spreadsheet) {
+            $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+            $writer->save('php://output');
+        }, $fileName, [
+            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'Cache-Control' => 'max-age=0',
+        ]);
     }
 
     public function show(Guru $guru)
@@ -271,6 +502,17 @@ class GuruController extends Controller
             }
             $path = $request->file('photo')->store('guru', 'public');
             $data['photo'] = $path;
+
+            try {
+                $publicGuruDir = public_path('storage/guru');
+                if (!\Illuminate\Support\Facades\File::exists($publicGuruDir)) {
+                    @\Illuminate\Support\Facades\File::makeDirectory($publicGuruDir, 0775, true, true);
+                }
+                $src = storage_path('app/public/' . $path);
+                if (\Illuminate\Support\Facades\File::exists($src) && is_dir($publicGuruDir) && is_writable($publicGuruDir)) {
+                    @copy($src, public_path('storage/' . $path));
+                }
+            } catch (\Throwable $e) {}
         }
 
         $guru->update($data);

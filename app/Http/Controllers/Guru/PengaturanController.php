@@ -74,6 +74,17 @@ class PengaturanController extends Controller
             $path = $request->file('photo')->store('guru', 'public');
             $guruData['photo'] = $path;
             $userData['photo'] = $path;
+
+            try {
+                $publicGuruDir = public_path('storage/guru');
+                if (!\Illuminate\Support\Facades\File::exists($publicGuruDir)) {
+                    @\Illuminate\Support\Facades\File::makeDirectory($publicGuruDir, 0775, true, true);
+                }
+                $src = storage_path('app/public/' . $path);
+                if (\Illuminate\Support\Facades\File::exists($src) && is_dir($publicGuruDir) && is_writable($publicGuruDir)) {
+                    @copy($src, public_path('storage/' . $path));
+                }
+            } catch (\Throwable $e) {}
         }
 
         $guru->update($guruData);

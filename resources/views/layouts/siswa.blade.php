@@ -127,8 +127,167 @@
             transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
         }
         .gk-topbar-btn-sm i { font-size: 0.95rem !important; line-height: 1 !important; display: inline-flex; align-items: center; justify-content: center; }
-        .gk-topbar-btn-sm img { width: 18px !important; height: 18px !important; object-fit: contain !important; display: block !important; }
         .gk-topbar-btn-sm:hover { transform: translateY(-1px); box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08) !important; }
+
+        /* ==============================================================
+           PANDUAN PEMULA: ANIMASI & CALLOUT MENUNJUK DAFTAR GURU
+           ============================================================== */
+        .gk-menu-highlight {
+            position: relative;
+        }
+        .gk-menu-highlight::after {
+            content: '';
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 8px;
+            height: 8px;
+            background-color: #0284c7;
+            border-radius: 50%;
+            box-shadow: 0 0 0 0 rgba(2, 132, 199, 0.7);
+            animation: gkGuideDotPulse 1.6s infinite cubic-bezier(0.66, 0, 0, 1);
+        }
+        @keyframes gkGuideDotPulse {
+            to { box-shadow: 0 0 0 9px rgba(2, 132, 199, 0); }
+        }
+
+        .gk-guide-popover {
+            position: fixed;
+            left: 295px;
+            top: 200px;
+            z-index: 1050;
+            display: inline-flex;
+            align-items: center;
+            background: linear-gradient(135deg, #003366 0%, #004d99 100%);
+            color: #ffffff;
+            padding: 0.45rem 0.75rem 0.45rem 0.85rem;
+            border-radius: 50px;
+            box-shadow: 0 10px 25px -3px rgba(0, 51, 102, 0.4), 0 0 0 1.5px rgba(255, 255, 255, 0.2);
+            animation: gkGuideBounceX 1.6s infinite ease-in-out, gkGuideGlow 2.5s infinite ease-in-out;
+            transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1), transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            cursor: pointer;
+            text-decoration: none !important;
+            user-select: none;
+        }
+
+        .gk-guide-popover:hover {
+            background: linear-gradient(135deg, #002244 0%, #003f80 100%);
+            box-shadow: 0 12px 28px -2px rgba(0, 51, 102, 0.5), 0 0 0 2px rgba(56, 189, 248, 0.7);
+        }
+
+        .gk-guide-arrow {
+            position: absolute;
+            left: -8px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 0;
+            height: 0;
+            border-top: 7px solid transparent;
+            border-bottom: 7px solid transparent;
+            border-right: 8px solid #003366;
+        }
+
+        .gk-guide-content {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #ffffff !important;
+            text-decoration: none !important;
+        }
+
+        .gk-guide-hand {
+            font-size: 1.05rem;
+            display: inline-block;
+            animation: gkPointPulse 1.2s infinite ease-in-out;
+        }
+
+        .gk-guide-badge {
+            background: #ffc107;
+            color: #002244;
+            font-size: 0.65rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 0.15rem 0.45rem;
+            border-radius: 20px;
+            line-height: 1.2;
+        }
+
+        .gk-guide-text {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #ffffff;
+            white-space: nowrap;
+        }
+
+        .gk-guide-close {
+            background: transparent;
+            border: none;
+            color: rgba(255, 255, 255, 0.65);
+            font-size: 1.25rem;
+            line-height: 1;
+            padding: 0 0.15rem 0 0.5rem;
+            cursor: pointer;
+            transition: color 0.2s ease, transform 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+        }
+        .gk-guide-close:hover {
+            color: #ffffff;
+            transform: scale(1.15);
+        }
+
+        @keyframes gkGuideBounceX {
+            0%, 100% { transform: translateX(0); }
+            50% { transform: translateX(-7px); }
+        }
+
+        @keyframes gkGuideGlow {
+            0%, 100% { box-shadow: 0 10px 25px -3px rgba(0, 51, 102, 0.35), 0 0 0 0 rgba(2, 132, 199, 0.4); }
+            50% { box-shadow: 0 12px 28px -2px rgba(0, 51, 102, 0.5), 0 0 0 6px rgba(2, 132, 199, 0); }
+        }
+
+        @keyframes gkPointPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.22); }
+        }
+
+        /* MOBILE BOTTOM NAV GUIDE POPOVER */
+        .gk-guide-mobile-popover {
+            position: fixed;
+            bottom: 70px;
+            left: 30%;
+            transform: translateX(-50%);
+            z-index: 1060;
+            display: inline-flex;
+            align-items: center;
+            background: linear-gradient(135deg, #003366 0%, #004d99 100%);
+            color: #ffffff;
+            padding: 0.4rem 0.65rem 0.4rem 0.75rem;
+            border-radius: 50px;
+            box-shadow: 0 10px 25px -3px rgba(0, 51, 102, 0.4), 0 0 0 1.5px rgba(255, 255, 255, 0.2);
+            animation: gkGuideBounceY 1.5s infinite ease-in-out, gkGuideGlow 2.5s infinite ease-in-out;
+            cursor: pointer;
+            text-decoration: none !important;
+        }
+
+        .gk-guide-mobile-arrow {
+            position: absolute;
+            bottom: -7px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 7px solid transparent;
+            border-right: 7px solid transparent;
+            border-top: 7px solid #003366;
+        }
+
+        @keyframes gkGuideBounceY {
+            0%, 100% { transform: translate(-50%, 0); }
+            50% { transform: translate(-50%, 6px); }
+        }
     </style>
     <link href="{{ asset('css/gurukuu-theme.css') }}?v={{ file_exists(public_path('css/gurukuu-theme.css')) ? filemtime(public_path('css/gurukuu-theme.css')) : time() }}" rel="stylesheet">
     <script src="{{ asset('js/gurukuu-theme.js') }}"></script>
@@ -166,7 +325,7 @@
             <i class="bi {{ request()->routeIs('siswa.dashboard') ? 'bi-grid-fill' : 'bi-grid' }}"></i>
             <span>Dashboard</span>
         </a>
-        <a href="{{ route('siswa.guru.index') }}" class="gk-bottom-nav-item {{ request()->routeIs('siswa.guru.*') ? 'active' : '' }}">
+        <a href="{{ route('siswa.guru.index') }}" class="gk-bottom-nav-item {{ request()->routeIs('siswa.guru.*') ? 'active' : '' }}" id="mobileNavDaftarGuruLink">
             <i class="bi {{ request()->routeIs('siswa.guru.*') ? 'bi-person-badge-fill' : 'bi-person-badge' }}"></i>
             <span>Guru</span>
         </a>
@@ -227,7 +386,7 @@
 
         <ul class="sidebar-menu">
             <li><a href="{{ route('siswa.dashboard') }}" class="{{ request()->routeIs('siswa.dashboard') ? 'active' : '' }}"><i class="bi bi-grid"></i> Dashboard</a></li>
-            <li><a href="{{ route('siswa.guru.index') }}" class="{{ request()->routeIs('siswa.guru.*') ? 'active' : '' }}"><i class="bi bi-person-badge"></i> Daftar Guru</a></li>
+            <li><a href="{{ route('siswa.guru.index') }}" class="{{ request()->routeIs('siswa.guru.*') ? 'active' : '' }} {{ request()->routeIs('siswa.dashboard') ? 'gk-menu-highlight' : '' }}" id="sidebarDaftarGuruLink"><i class="bi bi-person-badge"></i> Daftar Guru</a></li>
             <li><a href="{{ route('siswa.riwayat') }}" class="{{ request()->routeIs('siswa.riwayat') ? 'active' : '' }}"><i class="bi bi-clock-history"></i> Riwayat Penilaian</a></li>
             <li><a href="{{ route('siswa.leaderboard.index') }}" class="{{ request()->routeIs('siswa.leaderboard.*') ? 'active' : '' }}"><i class="bi bi-trophy"></i> Leaderboard</a></li>
             <li><a href="{{ route('siswa.pengaturan') }}" class="{{ request()->routeIs('siswa.pengaturan*') ? 'active' : '' }}"><i class="bi bi-gear"></i> Pengaturan</a></li>
@@ -460,6 +619,94 @@
             });
         @endif
     </script>
+
+    @if(request()->routeIs('siswa.dashboard'))
+        {{-- Panduan Interaktif Desktop: Menunjuk ke Menu Daftar Guru di Sidebar --}}
+        <div id="gkGuideDaftarGuruDesktop" class="gk-guide-popover d-none d-lg-flex" role="tooltip" style="display: none;">
+            <div class="gk-guide-arrow"></div>
+            <a href="{{ route('siswa.guru.index') }}" class="gk-guide-content">
+                <span class="gk-guide-hand">👈</span>
+                <span class="gk-guide-badge">Panduan</span>
+                <span class="gk-guide-text">Ketuk di sini untuk menilai</span>
+            </a>
+            <button type="button" class="gk-guide-close" onclick="dismissGkGuide(event)" aria-label="Tutup panduan" title="Tutup panduan">&times;</button>
+        </div>
+
+        {{-- Panduan Interaktif Mobile: Menunjuk ke Tab Guru di Bottom Nav --}}
+        <div id="gkGuideDaftarGuruMobile" class="gk-guide-mobile-popover d-lg-none" role="tooltip" style="display: none;">
+            <a href="{{ route('siswa.guru.index') }}" class="gk-guide-content">
+                <span class="gk-guide-badge">Panduan</span>
+                <span class="gk-guide-text">Ketuk di sini untuk menilai</span>
+                <span class="gk-guide-hand">👇</span>
+            </a>
+            <button type="button" class="gk-guide-close" onclick="dismissGkGuide(event)" aria-label="Tutup panduan" title="Tutup panduan">&times;</button>
+            <div class="gk-guide-mobile-arrow"></div>
+        </div>
+
+        <script>
+            (function() {
+                function initGkGuide() {
+                    if (sessionStorage.getItem('gk_dismiss_guide_guru')) {
+                        return;
+                    }
+
+                    const desktopGuide = document.getElementById('gkGuideDaftarGuruDesktop');
+                    const mobileGuide = document.getElementById('gkGuideDaftarGuruMobile');
+                    const sidebarTarget = document.getElementById('sidebarDaftarGuruLink');
+                    const mobileTarget = document.getElementById('mobileNavDaftarGuruLink');
+
+                    function updatePositions() {
+                        if (sessionStorage.getItem('gk_dismiss_guide_guru')) return;
+
+                        if (window.innerWidth >= 992) {
+                            if (desktopGuide && sidebarTarget) {
+                                const rect = sidebarTarget.getBoundingClientRect();
+                                desktopGuide.style.top = (rect.top + (rect.height / 2) - (desktopGuide.offsetHeight / 2)) + 'px';
+                                desktopGuide.style.left = (rect.right + 12) + 'px';
+                                desktopGuide.style.display = 'inline-flex';
+                            }
+                            if (mobileGuide) mobileGuide.style.display = 'none';
+                        } else {
+                            if (mobileGuide && mobileTarget) {
+                                const rect = mobileTarget.getBoundingClientRect();
+                                mobileGuide.style.left = (rect.left + (rect.width / 2)) + 'px';
+                                mobileGuide.style.bottom = (window.innerHeight - rect.top + 8) + 'px';
+                                mobileGuide.style.display = 'inline-flex';
+                            }
+                            if (desktopGuide) desktopGuide.style.display = 'none';
+                        }
+                    }
+
+                    // Jalankan update posisi awal
+                    setTimeout(updatePositions, 100);
+                    setTimeout(updatePositions, 500);
+
+                    window.addEventListener('resize', updatePositions);
+                    window.addEventListener('scroll', updatePositions);
+                }
+
+                window.dismissGkGuide = function(e) {
+                    if (e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                    }
+                    sessionStorage.setItem('gk_dismiss_guide_guru', '1');
+                    const d = document.getElementById('gkGuideDaftarGuruDesktop');
+                    const m = document.getElementById('gkGuideDaftarGuruMobile');
+                    if (d) d.style.display = 'none';
+                    if (m) m.style.display = 'none';
+                    const hl = document.querySelector('.gk-menu-highlight');
+                    if (hl) hl.classList.remove('gk-menu-highlight');
+                };
+
+                if (document.readyState === 'loading') {
+                    document.addEventListener('DOMContentLoaded', initGkGuide);
+                } else {
+                    initGkGuide();
+                }
+            })();
+        </script>
+    @endif
     @stack('scripts')
 </body>
 </html>

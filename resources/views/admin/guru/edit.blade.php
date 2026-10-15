@@ -20,14 +20,18 @@
                 @csrf
                 @method('PUT')
                 <div class="row g-3">
-                    <div class="col-12 text-center mb-3">
-                        <label class="form-label font-mono small fw-bold text-muted">FOTO PROFIL</label>
-                        <div class="mb-2">
-                            <img src="{{ $guru->photo_url }}" class="rounded-circle" style="width: 90px; height: 90px; object-fit: cover; border: 3px solid var(--border);">
+                    <div class="col-12 text-center mb-4">
+                        <label class="form-label d-block text-center font-mono small fw-bold text-muted mb-2">FOTO PROFIL</label>
+                        <div class="mb-2 d-flex justify-content-center">
+                            <div class="position-relative">
+                                <img id="avatarPreviewGuru" src="{{ $guru->photo_url }}" class="rounded-circle shadow-sm" style="width: 100px; height: 100px; object-fit: cover; border: 3px solid var(--border);" onerror="this.src='https://ui-avatars.com/api/?name={{ urlencode($guru->nama) }}&background=003366&color=fff'">
+                            </div>
                         </div>
-                        <input type="file" name="photo" class="form-control" style="border-radius: 8px; max-width: 400px; margin: 0 auto;" accept="image/*">
-                        <small class="text-muted">Biarkan kosong jika tidak ingin mengubah foto.</small>
-                        @error('photo')<div class="text-danger small">{{ $message }}</div>@enderror
+                        <div class="d-flex justify-content-center">
+                            <input type="file" name="photo" id="photoInputGuru" class="form-control" style="border-radius: 8px; max-width: 380px;" accept="image/png,image/jpeg,image/jpg,image/webp" data-crop="1:1" data-crop-preview="#avatarPreviewGuru">
+                        </div>
+                        <small class="text-muted d-block mt-1.5" style="font-size: 0.8rem;">Klik untuk memilih & memotong foto. Biarkan kosong jika tidak ingin mengubah foto.</small>
+                        @error('photo')<div class="text-danger small mt-1">{{ $message }}</div>@enderror
                     </div>
                     <div class="col-md-6">
                         <label class="form-label font-mono small fw-bold text-muted">NIP <span class="text-danger">*</span></label>

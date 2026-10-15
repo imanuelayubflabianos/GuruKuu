@@ -13,14 +13,58 @@
     $heroImg2 = \App\Models\Setting::get('hero_image_2', '');
     $heroImg3 = \App\Models\Setting::get('hero_image_3', '');
 
-    $heroImages = array_values(array_filter([$heroImg1, $heroImg2, $heroImg3]));
-    if (count($heroImages) < 2) {
-        $heroImages = [
-            $heroImg1 ?: 'https://images.unsplash.com/photo-1562774053-701939374585?w=1920',
-            'https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=1920',
-            'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=1920'
+    $formatHeroUrl = function($url) {
+        if (empty($url)) return '';
+        if (str_starts_with($url, 'http://') || str_starts_with($url, 'https://')) return $url;
+        return asset(ltrim($url, '/'));
+    };
+
+    $heroSlides = [
+        [
+            'img'      => $formatHeroUrl($heroImg1) ?: 'https://images.unsplash.com/photo-1562774053-701939374585?w=1920',
+            'badge'    => $heroBadge,
+            'title'    => $heroTitle,
+            'subtitle' => $heroSubtitle,
+            'cta_text' => $heroCtaText,
+            'cta_url'  => $heroCtaUrl,
+        ],
+    ];
+
+    $heroTitle2 = \App\Models\Setting::get('hero_title_2', 'Suara Siswa untuk Kemajuan Bersama');
+    $heroSubtitle2 = \App\Models\Setting::get('hero_subtitle_2', 'Memberikan apresiasi dan masukan konstruktif bagi para pendidik SMK Negeri 1 Bangsri.');
+    $heroCtaText2 = \App\Models\Setting::get('hero_cta_text_2', 'Lihat Leaderboard');
+    $heroCtaUrl2 = \App\Models\Setting::get('hero_cta_url_2', '/leaderboard');
+    $heroImg2Formatted = $formatHeroUrl($heroImg2);
+
+    if ($heroImg2Formatted || $heroTitle2) {
+        $heroSlides[] = [
+            'img'      => $heroImg2Formatted ?: 'https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=1920',
+            'badge'    => $heroBadge,
+            'title'    => $heroTitle2,
+            'subtitle' => $heroSubtitle2,
+            'cta_text' => $heroCtaText2,
+            'cta_url'  => $heroCtaUrl2,
         ];
     }
+
+    $heroTitle3 = \App\Models\Setting::get('hero_title_3', 'Anonim, Terpercaya, dan Terbuka');
+    $heroSubtitle3 = \App\Models\Setting::get('hero_subtitle_3', 'Seluruh data evaluasi terenkripsi aman untuk menjaga objektivitas dan kejujuran penilaian.');
+    $heroCtaText3 = \App\Models\Setting::get('hero_cta_text_3', 'Pelajari Panduan');
+    $heroCtaUrl3 = \App\Models\Setting::get('hero_cta_url_3', '/#panduan');
+    $heroImg3Formatted = $formatHeroUrl($heroImg3);
+
+    if ($heroImg3Formatted || $heroTitle3) {
+        $heroSlides[] = [
+            'img'      => $heroImg3Formatted ?: 'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=1920',
+            'badge'    => $heroBadge,
+            'title'    => $heroTitle3,
+            'subtitle' => $heroSubtitle3,
+            'cta_text' => $heroCtaText3,
+            'cta_url'  => $heroCtaUrl3,
+        ];
+    }
+
+    $heroImages = array_column($heroSlides, 'img');
 @endphp
 
 <style>
@@ -1053,54 +1097,54 @@
     <div class="hero-ambient-orb" style="top: 15%; right: 12%; width: 280px; height: 280px; background: radial-gradient(circle, rgba(0, 168, 107, 0.45), transparent 70%);"></div>
     <div class="hero-ambient-orb" style="bottom: 12%; left: 8%; width: 340px; height: 340px; background: radial-gradient(circle, rgba(255, 193, 7, 0.38), transparent 70%); animation-delay: -4s;"></div>
 
-    {{-- Background Carousel Slideshow --}}
-    <div id="heroBgSlider" class="carousel slide carousel-fade position-absolute w-100 h-100" data-bs-ride="carousel" data-bs-interval="4500" style="top: 0; left: 0; z-index: 1; touch-action: pan-y;">
+    {{-- Background Carousel Slideshow dengan Teks Dinamis per Slide --}}
+    <div id="heroBgSlider" class="carousel slide carousel-fade position-relative w-100" data-bs-ride="carousel" data-bs-interval="4500" style="min-height: 600px; touch-action: pan-y;">
         <div class="carousel-inner w-100 h-100">
-            @foreach($heroImages as $idx => $img)
-                <div class="carousel-item {{ $idx === 0 ? 'active' : '' }} w-100 h-100">
-                    <div class="hero-slide-bg w-100 h-100" style="background: linear-gradient(135deg, rgba(10, 25, 47, 0.88), rgba(0, 51, 102, 0.78)), url('{{ $img }}') center/cover no-repeat; min-height: 640px;"></div>
+            @foreach($heroSlides as $idx => $slide)
+                <div class="carousel-item {{ $idx === 0 ? 'active' : '' }} w-100 position-relative" style="min-height: 600px;">
+                    <div class="hero-slide-bg position-absolute w-100 h-100" style="top: 0; left: 0; background: linear-gradient(135deg, rgba(10, 25, 47, 0.88), rgba(0, 51, 102, 0.78)), url('{{ $slide['img'] }}') center/cover no-repeat; min-height: 640px; z-index: 1;"></div>
+
+                    {{-- Content Overlay untuk Slide Ini --}}
+                    <div class="container position-relative hero-content-container" style="z-index: 2; padding: 160px 0 110px;">
+                        <div class="row">
+                            <div class="col-lg-9 col-xl-8">
+                                <div class="hero-glass-badge hero-anim-badge">
+                                    <i class="bi bi-patch-check-fill text-warning"></i>
+                                    <span>{{ $slide['badge'] }}</span>
+                                </div>
+                                <h1 class="hero-title text-white hero-anim-title">{{ $slide['title'] }}</h1>
+                                <p class="hero-subtitle text-white hero-anim-subtitle" style="color: rgba(255, 255, 255, 0.92) !important;">{{ $slide['subtitle'] }}</p>
+                                <div class="d-flex flex-wrap gap-3 align-items-center hero-anim-cta">
+                                    <a href="{{ $slide['cta_url'] }}" class="hero-btn hero-btn-primary">
+                                        <span>{{ $slide['cta_text'] }}</span>
+                                        <i class="bi bi-arrow-right"></i>
+                                    </a>
+                                    <a href="#statistik" class="hero-btn hero-btn-secondary">
+                                        <i class="bi bi-bar-chart-line"></i>
+                                        <span>Lihat Statistik</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             @endforeach
         </div>
 
-        {{-- Next / Prev Arrows: Slide 1 only Next; Slide 2 Prev & Next; Slide 3 only Prev --}}
-        <button class="carousel-control-prev" id="heroPrevBtn" type="button" data-bs-target="#heroBgSlider" data-bs-slide="prev" style="z-index: 4; width: 5%; display: none;">
+        {{-- Next / Prev Arrows --}}
+        <button class="carousel-control-prev" id="heroPrevBtn" type="button" data-bs-target="#heroBgSlider" data-bs-slide="prev" style="z-index: 4; width: 5%;">
             <span class="carousel-control-prev-icon rounded-circle p-2.5" style="background-color: rgba(0,0,0,0.35); backdrop-filter: blur(4px);" aria-hidden="true"></span>
         </button>
         <button class="carousel-control-next" id="heroNextBtn" type="button" data-bs-target="#heroBgSlider" data-bs-slide="next" style="z-index: 4; width: 5%;">
             <span class="carousel-control-next-icon rounded-circle p-2.5" style="background-color: rgba(0,0,0,0.35); backdrop-filter: blur(4px);" aria-hidden="true"></span>
         </button>
-    </div>
 
-    {{-- Content Overlay --}}
-    <div class="container position-relative hero-content-container" style="z-index: 2; padding: 160px 0 110px;">
-        <div class="row">
-            <div class="col-lg-9 col-xl-8">
-                <div class="hero-glass-badge hero-anim-badge">
-                    <i class="bi bi-patch-check-fill text-warning"></i>
-                    <span>{{ $heroBadge }}</span>
-                </div>
-                <h1 class="hero-title text-white hero-anim-title">{{ $heroTitle }}</h1>
-                <p class="hero-subtitle text-white hero-anim-subtitle" style="color: rgba(255, 255, 255, 0.92) !important;">{{ $heroSubtitle }}</p>
-                <div class="d-flex flex-wrap gap-3 align-items-center hero-anim-cta">
-                    <a href="{{ $heroCtaUrl }}" class="hero-btn hero-btn-primary">
-                        <span>{{ $heroCtaText }}</span>
-                        <i class="bi bi-arrow-right"></i>
-                    </a>
-                    <a href="#statistik" class="hero-btn hero-btn-secondary">
-                        <i class="bi bi-bar-chart-line"></i>
-                        <span>Lihat Statistik</span>
-                    </a>
-                </div>
-            </div>
+        {{-- Garis Indikator Carousel --}}
+        <div class="carousel-indicators mb-4" style="z-index: 10; margin-bottom: 2rem;">
+            @foreach($heroSlides as $idx => $slide)
+                <button type="button" data-bs-target="#heroBgSlider" data-bs-slide-to="{{ $idx }}" class="{{ $idx === 0 ? 'active' : '' }}" aria-current="{{ $idx === 0 ? 'true' : 'false' }}" aria-label="Slide {{ $idx + 1 }}" style="cursor: pointer;"></button>
+            @endforeach
         </div>
-    </div>
-
-    {{-- Garis Indikator Carousel (Bisa Dipencet Pindah Foto) --}}
-    <div class="carousel-indicators mb-4" style="z-index: 10; margin-bottom: 2rem;">
-        @foreach($heroImages as $idx => $img)
-            <button type="button" data-bs-target="#heroBgSlider" data-bs-slide-to="{{ $idx }}" class="{{ $idx === 0 ? 'active' : '' }}" aria-current="{{ $idx === 0 ? 'true' : 'false' }}" aria-label="Slide {{ $idx + 1 }}" style="cursor: pointer;"></button>
-        @endforeach
     </div>
 </section>
 
@@ -1494,7 +1538,13 @@ document.addEventListener('DOMContentLoaded', function() {
         <div class="text-center mb-5" data-aos="fade-up">
             <div class="small fw-bold text-uppercase text-muted mb-1" style="letter-spacing: 1.5px; font-size: 0.78rem;">{{ \App\Models\Setting::get('leaderboard_label', 'PENCAPAIAN TERBAIK') }}</div>
             <h2 class="fw-bold mb-2 text-dark" style="font-size: clamp(1.6rem, 3.5vw, 2.2rem);">{{ \App\Models\Setting::get('leaderboard_title', 'Guru dengan Partisipasi Tertinggi') }}</h2>
-            <p class="text-muted mb-0" style="font-size: 0.95rem;">{{ \App\Models\Setting::get('leaderboard_subtitle', 'Data Guru dengan persentase nilai terbaik dari siswa') }}</p>
+            <p class="text-muted mb-2" style="font-size: 0.95rem;">{{ \App\Models\Setting::get('leaderboard_subtitle', 'Data Guru dengan persentase nilai terbaik dari siswa') }}</p>
+            <div class="d-inline-flex align-items-center justify-content-center gap-2 px-3 py-1.5 rounded-pill border" style="background: rgba(0, 51, 102, 0.04); border-color: rgba(0, 51, 102, 0.12) !important; max-width: 680px;">
+                <i class="bi bi-info-circle text-primary flex-shrink-0" style="font-size: 0.85rem;"></i>
+                <span class="text-muted small" style="font-size: 0.8rem; line-height: 1.4;">
+                    <strong>Catatan:</strong> Leaderboard ini hanyalah fitur apresiasi tambahan. Fokus utama evaluasi adalah refleksi pembelajaran, dedikasi, serta kedisiplinan guru dalam mengajar.
+                </span>
+            </div>
         </div>
 
         @php
@@ -1887,6 +1937,9 @@ document.addEventListener('DOMContentLoaded', function() {
 <section id="panduan" class="section-padding" style="background: #ffffff; padding: 5rem 0;">
     <div class="container">
         <div class="text-center mb-4 mb-md-5" data-aos="fade-up">
+            <div class="section-label mb-2 text-uppercase fw-bold text-primary" style="font-size: 0.8rem; letter-spacing: 1.5px;">
+                {{ \App\Models\Setting::get('panduan_label', 'PANDUAN PENGGUNAAN') }}
+            </div>
             <h2 class="fw-bold mb-2 text-dark" style="font-size: clamp(1.6rem, 3.5vw, 2.2rem);">
                 {{ \App\Models\Setting::get('panduan_title', 'Bagaimana Cara Memberi Penilaian?') }}
             </h2>
@@ -1913,7 +1966,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 </div>
                                 <div class="gk-step-roman">I</div>
                                 <p class="text-dark fw-semibold mb-0" style="font-size: 1rem; line-height: 1.6;">
-                                    {{ \App\Models\Setting::get('panduan_step1_desc', 'Masuk dengan akun NIS & tanggal lahir resmi terverifikasi.') }}
+                                    {{ \App\Models\Setting::get('panduan_step1_desc', 'Masuk dengan akun NIS & kata sandi resmi (atau SSO SiPintu).') }}
                                 </p>
                             </div>
                         </div>

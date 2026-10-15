@@ -23,6 +23,14 @@ class PenilaianController extends Controller
                           ->wherePivot('tahun_ajaran', $periodeAktif->tahun_ajaran)
                           ->first();
 
+        // 🛡️ ATURAN RESMI: Siswa hanya dapat menilai guru yang mengajar di kelasnya
+        if ($kelasAktif) {
+            $isMengajarKelas = $guru->kelas()->whereKey($kelasAktif->id)->exists();
+            if (!$isMengajarKelas) {
+                return redirect()->route('siswa.guru.index')->with('error', "Anda hanya dapat memberikan penilaian kepada guru yang mengajar di kelas Anda ({$kelasAktif->nama_kelas}).");
+            }
+        }
+
         // Cek apakah sudah menilai (unique constraint)
         $sudahMenilai = Penilaian::where('siswa_id', $user->id)
                                  ->where('guru_id', $guru->id)
@@ -52,6 +60,23 @@ class PenilaianController extends Controller
         ]);
 
         $user = auth()->user();
+        $periodeAktif = Periode::where('status', 'aktif')->first();
+
+        if (!$periodeAktif) {
+            return redirect()->route('siswa.guru.index')->with('error', 'Tidak ada periode aktif saat ini.');
+        }
+
+        $kelasAktif = $user->kelas()
+                          ->wherePivot('tahun_ajaran', $periodeAktif->tahun_ajaran)
+                          ->first();
+
+        // 🛡️ ATURAN RESMI: Siswa hanya dapat menilai guru yang mengajar di kelasnya
+        if ($kelasAktif) {
+            $isMengajarKelas = $guru->kelas()->whereKey($kelasAktif->id)->exists();
+            if (!$isMengajarKelas) {
+                return redirect()->route('siswa.guru.index')->with('error', "Anda hanya dapat memberikan penilaian kepada guru yang mengajar di kelas Anda ({$kelasAktif->nama_kelas}).");
+            }
+        }
 
         // 🛡️ KEAMANAN: Cegah pengiriman link/URL sembarangan
         if (\App\Services\ProfanityFilterService::containsLink($request->kritik) || \App\Services\ProfanityFilterService::containsLink($request->saran)) {
@@ -164,6 +189,16 @@ class PenilaianController extends Controller
         $periodeAktif = Periode::where('status', 'aktif')->first();
         if (!$periodeAktif) {
             return back()->with('error', 'Tidak ada periode evaluasi aktif saat ini.');
+        }
+
+        $user = auth()->user();
+        $kelasAktif = $user->kelas()
+            ->wherePivot('tahun_ajaran', $periodeAktif->tahun_ajaran)
+            ->first();
+
+        if (!$kelasAktif || !$guru->kelas()->whereKey($kelasAktif->id)->exists()) {
+            return redirect()->route('siswa.guru.index')
+                ->with('error', 'Anda hanya dapat memberikan penilaian kepada guru yang mengajar di kelas Anda' . ($kelasAktif ? ' (' . $kelasAktif->nama_kelas . ')' : '') . '.');
         }
 
         $penilaian = Penilaian::where('siswa_id', auth()->id())

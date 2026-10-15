@@ -66,7 +66,7 @@ class PengaturanController extends Controller
             'panduan_title'        => Setting::get('panduan_title', 'Bagaimana Cara Memberi Penilaian?'),
             'panduan_subtitle'     => Setting::get('panduan_subtitle', 'Hanya butuh 3 langkah mudah untuk berkontribusi bagi sekolahmu'),
             'panduan_step1_title'  => Setting::get('panduan_step1_title', 'Login NIS'),
-            'panduan_step1_desc'   => Setting::get('panduan_step1_desc', 'Masuk dengan akun NIS & tanggal lahir resmi terverifikasi.'),
+            'panduan_step1_desc'   => Setting::get('panduan_step1_desc', 'Masuk dengan akun NIS & kata sandi resmi (atau SSO SiPintu).'),
             'panduan_step2_title'  => Setting::get('panduan_step2_title', 'Beri Nilai'),
             'panduan_step2_desc'   => Setting::get('panduan_step2_desc', 'Pilih guru Normada/Produktif, beri nilai (1-5) pada 5 kriteria.'),
             'panduan_step3_title'  => Setting::get('panduan_step3_title', 'Kirim Anonim'),
@@ -200,38 +200,38 @@ class PengaturanController extends Controller
             'hero_image_url_3'  => 'nullable|string|max:1000',
 
             // Sections
-            'stats_label'       => 'nullable|string|max:50',
-            'stats_title'       => 'nullable|string|max:150',
-            'stats_subtitle'    => 'nullable|string|max:255',
+            'stats_label'       => 'nullable|string|max:100',
+            'stats_title'       => 'nullable|string|max:255',
+            'stats_subtitle'    => 'nullable|string|max:1000',
 
-            'leaderboard_label'    => 'nullable|string|max:50',
-            'leaderboard_title'    => 'nullable|string|max:150',
-            'leaderboard_subtitle' => 'nullable|string|max:255',
+            'leaderboard_label'    => 'nullable|string|max:100',
+            'leaderboard_title'    => 'nullable|string|max:255',
+            'leaderboard_subtitle' => 'nullable|string|max:1000',
 
-            'panduan_label'        => 'nullable|string|max:50',
-            'panduan_title'        => 'nullable|string|max:150',
-            'panduan_subtitle'     => 'nullable|string|max:255',
-            'panduan_step1_title'  => 'nullable|string|max:100',
-            'panduan_step1_desc'   => 'nullable|string|max:255',
-            'panduan_step2_title'  => 'nullable|string|max:100',
-            'panduan_step2_desc'   => 'nullable|string|max:255',
-            'panduan_step3_title'  => 'nullable|string|max:100',
-            'panduan_step3_desc'   => 'nullable|string|max:255',
+            'panduan_label'        => 'nullable|string|max:100',
+            'panduan_title'        => 'nullable|string|max:255',
+            'panduan_subtitle'     => 'nullable|string|max:1000',
+            'panduan_step1_title'  => 'nullable|string|max:150',
+            'panduan_step1_desc'   => 'nullable|string|max:1000',
+            'panduan_step2_title'  => 'nullable|string|max:150',
+            'panduan_step2_desc'   => 'nullable|string|max:1000',
+            'panduan_step3_title'  => 'nullable|string|max:150',
+            'panduan_step3_desc'   => 'nullable|string|max:1000',
 
-            'about_label'       => 'nullable|string|max:50',
-            'about_title'       => 'nullable|string|max:150',
-            'about_subtitle'    => 'nullable|string|max:255',
-            'visi_text'         => 'nullable|string|max:2000',
-            'misi_text'         => 'nullable|string|max:3000',
-            'feature1_title'    => 'nullable|string|max:100',
-            'feature1_desc'     => 'nullable|string|max:255',
-            'feature2_title'    => 'nullable|string|max:100',
-            'feature2_desc'     => 'nullable|string|max:255',
-            'feature3_title'    => 'nullable|string|max:100',
-            'feature3_desc'     => 'nullable|string|max:255',
+            'about_label'       => 'nullable|string|max:100',
+            'about_title'       => 'nullable|string|max:255',
+            'about_subtitle'    => 'nullable|string|max:1000',
+            'visi_text'         => 'nullable|string|max:5000',
+            'misi_text'         => 'nullable|string|max:5000',
+            'feature1_title'    => 'nullable|string|max:150',
+            'feature1_desc'     => 'nullable|string|max:1000',
+            'feature2_title'    => 'nullable|string|max:150',
+            'feature2_desc'     => 'nullable|string|max:1000',
+            'feature3_title'    => 'nullable|string|max:150',
+            'feature3_desc'     => 'nullable|string|max:1000',
 
-            'footer_about'      => 'nullable|string|max:1000',
-            'footer_copyright'  => 'nullable|string|max:255',
+            'footer_about'      => 'nullable|string|max:2000',
+            'footer_copyright'  => 'nullable|string|max:1000',
             'kebijakan_privasi' => 'nullable|string',
             'syarat_ketentuan'  => 'nullable|string',
             'profanity_words'   => 'nullable|string|max:10000',
@@ -645,7 +645,7 @@ class PengaturanController extends Controller
         Setting::set('panduan_title', 'Bagaimana Cara Memberi Penilaian?');
         Setting::set('panduan_subtitle', 'Hanya butuh 3 langkah mudah untuk berkontribusi bagi sekolahmu');
         Setting::set('panduan_step1_title', 'Login NIS');
-        Setting::set('panduan_step1_desc', 'Masuk dengan akun NIS & tanggal lahir resmi terverifikasi.');
+        Setting::set('panduan_step1_desc', 'Masuk dengan akun NIS & kata sandi resmi (atau SSO SiPintu).');
         Setting::set('panduan_step2_title', 'Beri Nilai');
         Setting::set('panduan_step2_desc', 'Pilih guru Normada/Produktif, beri nilai (1-5) pada 5 kriteria.');
         Setting::set('panduan_step3_title', 'Kirim Anonim');

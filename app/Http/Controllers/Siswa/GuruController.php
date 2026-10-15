@@ -20,6 +20,10 @@ class GuruController extends Controller
             ->wherePivot('tahun_ajaran', $periodeAktif?->tahun_ajaran)
             ->first();
 
+        $guruKelasSayaIds = $kelasAktif
+            ? $kelasAktif->guru()->pluck('guru.id')->toArray()
+            : [];
+
         $mode = $request->input('mode', 'kelas');
         $query = Guru::with('jurusan')->orderBy('nama');
 
@@ -40,13 +44,18 @@ class GuruController extends Controller
 
         $guru = $query->get();
 
-        $sudahMenilaiIds = $periodeId
-            ? Penilaian::where('siswa_id', $user->id)->where('periode_id', $periodeId)->pluck('guru_id')->toArray()
-            : [];
+        $penilaianSayaMap = $periodeId
+            ? Penilaian::where('siswa_id', $user->id)
+                ->where('periode_id', $periodeId)
+                ->get()
+                ->keyBy('guru_id')
+            : collect();
+
+        $sudahMenilaiIds = $penilaianSayaMap->keys()->toArray();
 
         $allTeacherNames = Guru::orderBy('nama')->pluck('nama')->toArray();
 
-        return view('siswa.guru.index', compact('guru', 'kelasAktif', 'periodeId', 'sudahMenilaiIds', 'mode', 'allTeacherNames'));
+        return view('siswa.guru.index', compact('guru', 'kelasAktif', 'periodeId', 'sudahMenilaiIds', 'penilaianSayaMap', 'mode', 'allTeacherNames', 'guruKelasSayaIds'));
     }
 
     public function show(Guru $guru)
@@ -59,6 +68,10 @@ class GuruController extends Controller
         $kelasAktif = $user->kelas()
             ->wherePivot('tahun_ajaran', $periodeAktif?->tahun_ajaran)
             ->first();
+
+        $isMengajarKelas = $kelasAktif
+            ? $guru->kelas()->whereKey($kelasAktif->id)->exists()
+            : false;
 
         $penilaianSaya = null;
         if ($periodeId) {
@@ -112,7 +125,7 @@ class GuruController extends Controller
 
         return view('siswa.guru.show', compact(
             'guru', 'kelasAktif', 'periodeId', 'sudahMenilai', 'penilaianSaya',
-            'semuaFeedback', 'stats', 'arsipPeriode'
+            'semuaFeedback', 'stats', 'arsipPeriode', 'isMengajarKelas'
         ));
     }
 }

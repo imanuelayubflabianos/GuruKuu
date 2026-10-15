@@ -508,7 +508,7 @@
                         </div>
                         <div class="gk-step-roman">I</div>
                         <p class="text-dark fw-semibold mb-0" style="font-size: 0.95rem; line-height: 1.5;">
-                            {{ \App\Models\Setting::get('panduan_step1_desc', 'Masuk dengan akun NIS & tanggal lahir resmi terverifikasi.') }}
+                            {{ \App\Models\Setting::get('panduan_step1_desc', 'Masuk dengan akun NIS & kata sandi resmi (atau SSO SiPintu).') }}
                         </p>
                     </div>
                 </div>

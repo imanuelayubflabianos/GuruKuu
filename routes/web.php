@@ -93,6 +93,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
     Route::post('/dashboard/clear-cache', [AdminDashboardController::class, 'clearCache'])->name('dashboard.clear-cache');
     Route::get('/profil', [AdminProfilController::class, 'index'])->name('profil.index');
+    Route::get('/guru/template-jadwal', [AdminGuruController::class, 'downloadTemplateJadwal'])->name('guru.template-jadwal');
     Route::post('/guru/import-jadwal', [AdminGuruController::class, 'importJadwal'])->name('guru.import-jadwal');
     Route::resource('guru', AdminGuruController::class);
     Route::patch('/guru/{guru}/toggle', [AdminGuruController::class, 'toggleStatus'])->name('guru.toggle');

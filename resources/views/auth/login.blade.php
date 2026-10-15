@@ -247,8 +247,17 @@
             {{-- HEADER BRANDING --}}
             <div class="position-relative mb-4 d-flex flex-column align-items-start gap-2.5 pt-2" style="z-index: 2;">
                 <div class="d-flex align-items-center gap-3">
-                    @if(!empty($siteLogo))
-                        <img src="{{ $siteLogo }}" alt="{{ $siteTitle ?? 'GuruKuu' }}" style="height: 44px; max-width: 140px; object-fit: contain;">
+                    @php
+                        $logoImgUrlLogin = '';
+                        if (!empty($siteLogo)) {
+                            $logoImgUrlLogin = (str_starts_with($siteLogo, 'http://') || str_starts_with($siteLogo, 'https://')) ? $siteLogo : asset(ltrim($siteLogo, '/'));
+                        }
+                    @endphp
+                    @if(!empty($logoImgUrlLogin))
+                        <img src="{{ $logoImgUrlLogin }}" alt="{{ $siteTitle ?? 'GuruKuu' }}" style="height: 44px; max-width: 140px; object-fit: contain;" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        <div class="rounded-circle bg-white p-2 d-none align-items-center justify-content-center shadow-sm" style="width: 44px; height: 44px;">
+                            <i class="bi bi-mortarboard-fill fs-4" style="color: {{ $siteTitleColor1 ?? '#003366' }};"></i>
+                        </div>
                     @else
                         <div class="rounded-circle bg-white p-2 d-flex align-items-center justify-content-center shadow-sm" style="width: 44px; height: 44px;">
                             <i class="bi bi-mortarboard-fill fs-4" style="color: {{ $siteTitleColor1 ?? '#003366' }};"></i>

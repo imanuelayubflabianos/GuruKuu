@@ -378,7 +378,7 @@
             </div>
             <div class="modal-body p-4">
                 <div class="p-3 mb-4 rounded-3 border" style="background: rgba(0, 51, 102, 0.03); border-color: rgba(0, 51, 102, 0.12) !important;">
-                    <div class="d-flex gap-2.5 align-items-start">
+                    <div class="d-flex gap-2.5 align-items-start mb-2.5">
                         <i class="bi bi-info-circle-fill text-primary fs-5 flex-shrink-0 mt-0.5"></i>
                         <div class="small">
                             <strong class="d-block text-dark mb-1">Mendukung Format Matrix SK & Tabel Jadwal Sekolah</strong>
@@ -389,6 +389,34 @@
                                 <li>Gelar akademik (seperti <em>S.Pd, M.Pd, S.T</em>) otomatis dibersihkan saat pencocokan ke nama guru di GuruKuu.</li>
                             </ul>
                         </div>
+                    </div>
+                    <style>
+                        .gk-btn-download-template {
+                            background-color: #ffffff !important;
+                            color: #003366 !important;
+                            border: 1.5px solid #003366 !important;
+                            transition: all 0.22s ease;
+                            text-decoration: none !important;
+                        }
+                        .gk-btn-download-template:hover,
+                        .gk-btn-download-template:focus {
+                            background-color: #003366 !important;
+                            color: #ffffff !important;
+                            border-color: #003366 !important;
+                            box-shadow: 0 4px 14px rgba(0, 51, 102, 0.3) !important;
+                            transform: translateY(-1px);
+                        }
+                        .gk-btn-download-template:hover i,
+                        .gk-btn-download-template:focus i {
+                            color: #4ade80 !important;
+                        }
+                    </style>
+                    <div class="pt-2.5 border-top d-flex align-items-center justify-content-between flex-wrap gap-2" style="border-color: rgba(0, 51, 102, 0.12) !important;">
+                        <span class="text-muted small" style="font-size: 0.78rem;"><i class="bi bi-lightbulb text-warning me-1"></i>Ingin format instan yang siap pakai?</span>
+                        <a href="{{ route('admin.guru.template-jadwal') }}" class="btn btn-sm gk-btn-download-template fw-bold px-3 py-1.5 rounded-pill d-inline-flex align-items-center gap-1.5 shadow-xs" style="font-size: 0.8rem;">
+                            <i class="bi bi-file-earmark-excel-fill text-success fs-6"></i>
+                            <span>Download Template Excel (.xlsx)</span>
+                        </a>
                     </div>
                 </div>
 

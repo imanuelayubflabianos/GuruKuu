@@ -57,7 +57,7 @@
 </div>
 
 {{-- GRID GURU UNIFIED --}}
-@include('siswa.guru.partials.guru-grid', ['teachers' => $guru])
+@include('siswa.guru.partials.guru-grid', ['teachers' => $guru, 'penilaianSayaMap' => $penilaianSayaMap ?? collect(), 'sudahMenilaiIds' => $sudahMenilaiIds ?? [], 'guruKelasSayaIds' => $guruKelasSayaIds ?? []])
 
 @push('scripts')
 <script>

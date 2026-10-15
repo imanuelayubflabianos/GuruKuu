@@ -4,6 +4,14 @@
  * File ini membantu membuat symlink storage dan mengatasi masalah upload di hosting/SSH.
  */
 
+// Keamanan: Cegah eksekusi dari jaringan eksternal / publik
+$allowedIps = ['127.0.0.1', '::1', 'localhost'];
+$clientIp = $_SERVER['REMOTE_ADDR'] ?? '';
+if (!in_array($clientIp, $allowedIps, true) && php_sapi_name() !== 'cli') {
+    http_response_code(403);
+    die('Akses ditolak: File diagnostik ini dibatasi hanya untuk lingkungan lokal server demi keamanan.');
+}
+
 header('Content-Type: text/html; charset=utf-8');
 
 $baseDir = dirname(__DIR__);

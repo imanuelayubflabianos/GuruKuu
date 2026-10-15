@@ -355,10 +355,14 @@ class Guru extends Model
             $periodeId = $periodeAktif?->id;
         }
 
-        $query = $this->penilaian()->select(['id', 'guru_id', 'siswa_id', 'total_nilai', 'periode_id']);
-        if ($periodeId) {
-            $query->where('periode_id', $periodeId);
+        if (!$periodeId) {
+            $this->update(['rata_rata_nilai' => 0, 'total_penilaian' => 0]);
+            return;
         }
+
+        $query = $this->penilaian()
+            ->select(['id', 'guru_id', 'siswa_id', 'total_nilai', 'periode_id'])
+            ->where('periode_id', $periodeId);
 
         $penilaian = $query->latest()->get()->unique('siswa_id');
         if ($penilaian->isEmpty()) {

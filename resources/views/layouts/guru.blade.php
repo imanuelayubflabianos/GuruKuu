@@ -358,6 +358,7 @@
     <script src="https://cdn.datatables.net/1.13.8/js/dataTables.bootstrap5.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="{{ asset('js/gurukuu-modal.js') }}"></script>
+    <script src="{{ asset('js/gurukuu-cropper.js') }}"></script>
     @include('components.welcome-landing-modal')
     @include('components.periode-notification-modal')
     @if(session('violation_popup'))

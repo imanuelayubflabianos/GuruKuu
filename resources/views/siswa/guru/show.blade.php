@@ -148,6 +148,18 @@
                                 @endif
                             </div>
                         </div>
+                    @elseif(!$isMengajarKelas)
+                        <div class="p-3 rounded-3 d-flex align-items-center gap-3 mb-0" style="background: rgba(100, 116, 139, 0.08); border: 1px solid rgba(100, 116, 139, 0.25);">
+                            <div class="rounded-circle d-flex align-items-center justify-content-center text-secondary bg-white shadow-sm flex-shrink-0" style="width: 44px; height: 44px;">
+                                <i class="bi bi-slash-circle fs-4 text-muted"></i>
+                            </div>
+                            <div>
+                                <strong class="text-dark d-block mb-1" style="font-size: 0.92rem;">Penilaian Tidak Tersedia</strong>
+                                <div class="small text-muted" style="line-height: 1.45;">
+                                    Guru ini tidak mengajar di kelas Anda{{ $kelasAktif ? ' (' . $kelasAktif->nama_kelas . ')' : '' }}, sehingga Anda hanya dapat melihat profil dan ulasannya.
+                                </div>
+                            </div>
+                        </div>
                     @elseif(isset($mInfo) && $mInfo['is_active'])
                         <button type="button" class="btn btn-warning w-100 py-2 fs-6 fw-semibold text-dark shadow-sm" onclick="showMaintenanceModal()">
                             <i class="bi bi-tools me-1"></i> Mode Pemeliharaan (Maintenance)

@@ -23,7 +23,7 @@ class DashboardController extends Controller
         $totalJurusan = Jurusan::count();
         $totalKelas = Kelas::count();
         
-        $topGuru = Guru::leaderboardFor('rating', null, $periodeAktif?->id)->take(3);
+        $topGuru = Guru::leaderboardFor('rating', null, $periodeAktif?->id)->take(5);
             
         // Ambil ulasan terbaru dari tabel penilaian (yang memiliki teks kritik atau saran dan tidak disensor)
         $feedbacks = Penilaian::with(['guru', 'siswa', 'kelas'])

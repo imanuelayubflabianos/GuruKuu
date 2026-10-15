@@ -166,8 +166,15 @@
     <div class="sidebar">
         <div class="sidebar-brand">
             <a href="{{ route('admin.dashboard') }}" class="d-flex align-items-center gap-2 text-decoration-none">
-                @if(!empty($siteLogo))
-                    <img src="{{ $siteLogo }}" alt="{{ $siteTitle ?? 'GuruKuu' }}" style="height: 32px; max-width: 45px; object-fit: contain;">
+                @php
+                    $logoImgUrlAdmin = '';
+                    if (!empty($siteLogo)) {
+                        $logoImgUrlAdmin = (str_starts_with($siteLogo, 'http://') || str_starts_with($siteLogo, 'https://')) ? $siteLogo : asset(ltrim($siteLogo, '/'));
+                    }
+                @endphp
+                @if(!empty($logoImgUrlAdmin))
+                    <img src="{{ $logoImgUrlAdmin }}" alt="{{ $siteTitle ?? 'GuruKuu' }}" style="height: 32px; max-width: 45px; object-fit: contain;" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
+                    <i class="bi bi-mortarboard-fill fs-4" style="display: none; color: {{ $siteTitleColor1 ?? '#003366' }} !important;"></i>
                 @else
                     <i class="bi bi-mortarboard-fill fs-4" style="color: {{ $siteTitleColor1 ?? '#003366' }} !important;"></i>
                 @endif
@@ -338,6 +345,7 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="{{ asset('js/gurukuu-modal.js') }}"></script>
     <script src="{{ asset('js/admin-page-cache.js') }}"></script>
+    <script src="{{ asset('js/gurukuu-cropper.js') }}"></script>
     @include('components.welcome-landing-modal')
     @if(session('violation_popup'))
         <script>

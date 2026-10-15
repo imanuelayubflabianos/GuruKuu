@@ -105,8 +105,8 @@
                                 </div>
                             </div>
                             <div class="col-12">
-                                <label class="form-label" for="siteLogoFileInput">Logo</label>
-                                <input type="file" name="site_logo_file" id="siteLogoFileInput" class="form-control" accept="image/png,image/jpeg,image/jpg,image/webp,image/svg+xml">
+                                <label class="form-label" for="siteLogoFileInput">Upload File Logo Baru (Bisa Dipotong Sesuai Kebutuhan)</label>
+                                <input type="file" name="site_logo_file" id="siteLogoFileInput" class="form-control" accept="image/png,image/jpeg,image/jpg,image/webp,image/svg+xml" data-crop="free" data-crop-preview="#brandLogoPreview">
                             </div>
                             <div class="col-12">
                                 <details>
@@ -170,12 +170,28 @@
 
                 {{-- Preview Live --}}
                 <div class="mt-4">
-                    <label class="form-label small text-muted text-uppercase fw-semibold"><i class="bi bi-eye me-1"></i> Live Preview Banner Teks</label>
-                    <div id="heroPreviewBox" class="settings-hero rounded-4 position-relative overflow-hidden shadow-sm" style="background-image:linear-gradient(rgba(10,25,47,.82),rgba(0,51,102,.75)),url('{{ $settings['hero_image'] }}'); min-height: 180px; padding: 1.75rem;">
-                        <div class="mw-100" style="max-width:680px;">
-                            <span class="badge bg-warning text-dark mb-2 px-2.5 py-1 fw-bold" id="previewBadge">{{ $settings['hero_badge'] }}</span>
-                            <h3 class="h5 fw-bold text-white mb-2" id="previewTitle">{{ $settings['hero_title'] }}</h3>
-                            <p class="mb-0 text-white-50 small" id="previewSubtitle">{{ $settings['hero_subtitle'] }}</p>
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <label class="form-label small text-muted text-uppercase fw-semibold mb-0"><i class="bi bi-eye me-1"></i> Live Preview Banner Teks (Sesuai Beranda Publik)</label>
+                        <span class="badge bg-secondary-subtle text-secondary small" style="font-size: 0.72rem;">Pratinjau Real-time</span>
+                    </div>
+                    <div id="heroPreviewBox" class="settings-hero rounded-4 position-relative overflow-hidden shadow-sm" style="background-image:linear-gradient(135deg, rgba(10,25,47,.88), rgba(0,51,102,.78)),url('{{ $settings['hero_image'] }}'); min-height: 200px; padding: 2rem 2.25rem;">
+                        <div class="mw-100" style="max-width:680px; position: relative; z-index: 2;">
+                            <div class="d-inline-flex align-items-center gap-1.5 px-3 py-1 rounded-pill mb-2.5" style="background: rgba(255, 193, 7, 0.15); border: 1px solid rgba(255, 193, 7, 0.4); backdrop-filter: blur(8px);">
+                                <i class="bi bi-patch-check-fill text-warning" style="font-size: 0.85rem;"></i>
+                                <span class="fw-bold text-warning" style="font-size: 0.75rem; letter-spacing: 0.5px;" id="previewBadge">{{ $settings['hero_badge'] }}</span>
+                            </div>
+                            <h3 class="fw-bold text-white mb-2" id="previewTitle" style="font-size: clamp(1.2rem, 2vw, 1.65rem); line-height: 1.3;">{{ $settings['hero_title'] }}</h3>
+                            <p class="text-white-50 small mb-3" id="previewSubtitle" style="font-size: 0.88rem; line-height: 1.55; max-width: 580px;">{{ $settings['hero_subtitle'] }}</p>
+                            <div class="d-flex flex-wrap gap-2.5 align-items-center mt-3" id="previewHeroCtaContainer">
+                                <a href="javascript:void(0)" class="btn fw-bold px-3.5 py-2 rounded-pill d-inline-flex align-items-center gap-2 shadow-sm text-dark text-decoration-none" id="previewHeroBtnPrimary" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); border: 1px solid rgba(255, 255, 255, 0.35); font-size: 0.85rem;">
+                                    <span id="previewCtaText">{{ $settings['hero_cta_text'] ?: 'Siap Memulai?' }}</span>
+                                    <i class="bi bi-arrow-right"></i>
+                                </a>
+                                <a href="javascript:void(0)" class="btn rounded-pill px-3 py-2 fw-semibold d-inline-flex align-items-center gap-2 text-white text-decoration-none" style="background: rgba(255, 255, 255, 0.12); backdrop-filter: blur(10px); border: 1.5px solid rgba(255, 255, 255, 0.35); font-size: 0.85rem; pointer-events: none;">
+                                    <i class="bi bi-bar-chart-line"></i>
+                                    <span>Lihat Statistik</span>
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -206,8 +222,8 @@
                                     <img src="{{ $settings['hero_image'] }}" alt="Thumbnail 1" class="rounded border shadow-sm w-100" style="height: 110px; object-fit: cover;" onerror="this.src='https://images.unsplash.com/photo-1562774053-701939374585?w=600'">
                                 </div>
                                 <div class="mb-2">
-                                    <label class="form-label small" for="heroImageFileInput">Upload Gambar</label>
-                                    <input type="file" name="hero_image_file" id="heroImageFileInput" class="form-control form-control-sm" accept="image/png,image/jpeg,image/jpg,image/webp">
+                                    <label class="form-label small" for="heroImageFileInput">Upload Gambar (Bisa Dipotong 16:9)</label>
+                                    <input type="file" name="hero_image_file" id="heroImageFileInput" class="form-control form-control-sm" accept="image/png,image/jpeg,image/jpg,image/webp" data-crop="16:9" data-crop-preview="#previewHero1Wrapper img">
                                 </div>
                                 <div>
                                     <label class="form-label small" for="heroImageUrlInput">atau URL Gambar</label>
@@ -242,8 +258,8 @@
                                     @endif
                                 </div>
                                 <div class="mb-2">
-                                    <label class="form-label small" for="heroImageFile2Input">Upload Gambar</label>
-                                    <input type="file" name="hero_image_file_2" id="heroImageFile2Input" class="form-control form-control-sm" accept="image/png,image/jpeg,image/jpg,image/webp">
+                                    <label class="form-label small" for="heroImageFile2Input">Upload Gambar (Bisa Dipotong 16:9)</label>
+                                    <input type="file" name="hero_image_file_2" id="heroImageFile2Input" class="form-control form-control-sm" accept="image/png,image/jpeg,image/jpg,image/webp" data-crop="16:9" data-crop-preview="#previewHero2Wrapper">
                                 </div>
                                 <div>
                                     <label class="form-label small" for="heroImageUrl2Input">atau URL Gambar</label>
@@ -278,8 +294,8 @@
                                     @endif
                                 </div>
                                 <div class="mb-2">
-                                    <label class="form-label small" for="heroImageFile3Input">Upload Gambar</label>
-                                    <input type="file" name="hero_image_file_3" id="heroImageFile3Input" class="form-control form-control-sm" accept="image/png,image/jpeg,image/jpg,image/webp">
+                                    <label class="form-label small" for="heroImageFile3Input">Upload Gambar (Bisa Dipotong 16:9)</label>
+                                    <input type="file" name="hero_image_file_3" id="heroImageFile3Input" class="form-control form-control-sm" accept="image/png,image/jpeg,image/jpg,image/webp" data-crop="16:9" data-crop-preview="#previewHero3Wrapper">
                                 </div>
                                 <div>
                                     <label class="form-label small" for="heroImageUrl3Input">atau URL Gambar</label>
@@ -353,6 +369,81 @@
                             <div>
                                 <label class="form-label small fw-bold" for="step3Desc">Deskripsi Langkah 3</label>
                                 <textarea name="panduan_step3_desc" id="step3Desc" rows="3" class="form-control">{{ $settings['panduan_step3_desc'] }}</textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Live Preview Panduan Penggunaan --}}
+                <div class="mt-4 pt-3 border-top">
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <label class="form-label small text-muted text-uppercase fw-semibold mb-0"><i class="bi bi-eye me-1"></i> Live Preview Seksi Panduan (Sesuai Beranda Publik)</label>
+                        <span class="badge bg-secondary-subtle text-secondary small" style="font-size: 0.72rem;">Pratinjau Real-time</span>
+                    </div>
+
+                    <div class="p-4 rounded-4 border shadow-xs" style="background: #f8fafc;">
+                        <div class="text-center mb-4">
+                            <div class="text-uppercase fw-bold text-primary mb-1" id="previewPanduanLabel" style="font-size: 0.76rem; letter-spacing: 1.2px;">
+                                {{ $settings['panduan_label'] }}
+                            </div>
+                            <h3 class="fw-bold mb-1 text-dark" id="previewPanduanTitle" style="font-size: 1.35rem;">
+                                {{ $settings['panduan_title'] }}
+                            </h3>
+                            <p class="text-muted small mb-0" id="previewPanduanSubtitle" style="font-size: 0.85rem;">
+                                {{ $settings['panduan_subtitle'] }}
+                            </p>
+                        </div>
+
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <div class="p-3.5 bg-white border rounded-3 text-center h-100 shadow-xs d-flex flex-column justify-content-between" style="min-height: 180px;">
+                                    <div>
+                                        <div class="d-flex align-items-center justify-content-center gap-2 mb-2">
+                                            <span class="badge rounded-pill px-2.5 py-1 fw-bold text-uppercase" id="previewStep1Badge" style="background: #f1f5f9; color: #475569; font-size: 0.68rem; letter-spacing: 0.5px;">
+                                                {{ $settings['panduan_step1_title'] }}
+                                            </span>
+                                            <span class="badge rounded-pill px-2 py-0.5 text-muted fw-semibold" style="background: #f8fafc; font-size: 0.65rem; font-family: monospace;">01 / 03</span>
+                                        </div>
+                                        <div class="fw-bold text-primary mb-1" style="font-size: 1.35rem; font-family: serif;">I</div>
+                                        <p class="text-dark small fw-semibold mb-0" id="previewStep1Desc" style="font-size: 0.82rem; line-height: 1.5;">
+                                            {{ $settings['panduan_step1_desc'] }}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="p-3.5 bg-white border rounded-3 text-center h-100 shadow-xs d-flex flex-column justify-content-between" style="min-height: 180px;">
+                                    <div>
+                                        <div class="d-flex align-items-center justify-content-center gap-2 mb-2">
+                                            <span class="badge rounded-pill px-2.5 py-1 fw-bold text-uppercase" id="previewStep2Badge" style="background: #f1f5f9; color: #475569; font-size: 0.68rem; letter-spacing: 0.5px;">
+                                                {{ $settings['panduan_step2_title'] }}
+                                            </span>
+                                            <span class="badge rounded-pill px-2 py-0.5 text-muted fw-semibold" style="background: #f8fafc; font-size: 0.65rem; font-family: monospace;">02 / 03</span>
+                                        </div>
+                                        <div class="fw-bold text-success mb-1" style="font-size: 1.35rem; font-family: serif;">II</div>
+                                        <p class="text-dark small fw-semibold mb-0" id="previewStep2Desc" style="font-size: 0.82rem; line-height: 1.5;">
+                                            {{ $settings['panduan_step2_desc'] }}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="p-3.5 bg-white border rounded-3 text-center h-100 shadow-xs d-flex flex-column justify-content-between" style="min-height: 180px;">
+                                    <div>
+                                        <div class="d-flex align-items-center justify-content-center gap-2 mb-2">
+                                            <span class="badge rounded-pill px-2.5 py-1 fw-bold text-uppercase" id="previewStep3Badge" style="background: #f1f5f9; color: #475569; font-size: 0.68rem; letter-spacing: 0.5px;">
+                                                {{ $settings['panduan_step3_title'] }}
+                                            </span>
+                                            <span class="badge rounded-pill px-2 py-0.5 text-muted fw-semibold" style="background: #f8fafc; font-size: 0.65rem; font-family: monospace;">03 / 03</span>
+                                        </div>
+                                        <div class="fw-bold text-warning mb-1" style="font-size: 1.35rem; font-family: serif;">III</div>
+                                        <p class="text-dark small fw-semibold mb-0" id="previewStep3Desc" style="font-size: 0.82rem; line-height: 1.5;">
+                                            {{ $settings['panduan_step3_desc'] }}
+                                        </p>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -476,6 +567,99 @@
                     <div class="col-md-4">
                         <label class="form-label" for="footerCopyrightInput">Hak cipta</label>
                         <input type="text" name="footer_copyright" id="footerCopyrightInput" class="form-control" value="{{ $settings['footer_copyright'] }}">
+                    </div>
+                </div>
+
+                {{-- Live Preview Footer (100% Identik Tampilan Asli Beranda Publik) --}}
+                <div class="mt-4 pt-3 border-top">
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <label class="form-label small text-muted text-uppercase fw-semibold mb-0"><i class="bi bi-eye me-1"></i> Live Preview Footer (Sesuai Beranda Publik)</label>
+                        <span class="badge bg-secondary-subtle text-secondary small" style="font-size: 0.72rem;">Pratinjau Real-time</span>
+                    </div>
+
+                    <div class="rounded-4 overflow-hidden border shadow-sm" style="background: linear-gradient(180deg, #1c2438 0%, #151d30 100%) !important; color: #e2e8f0 !important; padding: 3.5rem 2.5rem 2rem; position: relative;">
+                        <div class="row g-4 align-items-start">
+                            {{-- KOLOM 1: BRANDING & DESKRIPSI --}}
+                            <div class="col-lg-5 col-md-6 mb-4 mb-lg-0">
+                                <div class="d-flex align-items-center gap-2 mb-3">
+                                    @php
+                                        $logoImgUrlFooter = '';
+                                        if (!empty($siteLogo)) {
+                                            $logoImgUrlFooter = (str_starts_with($siteLogo, 'http://') || str_starts_with($siteLogo, 'https://')) ? $siteLogo : asset(ltrim($siteLogo, '/'));
+                                        }
+                                    @endphp
+                                    @if(!empty($logoImgUrlFooter))
+                                        <img src="{{ $logoImgUrlFooter }}" alt="{{ $siteTitle ?? 'GuruKuu' }}" style="height: 38px; max-width: 45px; object-fit: contain;" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
+                                        <i class="bi bi-mortarboard-fill fs-3" style="display: none; color: #ffffff;"></i>
+                                    @else
+                                        <i class="bi bi-mortarboard-fill fs-3" style="color: #ffffff;"></i>
+                                    @endif
+                                    <span class="fs-4 fw-bold">
+                                        <span style="color: {{ $siteTitleColor1 ?? '#ffffff' }} !important;">{{ $siteTitlePart1 ?? 'Guru' }}</span><span style="color: {{ $siteTitleColor2 ?? '#FFC107' }} !important;">{{ $siteTitlePart2 ?? 'Kuu' }}</span>
+                                    </span>
+                                </div>
+                                <p class="text-white-50 mb-0" id="previewFooterAbout" style="font-size: 0.9rem; line-height: 1.65; max-width: 420px;">
+                                    {{ $settings['footer_about'] }}
+                                </p>
+                            </div>
+
+                            {{-- KOLOM 2: LAYANAN & LEGAL --}}
+                            <div class="col-lg-3 col-md-6 mb-4 mb-lg-0">
+                                <div class="font-mono fw-bold text-white mb-3 text-uppercase" style="font-size: 0.82rem; letter-spacing: 1.5px;">LAYANAN</div>
+                                <ul class="list-unstyled p-0 m-0">
+                                    <li class="mb-2">
+                                        <a href="javascript:void(0)" class="text-decoration-none d-inline-flex align-items-center gap-2" style="color: #94a3b8; font-size: 0.9rem;">
+                                            <i class="bi bi-chevron-right" style="font-size: 0.75rem; color: #64748b;"></i>
+                                            <span>Kebijakan Privasi</span>
+                                        </a>
+                                    </li>
+                                    <li class="mb-2">
+                                        <a href="javascript:void(0)" class="text-decoration-none d-inline-flex align-items-center gap-2" style="color: #94a3b8; font-size: 0.9rem;">
+                                            <i class="bi bi-chevron-right" style="font-size: 0.75rem; color: #64748b;"></i>
+                                            <span>Syarat & Ketentuan</span>
+                                        </a>
+                                    </li>
+                                    <li class="mb-0">
+                                        <a href="javascript:void(0)" class="text-decoration-none d-inline-flex align-items-center gap-2" style="color: #94a3b8; font-size: 0.9rem;">
+                                            <i class="bi bi-chevron-right" style="font-size: 0.75rem; color: #64748b;"></i>
+                                            <span>Hubungi Admin</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+
+                            {{-- KOLOM 3: KONTAK --}}
+                            <div class="col-lg-4 col-md-12">
+                                <div class="font-mono fw-bold text-white mb-3 text-uppercase" style="font-size: 0.82rem; letter-spacing: 1.5px;">KONTAK</div>
+                                <div class="d-flex align-items-start gap-2.5 mb-2.5" style="color: #94a3b8; font-size: 0.88rem; line-height: 1.5;">
+                                    <i class="bi bi-geo-alt-fill flex-shrink-0" style="color: #f59e0b; font-size: 1.1rem; margin-top: 0.15rem;"></i>
+                                    <span>Jl. KH. Achmad Fauzan No.17, Krasak, Bangsri, Kab. Jepara, Jawa Tengah 59453</span>
+                                </div>
+                                <div class="d-flex align-items-center gap-2.5 mb-2.5" style="color: #94a3b8; font-size: 0.88rem;">
+                                    <i class="bi bi-instagram flex-shrink-0" style="color: #f59e0b; font-size: 1.1rem;"></i>
+                                    <span>@smkn1bangsri</span>
+                                </div>
+                                <div class="d-flex align-items-center gap-2.5" style="color: #94a3b8; font-size: 0.88rem;">
+                                    <i class="bi bi-envelope-fill flex-shrink-0" style="color: #f59e0b; font-size: 1.1rem;"></i>
+                                    <span>smkn1bangsri@yahoo.co.id</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- BOTTOM BAR (CENTERED COPYRIGHT SAMA PERSIS) --}}
+                        <div class="text-center justify-content-center" style="border-top: 1px solid rgba(255, 255, 255, 0.1); padding-top: 1.8rem; margin-top: 2.5rem;">
+                            <div class="text-white-50 small mb-0 w-100 text-center" style="font-size: 0.88rem; color: #94a3b8 !important;" id="previewFooterCopyright">
+                                @php
+                                    $rawCopy = $settings['footer_copyright'];
+                                    if (str_contains($rawCopy, '©') || str_contains($rawCopy, '&copy;')) {
+                                        $finalCopy = $rawCopy;
+                                    } else {
+                                        $finalCopy = '&copy; ' . date('Y') . ' ' . ($siteTitle ?? 'GuruKuu') . ' - SMK Negeri 1 Bangsri. ' . $rawCopy;
+                                    }
+                                @endphp
+                                {!! $finalCopy !!}
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1723,15 +1907,62 @@ document.addEventListener('DOMContentLoaded', function() {
     const heroSubtitle = document.getElementById('heroSubtitleInput');
     const heroUrl = document.getElementById('heroImageUrlInput');
     const heroBadge = document.getElementById('heroBadgeInput');
-    if (heroBadge) heroBadge.addEventListener('input', () => { document.getElementById('previewBadge').textContent = heroBadge.value; });
+    const heroCta = document.getElementById('heroCtaInput');
+
+    if (heroBadge) heroBadge.addEventListener('input', () => { document.getElementById('previewBadge').textContent = heroBadge.value || 'SMK NEGERI 1 BANGSRI • JUARA'; });
     if (heroTitle) heroTitle.addEventListener('input', () => document.getElementById('previewTitle').textContent = heroTitle.value);
     if (heroSubtitle) heroSubtitle.addEventListener('input', () => document.getElementById('previewSubtitle').textContent = heroSubtitle.value);
-    if (heroUrl) heroUrl.addEventListener('input', () => { if (heroUrl.value) heroPreview.style.backgroundImage = `linear-gradient(rgba(10,25,47,.82),rgba(0,51,102,.75)),url('${heroUrl.value}')`; });
+    if (heroCta) heroCta.addEventListener('input', () => {
+        const text = heroCta.value.trim() || 'Siap Memulai?';
+        const ctaEl = document.getElementById('previewCtaText');
+        if (ctaEl) ctaEl.textContent = text;
+    });
+    if (heroUrl) heroUrl.addEventListener('input', () => { if (heroUrl.value) heroPreview.style.backgroundImage = `linear-gradient(135deg, rgba(10,25,47,.88), rgba(0,51,102,.78)),url('${heroUrl.value}')`; });
     document.getElementById('heroImageFileInput')?.addEventListener('change', function() {
         if (!this.files[0]) return;
         const reader = new FileReader();
-        reader.onload = event => heroPreview.style.backgroundImage = `linear-gradient(rgba(10,25,47,.82),rgba(0,51,102,.75)),url('${event.target.result}')`;
+        reader.onload = event => heroPreview.style.backgroundImage = `linear-gradient(135deg, rgba(10,25,47,.88), rgba(0,51,102,.78)),url('${event.target.result}')`;
         reader.readAsDataURL(this.files[0]);
+    });
+
+    // 🌟 Live Preview Seksi Panduan Penggunaan
+    const panduanLabel = document.getElementById('panduanLabelInput');
+    const panduanTitle = document.getElementById('panduanTitleInput');
+    const panduanSub = document.getElementById('panduanSubtitleInput');
+    const s1Title = document.getElementById('step1Title');
+    const s1Desc = document.getElementById('step1Desc');
+    const s2Title = document.getElementById('step2Title');
+    const s2Desc = document.getElementById('step2Desc');
+    const s3Title = document.getElementById('step3Title');
+    const s3Desc = document.getElementById('step3Desc');
+
+    if (panduanLabel) panduanLabel.addEventListener('input', () => { document.getElementById('previewPanduanLabel').textContent = panduanLabel.value; });
+    if (panduanTitle) panduanTitle.addEventListener('input', () => { document.getElementById('previewPanduanTitle').textContent = panduanTitle.value; });
+    if (panduanSub) panduanSub.addEventListener('input', () => { document.getElementById('previewPanduanSubtitle').textContent = panduanSub.value; });
+    if (s1Title) s1Title.addEventListener('input', () => { document.getElementById('previewStep1Badge').textContent = s1Title.value; });
+    if (s1Desc) s1Desc.addEventListener('input', () => { document.getElementById('previewStep1Desc').textContent = s1Desc.value; });
+    if (s2Title) s2Title.addEventListener('input', () => { document.getElementById('previewStep2Badge').textContent = s2Title.value; });
+    if (s2Desc) s2Desc.addEventListener('input', () => { document.getElementById('previewStep2Desc').textContent = s2Desc.value; });
+    if (s3Title) s3Title.addEventListener('input', () => { document.getElementById('previewStep3Badge').textContent = s3Title.value; });
+    if (s3Desc) s3Desc.addEventListener('input', () => { document.getElementById('previewStep3Desc').textContent = s3Desc.value; });
+
+    // 🌟 Live Preview Footer
+    const footerAbout = document.getElementById('footerAboutInput');
+    const footerCopy = document.getElementById('footerCopyrightInput');
+    if (footerAbout) footerAbout.addEventListener('input', () => {
+        const target = document.getElementById('previewFooterAbout');
+        if (target) target.textContent = footerAbout.value;
+    });
+    if (footerCopy) footerCopy.addEventListener('input', () => {
+        const target = document.getElementById('previewFooterCopyright');
+        if (target) {
+            const raw = footerCopy.value;
+            if (raw.includes('©') || raw.includes('&copy;')) {
+                target.innerHTML = raw;
+            } else {
+                target.innerHTML = '&copy; ' + new Date().getFullYear() + ' GuruKuu - SMK Negeri 1 Bangsri. ' + raw;
+            }
+        }
     });
 
     window.toggleResetScope = function(scope) {

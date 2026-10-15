@@ -84,7 +84,7 @@
                             <p class="text-muted small mb-3">Gunakan foto resmi atau formal dengan format PNG/JPG (Maks 2MB).</p>
                         </div>
                         <div>
-                            <input type="file" name="photo" id="photoInput" class="form-control form-control-sm" accept="image/png, image/jpeg, image/jpg, image/webp">
+                            <input type="file" name="photo" id="photoInput" class="form-control form-control-sm" accept="image/png, image/jpeg, image/jpg, image/webp" data-crop="1:1" data-crop-preview="#avatarPreview">
                         </div>
                     </div>
                 </div>

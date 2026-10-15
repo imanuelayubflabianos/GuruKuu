@@ -19,13 +19,16 @@ class DashboardController extends Controller
             ? $user->kelas()->wherePivot('tahun_ajaran', $periodeAktif->tahun_ajaran)->first()
             : null;
 
+        // Guru yang mengajar kelas siswa
+        $guruKelasIds = $kelasAktif ? $kelasAktif->guru()->pluck('guru.id')->toArray() : [];
+
         // Semua Guru di sekolah
         $semuaGuru = \App\Models\Guru::with('jurusan')
             ->withCount(['penilaian' => function ($q) use ($periodeAktif) {
                 if ($periodeAktif) $q->where('periode_id', $periodeAktif->id);
             }])
             ->get();
-        $guruDiKelas = $semuaGuru; // Kompatibel dengan view
+        $guruDiKelas = !empty($guruKelasIds) ? $semuaGuru->whereIn('id', $guruKelasIds) : $semuaGuru;
         $guruNormada = $semuaGuru->where('kategori', 'normada');
         $guruProduktif = $semuaGuru->where('kategori', 'produktif');
 
@@ -36,8 +39,8 @@ class DashboardController extends Controller
         $sudahDinilai = $periodeAktif
             ? Penilaian::where('siswa_id', $user->id)->where('periode_id', $periodeAktif->id)->pluck('guru_id')->toArray()
             : [];
-        $totalGuru = $semuaGuru->count();
-        $jumlahSudah = count($sudahDinilai);
+        $totalGuru = !empty($guruKelasIds) ? count($guruKelasIds) : $semuaGuru->count();
+        $jumlahSudah = !empty($guruKelasIds) ? count(array_intersect($sudahDinilai, $guruKelasIds)) : count($sudahDinilai);
 
         // Riwayat terakhir
         $riwayatTerakhir = Penilaian::where('siswa_id', $user->id)

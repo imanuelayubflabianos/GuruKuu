@@ -650,6 +650,14 @@ class SiPintuService
                 if ($matchedJurusan) $jurusanId = $matchedJurusan->id;
             }
 
+            // KEAMANAN DATA: Jangan pernah timpa foto guru yang sudah diupload manual di web jika data SiPintu kosong/hanya avatar bawaan
+            $existingGuru = Guru::where('nip', (string) $nip)->first();
+            if ($existingGuru && !empty($existingGuru->photo)) {
+                if (empty($photo) || str_contains((string)$photo, 'ui-avatars.com')) {
+                    $photo = $existingGuru->photo;
+                }
+            }
+
             $guru = Guru::updateOrCreate(['nip' => (string) $nip], [
                 'nama' => $nama,
                 'email' => $email,

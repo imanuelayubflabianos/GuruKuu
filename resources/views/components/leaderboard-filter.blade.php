@@ -955,4 +955,34 @@ img.rounded-circle {
 .gk-bar-blue-low {
     background: linear-gradient(90deg, #38bdf8, #93c5fd) !important;
 }
+
+/* UNIFIED LEADERBOARD TABLE HEADERS & BORDER - IDENTIK DENGAN DASHBOARD SISWA */
+.table-custom {
+    margin-bottom: 0 !important;
+}
+.table-custom thead th {
+    font-family: 'JetBrains Mono', monospace !important;
+    font-size: 0.7rem !important;
+    font-weight: 600 !important;
+    color: #64748b !important; /* Soft Slate Blue / Muted */
+    letter-spacing: 1px !important;
+    text-transform: uppercase !important;
+    border-bottom: 1px solid #e2e8f0 !important;
+    padding: 1rem 1.25rem !important;
+    background-color: #ffffff !important;
+    vertical-align: middle !important;
+    white-space: nowrap !important;
+}
+.table-custom tbody td {
+    padding: 1rem 1.25rem !important;
+    vertical-align: middle !important;
+    border-bottom: 1px solid #e2e8f0 !important;
+}
+[data-bs-theme="dark"] .table-custom thead th,
+[data-theme="dark"] .table-custom thead th,
+.dark-theme .table-custom thead th {
+    color: #94a3b8 !important;
+    background-color: transparent !important;
+    border-bottom-color: rgba(255, 255, 255, 0.1) !important;
+}
 </style>

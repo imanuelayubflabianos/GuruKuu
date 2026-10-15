@@ -7,6 +7,14 @@
         <h1 class="page-title mb-1">Leaderboard Guru</h1>
         <p class="page-subtitle text-muted mb-0">Monitoring peringkat guru terbaik berdasarkan evaluasi dan ulasan siswa.</p>
     </div>
+    <div class="w-100 mt-2">
+        <div class="d-inline-flex align-items-center gap-2 px-3 py-1.5 rounded-pill border" style="background: rgba(0, 51, 102, 0.04); border-color: rgba(0, 51, 102, 0.12) !important;">
+            <i class="bi bi-info-circle text-primary flex-shrink-0" style="font-size: 0.85rem;"></i>
+            <span class="text-muted small" style="font-size: 0.8rem; line-height: 1.4;">
+                <strong>Catatan:</strong> Leaderboard ini hanyalah fitur apresiasi tambahan. Fokus utama evaluasi adalah refleksi pembelajaran, dedikasi, serta kedisiplinan guru dalam mengajar.
+            </span>
+        </div>
+    </div>
     <div class="d-flex gap-2 align-items-center">
         <div class="dropdown">
             <button class="btn btn-primary-custom dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -100,7 +108,7 @@
                                 <span class="position-relative text-white" style="z-index: 2; text-shadow: 0 1px 2px rgba(0,0,0,0.6);">{{ $pct1 }}%</span>
                             </div>
                         </div>
-                        <small class="text-muted font-mono d-block mb-3" style="font-size: 0.8rem;">{{ $top1->total_penilaian }} {{ $mode === 'partisipasi' ? 'siswa memilih' : 'ulasan' }}</small>
+                        <small class="text-muted font-mono d-block mb-3" style="font-size: 0.8rem;">{{ $top1->total_penilaian }} {{ $mode === 'partisipasi' ? 'siswa yang menilai' : 'ulasan' }}</small>
                     </div>
 
                     <a href="{{ route('admin.guru.show', $top1->id) }}" class="btn btn-sm btn-outline-primary gk-btn-podium-profile mb-2">
@@ -156,7 +164,7 @@
                                 <span class="position-relative text-white" style="z-index: 2; text-shadow: 0 1px 2px rgba(0,0,0,0.6);">{{ $pct2 }}%</span>
                             </div>
                         </div>
-                        <small class="text-muted font-mono d-block mb-3" style="font-size: 0.78rem;">{{ $top2->total_penilaian }} {{ $mode === 'partisipasi' ? 'siswa memilih' : 'ulasan' }}</small>
+                        <small class="text-muted font-mono d-block mb-3" style="font-size: 0.78rem;">{{ $top2->total_penilaian }} {{ $mode === 'partisipasi' ? 'siswa yang menilai' : 'ulasan' }}</small>
                     </div>
                     <a href="{{ route('admin.guru.show', $top2->id) }}" class="btn btn-sm btn-outline-primary gk-btn-podium-profile mb-2">
                         <i class="bi bi-eye me-1"></i> Profil
@@ -204,7 +212,7 @@
                                 <span class="position-relative text-white" style="z-index: 2; text-shadow: 0 1px 2px rgba(0,0,0,0.6);">{{ $pct1 }}%</span>
                             </div>
                         </div>
-                        <small class="text-muted font-mono d-block mb-3" style="font-size: 0.8rem;">{{ $top1->total_penilaian }} {{ $mode === 'partisipasi' ? 'siswa memilih' : 'ulasan' }}</small>
+                        <small class="text-muted font-mono d-block mb-3" style="font-size: 0.8rem;">{{ $top1->total_penilaian }} {{ $mode === 'partisipasi' ? 'siswa yang menilai' : 'ulasan' }}</small>
                     </div>
                     <a href="{{ route('admin.guru.show', $top1->id) }}" class="btn btn-sm btn-outline-primary gk-btn-podium-profile mb-2">
                         <i class="bi bi-eye me-1"></i> Profil
@@ -260,7 +268,7 @@
                                 <span class="position-relative text-white" style="z-index: 2; text-shadow: 0 1px 2px rgba(0,0,0,0.6);">{{ $pct2 }}%</span>
                             </div>
                         </div>
-                        <small class="text-muted font-mono d-block mb-3" style="font-size: 0.78rem;">{{ $top2->total_penilaian }} {{ $mode === 'partisipasi' ? 'siswa memilih' : 'ulasan' }}</small>
+                        <small class="text-muted font-mono d-block mb-3" style="font-size: 0.78rem;">{{ $top2->total_penilaian }} {{ $mode === 'partisipasi' ? 'siswa yang menilai' : 'ulasan' }}</small>
                     </div>
                     <a href="{{ route('admin.guru.show', $top2->id) }}" class="btn btn-sm btn-outline-primary gk-btn-podium-profile mb-2">
                         <i class="bi bi-eye me-1"></i> Profil
@@ -308,7 +316,7 @@
                                 <span class="position-relative text-white" style="z-index: 2; text-shadow: 0 1px 2px rgba(0,0,0,0.6);">{{ $pct1 }}%</span>
                             </div>
                         </div>
-                        <small class="text-muted font-mono d-block mb-3" style="font-size: 0.8rem;">{{ $top1->total_penilaian }} {{ $mode === 'partisipasi' ? 'siswa memilih' : 'ulasan' }}</small>
+                        <small class="text-muted font-mono d-block mb-3" style="font-size: 0.8rem;">{{ $top1->total_penilaian }} {{ $mode === 'partisipasi' ? 'siswa yang menilai' : 'ulasan' }}</small>
                     </div>
                     <a href="{{ route('admin.guru.show', $top1->id) }}" class="btn btn-sm btn-outline-primary gk-btn-podium-profile mb-2">
                         <i class="bi bi-eye me-1"></i> Profil
@@ -356,7 +364,7 @@
                                 <span class="position-relative text-white" style="z-index: 2; text-shadow: 0 1px 2px rgba(0,0,0,0.6);">{{ $pct3 }}%</span>
                             </div>
                         </div>
-                        <small class="text-muted font-mono d-block mb-3" style="font-size: 0.75rem;">{{ $top3->total_penilaian }} {{ $mode === 'partisipasi' ? 'siswa memilih' : 'ulasan' }}</small>
+                        <small class="text-muted font-mono d-block mb-3" style="font-size: 0.75rem;">{{ $top3->total_penilaian }} {{ $mode === 'partisipasi' ? 'siswa yang menilai' : 'ulasan' }}</small>
                     </div>
                     <a href="{{ route('admin.guru.show', $top3->id) }}" class="btn btn-sm btn-outline-primary gk-btn-podium-profile mb-2">
                         <i class="bi bi-eye me-1"></i> Profil
@@ -381,7 +389,7 @@
                     <th class="align-middle">NAMA GURU</th>
                     <th class="text-center align-middle">JURUSAN / KEAHLIAN</th>
                     <th style="width: 200px;" class="align-middle">{{ $mode === 'partisipasi' ? 'PARTISIPASI KELAS' : 'RATING KEPUASAN' }}</th>
-                    <th class="text-center align-middle">{{ $mode === 'partisipasi' ? 'SISWA MEMILIH' : 'TOTAL ULASAN' }}</th>
+                    <th class="text-center align-middle">{{ $mode === 'partisipasi' ? 'SISWA YANG MENILAI' : 'TOTAL ULASAN' }}</th>
                     <th class="text-center align-middle" style="width: 140px;">AKSI</th>
                 </tr>
             </thead>

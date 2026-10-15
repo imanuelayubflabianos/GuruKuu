@@ -66,9 +66,25 @@ class Setting extends Model
         );
 
         self::$runtimeCache = null;
-        Cache::forget('gurukuu_all_settings');
-        Cache::forget("setting_{$key}");
+        try {
+            Cache::forget('gurukuu_all_settings');
+            Cache::forget("setting_{$key}");
+            Cache::flush();
+        } catch (\Throwable $e) {}
 
         return $setting;
+    }
+
+    /**
+     * Bersihkan seluruh cache settings dan view cache
+     */
+    public static function clearAllCache(): void
+    {
+        self::$runtimeCache = null;
+        try {
+            Cache::forget('gurukuu_all_settings');
+            Cache::flush();
+            \Illuminate\Support\Facades\Artisan::call('view:clear');
+        } catch (\Throwable $e) {}
     }
 }

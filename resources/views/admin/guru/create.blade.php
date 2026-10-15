@@ -19,8 +19,11 @@
                 <div class="row g-3">
                     <div class="col-12 text-center mb-3">
                         <label class="form-label font-mono small fw-bold text-muted">FOTO PROFIL</label>
-                        <input type="file" name="photo" class="form-control" style="border-radius: 8px; max-width: 400px; margin: 0 auto;" accept="image/*">
-                        <small class="text-muted">Format: JPG, PNG. Maksimal 2MB.</small>
+                        <div class="mb-2 position-relative d-inline-block">
+                            <img id="avatarPreviewNewGuru" src="https://ui-avatars.com/api/?name=Guru+Baru&background=003366&color=fff" class="rounded-circle shadow-sm" style="width: 100px; height: 100px; object-fit: cover; border: 3px solid var(--border);">
+                        </div>
+                        <input type="file" name="photo" id="photoInputNewGuru" class="form-control" style="border-radius: 8px; max-width: 400px; margin: 0 auto;" accept="image/png,image/jpeg,image/jpg,image/webp" data-crop="1:1" data-crop-preview="#avatarPreviewNewGuru">
+                        <small class="text-muted d-block mt-1">Klik untuk memilih & memotong foto. Format: JPG, PNG. Maksimal 2MB.</small>
                         @error('photo')<div class="text-danger small">{{ $message }}</div>@enderror
                     </div>
                     <div class="col-md-6">

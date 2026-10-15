@@ -91,14 +91,33 @@
                     <a href="{{ route('admin.leaderboard.index') }}" class="small text-decoration-none">Lihat semua</a>
                 </div>
                 @forelse($topGuru as $index => $guru)
+                    @php
+                        $ratingBintang = number_format($guru->rata_rata_nilai, 1);
+                        $persenNilai = number_format(($guru->rata_rata_nilai / 5) * 100, 0);
+                        $totalPenilai = $guru->total_penilaian;
+                    @endphp
                     <a href="{{ route('admin.guru.show', $guru) }}" class="dashboard-list-item">
                         <span class="dashboard-rank">{{ $index + 1 }}</span>
-                        <img src="{{ $guru->photo_url }}" alt="" class="dashboard-avatar">
+                        <img src="{{ $guru->photo_url }}" alt="{{ $guru->nama }}" class="dashboard-avatar" onerror="this.src='https://ui-avatars.com/api/?name={{ urlencode($guru->nama) }}&background=003366&color=fff'">
                         <div class="flex-grow-1 min-w-0" style="min-width: 0; overflow: hidden;">
-                            <div class="fw-semibold text-truncate">{{ $guru->nama }}</div>
-                            <small class="text-muted d-block text-truncate">{{ $guru->jurusan?->nama_jurusan ?? 'Umum' }} · {{ $guru->total_penilaian }} penilaian</small>
+                            <div class="fw-semibold text-truncate text-dark">{{ $guru->nama }}</div>
+                            <div class="d-flex align-items-center gap-2 flex-wrap mt-0.5">
+                                <small class="text-muted text-truncate">{{ $guru->jurusan?->nama_jurusan ?? 'Umum' }}</small>
+                                <span class="badge bg-light text-muted border px-1.5 py-0.5" style="font-size: 0.68rem;">
+                                    <i class="bi bi-people-fill me-1 text-primary"></i>{{ number_format($totalPenilai) }} penilai
+                                </span>
+                            </div>
                         </div>
-                        <strong class="text-primary flex-shrink-0 ms-2">{{ number_format(($guru->rata_rata_nilai / 5) * 100, 0) }}%</strong>
+                        <div class="text-end flex-shrink-0 ms-2">
+                            <div class="d-inline-flex align-items-center gap-1 bg-warning-subtle text-warning-emphasis px-2 py-0.5 rounded-pill fw-bold" style="font-size: 0.78rem;">
+                                <i class="bi bi-star-fill text-warning"></i>
+                                <span>{{ $ratingBintang }}</span>
+                                <span class="text-muted fw-normal" style="font-size: 0.7rem;">/ 5.0</span>
+                            </div>
+                            <div class="small fw-bold text-primary mt-1" style="font-size: 0.75rem;">
+                                {{ $persenNilai }}% kepuasan
+                            </div>
+                        </div>
                     </a>
                 @empty
                     <div class="dashboard-empty"><i class="bi bi-inbox d-block fs-4 mb-2"></i>Belum ada penilaian.</div>

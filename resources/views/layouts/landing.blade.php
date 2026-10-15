@@ -347,8 +347,13 @@
             box-shadow: 0 10px 25px rgba(119, 119, 119, 0.55);
         }
 
-        .btn-primary-custom { background: var(--primary); color: white; padding: 0.75rem 1.5rem; border-radius: 8px; font-weight: 600; border: none; text-decoration: none; display: inline-block; }
+        .btn-primary-custom { background: var(--primary); color: white; padding: 0.6rem 1.25rem; border-radius: 8px; font-weight: 600; border: none; text-decoration: none; display: inline-block; }
         .btn-primary-custom:hover { background: var(--primary-light); color: white; }
+        .btn-outline-custom { background: white; color: var(--primary); border: 1px solid var(--border); padding: 0.6rem 1.25rem; border-radius: 8px; font-weight: 600; text-decoration: none; display: inline-block; }
+        .btn-outline-custom:hover { background: #f8fafc; color: var(--primary); border-color: var(--primary); }
+        .table-custom { margin-bottom: 0; }
+        .table-custom thead th { font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; font-weight: 600; color: var(--text-muted); letter-spacing: 1px; text-transform: uppercase; border-bottom: 1px solid var(--border); padding: 1rem 1.5rem; }
+        .table-custom tbody td { padding: 1rem 1.5rem; vertical-align: middle; border-bottom: 1px solid var(--border); }
 
         @media (max-width: 991.98px) {
             .navbar-custom {
@@ -416,8 +421,15 @@
     <nav class="navbar navbar-expand-lg navbar-custom fixed-top">
         <div class="container d-flex align-items-center justify-content-between">
             <a class="navbar-brand navbar-brand-custom d-flex align-items-center gap-2 m-0" href="{{ route('landing.index') }}">
-                @if(!empty($siteLogo))
-                    <img src="{{ $siteLogo }}" alt="{{ $siteTitle ?? 'GuruKuu' }}" style="height: 36px; max-width: 45px; object-fit: contain;">
+                @php
+                    $logoImgUrl = '';
+                    if (!empty($siteLogo)) {
+                        $logoImgUrl = (str_starts_with($siteLogo, 'http://') || str_starts_with($siteLogo, 'https://')) ? $siteLogo : asset(ltrim($siteLogo, '/'));
+                    }
+                @endphp
+                @if(!empty($logoImgUrl))
+                    <img src="{{ $logoImgUrl }}" alt="{{ $siteTitle ?? 'GuruKuu' }}" style="height: 36px; max-width: 45px; object-fit: contain;" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
+                    <i class="bi bi-mortarboard-fill fs-3" style="display: none; color: {{ $siteTitleColor1 ?? '#003366' }};"></i>
                 @else
                     <i class="bi bi-mortarboard-fill fs-3" style="color: {{ $siteTitleColor1 ?? '#003366' }};"></i>
                 @endif
@@ -504,13 +516,20 @@
                 {{-- KOLOM 1: BRANDING & DESKRIPSI --}}
                 <div class="col-lg-5 col-md-6 mb-4 mb-lg-0">
                     <div class="footer-brand-title d-flex align-items-center gap-2">
-                        @if(!empty($siteLogo))
-                            <img src="{{ $siteLogo }}" alt="{{ $siteTitle ?? 'GuruKuu' }}" style="height: 38px; max-width: 45px; object-fit: contain;">
+                        @php
+                            $logoImgUrlFooter = '';
+                            if (!empty($siteLogo)) {
+                                $logoImgUrlFooter = (str_starts_with($siteLogo, 'http://') || str_starts_with($siteLogo, 'https://')) ? $siteLogo : asset(ltrim($siteLogo, '/'));
+                            }
+                        @endphp
+                        @if(!empty($logoImgUrlFooter))
+                            <img src="{{ $logoImgUrlFooter }}" alt="{{ $siteTitle ?? 'GuruKuu' }}" style="height: 38px; max-width: 45px; object-fit: contain;" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
+                            <i class="bi bi-mortarboard-fill fs-3" style="display: none; color: #ffffff;"></i>
                         @else
-                            <i class="bi bi-mortarboard-fill fs-3" style="color: {{ $siteTitleColor1 ?? '#003366' }};"></i>
+                            <i class="bi bi-mortarboard-fill fs-3" style="color: #ffffff;"></i>
                         @endif
                         <span class="fs-4 fw-bold">
-                            <span style="color: {{ $siteTitleColor1 ?? '#ffffffff' }} !important;">{{ $siteTitlePart1 ?? 'Guru' }}</span><span style="color: {{ $siteTitleColor2 ?? '#FFC107' }} !important;">{{ $siteTitlePart2 ?? 'Kuu' }}</span>
+                            <span style="color: {{ $siteTitleColor1 ?? '#ffffff' }} !important;">{{ $siteTitlePart1 ?? 'Guru' }}</span><span style="color: {{ $siteTitleColor2 ?? '#FFC107' }} !important;">{{ $siteTitlePart2 ?? 'Kuu' }}</span>
                         </span>
                     </div>
                     <p class="text-white-50 mb-0" style="font-size: 0.9rem; line-height: 1.65; max-width: 420px;">
