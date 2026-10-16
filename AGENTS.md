@@ -20,3 +20,8 @@ Aturan permanen untuk setiap prompt dan eksekusi:
 
 5. **Minimalkan Bug Menyeluruh**:
    - Tuntaskan bug hingga tidak ada yang tersisa sehingga sistem benar-benar jadi dan stabil.
+
+6. **Wajib Rujuk & Sinkronkan Dokumentasi Sistem**:
+   - Selalu baca dan patuhi [GURUKUU_SYSTEM_DOCUMENTATION.md](file:///c:/Users/ADVAN/PROJEK/Laravel/GuruKuu/GURUKUU_SYSTEM_DOCUMENTATION.md) sebelum menganalisis atau mengubah kode.
+   - Setiap kali melakukan penambahan fitur, perubahan alur, rumus, atau perbaikan sistem, AI **WAJIB** memperbarui file dokumentasi tersebut agar informasinya tidak pernah usang bagi AI/pengembang berikutnya.
+

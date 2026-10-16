@@ -101,12 +101,20 @@ class Guru extends Model
             $periodeId = $periodeAktif?->id;
         }
 
-        $cacheKey = $mode . '_' . ($kelasId ?? 0) . '_' . ($periodeId ?? 0);
+        $cacheKey = 'guru_lb_' . $mode . '_' . ($kelasId ?? 0) . '_' . ($periodeId ?? 0);
         if (isset(self::$leaderboardCache[$cacheKey])) {
             return self::$leaderboardCache[$cacheKey];
         }
 
+        try {
+            $cached = \Illuminate\Support\Facades\Cache::get($cacheKey);
+            if ($cached !== null) {
+                return self::$leaderboardCache[$cacheKey] = $cached;
+            }
+        } catch (\Throwable $e) {}
+
         $query = self::with(['jurusan', 'penghargaan.badge']);
+
 
         if ($mode === 'partisipasi') {
             if (!$kelasId) return collect();
@@ -243,8 +251,16 @@ class Guru extends Model
             $guru->setAttribute('leaderboard_rank', null);
         }
 
-        return self::$leaderboardCache[$cacheKey] = $eligible->concat($notEligible);
+        $result = $eligible->concat($notEligible);
+        self::$leaderboardCache[$cacheKey] = $result;
+
+        try {
+            \Illuminate\Support\Facades\Cache::put($cacheKey, $result, 60);
+        } catch (\Throwable $e) {}
+
+        return $result;
     }
+
 
     // ==================== ACCESSOR & HELPER ====================
 
@@ -374,6 +390,16 @@ class Guru extends Model
             'rata_rata_nilai' => round($penilaian->avg('total_nilai') / 5, 2),
             'total_penilaian' => $penilaian->count(),
         ]);
+
+        self::clearLeaderboardCache();
+    }
+
+    public static function clearLeaderboardCache(): void
+    {
+        self::$leaderboardCache = [];
+        try {
+            \Illuminate\Support\Facades\Cache::flush();
+        } catch (\Throwable $e) {}
     }
 
     public static function recalculateAll(?int $periodeId = null): void
