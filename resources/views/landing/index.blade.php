@@ -1138,37 +1138,46 @@
     opacity: 1 !important;
 }
 
-/* 📱 RESPONSIVE MOBILE: PANAH NAIK KE TENGAH, KONTRAS TINGGI, BEBAS OVERLAP */
+/* 📱 RESPONSIVE MOBILE: PANAH PAS DI TENGAH (33%), KONTRAS TINGGI, 100% BEBAS OVERLAP */
 @media (max-width: 767.98px) {
     .hero-content-container {
-        padding-left: 44px !important;
-        padding-right: 44px !important;
+        padding-left: 48px !important;
+        padding-right: 48px !important;
         padding-top: 140px !important;
         padding-bottom: 90px !important;
     }
+    .hero-content-container .row {
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+    }
+    .hero-content-container [class*="col-"] {
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+    }
     #heroPrevBtn,
     #heroNextBtn {
-        top: 28% !important; /* Naik ke area tengah judul/badge hero mobile */
+        top: 33% !important; /* Pas di tengah-tengah antara judul dan tombol */
         transform: translateY(-50%) !important;
-        width: 34px !important;
-        height: 34px !important;
+        width: 32px !important;
+        height: 32px !important;
         opacity: 0.95 !important;
         z-index: 30 !important;
     }
     #heroPrevBtn {
-        left: 5px !important;
+        left: 6px !important;
     }
     #heroNextBtn {
-        right: 5px !important;
+        right: 6px !important;
     }
     #heroPrevBtn .carousel-control-prev-icon,
     #heroNextBtn .carousel-control-next-icon {
-        width: 32px !important;
-        height: 32px !important;
-        background-color: rgba(15, 23, 42, 0.78) !important;
-        backdrop-filter: blur(6px) !important;
-        border: 1.5px solid rgba(255, 255, 255, 0.45) !important;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important;
+        width: 30px !important;
+        height: 30px !important;
+        background-color: rgba(10, 25, 47, 0.85) !important;
+        backdrop-filter: blur(8px) !important;
+        border: 1.5px solid rgba(255, 255, 255, 0.6) !important;
+        border-radius: 50% !important;
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45) !important;
         background-size: 50% 50% !important;
     }
 
