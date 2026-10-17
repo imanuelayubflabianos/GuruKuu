@@ -70,13 +70,13 @@ class PenilaianBalasanController extends Controller
             return back()->with('error', $msg);
         }
 
-        // ⏱️ SLOWMODE ANTI-SPAM (Mirip Discord Cooldown)
+        // ⏱️ SLOWMODE ANTI-SPAM
         $cooldownSeconds = 25;
         $slowmodeKey = "slowmode_reply_{$user->id}";
         if ($user->role !== 'admin' && Cache::has($slowmodeKey)) {
             $expiresAt = Cache::get($slowmodeKey);
             $remaining = max(1, $expiresAt - now()->timestamp);
-            $msg = "Mode lambat (Slowmode) aktif seperti Discord! Harap tunggu {$remaining} detik sebelum dapat mengirim pesan lagi.";
+            $msg = "Mode lambat (Slowmode) aktif! Harap tunggu {$remaining} detik sebelum dapat mengirim pesan lagi.";
             if ($request->ajax() || $request->wantsJson()) {
                 return response()->json(['success' => false, 'message' => $msg, 'remaining' => $remaining], 429);
             }
@@ -166,7 +166,10 @@ class PenilaianBalasanController extends Controller
                     'pesan' => $balasan->pesan,
                     'role' => $balasan->role,
                     'is_anonim' => $balasan->is_anonim,
+                    'user_id' => $balasan->user_id,
                     'created_at_human' => $balasan->created_at->diffForHumans(),
+                    'update_url' => route('penilaian.balasan.update', $balasan),
+                    'destroy_url' => route('penilaian.balasan.destroy', $balasan),
                 ]
             ]);
         }
@@ -175,16 +178,127 @@ class PenilaianBalasanController extends Controller
     }
 
     /**
-     * Hapus balasan
+     * Edit balasan ulasan
      */
-    public function destroy(PenilaianBalasan $balasan)
+    public function update(Request $request, PenilaianBalasan $balasan)
     {
         $user = Auth::user();
         if (!$user) {
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => 'Silakan login terlebih dahulu.'], 401);
+            }
             return back()->with('error', 'Silakan login terlebih dahulu.');
         }
 
-        if ($user->role !== 'admin' && $balasan->user_id !== $user->id) {
+        // Hanya pembuat balasan atau admin yang berhak mengedit
+        if ($user->role !== 'admin' && (int)$balasan->user_id !== (int)$user->id) {
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => 'Anda tidak memiliki wewenang untuk mengubah balasan ini.'], 403);
+            }
+            return back()->with('error', 'Anda tidak memiliki wewenang untuk mengubah balasan ini.');
+        }
+
+        if ($user->isDeactivated()) {
+            $msg = 'Akun Anda sedang dinonaktifkan oleh Admin/Operator Sekolah.';
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => $msg], 403);
+            }
+            return back()->with('error', $msg);
+        }
+
+        $validated = $request->validate([
+            'pesan' => 'required|string|min:2|max:255',
+        ], [
+            'pesan.required' => 'Isi balasan tidak boleh kosong.',
+            'pesan.max' => 'Panjang balasan melebihi batas maksimal 255 karakter.',
+        ]);
+
+        if (ProfanityFilterService::containsLink($validated['pesan'])) {
+            $msg = 'Balasan ulasan tidak boleh mengandung tautan / link URL luar demi keamanan sistem.';
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => $msg], 422);
+            }
+            return back()->withInput()->with('error', $msg);
+        }
+
+        $profanityFilter = new ProfanityFilterService();
+        $filterResult = $profanityFilter->check($validated['pesan']);
+
+        if (!$filterResult['clean']) {
+            $detectedWords = $filterResult['detected'] ?? [];
+
+            Pelanggaran::create([
+                'user_id' => $user->id,
+                'guru_id' => $balasan->penilaian->guru_id ?? null,
+                'penilaian_id' => $balasan->penilaian_id,
+                'tipe' => 'balasan_ulasan',
+                'isi_teks' => $validated['pesan'],
+                'kata_terdeteksi' => $detectedWords,
+                'ip_address' => $request->ip(),
+                'user_agent' => $request->userAgent(),
+                'tindakan' => 'diblokir_otomatis',
+                'is_read' => false,
+            ]);
+
+            $user->increment('warning_count');
+
+            $wordList = implode(', ', $detectedWords);
+            $msg = "Edit balasan diblokir karena mengandung kata yang melanggar: \"{$wordList}\". Pelanggaran telah dicatat sistem.";
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => $msg, 'violation' => true], 422);
+            }
+            return back()->with('violation_popup', $msg);
+        }
+
+        $balasan->update([
+            'pesan' => trim($validated['pesan']),
+        ]);
+
+        // Jika guru yang mengedit balasan, sinkronkan balasan_guru pada penilaian jika ini balasan terbaru
+        if ($balasan->role === 'guru') {
+            $penilaian = $balasan->penilaian;
+            if ($penilaian) {
+                $lastGuruReply = PenilaianBalasan::where('penilaian_id', $penilaian->id)
+                    ->where('role', 'guru')
+                    ->latest()
+                    ->first();
+
+                if ($lastGuruReply && (int)$lastGuruReply->id === (int)$balasan->id) {
+                    $penilaian->update([
+                        'balasan_guru' => trim($validated['pesan']),
+                    ]);
+                }
+            }
+        }
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Balasan ulasan berhasil diperbarui.',
+                'pesan' => $balasan->pesan,
+            ]);
+        }
+
+        return back()->with('success', 'Balasan ulasan berhasil diperbarui.');
+    }
+
+    /**
+     * Hapus balasan
+     */
+    public function destroy(Request $request, PenilaianBalasan $balasan)
+    {
+        $user = Auth::user();
+        if (!$user) {
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => 'Silakan login terlebih dahulu.'], 401);
+            }
+            return back()->with('error', 'Silakan login terlebih dahulu.');
+        }
+
+        if ($user->role !== 'admin' && (int)$balasan->user_id !== (int)$user->id) {
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => 'Anda tidak memiliki wewenang untuk menghapus balasan ini.'], 403);
+            }
             return back()->with('error', 'Anda tidak memiliki wewenang untuk menghapus balasan ini.');
         }
 
@@ -192,7 +306,7 @@ class PenilaianBalasanController extends Controller
         $balasan->delete();
 
         // Update ulasan jika balasan guru terakhir dihapus
-        if ($balasan->role === 'guru') {
+        if ($balasan->role === 'guru' && $penilaian) {
             $lastGuruReply = PenilaianBalasan::where('penilaian_id', $penilaian->id)
                 ->where('role', 'guru')
                 ->latest()
@@ -201,6 +315,13 @@ class PenilaianBalasanController extends Controller
             $penilaian->update([
                 'balasan_guru' => $lastGuruReply ? $lastGuruReply->pesan : null,
                 'balasan_guru_at' => $lastGuruReply ? $lastGuruReply->created_at : null,
+            ]);
+        }
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Balasan ulasan berhasil dihapus.',
             ]);
         }
 

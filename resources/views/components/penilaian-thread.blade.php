@@ -35,7 +35,7 @@
         $senderBadge = 'Penulis Ulasan (Anonim)';
     }
 
-    // Hitung sisa cooldown slowmode (25 detik ala Discord)
+    // Hitung sisa cooldown slowmode (25 detik)
     $cooldownKey = $user ? "slowmode_reply_{$user->id}" : null;
     $remainingCooldown = ($user && !$isAdmin && \Illuminate\Support\Facades\Cache::has($cooldownKey)) 
         ? max(0, \Illuminate\Support\Facades\Cache::get($cooldownKey) - now()->timestamp) 
@@ -145,7 +145,7 @@
                 @endforeach
             </div>
 
-            {{-- FORM BALAS CEPAT DENGAN DISCORD-STYLE SLOWMODE (HANYA UNTUK GURU & SISWA TERKAIT, ADMIN HANYA MEMANTAU) --}}
+            {{-- FORM BALAS CEPAT DENGAN SLOWMODE ANTI-SPAM (HANYA UNTUK GURU & SISWA TERKAIT, ADMIN HANYA MEMANTAU) --}}
             @if($canReply)
                 <div class="p-2.5 rounded-3 border bg-white shadow-xs mt-2 reply-box-container">
                     <form action="{{ route('penilaian.balasan.store', $penilaian) }}" 
@@ -189,7 +189,7 @@
                                 <div class="slowmode-banner small mt-1.5 p-1.5 rounded-2 bg-light border text-muted d-flex align-items-center justify-content-between" style="font-size: 0.72rem; {{ $remainingCooldown > 0 ? '' : 'display: none !important;' }}">
                                     <span class="d-flex align-items-center gap-1 text-warning-emphasis fw-semibold">
                                         <i class="bi bi-stopwatch text-warning"></i>
-                                        <span>Slowmode aktif (Mirip Discord). Tunggu jeda waktu sebelum membalas lagi.</span>
+                                        <span>Slowmode aktif. Tunggu jeda waktu sebelum membalas lagi.</span>
                                     </span>
                                 </div>
 
@@ -257,7 +257,6 @@ function updateThreadCounter(el) {
     if (warn) warn.style.display = len >= 255 ? 'block' : 'none';
 }
 
-// Inisialisasi Discord-Style Slowmode Timers & Collapse Handler untuk semua thread
 document.addEventListener('DOMContentLoaded', function () {
     // 1. Setup Slowmode Timers yang sedang aktif di backend
     const submitBtns = document.querySelectorAll('.btn-submit-thread');
@@ -317,11 +316,9 @@ document.addEventListener('DOMContentLoaded', function () {
             .then(res => res.json().then(data => ({ status: res.status, data })))
             .then(({ status, data }) => {
                 if (status === 200 && data.success) {
-                    // Kosongkan textarea & reset counter
                     textarea.value = '';
                     updateThreadCounter(textarea);
 
-                    // Tampilkan notifikasi mini jika ada toastify/swal atau alert
                     if (window.toastNotification) {
                         window.toastNotification(data.message || 'Balasan ulasan berhasil dikirimkan.', 'success');
                     }
@@ -330,8 +327,15 @@ document.addEventListener('DOMContentLoaded', function () {
                     const threadContainer = form.closest('.thread-container');
                     const messagesContainer = threadContainer ? threadContainer.querySelector('[id^="moreReplies-list-"]') : null;
                     if (messagesContainer) {
+                        const newId = data.balasan?.id || Date.now();
+                        const updateUrl = data.balasan?.update_url || '';
+                        const destroyUrl = data.balasan?.destroy_url || '';
+                        const cleanPesan = escapeHtml(data.balasan?.pesan || pesan);
+
                         const newBubble = document.createElement('div');
-                        newBubble.className = 'p-2.5 rounded-3 border bg-light border-light-subtle shadow-xs';
+                        newBubble.className = 'p-2.5 rounded-3 border bg-light border-light-subtle shadow-xs thread-item-card';
+                        newBubble.id = `thread-item-${newId}`;
+                        newBubble.setAttribute('data-id', newId);
                         newBubble.innerHTML = `
                             <div class="d-flex align-items-center justify-content-between mb-1">
                                 <div class="d-flex align-items-center gap-2">
@@ -341,23 +345,53 @@ document.addEventListener('DOMContentLoaded', function () {
                                     <strong class="text-dark small" style="font-size: 0.82rem;">Penulis Ulasan (Anonim)</strong>
                                     <span class="badge bg-secondary text-white font-mono px-1.5 py-0.5" style="font-size: 0.62rem;">PENULIS ULASAN</span>
                                 </div>
-                                <span class="text-secondary font-mono" style="font-size: 0.68rem;">
-                                    <i class="bi bi-clock me-0.5"></i>baru saja
-                                </span>
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="text-secondary font-mono" style="font-size: 0.68rem;">
+                                        <i class="bi bi-clock me-0.5"></i>baru saja
+                                    </span>
+                                    <div class="d-flex align-items-center gap-2 ms-1">
+                                        <button type="button" 
+                                                class="btn btn-link text-primary p-0 border-0 btn-trigger-edit-thread" 
+                                                data-target="#thread-edit-box-${newId}"
+                                                data-text-target="#thread-text-${newId}"
+                                                title="Edit Pesan" 
+                                                style="font-size: 0.75rem; text-decoration: none;">
+                                            <i class="bi bi-pencil-square"></i>
+                                        </button>
+                                        <button type="button" 
+                                                class="btn btn-link text-danger p-0 border-0 btn-trigger-delete-thread" 
+                                                data-delete-url="${destroyUrl}"
+                                                data-target="#thread-item-${newId}"
+                                                title="Hapus Pesan" 
+                                                style="font-size: 0.75rem; text-decoration: none;">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="text-dark small ps-4" style="line-height: 1.5; font-size: 0.82rem; white-space: pre-line;">
-                                ${escapeHtml(data.balasan?.pesan || pesan)}
+                            <div class="text-dark small ps-4 thread-text-display" id="thread-text-${newId}" style="line-height: 1.5; font-size: 0.82rem; white-space: pre-line;">${cleanPesan}</div>
+                            <div class="thread-edit-box ps-4 mt-2" id="thread-edit-box-${newId}" style="display: none;">
+                                <form action="${updateUrl}" method="POST" class="form-edit-thread" data-target="#thread-text-${newId}" data-box="#thread-edit-box-${newId}">
+                                    <input type="hidden" name="_method" value="PUT">
+                                    <textarea name="pesan" rows="2" class="form-control form-control-sm border bg-white rounded-3 px-2 py-1.5" style="resize: none; font-size: 0.82rem;" maxlength="255" required>${cleanPesan}</textarea>
+                                    <div class="d-flex align-items-center justify-content-end gap-1.5 mt-1.5">
+                                        <button type="button" class="btn btn-sm btn-light border py-0.5 px-2 rounded-pill btn-cancel-edit-thread" data-target="#thread-edit-box-${newId}" data-text-target="#thread-text-${newId}" style="font-size: 0.72rem;">Batal</button>
+                                        <button type="submit" class="btn btn-sm btn-primary-custom py-0.5 px-2.5 rounded-pill btn-save-edit-thread" style="font-size: 0.72rem;">
+                                            <span>Simpan</span>
+                                            <i class="bi bi-check-lg ms-0.5"></i>
+                                        </button>
+                                    </div>
+                                </form>
                             </div>
                         `;
                         messagesContainer.appendChild(newBubble);
                     }
 
-                    // Mulai countdown Slowmode (25 detik seperti Discord)
+                    // Mulai countdown Slowmode (25 detik)
                     const cooldownTime = data.cooldown || 25;
                     startSlowmodeCountdown(btn, cooldownTime);
 
                 } else if (status === 429) {
-                    // Slowmode terpicu dari server
                     const remaining = data.remaining || 25;
                     if (typeof Swal !== 'undefined') {
                         Swal.fire({ icon: 'warning', title: 'Mode Lambat Aktif', text: data.message || `Harap tunggu ${remaining} detik.` });
@@ -394,6 +428,177 @@ document.addEventListener('DOMContentLoaded', function () {
                 console.error(err);
                 form.submit();
             });
+        });
+    });
+
+    // 4. EVENT DELEGATION UNTUK EDIT & HAPUS BALASAN DISKUSI
+    document.addEventListener('click', function (e) {
+        // A. Tombol Buka Form Edit
+        const editBtn = e.target.closest('.btn-trigger-edit-thread');
+        if (editBtn) {
+            e.preventDefault();
+            const targetBox = document.querySelector(editBtn.getAttribute('data-target'));
+            const targetText = document.querySelector(editBtn.getAttribute('data-text-target'));
+            if (targetBox && targetText) {
+                targetText.style.display = 'none';
+                targetBox.style.display = 'block';
+                const textarea = targetBox.querySelector('textarea[name="pesan"]');
+                if (textarea) textarea.focus();
+            }
+            return;
+        }
+
+        // B. Tombol Batal Edit
+        const cancelBtn = e.target.closest('.btn-cancel-edit-thread');
+        if (cancelBtn) {
+            e.preventDefault();
+            const targetBox = document.querySelector(cancelBtn.getAttribute('data-target'));
+            const targetText = document.querySelector(cancelBtn.getAttribute('data-text-target'));
+            if (targetBox && targetText) {
+                targetBox.style.display = 'none';
+                targetText.style.display = 'block';
+            }
+            return;
+        }
+
+        // C. Tombol Hapus Pesan Diskusi
+        const deleteBtn = e.target.closest('.btn-trigger-delete-thread');
+        if (deleteBtn) {
+            e.preventDefault();
+            const deleteUrl = deleteBtn.getAttribute('data-delete-url');
+            const targetCard = document.querySelector(deleteBtn.getAttribute('data-target'));
+            if (!deleteUrl) return;
+
+            const doDelete = function () {
+                const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+                fetch(deleteUrl, {
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken
+                    },
+                    body: JSON.stringify({ _method: 'DELETE' })
+                })
+                .then(res => res.json().then(data => ({ status: res.status, data })))
+                .then(({ status, data }) => {
+                    if (status === 200 && data.success) {
+                        if (targetCard) {
+                            targetCard.style.transition = 'all 0.3s ease';
+                            targetCard.style.opacity = '0';
+                            targetCard.style.transform = 'translateY(-6px)';
+                            setTimeout(() => targetCard.remove(), 300);
+                        }
+                        if (typeof Swal !== 'undefined') {
+                            Swal.fire({ icon: 'success', title: 'Berhasil', text: data.message || 'Pesan diskusi berhasil dihapus.', timer: 1500, showConfirmButton: false });
+                        }
+                    } else {
+                        if (typeof Swal !== 'undefined') {
+                            Swal.fire({ icon: 'error', title: 'Gagal Menghapus', text: data.message || 'Tidak dapat menghapus pesan diskusi ini.' });
+                        } else {
+                            alert(data.message || 'Tidak dapat menghapus pesan diskusi ini.');
+                        }
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    window.location.reload();
+                });
+            };
+
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    title: 'Hapus Pesan?',
+                    text: 'Pesan diskusi ini akan dihapus secara permanen.',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#dc3545',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Ya, Hapus',
+                    cancelButtonText: 'Batal'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        doDelete();
+                    }
+                });
+            } else {
+                if (confirm('Hapus pesan diskusi ini?')) {
+                    doDelete();
+                }
+            }
+            return;
+        }
+    });
+
+    // 5. Submit Form Edit Diskusi via AJAX
+    document.addEventListener('submit', function (e) {
+        const form = e.target.closest('.form-edit-thread');
+        if (!form) return;
+        e.preventDefault();
+
+        const targetText = document.querySelector(form.getAttribute('data-target'));
+        const targetBox = document.querySelector(form.getAttribute('data-box'));
+        const textarea = form.querySelector('textarea[name="pesan"]');
+        const submitBtn = form.querySelector('.btn-save-edit-thread');
+        const newText = textarea ? textarea.value.trim() : '';
+
+        if (!newText) return;
+
+        const originalBtnHtml = submitBtn ? submitBtn.innerHTML : 'Simpan';
+        if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="width: 0.65rem; height: 0.65rem;"></span>`;
+        }
+
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || form.querySelector('input[name="_token"]')?.value || '';
+
+        fetch(form.action, {
+            method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken
+            },
+            body: JSON.stringify({
+                _method: 'PUT',
+                pesan: newText
+            })
+        })
+        .then(res => res.json().then(data => ({ status: res.status, data })))
+        .then(({ status, data }) => {
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalBtnHtml;
+            }
+
+            if (status === 200 && data.success) {
+                if (targetText) {
+                    targetText.textContent = data.pesan || newText;
+                    targetText.style.display = 'block';
+                }
+                if (targetBox) {
+                    targetBox.style.display = 'none';
+                }
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({ icon: 'success', title: 'Berhasil', text: data.message || 'Balasan ulasan berhasil diperbarui.', timer: 1500, showConfirmButton: false });
+                }
+            } else {
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({ icon: 'error', title: 'Gagal Memperbarui', text: data.message || 'Terjadi kesalahan saat memperbarui pesan.' });
+                } else {
+                    alert(data.message || 'Terjadi kesalahan saat memperbarui pesan.');
+                }
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalBtnHtml;
+            }
+            form.submit();
         });
     });
 });

@@ -218,6 +218,12 @@ GuruKuu/
   - Menghapus border/garis tepi stroke pada tombol panah navigasi slider hero, menggantinya dengan latar belakang frosted glass putih lembut (`rgba(255, 255, 255, 0.22)`) yang kontras jelas tanpa menutupi teks (`padding-left: 56px` & `padding-right: 56px`).
   - Menerapkan navigasi panah terikat (bounded navigation) menggunakan `getSlideIndex()` berbasis elemen slide aktual pada event `slide.bs.carousel` dan `slid.bs.carousel`: Halaman pertama hanya menampilkan panah kanan, halaman terakhir hanya menampilkan panah kiri, dan halaman tengah menampilkan kedua panah (`data-bs-wrap="false"`).
   - Mengubah warna indikator garis aktif menjadi putih murni (`#ffffff`) tanpa efek glow/bayangan bercahaya, menghapus total latar belakang kapsul hitam/gelap pada indikator (baik desktop maupun mobile) menjadi garis putih flat melayang bersih, memindahkan tombol panah mobile ke bawah pojok kiri dan kanan (`bottom: 12px`), serta mengompres tinggi hero mobile (`min-height: 350px`) agar proporsional tanpa menutupi konten.
+* **2026-10-17 (Fitur Edit & Hapus Diskusi Ulasan & Pembersihan Teks):**
+  - Menghapus seluruh tulisan atau penyebutan nama aplikasi luar seperti "(Mirip Discord)" pada tampilan UI maupun backend komentar dan notifikasi.
+  - Menambahkan rute dan controller `PUT /penilaian-balasan/{balasan}` (`PenilaianBalasanController@update`) dengan proteksi keamanan (cek kepemilikan author, sensor kata kasar / anti-toxic bilingual, pencegahan link luar, dan sinkronisasi real-time ulasan).
+  - Mengimplementasikan fitur **Edit Pesan Diskusi** inline secara instan via AJAX dan **Hapus Pesan Diskusi** dengan konfirmasi SweetAlert untuk siswa dan guru pada ulasan mereka sendiri.
+  - Memperbaiki pengecekan ID author `(int)$currentUser->id === (int)$b->user_id` agar tombol kontrol edit & hapus selalu tampil akurat tanpa masalah perbedaan tipe data PHP.
+
 
 
 

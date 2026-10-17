@@ -79,6 +79,7 @@ Route::middleware('auth')->group(function () {
 
     // THREADED BALASAN ULASAN (SISWA, GURU, ADMIN)
     Route::post('/penilaian/{penilaian}/balasan', [\App\Http\Controllers\PenilaianBalasanController::class, 'store'])->name('penilaian.balasan.store');
+    Route::put('/penilaian-balasan/{balasan}', [\App\Http\Controllers\PenilaianBalasanController::class, 'update'])->name('penilaian.balasan.update');
     Route::delete('/penilaian-balasan/{balasan}', [\App\Http\Controllers\PenilaianBalasanController::class, 'destroy'])->name('penilaian.balasan.destroy');
 });
 
