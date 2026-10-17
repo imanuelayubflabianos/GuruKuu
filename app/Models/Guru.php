@@ -108,8 +108,11 @@ class Guru extends Model
 
         try {
             $cached = \Illuminate\Support\Facades\Cache::get($cacheKey);
-            if ($cached !== null) {
+            if ($cached instanceof \Illuminate\Support\Collection) {
                 return self::$leaderboardCache[$cacheKey] = $cached;
+            }
+            if ($cached !== null) {
+                \Illuminate\Support\Facades\Cache::forget($cacheKey);
             }
         } catch (\Throwable $e) {}
 
