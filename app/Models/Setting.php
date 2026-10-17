@@ -76,6 +76,18 @@ class Setting extends Model
     }
 
     /**
+     * Bersihkan cache settings secara menyeluruh
+     */
+    public static function clearCache(): void
+    {
+        self::$runtimeCache = null;
+        try {
+            Cache::forget('gurukuu_all_settings');
+            Cache::flush();
+        } catch (\Throwable $e) {}
+    }
+
+    /**
      * Bersihkan seluruh cache settings dan view cache
      */
     public static function clearAllCache(): void

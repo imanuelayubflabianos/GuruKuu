@@ -28,6 +28,10 @@ class AppServiceProvider extends ServiceProvider
             @ini_set('max_execution_time', '120');
         }
 
+        if (config('app.env') === 'production' || request()->server('HTTP_X_FORWARDED_PROTO') === 'https' || request()->server('HTTPS') === 'on' || str_starts_with((string) config('app.url'), 'https://')) {
+            \Illuminate\Support\Facades\URL::forceScheme('https');
+        }
+
         Paginator::useBootstrapFive();
 
         // 1. Rate Limiters untuk Perlindungan Server & Anti-Abuse

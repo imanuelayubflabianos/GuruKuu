@@ -416,6 +416,7 @@ class PengaturanController extends Controller
 
         // Bersihkan cache aplikasi & view
         try {
+            \App\Models\Setting::clearCache();
             \Illuminate\Support\Facades\Cache::flush();
             \Illuminate\Support\Facades\Artisan::call('view:clear');
         } catch (\Throwable $e) {}

@@ -205,4 +205,9 @@ GuruKuu/
 
 * **2026-10-16:** Inisialisasi dokumentasi lengkap sistem, validasi relasi database per kelas, rumus leaderboard, dan penambahan protokol wajib untuk AI berikutnya.
 * **2026-10-16 (Optimasi Hosting):** Penerapan kompresi GZIP dan Expire Headers di `.htaccess`, implementasi persistent caching 60 detik pada `Guru::leaderboardFor()` dengan auto-invalidation, serta penambahan `loading="lazy"` pada gambar/avatar kartu guru.
+* **2026-10-17 (Reverse Proxy & Pengaturan Admin Sync):** 
+  - Penambahan `$middleware->trustProxies(at: '*')` di `bootstrap/app.php` dan `URL::forceScheme('https')` di `AppServiceProvider.php` agar form POST di lingkungan server reverse proxy/Cloudflare tidak ter-redirect 301 ke GET.
+  - Penambahan input `leaderboard_catatan` di Admin Pengaturan dengan real-time live preview serta rendering dinamis pada 5 view leaderboard (Landing, Public Leaderboard, Siswa, Guru, Admin).
+  - Penyatuan teks dan CTA tombol hero slider agar seragam di semua slide, hanya thumbnail background yang berganti, serta perataan vertikal tombol panah slide hero pada tampilan mobile.
+  - Implementasi metode `Setting::clearCache()` untuk memastikan pembersihan in-memory cache dan cache key `gurukuu_all_settings` saat pengaturan diperbarui.
 
