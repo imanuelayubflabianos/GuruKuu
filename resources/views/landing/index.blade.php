@@ -1114,7 +1114,7 @@
     transform: scale(1.08) !important;
 }
 
-/* 🌟 CAROUSEL INDICATORS DESKTOP & GLOBAL (Kapsul Melayang Elegan di Bawah Tengah - WARNA PUTIH) */
+/* 🌟 CAROUSEL INDICATORS (Garis Bersih Melayang, Tanpa Background Hitam, Tanpa Efek Bercahaya) */
 #heroBgSlider .carousel-indicators {
     position: absolute !important;
     bottom: 20px !important;
@@ -1126,31 +1126,32 @@
     justify-content: center !important;
     gap: 8px !important;
     z-index: 35 !important;
-    padding: 6px 14px !important;
-    background: rgba(15, 23, 42, 0.45) !important;
-    backdrop-filter: blur(8px) !important;
-    -webkit-backdrop-filter: blur(8px) !important;
-    border-radius: 999px !important;
+    padding: 0 !important;
+    background: transparent !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
     width: auto !important;
-    max-width: 90% !important;
 }
 #heroBgSlider .carousel-indicators button {
-    width: 24px !important;
+    width: 26px !important;
     height: 5px !important;
     border-radius: 999px !important;
-    background-color: rgba(255, 255, 255, 0.4) !important;
+    background-color: rgba(255, 255, 255, 0.45) !important;
     border: none !important;
+    box-shadow: none !important;
     transition: all 0.25s ease !important;
-    opacity: 0.65 !important;
+    opacity: 0.7 !important;
     margin: 0 3px !important;
     padding: 0 !important;
     cursor: pointer;
 }
 #heroBgSlider .carousel-indicators button.active {
     width: 38px !important;
-    background-color: #ffffff !important; /* Putih murni, bukan kuning */
+    background-color: #ffffff !important; /* Putih biasa, tanpa efek glow */
     opacity: 1 !important;
-    box-shadow: 0 0 10px rgba(255, 255, 255, 0.6) !important;
+    box-shadow: none !important;
 }
 
 /* 📱 RESPONSIVE MOBILE: TINGGI KOMPAK, PANAH PINDAH KE BAWAH POJOK KANAN KIRI SEJAJAR INDIKATOR */
@@ -1221,20 +1222,24 @@
         border-radius: 0 !important;
         box-shadow: none !important;
         padding: 0 !important;
-        gap: 7px !important;
+        gap: 6px !important;
         display: inline-flex !important;
     }
     #heroBgSlider .carousel-indicators button {
         width: 20px !important;
         height: 4px !important;
-        background-color: rgba(255, 255, 255, 0.5) !important;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4) !important;
+        border-radius: 999px !important;
+        background-color: rgba(255, 255, 255, 0.45) !important;
+        border: none !important;
+        box-shadow: none !important;
+        margin: 0 2px !important;
+        padding: 0 !important;
     }
     #heroBgSlider .carousel-indicators button.active {
         width: 30px !important;
-        background-color: #ffffff !important; /* Putih murni */
+        background-color: #ffffff !important;
         opacity: 1 !important;
-        box-shadow: 0 0 8px rgba(255, 255, 255, 0.8), 0 1px 4px rgba(0, 0, 0, 0.5) !important;
+        box-shadow: none !important;
     }
 }
 </style>
