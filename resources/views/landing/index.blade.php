@@ -19,48 +19,25 @@
         return asset(ltrim($url, '/'));
     };
 
-    $heroSlides = [
-        [
-            'img'      => $formatHeroUrl($heroImg1) ?: 'https://images.unsplash.com/photo-1562774053-701939374585?w=1920',
+    $heroImagesList = array_values(array_filter([
+        $formatHeroUrl($heroImg1) ?: 'https://images.unsplash.com/photo-1562774053-701939374585?w=1920',
+        $formatHeroUrl($heroImg2),
+        $formatHeroUrl($heroImg3),
+    ]));
+
+    if (empty($heroImagesList)) {
+        $heroImagesList = ['https://images.unsplash.com/photo-1562774053-701939374585?w=1920'];
+    }
+
+    $heroSlides = [];
+    foreach ($heroImagesList as $imgUrl) {
+        $heroSlides[] = [
+            'img'      => $imgUrl,
             'badge'    => $heroBadge,
             'title'    => $heroTitle,
             'subtitle' => $heroSubtitle,
             'cta_text' => $heroCtaText,
             'cta_url'  => $heroCtaUrl,
-        ],
-    ];
-
-    $heroTitle2 = \App\Models\Setting::get('hero_title_2', 'Suara Siswa untuk Kemajuan Bersama');
-    $heroSubtitle2 = \App\Models\Setting::get('hero_subtitle_2', 'Memberikan apresiasi dan masukan konstruktif bagi para pendidik SMK Negeri 1 Bangsri.');
-    $heroCtaText2 = \App\Models\Setting::get('hero_cta_text_2', 'Lihat Leaderboard');
-    $heroCtaUrl2 = \App\Models\Setting::get('hero_cta_url_2', '/leaderboard');
-    $heroImg2Formatted = $formatHeroUrl($heroImg2);
-
-    if ($heroImg2Formatted || $heroTitle2) {
-        $heroSlides[] = [
-            'img'      => $heroImg2Formatted ?: 'https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=1920',
-            'badge'    => $heroBadge,
-            'title'    => $heroTitle2,
-            'subtitle' => $heroSubtitle2,
-            'cta_text' => $heroCtaText2,
-            'cta_url'  => $heroCtaUrl2,
-        ];
-    }
-
-    $heroTitle3 = \App\Models\Setting::get('hero_title_3', 'Anonim, Terpercaya, dan Terbuka');
-    $heroSubtitle3 = \App\Models\Setting::get('hero_subtitle_3', 'Seluruh data evaluasi terenkripsi aman untuk menjaga objektivitas dan kejujuran penilaian.');
-    $heroCtaText3 = \App\Models\Setting::get('hero_cta_text_3', 'Pelajari Panduan');
-    $heroCtaUrl3 = \App\Models\Setting::get('hero_cta_url_3', '/#panduan');
-    $heroImg3Formatted = $formatHeroUrl($heroImg3);
-
-    if ($heroImg3Formatted || $heroTitle3) {
-        $heroSlides[] = [
-            'img'      => $heroImg3Formatted ?: 'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=1920',
-            'badge'    => $heroBadge,
-            'title'    => $heroTitle3,
-            'subtitle' => $heroSubtitle3,
-            'cta_text' => $heroCtaText3,
-            'cta_url'  => $heroCtaUrl3,
         ];
     }
 
@@ -1089,6 +1066,51 @@
     background-color: var(--primary-subtle, rgba(0, 51, 102, 0.08)) !important;
     color: var(--primary, #003366) !important;
 }
+#heroPrevBtn,
+#heroNextBtn {
+    position: absolute !important;
+    top: 50% !important;
+    bottom: auto !important;
+    transform: translateY(-50%) !important;
+    z-index: 15 !important;
+    width: 48px !important;
+    height: 48px !important;
+    padding: 0 !important;
+    border: none !important;
+    background: transparent !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    opacity: 0.85;
+    transition: all 0.25s ease;
+}
+#heroPrevBtn {
+    left: 14px !important;
+}
+#heroNextBtn {
+    right: 14px !important;
+}
+#heroPrevBtn:hover,
+#heroNextBtn:hover {
+    opacity: 1;
+    transform: translateY(-50%) scale(1.1) !important;
+}
+@media (max-width: 767.98px) {
+    #heroPrevBtn,
+    #heroNextBtn {
+        top: 50% !important;
+        transform: translateY(-50%) !important;
+        width: 40px !important;
+        height: 40px !important;
+        opacity: 0.95;
+    }
+    #heroPrevBtn {
+        left: 8px !important;
+    }
+    #heroNextBtn {
+        right: 8px !important;
+    }
+}
 </style>
 
 {{-- 1. HERO SECTION (id="home") - SLIDER DENGAN EFEK ANIMASI RINGAN DAN DINAMIS --}}
@@ -1132,11 +1154,11 @@
         </div>
 
         {{-- Next / Prev Arrows --}}
-        <button class="carousel-control-prev" id="heroPrevBtn" type="button" data-bs-target="#heroBgSlider" data-bs-slide="prev" style="z-index: 4; width: 5%;">
-            <span class="carousel-control-prev-icon rounded-circle p-2.5" style="background-color: rgba(0,0,0,0.35); backdrop-filter: blur(4px);" aria-hidden="true"></span>
+        <button class="carousel-control-prev" id="heroPrevBtn" type="button" data-bs-target="#heroBgSlider" data-bs-slide="prev" aria-label="Slide sebelumnya">
+            <span class="carousel-control-prev-icon rounded-circle p-2.5" style="background-color: rgba(0,0,0,0.45); backdrop-filter: blur(6px); width: 42px; height: 42px; display: inline-flex; align-items: center; justify-content: center;" aria-hidden="true"></span>
         </button>
-        <button class="carousel-control-next" id="heroNextBtn" type="button" data-bs-target="#heroBgSlider" data-bs-slide="next" style="z-index: 4; width: 5%;">
-            <span class="carousel-control-next-icon rounded-circle p-2.5" style="background-color: rgba(0,0,0,0.35); backdrop-filter: blur(4px);" aria-hidden="true"></span>
+        <button class="carousel-control-next" id="heroNextBtn" type="button" data-bs-target="#heroBgSlider" data-bs-slide="next" aria-label="Slide berikutnya">
+            <span class="carousel-control-next-icon rounded-circle p-2.5" style="background-color: rgba(0,0,0,0.45); backdrop-filter: blur(6px); width: 42px; height: 42px; display: inline-flex; align-items: center; justify-content: center;" aria-hidden="true"></span>
         </button>
 
         {{-- Garis Indikator Carousel --}}
