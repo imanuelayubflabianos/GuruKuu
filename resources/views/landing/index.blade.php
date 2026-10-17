@@ -1138,29 +1138,38 @@
     opacity: 1 !important;
 }
 
-/* 📱 RESPONSIVE MOBILE: PANAH SEJAJAR TEKS & INDIKATOR JELAS */
+/* 📱 RESPONSIVE MOBILE: PANAH NAIK KE TENGAH, KONTRAS TINGGI, BEBAS OVERLAP */
 @media (max-width: 767.98px) {
+    .hero-content-container {
+        padding-left: 44px !important;
+        padding-right: 44px !important;
+        padding-top: 140px !important;
+        padding-bottom: 90px !important;
+    }
     #heroPrevBtn,
     #heroNextBtn {
-        top: 38% !important; /* Sejajar tepat di tengah area teks judul hero mobile */
+        top: 28% !important; /* Naik ke area tengah judul/badge hero mobile */
         transform: translateY(-50%) !important;
-        width: 32px !important;
-        height: 32px !important;
-        opacity: 0.9 !important;
+        width: 34px !important;
+        height: 34px !important;
+        opacity: 0.95 !important;
+        z-index: 30 !important;
     }
     #heroPrevBtn {
-        left: 6px !important;
+        left: 5px !important;
     }
     #heroNextBtn {
-        right: 6px !important;
+        right: 5px !important;
     }
     #heroPrevBtn .carousel-control-prev-icon,
     #heroNextBtn .carousel-control-next-icon {
-        width: 30px !important;
-        height: 30px !important;
-        background-color: rgba(0,0,0,0.52) !important;
-        backdrop-filter: blur(4px) !important;
-        background-size: 45% 45% !important;
+        width: 32px !important;
+        height: 32px !important;
+        background-color: rgba(15, 23, 42, 0.78) !important;
+        backdrop-filter: blur(6px) !important;
+        border: 1.5px solid rgba(255, 255, 255, 0.45) !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important;
+        background-size: 50% 50% !important;
     }
 
     #heroBgSlider .carousel-indicators {
