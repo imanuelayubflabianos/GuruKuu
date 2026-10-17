@@ -1094,30 +1094,30 @@
 #heroNextBtn .carousel-control-next-icon {
     width: 40px !important;
     height: 40px !important;
-    background-color: rgba(15, 23, 42, 0.42) !important;
-    backdrop-filter: blur(6px) !important;
-    -webkit-backdrop-filter: blur(6px) !important;
+    background-color: rgba(255, 255, 255, 0.2) !important;
+    backdrop-filter: blur(8px) !important;
+    -webkit-backdrop-filter: blur(8px) !important;
     border: none !important;
     border-radius: 50% !important;
-    box-shadow: none !important;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3) !important;
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
-    background-size: 45% 45% !important;
-    opacity: 0.8 !important;
+    background-size: 50% 50% !important;
+    opacity: 0.85 !important;
     transition: all 0.2s ease !important;
 }
 #heroPrevBtn:hover .carousel-control-prev-icon,
 #heroNextBtn:hover .carousel-control-next-icon {
     opacity: 1 !important;
-    background-color: rgba(15, 23, 42, 0.72) !important;
+    background-color: rgba(255, 255, 255, 0.32) !important;
     transform: scale(1.08) !important;
 }
 
-/* 🌟 CAROUSEL INDICATORS DESKTOP & GLOBAL (Kapsul Melayang Elegan di Bawah Tengah) */
+/* 🌟 CAROUSEL INDICATORS DESKTOP & GLOBAL (Kapsul Melayang Elegan di Bawah Tengah - WARNA PUTIH) */
 #heroBgSlider .carousel-indicators {
     position: absolute !important;
-    bottom: 22px !important;
+    bottom: 20px !important;
     left: 50% !important;
     transform: translateX(-50%) !important;
     margin: 0 !important;
@@ -1135,38 +1135,40 @@
     max-width: 90% !important;
 }
 #heroBgSlider .carousel-indicators button {
-    width: 26px !important;
-    height: 6px !important;
+    width: 24px !important;
+    height: 5px !important;
     border-radius: 999px !important;
-    background-color: rgba(255, 255, 255, 0.45) !important;
+    background-color: rgba(255, 255, 255, 0.4) !important;
     border: none !important;
     transition: all 0.25s ease !important;
-    opacity: 0.75 !important;
+    opacity: 0.65 !important;
     margin: 0 3px !important;
     padding: 0 !important;
     cursor: pointer;
 }
 #heroBgSlider .carousel-indicators button.active {
-    width: 42px !important;
-    background-color: #ffc107 !important;
+    width: 38px !important;
+    background-color: #ffffff !important; /* Putih murni, bukan kuning */
     opacity: 1 !important;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.6) !important;
 }
 
-/* 📱 RESPONSIVE MOBILE: PANAH LEMBUT TANPA BORDER/STROKE, 100% BEBAS DARI TEKS, INDIKATOR JELAS */
+/* 📱 RESPONSIVE MOBILE: TINGGI PAS TIDAK KEBESARAN, PANAH PUTIH JELAS TANPA STROKE, BEBAS OVERLAP */
 @media (max-width: 767.98px) {
     #home,
     #heroBgSlider,
     #heroBgSlider .carousel-item {
-        min-height: 520px !important;
+        min-height: 420px !important;
+        height: auto !important;
     }
     #heroBgSlider .hero-slide-bg {
-        min-height: 520px !important;
+        min-height: 420px !important;
     }
     .hero-content-container {
         padding-left: 56px !important;
         padding-right: 56px !important;
-        padding-top: 130px !important;
-        padding-bottom: 75px !important;
+        padding-top: 105px !important;
+        padding-bottom: 45px !important;
         max-width: 100% !important;
         box-sizing: border-box !important;
     }
@@ -1180,11 +1182,11 @@
     }
     #heroPrevBtn,
     #heroNextBtn {
-        top: 36% !important; /* Pas vertikal sejajar, tidak menabrak teks */
+        top: 50% !important;
         transform: translateY(-50%) !important;
         width: 32px !important;
         height: 32px !important;
-        opacity: 0.82 !important;
+        opacity: 0.9 !important;
         z-index: 30 !important;
         border: none !important;
         background: transparent !important;
@@ -1197,50 +1199,51 @@
     }
     #heroPrevBtn .carousel-control-prev-icon,
     #heroNextBtn .carousel-control-next-icon {
-        width: 30px !important;
-        height: 30px !important;
-        background-color: rgba(15, 23, 42, 0.45) !important; /* Transparan lembut, tanpa garis stroke */
-        backdrop-filter: blur(4px) !important;
-        -webkit-backdrop-filter: blur(4px) !important;
+        width: 32px !important;
+        height: 32px !important;
+        background-color: rgba(255, 255, 255, 0.22) !important; /* Terang jelas, tanpa stroke border */
+        backdrop-filter: blur(6px) !important;
+        -webkit-backdrop-filter: blur(6px) !important;
         border: none !important;
         border-radius: 50% !important;
-        box-shadow: none !important;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35) !important;
         background-size: 45% 45% !important;
     }
 
     #heroBgSlider .carousel-indicators {
-        bottom: 16px !important;
+        bottom: 12px !important;
         padding: 5px 12px !important;
         gap: 6px !important;
         display: inline-flex !important;
     }
     #heroBgSlider .carousel-indicators button {
         width: 18px !important;
-        height: 5px !important;
-        background-color: rgba(255, 255, 255, 0.45) !important;
+        height: 4px !important;
+        background-color: rgba(255, 255, 255, 0.4) !important;
     }
     #heroBgSlider .carousel-indicators button.active {
-        width: 30px !important;
-        background-color: #ffc107 !important;
+        width: 28px !important;
+        background-color: #ffffff !important; /* Putih murni */
+        opacity: 1 !important;
     }
 }
 </style>
 
 {{-- 1. HERO SECTION (id="home") - SLIDER DENGAN EFEK ANIMASI RINGAN DAN DINAMIS --}}
-<section id="home" class="p-0 position-relative overflow-hidden" style="min-height: 600px; touch-action: pan-y;">
+<section id="home" class="p-0 position-relative overflow-hidden" style="min-height: 520px; touch-action: pan-y;">
     {{-- Floating Ambient Glow Orbs --}}
     <div class="hero-ambient-orb" style="top: 15%; right: 12%; width: 280px; height: 280px; background: radial-gradient(circle, rgba(0, 168, 107, 0.45), transparent 70%);"></div>
     <div class="hero-ambient-orb" style="bottom: 12%; left: 8%; width: 340px; height: 340px; background: radial-gradient(circle, rgba(255, 193, 7, 0.38), transparent 70%); animation-delay: -4s;"></div>
 
     {{-- Background Carousel Slideshow dengan Teks Dinamis per Slide --}}
-    <div id="heroBgSlider" class="carousel slide carousel-fade position-relative w-100" data-bs-ride="carousel" data-bs-interval="4500" data-bs-wrap="false" style="min-height: 600px; touch-action: pan-y;">
+    <div id="heroBgSlider" class="carousel slide carousel-fade position-relative w-100" data-bs-ride="carousel" data-bs-interval="4500" data-bs-wrap="false" style="min-height: 520px; touch-action: pan-y;">
         <div class="carousel-inner w-100 h-100">
             @foreach($heroSlides as $idx => $slide)
-                <div class="carousel-item {{ $idx === 0 ? 'active' : '' }} w-100 position-relative" style="min-height: 600px;">
-                    <div class="hero-slide-bg position-absolute w-100 h-100" style="top: 0; left: 0; background: linear-gradient(135deg, rgba(10, 25, 47, 0.88), rgba(0, 51, 102, 0.78)), url('{{ $slide['img'] }}') center/cover no-repeat; min-height: 640px; z-index: 1;"></div>
+                <div class="carousel-item {{ $idx === 0 ? 'active' : '' }} w-100 position-relative" style="min-height: 520px;">
+                    <div class="hero-slide-bg position-absolute w-100 h-100" style="top: 0; left: 0; background: linear-gradient(135deg, rgba(10, 25, 47, 0.88), rgba(0, 51, 102, 0.78)), url('{{ $slide['img'] }}') center/cover no-repeat; min-height: 520px; z-index: 1;"></div>
 
                     {{-- Content Overlay untuk Slide Ini --}}
-                    <div class="container position-relative hero-content-container" style="z-index: 2; padding: 160px 0 110px;">
+                    <div class="container position-relative hero-content-container" style="z-index: 2; padding: 140px 0 90px;">
                         <div class="row">
                             <div class="col-lg-9 col-xl-8">
                                 @if(!empty(trim($slide['badge'] ?? '')))
@@ -1276,10 +1279,10 @@
 
         {{-- Next / Prev Arrows --}}
         @if(count($heroSlides) > 1)
-            <button class="carousel-control-prev" id="heroPrevBtn" type="button" data-bs-target="#heroBgSlider" data-bs-slide="prev" aria-label="Slide sebelumnya" style="display: none;">
+            <button class="carousel-control-prev" id="heroPrevBtn" type="button" data-bs-target="#heroBgSlider" data-bs-slide="prev" aria-label="Slide sebelumnya" style="display: none !important;">
                 <span class="carousel-control-prev-icon rounded-circle" aria-hidden="true"></span>
             </button>
-            <button class="carousel-control-next" id="heroNextBtn" type="button" data-bs-target="#heroBgSlider" data-bs-slide="next" aria-label="Slide berikutnya" style="display: flex;">
+            <button class="carousel-control-next" id="heroNextBtn" type="button" data-bs-target="#heroBgSlider" data-bs-slide="next" aria-label="Slide berikutnya" style="display: flex !important;">
                 <span class="carousel-control-next-icon rounded-circle" aria-hidden="true"></span>
             </button>
         @endif
@@ -1304,30 +1307,53 @@ document.addEventListener('DOMContentLoaded', function() {
     const totalSlides = {{ count($heroSlides) }};
     let currentHeroIndex = 0;
 
+    function getSlideIndex(targetEl) {
+        if (!targetEl && heroSlider) {
+            targetEl = heroSlider.querySelector('.carousel-item.active');
+        }
+        if (!targetEl || !heroSlider) return 0;
+        const items = Array.from(heroSlider.querySelectorAll('.carousel-item'));
+        const idx = items.indexOf(targetEl);
+        return idx >= 0 ? idx : 0;
+    }
+
     // Logika kontrol panah dinamis sesuai batas halaman
-    function updateHeroArrows(currentIndex) {
+    function updateHeroArrows(idx) {
         if (!prevBtn || !nextBtn) return;
         if (totalSlides <= 1) {
-            prevBtn.style.display = 'none';
-            nextBtn.style.display = 'none';
+            prevBtn.style.setProperty('display', 'none', 'important');
+            nextBtn.style.setProperty('display', 'none', 'important');
             return;
         }
 
-        // Halaman pertama: panah kanan saja, panah kiri sembunyi
-        if (currentIndex <= 0) {
-            prevBtn.style.display = 'none';
-            nextBtn.style.display = 'flex';
+        // Halaman pertama (slide 1): panah kanan saja, panah kiri sembunyi
+        if (idx <= 0) {
+            prevBtn.style.setProperty('display', 'none', 'important');
+            nextBtn.style.setProperty('display', 'flex', 'important');
         }
         // Halaman terakhir: panah kiri saja, panah kanan sembunyi
-        else if (currentIndex >= totalSlides - 1) {
-            prevBtn.style.display = 'flex';
-            nextBtn.style.display = 'none';
+        else if (idx >= totalSlides - 1) {
+            prevBtn.style.setProperty('display', 'flex', 'important');
+            nextBtn.style.setProperty('display', 'none', 'important');
         }
         // Halaman tengah: kedua panah muncul
         else {
-            prevBtn.style.display = 'flex';
-            nextBtn.style.display = 'flex';
+            prevBtn.style.setProperty('display', 'flex', 'important');
+            nextBtn.style.setProperty('display', 'flex', 'important');
         }
+    }
+
+    function updateHeroIndicators(idx) {
+        const indicators = heroSlider ? heroSlider.querySelectorAll('#heroIndicators button') : [];
+        indicators.forEach((btn, i) => {
+            if (i === idx) {
+                btn.classList.add('active');
+                btn.setAttribute('aria-current', 'true');
+            } else {
+                btn.classList.remove('active');
+                btn.removeAttribute('aria-current');
+            }
+        });
     }
 
     if (heroSlider && typeof bootstrap !== 'undefined') {
@@ -1353,6 +1379,24 @@ document.addEventListener('DOMContentLoaded', function() {
             }, HERO_RESUME_IDLE_DELAY);
         }
 
+        // Sinkronisasi status panah dan indikator
+        function syncCarouselState(e) {
+            let targetIdx = 0;
+            if (e && e.relatedTarget) {
+                targetIdx = getSlideIndex(e.relatedTarget);
+            } else if (e && typeof e.to === 'number') {
+                targetIdx = e.to;
+            } else {
+                targetIdx = getSlideIndex();
+            }
+            currentHeroIndex = targetIdx;
+            updateHeroArrows(targetIdx);
+            updateHeroIndicators(targetIdx);
+        }
+
+        heroSlider.addEventListener('slide.bs.carousel', syncCarouselState);
+        heroSlider.addEventListener('slid.bs.carousel', syncCarouselState);
+
         // Click listener pada garis indikator
         document.querySelectorAll('[data-bs-target="#heroBgSlider"][data-bs-slide-to]').forEach(btn => {
             btn.addEventListener('click', function(e) {
@@ -1366,7 +1410,8 @@ document.addEventListener('DOMContentLoaded', function() {
         });
 
         if (prevBtn) {
-            prevBtn.addEventListener('click', function() {
+            prevBtn.addEventListener('click', function(e) {
+                e.preventDefault();
                 if (currentHeroIndex > 0) {
                     carousel.prev();
                     pauseHeroAndScheduleResume();
@@ -1375,7 +1420,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         if (nextBtn) {
-            nextBtn.addEventListener('click', function() {
+            nextBtn.addEventListener('click', function(e) {
+                e.preventDefault();
                 if (currentHeroIndex < totalSlides - 1) {
                     carousel.next();
                     pauseHeroAndScheduleResume();
@@ -1391,23 +1437,8 @@ document.addEventListener('DOMContentLoaded', function() {
             pauseHeroAndScheduleResume();
         });
 
-        heroSlider.addEventListener('slid.bs.carousel', function(e) {
-            currentHeroIndex = e.to;
-            updateHeroArrows(e.to);
-
-            document.querySelectorAll('[data-bs-target="#heroBgSlider"][data-bs-slide-to]').forEach((btn, idx) => {
-                if (idx === e.to) {
-                    btn.classList.add('active');
-                    btn.setAttribute('aria-current', 'true');
-                } else {
-                    btn.classList.remove('active');
-                    btn.removeAttribute('aria-current');
-                }
-            });
-        });
-
-        // Inisialisasi awal
-        updateHeroArrows(0);
+        // Inisialisasi awal sinkronisasi
+        syncCarouselState();
 
         // 🌟 GESTURE GESER DENGAN JARI (TOUCH MOBILE) & MOUSE DRAG (DESKTOP)
         const heroSection = document.getElementById('home');
