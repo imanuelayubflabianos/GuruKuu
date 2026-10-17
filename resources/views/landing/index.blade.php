@@ -1154,11 +1154,11 @@
         </div>
 
         {{-- Next / Prev Arrows --}}
-        <button class="carousel-control-prev" id="heroPrevBtn" type="button" data-bs-target="#heroBgSlider" data-bs-slide="prev" aria-label="Slide sebelumnya">
-            <span class="carousel-control-prev-icon rounded-circle p-2.5" style="background-color: rgba(0,0,0,0.45); backdrop-filter: blur(6px); width: 42px; height: 42px; display: inline-flex; align-items: center; justify-content: center;" aria-hidden="true"></span>
+        <button class="carousel-control-prev" id="heroPrevBtn" type="button" data-bs-target="#heroBgSlider" data-bs-slide="prev" aria-label="Slide sebelumnya" style="position: absolute !important; top: 50% !important; transform: translateY(-50%) !important; z-index: 20 !important; left: 10px !important; width: 44px !important; height: 44px !important; padding: 0 !important; background: transparent !important; border: none !important; opacity: 0.95 !important;">
+            <span class="carousel-control-prev-icon rounded-circle p-2.5" style="background-color: rgba(0,0,0,0.5); backdrop-filter: blur(6px); width: 42px; height: 42px; display: inline-flex; align-items: center; justify-content: center;" aria-hidden="true"></span>
         </button>
-        <button class="carousel-control-next" id="heroNextBtn" type="button" data-bs-target="#heroBgSlider" data-bs-slide="next" aria-label="Slide berikutnya">
-            <span class="carousel-control-next-icon rounded-circle p-2.5" style="background-color: rgba(0,0,0,0.45); backdrop-filter: blur(6px); width: 42px; height: 42px; display: inline-flex; align-items: center; justify-content: center;" aria-hidden="true"></span>
+        <button class="carousel-control-next" id="heroNextBtn" type="button" data-bs-target="#heroBgSlider" data-bs-slide="next" aria-label="Slide berikutnya" style="position: absolute !important; top: 50% !important; transform: translateY(-50%) !important; z-index: 20 !important; right: 10px !important; width: 44px !important; height: 44px !important; padding: 0 !important; background: transparent !important; border: none !important; opacity: 0.95 !important;">
+            <span class="carousel-control-next-icon rounded-circle p-2.5" style="background-color: rgba(0,0,0,0.5); backdrop-filter: blur(6px); width: 42px; height: 42px; display: inline-flex; align-items: center; justify-content: center;" aria-hidden="true"></span>
         </button>
 
         {{-- Garis Indikator Carousel --}}
