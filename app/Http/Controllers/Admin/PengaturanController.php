@@ -59,7 +59,8 @@ class PengaturanController extends Controller
             // Leaderboard Section
             'leaderboard_label'    => Setting::get('leaderboard_label', 'PENCAPAIAN TERBAIK'),
             'leaderboard_title'    => Setting::get('leaderboard_title', 'Guru dengan Partisipasi Tertinggi'),
-            'leaderboard_subtitle' => Setting::get('leaderboard_subtitle', 'Guru dengan persentase kepuasan dan partisipasi penilaian tertinggi dari siswa'),
+            'leaderboard_subtitle' => Setting::get('leaderboard_subtitle', 'Data Guru dengan persentase nilai terbaik dari siswa'),
+            'leaderboard_catatan'  => Setting::get('leaderboard_catatan', 'Leaderboard ini hanyalah fitur apresiasi tambahan. Fokus utama evaluasi adalah refleksi pembelajaran, dedikasi, serta kedisiplinan guru dalam mengajar.'),
 
             // Panduan Section
             'panduan_label'        => Setting::get('panduan_label', 'PANDUAN PENGGUNAAN'),
@@ -207,6 +208,7 @@ class PengaturanController extends Controller
             'leaderboard_label'    => 'nullable|string|max:100',
             'leaderboard_title'    => 'nullable|string|max:255',
             'leaderboard_subtitle' => 'nullable|string|max:1000',
+            'leaderboard_catatan'  => 'nullable|string|max:2000',
 
             'panduan_label'        => 'nullable|string|max:100',
             'panduan_title'        => 'nullable|string|max:255',
@@ -360,7 +362,7 @@ class PengaturanController extends Controller
             'hero_title_2', 'hero_subtitle_2', 'hero_cta_text_2', 'hero_cta_url_2',
             'hero_title_3', 'hero_subtitle_3', 'hero_cta_text_3', 'hero_cta_url_3',
             'stats_label', 'stats_title', 'stats_subtitle',
-            'leaderboard_label', 'leaderboard_title', 'leaderboard_subtitle',
+            'leaderboard_label', 'leaderboard_title', 'leaderboard_subtitle', 'leaderboard_catatan',
             'panduan_label', 'panduan_title', 'panduan_subtitle',
             'panduan_step1_title', 'panduan_step1_desc',
             'panduan_step2_title', 'panduan_step2_desc',

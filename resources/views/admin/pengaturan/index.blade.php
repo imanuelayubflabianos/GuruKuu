@@ -452,32 +452,91 @@
 
             <div class="settings-card">
                 <h2 class="settings-heading mb-1"><i class="bi bi-bar-chart-line me-2"></i>Teks Seksi Statistik & Leaderboard Beranda</h2>
-                <p class="settings-muted mb-4">Ubah judul dan teks keterangan pada seksi data statistik dan leaderboard di beranda publik.</p>
+                <p class="settings-muted mb-4">Ubah label kategori, judul, teks keterangan, dan catatan disclaimer pada seksi data statistik dan leaderboard di beranda publik serta portal.</p>
 
                 <div class="row g-3">
                     <div class="col-md-6">
-                        <div class="p-3 border rounded-3 bg-white shadow-sm">
-                            <h6 class="fw-bold text-primary mb-3"><i class="bi bi-graph-up me-1"></i> Seksi Statistik</h6>
-                            <div class="mb-3">
-                                <label class="form-label small" for="statsTitleInput">Judul Seksi Statistik</label>
-                                <input type="text" name="stats_title" id="statsTitleInput" class="form-control" value="{{ $settings['stats_title'] }}">
-                            </div>
+                        <div class="p-3 border rounded-3 bg-white shadow-sm h-100 d-flex flex-column justify-content-between">
                             <div>
-                                <label class="form-label small" for="statsSubtitleInput">Deskripsi Statistik</label>
-                                <input type="text" name="stats_subtitle" id="statsSubtitleInput" class="form-control" value="{{ $settings['stats_subtitle'] }}">
+                                <h6 class="fw-bold text-primary mb-3"><i class="bi bi-graph-up me-1"></i> Seksi Statistik</h6>
+                                <div class="mb-3">
+                                    <label class="form-label small" for="statsLabelInput">Label Kategori Statistik</label>
+                                    <input type="text" name="stats_label" id="statsLabelInput" class="form-control" value="{{ $settings['stats_label'] }}" placeholder="DATA SEKOLAH">
+                                    <div class="text-muted small mt-1" style="font-size: 0.74rem;">Teks kecil di atas judul seksi statistik.</div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label small" for="statsTitleInput">Judul Seksi Statistik</label>
+                                    <input type="text" name="stats_title" id="statsTitleInput" class="form-control" value="{{ $settings['stats_title'] }}">
+                                </div>
+                                <div>
+                                    <label class="form-label small" for="statsSubtitleInput">Deskripsi Statistik</label>
+                                    <input type="text" name="stats_subtitle" id="statsSubtitleInput" class="form-control" value="{{ $settings['stats_subtitle'] }}">
+                                </div>
                             </div>
                         </div>
                     </div>
                     <div class="col-md-6">
-                        <div class="p-3 border rounded-3 bg-white shadow-sm">
+                        <div class="p-3 border rounded-3 bg-white shadow-sm h-100">
                             <h6 class="fw-bold text-warning mb-3"><i class="bi bi-trophy me-1"></i> Seksi Leaderboard</h6>
+                            <div class="mb-3">
+                                <label class="form-label small" for="lbLabelInput">Label Kategori Leaderboard</label>
+                                <input type="text" name="leaderboard_label" id="lbLabelInput" class="form-control" value="{{ $settings['leaderboard_label'] }}" placeholder="PENCAPAIAN TERBAIK">
+                                <div class="text-muted small mt-1" style="font-size: 0.74rem;">Teks kecil di atas judul seksi leaderboard.</div>
+                            </div>
                             <div class="mb-3">
                                 <label class="form-label small" for="lbTitleInput">Judul Seksi Leaderboard</label>
                                 <input type="text" name="leaderboard_title" id="lbTitleInput" class="form-control" value="{{ $settings['leaderboard_title'] }}">
                             </div>
-                            <div>
+                            <div class="mb-3">
                                 <label class="form-label small" for="lbSubtitleInput">Deskripsi Leaderboard</label>
                                 <input type="text" name="leaderboard_subtitle" id="lbSubtitleInput" class="form-control" value="{{ $settings['leaderboard_subtitle'] }}">
+                            </div>
+                            <div>
+                                <label class="form-label small" for="lbCatatanInput"><i class="bi bi-info-circle text-primary me-1"></i>Catatan Tambahan Leaderboard</label>
+                                <textarea name="leaderboard_catatan" id="lbCatatanInput" class="form-control" rows="3" placeholder="Tuliskan catatan apresiasi...">{{ $settings['leaderboard_catatan'] }}</textarea>
+                                <div class="text-muted small mt-1" style="font-size: 0.74rem;">Catatan ini tampil dalam kotak informasi (pill) di beranda dan halaman leaderboard siswa, guru, serta admin.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Live Preview Statistik & Leaderboard (100% Identik Tampilan Asli Beranda Publik) --}}
+                <div class="mt-4 pt-3 border-top">
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <label class="form-label small text-muted text-uppercase fw-semibold mb-0"><i class="bi bi-eye me-1"></i> Live Preview Seksi Statistik & Leaderboard (Sesuai Beranda Publik)</label>
+                        <span class="badge bg-secondary-subtle text-secondary small" style="font-size: 0.72rem;">Pratinjau Real-time</span>
+                    </div>
+
+                    <div class="p-4 rounded-4 border shadow-xs" style="background: #f8fafc;">
+                        {{-- 1. Preview Statistik --}}
+                        <div class="text-center mb-4 pb-4 border-bottom">
+                            <div class="text-uppercase fw-bold text-primary mb-1" id="previewStatsLabel" style="font-size: 0.76rem; letter-spacing: 1.2px;">
+                                {{ $settings['stats_label'] }}
+                            </div>
+                            <h4 class="fw-bold mb-1 text-dark" id="previewStatsTitle">
+                                {{ $settings['stats_title'] }}
+                            </h4>
+                            <p class="text-muted small mb-0" id="previewStatsSubtitle" style="font-size: 0.85rem;">
+                                {{ $settings['stats_subtitle'] }}
+                            </p>
+                        </div>
+
+                        {{-- 2. Preview Leaderboard --}}
+                        <div class="text-center">
+                            <div class="small fw-bold text-uppercase text-muted mb-1" id="previewLbLabel" style="letter-spacing: 1.5px; font-size: 0.78rem;">
+                                {{ $settings['leaderboard_label'] }}
+                            </div>
+                            <h3 class="fw-bold mb-2 text-dark" id="previewLbTitle" style="font-size: 1.5rem;">
+                                {{ $settings['leaderboard_title'] }}
+                            </h3>
+                            <p class="text-muted mb-2" id="previewLbSubtitle" style="font-size: 0.92rem;">
+                                {{ $settings['leaderboard_subtitle'] }}
+                            </p>
+                            <div class="d-inline-flex align-items-center justify-content-center gap-2 px-3 py-1.5 rounded-pill border" style="background: rgba(0, 51, 102, 0.04); border-color: rgba(0, 51, 102, 0.12) !important; max-width: 680px;">
+                                <i class="bi bi-info-circle text-primary flex-shrink-0" style="font-size: 0.85rem;"></i>
+                                <span class="text-muted small" style="font-size: 0.8rem; line-height: 1.4;">
+                                    <strong>Catatan:</strong> <span id="previewLbCatatan">{{ $settings['leaderboard_catatan'] }}</span>
+                                </span>
                             </div>
                         </div>
                     </div>
@@ -490,11 +549,15 @@
                 <h2 class="settings-heading mb-1"><i class="bi bi-bullseye me-2"></i>Profil Beranda & Visi Misi</h2>
                 <p class="settings-muted mb-4">Atur judul pengantar, teks visi, dan rincian misi sekolah.</p>
                 <div class="row g-3 mb-4">
-                    <div class="col-md-5">
+                    <div class="col-md-3">
+                        <label class="form-label" for="aboutLabelInput">Label Kategori Tentang</label>
+                        <input type="text" name="about_label" id="aboutLabelInput" class="form-control" value="{{ $settings['about_label'] }}" placeholder="TENTANG KAMI">
+                    </div>
+                    <div class="col-md-4">
                         <label class="form-label" for="aboutTitleInput">Judul Seksi Tentang</label>
                         <input type="text" name="about_title" id="aboutTitleInput" class="form-control" value="{{ $settings['about_title'] }}">
                     </div>
-                    <div class="col-md-7">
+                    <div class="col-md-5">
                         <label class="form-label" for="aboutSubtitleInput">Deskripsi Singkat Tentang</label>
                         <input type="text" name="about_subtitle" id="aboutSubtitleInput" class="form-control" value="{{ $settings['about_subtitle'] }}">
                     </div>
@@ -1945,6 +2008,23 @@ document.addEventListener('DOMContentLoaded', function() {
     if (s2Desc) s2Desc.addEventListener('input', () => { document.getElementById('previewStep2Desc').textContent = s2Desc.value; });
     if (s3Title) s3Title.addEventListener('input', () => { document.getElementById('previewStep3Badge').textContent = s3Title.value; });
     if (s3Desc) s3Desc.addEventListener('input', () => { document.getElementById('previewStep3Desc').textContent = s3Desc.value; });
+
+    // 🌟 Live Preview Seksi Statistik & Leaderboard
+    const statsLabel = document.getElementById('statsLabelInput');
+    const statsTitle = document.getElementById('statsTitleInput');
+    const statsSub = document.getElementById('statsSubtitleInput');
+    const lbLabel = document.getElementById('lbLabelInput');
+    const lbTitle = document.getElementById('lbTitleInput');
+    const lbSub = document.getElementById('lbSubtitleInput');
+    const lbCatatan = document.getElementById('lbCatatanInput');
+
+    if (statsLabel) statsLabel.addEventListener('input', () => { const el = document.getElementById('previewStatsLabel'); if (el) el.textContent = statsLabel.value; });
+    if (statsTitle) statsTitle.addEventListener('input', () => { const el = document.getElementById('previewStatsTitle'); if (el) el.textContent = statsTitle.value; });
+    if (statsSub) statsSub.addEventListener('input', () => { const el = document.getElementById('previewStatsSubtitle'); if (el) el.textContent = statsSub.value; });
+    if (lbLabel) lbLabel.addEventListener('input', () => { const el = document.getElementById('previewLbLabel'); if (el) el.textContent = lbLabel.value; });
+    if (lbTitle) lbTitle.addEventListener('input', () => { const el = document.getElementById('previewLbTitle'); if (el) el.textContent = lbTitle.value; });
+    if (lbSub) lbSub.addEventListener('input', () => { const el = document.getElementById('previewLbSubtitle'); if (el) el.textContent = lbSub.value; });
+    if (lbCatatan) lbCatatan.addEventListener('input', () => { const el = document.getElementById('previewLbCatatan'); if (el) el.textContent = lbCatatan.value; });
 
     // 🌟 Live Preview Footer
     const footerAbout = document.getElementById('footerAboutInput');

@@ -100,7 +100,8 @@ erDiagram
    * Modul perpesanan/live helpdesk real-time polling antara Siswa/Guru/Guest dengan Admin.
 
 9. **`Setting` (`settings`)**:
-   * Penyimpanan konfigurasi dinamis (hero landing page, status maintenance, subtitle leaderboard, threshold kata kasar).
+   * Penyimpanan konfigurasi dinamis (hero landing page, status maintenance, label & judul & subtitle statistik, label & judul & subtitle & catatan apresiasi disclaimer leaderboard, threshold kata kasar).
+   * Dilengkapi live preview real-time di Admin Pengaturan dan sinkronisasi otomatis ke Beranda publik, portal Siswa, portal Guru, dan portal Admin.
 
 ---
 
