@@ -1549,7 +1549,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
         @php
             $list = $leaderboard ?? \App\Models\Guru::leaderboardFor('rating');
-            $eligibleList = $list->filter(fn($g) => !empty($g->leaderboard_rank))->values();
+            if (!($list instanceof \Illuminate\Support\Collection)) {
+                $list = collect($list ?? []);
+            }
+            $eligibleList = $list->filter(fn($g) => is_object($g) && !($g instanceof \__PHP_Incomplete_Class) && !empty($g->leaderboard_rank))->values();
             $top1 = $eligibleList->get(0);
             $top2 = $eligibleList->get(1);
             $top3 = $eligibleList->get(2);

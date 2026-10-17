@@ -109,7 +109,10 @@ class Guru extends Model
         try {
             $cached = \Illuminate\Support\Facades\Cache::get($cacheKey);
             if ($cached instanceof \Illuminate\Support\Collection) {
-                return self::$leaderboardCache[$cacheKey] = $cached;
+                $first = $cached->first();
+                if ($cached->isEmpty() || ($first instanceof self && !($first instanceof \__PHP_Incomplete_Class))) {
+                    return self::$leaderboardCache[$cacheKey] = $cached;
+                }
             }
             if ($cached !== null) {
                 \Illuminate\Support\Facades\Cache::forget($cacheKey);
