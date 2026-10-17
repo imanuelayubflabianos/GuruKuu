@@ -1214,20 +1214,27 @@
     }
 
     #heroBgSlider .carousel-indicators {
-        bottom: 12px !important;
-        padding: 5px 12px !important;
-        gap: 6px !important;
+        bottom: 15px !important;
+        background: transparent !important;
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+        gap: 7px !important;
         display: inline-flex !important;
     }
     #heroBgSlider .carousel-indicators button {
-        width: 18px !important;
+        width: 20px !important;
         height: 4px !important;
-        background-color: rgba(255, 255, 255, 0.4) !important;
+        background-color: rgba(255, 255, 255, 0.5) !important;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4) !important;
     }
     #heroBgSlider .carousel-indicators button.active {
-        width: 28px !important;
+        width: 30px !important;
         background-color: #ffffff !important; /* Putih murni */
         opacity: 1 !important;
+        box-shadow: 0 0 8px rgba(255, 255, 255, 0.8), 0 1px 4px rgba(0, 0, 0, 0.5) !important;
     }
 }
 </style>
