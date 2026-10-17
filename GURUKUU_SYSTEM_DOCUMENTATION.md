@@ -213,4 +213,10 @@ GuruKuu/
   - Menghapus serialisasi Eloquent Model/Collection di `Cache::put` pada `Guru::leaderboardFor()` yang memicu error fatal `__PHP_Incomplete_Class` saat `unserialize()` dipanggil oleh driver cache di PHP 8.3+. Runtime cache kini menggunakan `self::$leaderboardCache` (in-memory, aman 100%).
   - Menghilangkan `Cache::remember('gurukuu_all_settings')` dari `Setting::allCached()` dan beralih ke pembacaan langsung database dengan in-memory cache runtime per request (`$runtimeCache`), menjamin perubahan di Admin Pengaturan langsung aktif seketika tanpa tertahan cache stale database.
   - Penyesuaian panah hero slider mobile ke posisi `top: 38%` (sejajar teks judul) dengan ukuran proporsional 32px, serta penambahan indikator kapsul emas (`bottom: 14px`) yang selalu tampak di tampilan mobile.
+* **2026-10-17 (Hero Slider Mobile Navigation & Setting Emptying Refinements):**
+  - Mengizinkan pengosongan nilai (empty string `""`) pada pengaturan admin di `Setting::get()` tanpa memaksakan kembali fallback default teks bawaan.
+  - Menghapus border/garis tepi stroke pada tombol panah navigasi slider hero, menggantinya dengan latar belakang transparan lembut (`rgba(15, 23, 42, 0.45)`) dengan efek blur halus tanpa menutupi teks (`padding-left: 56px` & `padding-right: 56px`).
+  - Menerapkan navigasi panah terikat (bounded navigation): Halaman pertama hanya menampilkan panah kanan, halaman terakhir hanya menampilkan panah kiri, dan halaman tengah menampilkan kedua panah (`data-bs-wrap="false"`).
+  - Menyematkan kapsul indikator garis aktif di bawah tengah hero banner (`bottom: 16px`, pill blur) yang selalu jelas terlihat di layar perangkat seluler.
+
 

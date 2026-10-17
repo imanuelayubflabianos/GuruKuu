@@ -46,7 +46,7 @@ class Setting extends Model
     public static function get(string $key, $default = null)
     {
         $all = self::allCached();
-        if (array_key_exists($key, $all) && $all[$key] !== null && trim((string)$all[$key]) !== '') {
+        if (array_key_exists($key, $all) && $all[$key] !== null) {
             return $all[$key];
         }
 

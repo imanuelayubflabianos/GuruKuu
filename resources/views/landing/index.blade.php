@@ -3,11 +3,11 @@
 
 @section('content')
 @php
-    $heroBadge = \App\Models\Setting::get('hero_badge') ?: 'SMK NEGERI 1 BANGSRI • JUARA';
-    $heroTitle = \App\Models\Setting::get('hero_title') ?: 'Bangun Sekolah yang Lebih Baik Melalui Penilaian Guru yang Objektif';
-    $heroSubtitle = \App\Models\Setting::get('hero_subtitle') ?: 'Suarakan aspirasimu secara aman untuk meningkatkan kualitas pengajaran dan menciptakan lingkungan belajar yang inspiratif.';
-    $heroCtaText = \App\Models\Setting::get('hero_cta_text') ?: 'Siap Memulai?';
-    $heroCtaUrl = \App\Models\Setting::get('hero_cta_url') ?: route('login');
+    $heroBadge = \App\Models\Setting::get('hero_badge', 'SMK NEGERI 1 BANGSRI • JUARA');
+    $heroTitle = \App\Models\Setting::get('hero_title', 'Bangun Sekolah yang Lebih Baik Melalui Penilaian Guru yang Objektif');
+    $heroSubtitle = \App\Models\Setting::get('hero_subtitle', 'Suarakan aspirasimu secara aman untuk meningkatkan kualitas pengajaran dan menciptakan lingkungan belajar yang inspiratif.');
+    $heroCtaText = \App\Models\Setting::get('hero_cta_text', 'Siap Memulai?');
+    $heroCtaUrl = \App\Models\Setting::get('hero_cta_url', route('login'));
 
     $heroImg1 = \App\Models\Setting::get('hero_image', '/uploads/hero/hero_KRCqd4TJtmyGUMoMVp58Vr6Z.png');
     $heroImg2 = \App\Models\Setting::get('hero_image_2', '');
@@ -1094,33 +1094,45 @@
 #heroNextBtn .carousel-control-next-icon {
     width: 40px !important;
     height: 40px !important;
-    background-color: rgba(0,0,0,0.48) !important;
+    background-color: rgba(15, 23, 42, 0.42) !important;
     backdrop-filter: blur(6px) !important;
+    -webkit-backdrop-filter: blur(6px) !important;
+    border: none !important;
     border-radius: 50% !important;
+    box-shadow: none !important;
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
-    background-size: 50% 50% !important;
+    background-size: 45% 45% !important;
+    opacity: 0.8 !important;
+    transition: all 0.2s ease !important;
 }
-#heroPrevBtn:hover,
-#heroNextBtn:hover {
-    opacity: 1;
-    transform: translateY(-50%) scale(1.08) !important;
+#heroPrevBtn:hover .carousel-control-prev-icon,
+#heroNextBtn:hover .carousel-control-next-icon {
+    opacity: 1 !important;
+    background-color: rgba(15, 23, 42, 0.72) !important;
+    transform: scale(1.08) !important;
 }
 
-/* 🌟 CAROUSEL INDICATORS DESKTOP & GLOBAL */
+/* 🌟 CAROUSEL INDICATORS DESKTOP & GLOBAL (Kapsul Melayang Elegan di Bawah Tengah) */
 #heroBgSlider .carousel-indicators {
     position: absolute !important;
-    bottom: 20px !important;
-    left: 0 !important;
-    right: 0 !important;
-    margin: 0 auto !important;
-    display: flex !important;
+    bottom: 22px !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    margin: 0 !important;
+    display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
     gap: 8px !important;
-    z-index: 25 !important;
-    padding: 0 !important;
+    z-index: 35 !important;
+    padding: 6px 14px !important;
+    background: rgba(15, 23, 42, 0.45) !important;
+    backdrop-filter: blur(8px) !important;
+    -webkit-backdrop-filter: blur(8px) !important;
+    border-radius: 999px !important;
+    width: auto !important;
+    max-width: 90% !important;
 }
 #heroBgSlider .carousel-indicators button {
     width: 26px !important;
@@ -1131,6 +1143,8 @@
     transition: all 0.25s ease !important;
     opacity: 0.75 !important;
     margin: 0 3px !important;
+    padding: 0 !important;
+    cursor: pointer;
 }
 #heroBgSlider .carousel-indicators button.active {
     width: 42px !important;
@@ -1138,57 +1152,72 @@
     opacity: 1 !important;
 }
 
-/* 📱 RESPONSIVE MOBILE: PANAH PAS DI TENGAH (33%), KONTRAS TINGGI, 100% BEBAS OVERLAP */
+/* 📱 RESPONSIVE MOBILE: PANAH LEMBUT TANPA BORDER/STROKE, 100% BEBAS DARI TEKS, INDIKATOR JELAS */
 @media (max-width: 767.98px) {
+    #home,
+    #heroBgSlider,
+    #heroBgSlider .carousel-item {
+        min-height: 520px !important;
+    }
+    #heroBgSlider .hero-slide-bg {
+        min-height: 520px !important;
+    }
     .hero-content-container {
-        padding-left: 48px !important;
-        padding-right: 48px !important;
-        padding-top: 140px !important;
-        padding-bottom: 90px !important;
+        padding-left: 56px !important;
+        padding-right: 56px !important;
+        padding-top: 130px !important;
+        padding-bottom: 75px !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
     }
-    .hero-content-container .row {
-        margin-left: 0 !important;
-        margin-right: 0 !important;
-    }
+    .hero-content-container .row,
     .hero-content-container [class*="col-"] {
         padding-left: 0 !important;
         padding-right: 0 !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+        width: 100% !important;
     }
     #heroPrevBtn,
     #heroNextBtn {
-        top: 33% !important; /* Pas di tengah-tengah antara judul dan tombol */
+        top: 36% !important; /* Pas vertikal sejajar, tidak menabrak teks */
         transform: translateY(-50%) !important;
         width: 32px !important;
         height: 32px !important;
-        opacity: 0.95 !important;
+        opacity: 0.82 !important;
         z-index: 30 !important;
+        border: none !important;
+        background: transparent !important;
     }
     #heroPrevBtn {
-        left: 6px !important;
+        left: 8px !important;
     }
     #heroNextBtn {
-        right: 6px !important;
+        right: 8px !important;
     }
     #heroPrevBtn .carousel-control-prev-icon,
     #heroNextBtn .carousel-control-next-icon {
         width: 30px !important;
         height: 30px !important;
-        background-color: rgba(10, 25, 47, 0.85) !important;
-        backdrop-filter: blur(8px) !important;
-        border: 1.5px solid rgba(255, 255, 255, 0.6) !important;
+        background-color: rgba(15, 23, 42, 0.45) !important; /* Transparan lembut, tanpa garis stroke */
+        backdrop-filter: blur(4px) !important;
+        -webkit-backdrop-filter: blur(4px) !important;
+        border: none !important;
         border-radius: 50% !important;
-        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45) !important;
-        background-size: 50% 50% !important;
+        box-shadow: none !important;
+        background-size: 45% 45% !important;
     }
 
     #heroBgSlider .carousel-indicators {
-        bottom: 14px !important;
+        bottom: 16px !important;
+        padding: 5px 12px !important;
         gap: 6px !important;
+        display: inline-flex !important;
     }
     #heroBgSlider .carousel-indicators button {
         width: 18px !important;
         height: 5px !important;
-        background-color: rgba(255, 255, 255, 0.5) !important;
+        background-color: rgba(255, 255, 255, 0.45) !important;
     }
     #heroBgSlider .carousel-indicators button.active {
         width: 30px !important;
@@ -1204,7 +1233,7 @@
     <div class="hero-ambient-orb" style="bottom: 12%; left: 8%; width: 340px; height: 340px; background: radial-gradient(circle, rgba(255, 193, 7, 0.38), transparent 70%); animation-delay: -4s;"></div>
 
     {{-- Background Carousel Slideshow dengan Teks Dinamis per Slide --}}
-    <div id="heroBgSlider" class="carousel slide carousel-fade position-relative w-100" data-bs-ride="carousel" data-bs-interval="4500" style="min-height: 600px; touch-action: pan-y;">
+    <div id="heroBgSlider" class="carousel slide carousel-fade position-relative w-100" data-bs-ride="carousel" data-bs-interval="4500" data-bs-wrap="false" style="min-height: 600px; touch-action: pan-y;">
         <div class="carousel-inner w-100 h-100">
             @foreach($heroSlides as $idx => $slide)
                 <div class="carousel-item {{ $idx === 0 ? 'active' : '' }} w-100 position-relative" style="min-height: 600px;">
@@ -1214,17 +1243,25 @@
                     <div class="container position-relative hero-content-container" style="z-index: 2; padding: 160px 0 110px;">
                         <div class="row">
                             <div class="col-lg-9 col-xl-8">
-                                <div class="hero-glass-badge hero-anim-badge">
-                                    <i class="bi bi-patch-check-fill text-warning"></i>
-                                    <span>{{ $slide['badge'] }}</span>
-                                </div>
-                                <h1 class="hero-title text-white hero-anim-title">{{ $slide['title'] }}</h1>
-                                <p class="hero-subtitle text-white hero-anim-subtitle" style="color: rgba(255, 255, 255, 0.92) !important;">{{ $slide['subtitle'] }}</p>
+                                @if(!empty(trim($slide['badge'] ?? '')))
+                                    <div class="hero-glass-badge hero-anim-badge">
+                                        <i class="bi bi-patch-check-fill text-warning"></i>
+                                        <span>{{ $slide['badge'] }}</span>
+                                    </div>
+                                @endif
+                                @if(!empty(trim($slide['title'] ?? '')))
+                                    <h1 class="hero-title text-white hero-anim-title">{{ $slide['title'] }}</h1>
+                                @endif
+                                @if(!empty(trim($slide['subtitle'] ?? '')))
+                                    <p class="hero-subtitle text-white hero-anim-subtitle" style="color: rgba(255, 255, 255, 0.92) !important;">{{ $slide['subtitle'] }}</p>
+                                @endif
                                 <div class="d-flex flex-wrap gap-3 align-items-center hero-anim-cta">
-                                    <a href="{{ $slide['cta_url'] }}" class="hero-btn hero-btn-primary">
-                                        <span>{{ $slide['cta_text'] }}</span>
-                                        <i class="bi bi-arrow-right"></i>
-                                    </a>
+                                    @if(!empty(trim($slide['cta_text'] ?? '')))
+                                        <a href="{{ $slide['cta_url'] }}" class="hero-btn hero-btn-primary">
+                                            <span>{{ $slide['cta_text'] }}</span>
+                                            <i class="bi bi-arrow-right"></i>
+                                        </a>
+                                    @endif
                                     <a href="#statistik" class="hero-btn hero-btn-secondary">
                                         <i class="bi bi-bar-chart-line"></i>
                                         <span>Lihat Statistik</span>
@@ -1238,19 +1275,23 @@
         </div>
 
         {{-- Next / Prev Arrows --}}
-        <button class="carousel-control-prev" id="heroPrevBtn" type="button" data-bs-target="#heroBgSlider" data-bs-slide="prev" aria-label="Slide sebelumnya">
-            <span class="carousel-control-prev-icon rounded-circle" aria-hidden="true"></span>
-        </button>
-        <button class="carousel-control-next" id="heroNextBtn" type="button" data-bs-target="#heroBgSlider" data-bs-slide="next" aria-label="Slide berikutnya">
-            <span class="carousel-control-next-icon rounded-circle" aria-hidden="true"></span>
-        </button>
+        @if(count($heroSlides) > 1)
+            <button class="carousel-control-prev" id="heroPrevBtn" type="button" data-bs-target="#heroBgSlider" data-bs-slide="prev" aria-label="Slide sebelumnya" style="display: none;">
+                <span class="carousel-control-prev-icon rounded-circle" aria-hidden="true"></span>
+            </button>
+            <button class="carousel-control-next" id="heroNextBtn" type="button" data-bs-target="#heroBgSlider" data-bs-slide="next" aria-label="Slide berikutnya" style="display: flex;">
+                <span class="carousel-control-next-icon rounded-circle" aria-hidden="true"></span>
+            </button>
+        @endif
 
         {{-- Garis Indikator Carousel --}}
-        <div class="carousel-indicators" id="heroIndicators">
-            @foreach($heroSlides as $idx => $slide)
-                <button type="button" data-bs-target="#heroBgSlider" data-bs-slide-to="{{ $idx }}" class="{{ $idx === 0 ? 'active' : '' }}" aria-current="{{ $idx === 0 ? 'true' : 'false' }}" aria-label="Slide {{ $idx + 1 }}"></button>
-            @endforeach
-        </div>
+        @if(count($heroSlides) > 1)
+            <div class="carousel-indicators" id="heroIndicators">
+                @foreach($heroSlides as $idx => $slide)
+                    <button type="button" data-bs-target="#heroBgSlider" data-bs-slide-to="{{ $idx }}" class="{{ $idx === 0 ? 'active' : '' }}" aria-current="{{ $idx === 0 ? 'true' : 'false' }}" aria-label="Slide {{ $idx + 1 }}"></button>
+                @endforeach
+            </div>
+        @endif
     </div>
 </section>
 
@@ -1260,19 +1301,40 @@ document.addEventListener('DOMContentLoaded', function() {
     const heroSlider = document.getElementById('heroBgSlider');
     const prevBtn = document.getElementById('heroPrevBtn');
     const nextBtn = document.getElementById('heroNextBtn');
-    const totalSlides = {{ count($heroImages) }};
+    const totalSlides = {{ count($heroSlides) }};
+    let currentHeroIndex = 0;
 
-    function updateHeroArrows() {
+    // Logika kontrol panah dinamis sesuai batas halaman
+    function updateHeroArrows(currentIndex) {
         if (!prevBtn || !nextBtn) return;
-        prevBtn.style.display = 'flex';
-        nextBtn.style.display = 'flex';
+        if (totalSlides <= 1) {
+            prevBtn.style.display = 'none';
+            nextBtn.style.display = 'none';
+            return;
+        }
+
+        // Halaman pertama: panah kanan saja, panah kiri sembunyi
+        if (currentIndex <= 0) {
+            prevBtn.style.display = 'none';
+            nextBtn.style.display = 'flex';
+        }
+        // Halaman terakhir: panah kiri saja, panah kanan sembunyi
+        else if (currentIndex >= totalSlides - 1) {
+            prevBtn.style.display = 'flex';
+            nextBtn.style.display = 'none';
+        }
+        // Halaman tengah: kedua panah muncul
+        else {
+            prevBtn.style.display = 'flex';
+            nextBtn.style.display = 'flex';
+        }
     }
 
     if (heroSlider && typeof bootstrap !== 'undefined') {
         const carousel = new bootstrap.Carousel(heroSlider, {
             interval: 5000,
             ride: 'carousel',
-            wrap: true
+            wrap: false
         });
 
         let heroIdleTimer = null;
@@ -1285,7 +1347,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 heroIdleTimer = null;
             }
             heroIdleTimer = setTimeout(function() {
-                carousel.cycle();
+                if (currentHeroIndex < totalSlides - 1) {
+                    carousel.cycle();
+                }
             }, HERO_RESUME_IDLE_DELAY);
         }
 
@@ -1303,15 +1367,19 @@ document.addEventListener('DOMContentLoaded', function() {
 
         if (prevBtn) {
             prevBtn.addEventListener('click', function() {
-                carousel.prev();
-                pauseHeroAndScheduleResume();
+                if (currentHeroIndex > 0) {
+                    carousel.prev();
+                    pauseHeroAndScheduleResume();
+                }
             });
         }
 
         if (nextBtn) {
             nextBtn.addEventListener('click', function() {
-                carousel.next();
-                pauseHeroAndScheduleResume();
+                if (currentHeroIndex < totalSlides - 1) {
+                    carousel.next();
+                    pauseHeroAndScheduleResume();
+                }
             });
         }
 
@@ -1324,6 +1392,9 @@ document.addEventListener('DOMContentLoaded', function() {
         });
 
         heroSlider.addEventListener('slid.bs.carousel', function(e) {
+            currentHeroIndex = e.to;
+            updateHeroArrows(e.to);
+
             document.querySelectorAll('[data-bs-target="#heroBgSlider"][data-bs-slide-to]').forEach((btn, idx) => {
                 if (idx === e.to) {
                     btn.classList.add('active');
@@ -1335,7 +1406,8 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
 
-        updateHeroArrows();
+        // Inisialisasi awal
+        updateHeroArrows(0);
 
         // 🌟 GESTURE GESER DENGAN JARI (TOUCH MOBILE) & MOUSE DRAG (DESKTOP)
         const heroSection = document.getElementById('home');
@@ -1347,7 +1419,6 @@ document.addEventListener('DOMContentLoaded', function() {
             let mouseStartY = 0;
             const threshold = 40; // minimal geser 40px
 
-            // Touch events untuk Mobile (swipe dengan jari)
             heroSection.addEventListener('touchstart', function(e) {
                 if (e.touches && e.touches.length === 1) {
                     touchStartX = e.touches[0].clientX;
@@ -1361,11 +1432,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     const diffX = e.changedTouches[0].clientX - touchStartX;
                     const diffY = e.changedTouches[0].clientY - touchStartY;
 
-                    // Deteksi geser horizontal dominan
                     if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > threshold) {
-                        if (diffX < 0) {
+                        if (diffX < 0 && currentHeroIndex < totalSlides - 1) {
                             carousel.next();
-                        } else {
+                        } else if (diffX > 0 && currentHeroIndex > 0) {
                             carousel.prev();
                         }
                     }
@@ -1376,7 +1446,6 @@ document.addEventListener('DOMContentLoaded', function() {
             heroSection.addEventListener('touchend', handleHeroTouchEnd, { passive: true });
             heroSection.addEventListener('touchcancel', handleHeroTouchEnd, { passive: true });
 
-            // Mouse drag untuk Desktop
             heroSection.addEventListener('mousedown', function(e) {
                 if (e.target.closest('a, button, input, textarea')) return;
                 isMouseDown = true;
@@ -1392,9 +1461,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 const diffY = e.clientY - mouseStartY;
 
                 if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > threshold) {
-                    if (diffX < 0) {
+                    if (diffX < 0 && currentHeroIndex < totalSlides - 1) {
                         carousel.next();
-                    } else {
+                    } else if (diffX > 0 && currentHeroIndex > 0) {
                         carousel.prev();
                     }
                 }
@@ -1645,12 +1714,17 @@ document.addEventListener('DOMContentLoaded', function() {
             <div class="small fw-bold text-uppercase text-muted mb-1" style="letter-spacing: 1.5px; font-size: 0.78rem;">{{ \App\Models\Setting::get('leaderboard_label', 'PENCAPAIAN TERBAIK') }}</div>
             <h2 class="fw-bold mb-2 text-dark" style="font-size: clamp(1.6rem, 3.5vw, 2.2rem);">{{ \App\Models\Setting::get('leaderboard_title', 'Guru dengan Partisipasi Tertinggi') }}</h2>
             <p class="text-muted mb-2" style="font-size: 0.95rem;">{{ \App\Models\Setting::get('leaderboard_subtitle', 'Data Guru dengan persentase nilai terbaik dari siswa') }}</p>
-            <div class="d-inline-flex align-items-center justify-content-center gap-2 px-3 py-1.5 rounded-pill border" style="background: rgba(0, 51, 102, 0.04); border-color: rgba(0, 51, 102, 0.12) !important; max-width: 680px;">
-                <i class="bi bi-info-circle text-primary flex-shrink-0" style="font-size: 0.85rem;"></i>
-                <span class="text-muted small" style="font-size: 0.8rem; line-height: 1.4;">
-                    <strong>Catatan:</strong> {{ \App\Models\Setting::get('leaderboard_catatan', 'Leaderboard ini hanyalah fitur apresiasi tambahan. Fokus utama evaluasi adalah refleksi pembelajaran, dedikasi, serta kedisiplinan guru dalam mengajar.') }}
-                </span>
-            </div>
+            @php
+                $lbCatatan = \App\Models\Setting::get('leaderboard_catatan', 'Leaderboard ini hanyalah fitur apresiasi tambahan. Fokus utama evaluasi adalah refleksi pembelajaran, dedikasi, serta kedisiplinan guru dalam mengajar.');
+            @endphp
+            @if(!empty(trim($lbCatatan)))
+                <div class="d-inline-flex align-items-center justify-content-center gap-2 px-3 py-1.5 rounded-pill border" style="background: rgba(0, 51, 102, 0.04); border-color: rgba(0, 51, 102, 0.12) !important; max-width: 680px;">
+                    <i class="bi bi-info-circle text-primary flex-shrink-0" style="font-size: 0.85rem;"></i>
+                    <span class="text-muted small" style="font-size: 0.8rem; line-height: 1.4;">
+                        <strong>Catatan:</strong> {{ $lbCatatan }}
+                    </span>
+                </div>
+            @endif
         </div>
 
         @php

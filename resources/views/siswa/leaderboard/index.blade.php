@@ -5,12 +5,17 @@
 <div class="text-center mb-4">
     <h1 class="page-title fw-bold text-dark mb-1" style="font-size: 1.85rem;">Leaderboard Guru</h1>
     <p class="text-muted mb-2" style="font-size: 0.95rem;">Peringkat guru terbaik berdasarkan penilaian dan ulasan objektif siswa.</p>
+    @php
+        $lbCatatan = \App\Models\Setting::get('leaderboard_catatan', 'Leaderboard ini hanyalah fitur apresiasi tambahan. Fokus utama evaluasi adalah refleksi pembelajaran, dedikasi, serta kedisiplinan guru dalam mengajar.');
+    @endphp
+    @if(!empty(trim($lbCatatan)))
     <div class="d-inline-flex align-items-center justify-content-center gap-2 px-3 py-1.5 rounded-pill border" style="background: rgba(0, 51, 102, 0.04); border-color: rgba(0, 51, 102, 0.12) !important; max-width: 680px;">
         <i class="bi bi-info-circle text-primary flex-shrink-0" style="font-size: 0.85rem;"></i>
         <span class="text-muted small" style="font-size: 0.8rem; line-height: 1.4;">
-            <strong>Catatan:</strong> {{ \App\Models\Setting::get('leaderboard_catatan', 'Leaderboard ini hanyalah fitur apresiasi tambahan. Fokus utama evaluasi adalah refleksi pembelajaran, dedikasi, serta kedisiplinan guru dalam mengajar.') }}
+            <strong>Catatan:</strong> {{ $lbCatatan }}
         </span>
     </div>
+    @endif
 </div>
 
 @include('components.leaderboard-filter')

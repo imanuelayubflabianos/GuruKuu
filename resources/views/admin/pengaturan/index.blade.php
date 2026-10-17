@@ -88,7 +88,7 @@
                         <div class="row g-3">
                             <div class="col-12">
                                 <label class="form-label" for="siteTitleInput">Nama website</label>
-                                <input type="text" name="site_title" id="siteTitleInput" class="form-control" value="{{ $settings['site_title'] }}" required>
+                                <input type="text" name="site_title" id="siteTitleInput" class="form-control" value="{{ $settings['site_title'] }}" placeholder="GuruKuu">
                             </div>
                             <div class="col-sm-6">
                                 <label class="form-label" for="part1Input">Nama bagian 1</label>
@@ -152,7 +152,7 @@
                 <div class="row g-3">
                     <div class="col-lg-7">
                         <label class="form-label fw-bold" for="heroTitleInput">Judul Utama Hero</label>
-                        <input type="text" name="hero_title" id="heroTitleInput" class="form-control" value="{{ $settings['hero_title'] }}" placeholder="Judul banner utama..." required>
+                        <input type="text" name="hero_title" id="heroTitleInput" class="form-control" value="{{ $settings['hero_title'] }}" placeholder="Judul banner utama...">
                     </div>
                     <div class="col-lg-5">
                         <label class="form-label fw-bold" for="heroCtaInput">Teks Tombol Utama</label>
