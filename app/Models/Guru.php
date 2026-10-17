@@ -106,19 +106,6 @@ class Guru extends Model
             return self::$leaderboardCache[$cacheKey];
         }
 
-        try {
-            $cached = \Illuminate\Support\Facades\Cache::get($cacheKey);
-            if ($cached instanceof \Illuminate\Support\Collection) {
-                $first = $cached->first();
-                if ($cached->isEmpty() || ($first instanceof self && !($first instanceof \__PHP_Incomplete_Class))) {
-                    return self::$leaderboardCache[$cacheKey] = $cached;
-                }
-            }
-            if ($cached !== null) {
-                \Illuminate\Support\Facades\Cache::forget($cacheKey);
-            }
-        } catch (\Throwable $e) {}
-
         $query = self::with(['jurusan', 'penghargaan.badge']);
 
 
@@ -259,10 +246,6 @@ class Guru extends Model
 
         $result = $eligible->concat($notEligible);
         self::$leaderboardCache[$cacheKey] = $result;
-
-        try {
-            \Illuminate\Support\Facades\Cache::put($cacheKey, $result, 60);
-        } catch (\Throwable $e) {}
 
         return $result;
     }
