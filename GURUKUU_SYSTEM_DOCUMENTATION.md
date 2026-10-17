@@ -211,4 +211,6 @@ GuruKuu/
   - Penyatuan teks dan CTA tombol hero slider agar seragam di semua slide, hanya thumbnail background yang berganti, serta perataan vertikal tombol panah slide hero pada tampilan mobile.
   - Implementasi metode `Setting::clearCache()` untuk memastikan pembersihan in-memory cache dan cache key `gurukuu_all_settings` saat pengaturan diperbarui.
   - Menghapus serialisasi Eloquent Model/Collection di `Cache::put` pada `Guru::leaderboardFor()` yang memicu error fatal `__PHP_Incomplete_Class` saat `unserialize()` dipanggil oleh driver cache di PHP 8.3+. Runtime cache kini menggunakan `self::$leaderboardCache` (in-memory, aman 100%).
+  - Menghilangkan `Cache::remember('gurukuu_all_settings')` dari `Setting::allCached()` dan beralih ke pembacaan langsung database dengan in-memory cache runtime per request (`$runtimeCache`), menjamin perubahan di Admin Pengaturan langsung aktif seketika tanpa tertahan cache stale database.
+  - Penyesuaian panah hero slider mobile ke posisi `top: 38%` (sejajar teks judul) dengan ukuran proporsional 32px, serta penambahan indikator kapsul emas (`bottom: 14px`) yang selalu tampak di tampilan mobile.
 

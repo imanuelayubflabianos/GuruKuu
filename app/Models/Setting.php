@@ -23,7 +23,7 @@ class Setting extends Model
     protected static ?array $runtimeCache = null;
 
     /**
-     * Ambil semua settings dalam satu mapping memory & cache terpusat
+     * Ambil semua settings langsung dari database dengan in-memory cache per request
      */
     public static function allCached(): array
     {
@@ -32,9 +32,7 @@ class Setting extends Model
         }
 
         try {
-            self::$runtimeCache = Cache::remember('gurukuu_all_settings', 3600, function () {
-                return self::pluck('value', 'key')->toArray();
-            });
+            self::$runtimeCache = self::pluck('value', 'key')->toArray();
         } catch (\Throwable $e) {
             self::$runtimeCache = [];
         }
@@ -43,7 +41,7 @@ class Setting extends Model
     }
 
     /**
-     * Ambil nilai setting berdasarkan key (dengan in-memory fallback dan cache)
+     * Ambil nilai setting berdasarkan key (dengan in-memory fallback)
      */
     public static function get(string $key, $default = null)
     {
@@ -69,7 +67,6 @@ class Setting extends Model
         try {
             Cache::forget('gurukuu_all_settings');
             Cache::forget("setting_{$key}");
-            Cache::flush();
         } catch (\Throwable $e) {}
 
         return $setting;
@@ -83,7 +80,6 @@ class Setting extends Model
         self::$runtimeCache = null;
         try {
             Cache::forget('gurukuu_all_settings');
-            Cache::flush();
         } catch (\Throwable $e) {}
     }
 

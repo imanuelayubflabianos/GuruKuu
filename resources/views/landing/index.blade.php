@@ -1072,9 +1072,9 @@
     top: 50% !important;
     bottom: auto !important;
     transform: translateY(-50%) !important;
-    z-index: 15 !important;
-    width: 48px !important;
-    height: 48px !important;
+    z-index: 20 !important;
+    width: 44px !important;
+    height: 44px !important;
     padding: 0 !important;
     border: none !important;
     background: transparent !important;
@@ -1085,30 +1085,96 @@
     transition: all 0.25s ease;
 }
 #heroPrevBtn {
-    left: 14px !important;
+    left: 16px !important;
 }
 #heroNextBtn {
-    right: 14px !important;
+    right: 16px !important;
+}
+#heroPrevBtn .carousel-control-prev-icon,
+#heroNextBtn .carousel-control-next-icon {
+    width: 40px !important;
+    height: 40px !important;
+    background-color: rgba(0,0,0,0.48) !important;
+    backdrop-filter: blur(6px) !important;
+    border-radius: 50% !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background-size: 50% 50% !important;
 }
 #heroPrevBtn:hover,
 #heroNextBtn:hover {
     opacity: 1;
-    transform: translateY(-50%) scale(1.1) !important;
+    transform: translateY(-50%) scale(1.08) !important;
 }
+
+/* 🌟 CAROUSEL INDICATORS DESKTOP & GLOBAL */
+#heroBgSlider .carousel-indicators {
+    position: absolute !important;
+    bottom: 20px !important;
+    left: 0 !important;
+    right: 0 !important;
+    margin: 0 auto !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    z-index: 25 !important;
+    padding: 0 !important;
+}
+#heroBgSlider .carousel-indicators button {
+    width: 26px !important;
+    height: 6px !important;
+    border-radius: 999px !important;
+    background-color: rgba(255, 255, 255, 0.45) !important;
+    border: none !important;
+    transition: all 0.25s ease !important;
+    opacity: 0.75 !important;
+    margin: 0 3px !important;
+}
+#heroBgSlider .carousel-indicators button.active {
+    width: 42px !important;
+    background-color: #ffc107 !important;
+    opacity: 1 !important;
+}
+
+/* 📱 RESPONSIVE MOBILE: PANAH SEJAJAR TEKS & INDIKATOR JELAS */
 @media (max-width: 767.98px) {
     #heroPrevBtn,
     #heroNextBtn {
-        top: 50% !important;
+        top: 38% !important; /* Sejajar tepat di tengah area teks judul hero mobile */
         transform: translateY(-50%) !important;
-        width: 40px !important;
-        height: 40px !important;
-        opacity: 0.95;
+        width: 32px !important;
+        height: 32px !important;
+        opacity: 0.9 !important;
     }
     #heroPrevBtn {
-        left: 8px !important;
+        left: 6px !important;
     }
     #heroNextBtn {
-        right: 8px !important;
+        right: 6px !important;
+    }
+    #heroPrevBtn .carousel-control-prev-icon,
+    #heroNextBtn .carousel-control-next-icon {
+        width: 30px !important;
+        height: 30px !important;
+        background-color: rgba(0,0,0,0.52) !important;
+        backdrop-filter: blur(4px) !important;
+        background-size: 45% 45% !important;
+    }
+
+    #heroBgSlider .carousel-indicators {
+        bottom: 14px !important;
+        gap: 6px !important;
+    }
+    #heroBgSlider .carousel-indicators button {
+        width: 18px !important;
+        height: 5px !important;
+        background-color: rgba(255, 255, 255, 0.5) !important;
+    }
+    #heroBgSlider .carousel-indicators button.active {
+        width: 30px !important;
+        background-color: #ffc107 !important;
     }
 }
 </style>
@@ -1154,17 +1220,17 @@
         </div>
 
         {{-- Next / Prev Arrows --}}
-        <button class="carousel-control-prev" id="heroPrevBtn" type="button" data-bs-target="#heroBgSlider" data-bs-slide="prev" aria-label="Slide sebelumnya" style="position: absolute !important; top: 50% !important; transform: translateY(-50%) !important; z-index: 20 !important; left: 10px !important; width: 44px !important; height: 44px !important; padding: 0 !important; background: transparent !important; border: none !important; opacity: 0.95 !important;">
-            <span class="carousel-control-prev-icon rounded-circle p-2.5" style="background-color: rgba(0,0,0,0.5); backdrop-filter: blur(6px); width: 42px; height: 42px; display: inline-flex; align-items: center; justify-content: center;" aria-hidden="true"></span>
+        <button class="carousel-control-prev" id="heroPrevBtn" type="button" data-bs-target="#heroBgSlider" data-bs-slide="prev" aria-label="Slide sebelumnya">
+            <span class="carousel-control-prev-icon rounded-circle" aria-hidden="true"></span>
         </button>
-        <button class="carousel-control-next" id="heroNextBtn" type="button" data-bs-target="#heroBgSlider" data-bs-slide="next" aria-label="Slide berikutnya" style="position: absolute !important; top: 50% !important; transform: translateY(-50%) !important; z-index: 20 !important; right: 10px !important; width: 44px !important; height: 44px !important; padding: 0 !important; background: transparent !important; border: none !important; opacity: 0.95 !important;">
-            <span class="carousel-control-next-icon rounded-circle p-2.5" style="background-color: rgba(0,0,0,0.5); backdrop-filter: blur(6px); width: 42px; height: 42px; display: inline-flex; align-items: center; justify-content: center;" aria-hidden="true"></span>
+        <button class="carousel-control-next" id="heroNextBtn" type="button" data-bs-target="#heroBgSlider" data-bs-slide="next" aria-label="Slide berikutnya">
+            <span class="carousel-control-next-icon rounded-circle" aria-hidden="true"></span>
         </button>
 
         {{-- Garis Indikator Carousel --}}
-        <div class="carousel-indicators mb-4" style="z-index: 10; margin-bottom: 2rem;">
+        <div class="carousel-indicators" id="heroIndicators">
             @foreach($heroSlides as $idx => $slide)
-                <button type="button" data-bs-target="#heroBgSlider" data-bs-slide-to="{{ $idx }}" class="{{ $idx === 0 ? 'active' : '' }}" aria-current="{{ $idx === 0 ? 'true' : 'false' }}" aria-label="Slide {{ $idx + 1 }}" style="cursor: pointer;"></button>
+                <button type="button" data-bs-target="#heroBgSlider" data-bs-slide-to="{{ $idx }}" class="{{ $idx === 0 ? 'active' : '' }}" aria-current="{{ $idx === 0 ? 'true' : 'false' }}" aria-label="Slide {{ $idx + 1 }}"></button>
             @endforeach
         </div>
     </div>
