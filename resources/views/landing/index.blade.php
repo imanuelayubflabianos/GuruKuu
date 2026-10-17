@@ -1153,22 +1153,22 @@
     box-shadow: 0 0 10px rgba(255, 255, 255, 0.6) !important;
 }
 
-/* 📱 RESPONSIVE MOBILE: TINGGI PAS TIDAK KEBESARAN, PANAH PUTIH JELAS TANPA STROKE, BEBAS OVERLAP */
+/* 📱 RESPONSIVE MOBILE: TINGGI KOMPAK, PANAH PINDAH KE BAWAH POJOK KANAN KIRI SEJAJAR INDIKATOR */
 @media (max-width: 767.98px) {
     #home,
     #heroBgSlider,
     #heroBgSlider .carousel-item {
-        min-height: 420px !important;
+        min-height: 350px !important;
         height: auto !important;
     }
     #heroBgSlider .hero-slide-bg {
-        min-height: 420px !important;
+        min-height: 350px !important;
     }
     .hero-content-container {
-        padding-left: 56px !important;
-        padding-right: 56px !important;
-        padding-top: 105px !important;
-        padding-bottom: 45px !important;
+        padding-left: 20px !important;
+        padding-right: 20px !important;
+        padding-top: 85px !important;
+        padding-bottom: 52px !important;
         max-width: 100% !important;
         box-sizing: border-box !important;
     }
@@ -1182,26 +1182,29 @@
     }
     #heroPrevBtn,
     #heroNextBtn {
-        top: 50% !important;
-        transform: translateY(-50%) !important;
+        top: auto !important;
+        bottom: 12px !important;
+        transform: none !important;
         width: 32px !important;
         height: 32px !important;
         opacity: 0.9 !important;
-        z-index: 30 !important;
+        z-index: 35 !important;
         border: none !important;
         background: transparent !important;
     }
     #heroPrevBtn {
-        left: 8px !important;
+        left: 14px !important;
+        right: auto !important;
     }
     #heroNextBtn {
-        right: 8px !important;
+        right: 14px !important;
+        left: auto !important;
     }
     #heroPrevBtn .carousel-control-prev-icon,
     #heroNextBtn .carousel-control-next-icon {
         width: 32px !important;
         height: 32px !important;
-        background-color: rgba(255, 255, 255, 0.22) !important; /* Terang jelas, tanpa stroke border */
+        background-color: rgba(255, 255, 255, 0.22) !important;
         backdrop-filter: blur(6px) !important;
         -webkit-backdrop-filter: blur(6px) !important;
         border: none !important;

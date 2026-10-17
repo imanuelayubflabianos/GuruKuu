@@ -217,7 +217,8 @@ GuruKuu/
   - Mengizinkan pengosongan nilai (empty string `""`) pada pengaturan admin di `Setting::get()` tanpa memaksakan kembali fallback default teks bawaan.
   - Menghapus border/garis tepi stroke pada tombol panah navigasi slider hero, menggantinya dengan latar belakang frosted glass putih lembut (`rgba(255, 255, 255, 0.22)`) yang kontras jelas tanpa menutupi teks (`padding-left: 56px` & `padding-right: 56px`).
   - Menerapkan navigasi panah terikat (bounded navigation) menggunakan `getSlideIndex()` berbasis elemen slide aktual pada event `slide.bs.carousel` dan `slid.bs.carousel`: Halaman pertama hanya menampilkan panah kanan, halaman terakhir hanya menampilkan panah kiri, dan halaman tengah menampilkan kedua panah (`data-bs-wrap="false"`).
-  - Mengubah warna indikator garis aktif menjadi putih murni (`#ffffff`) solid melayang di bawah tengah hero banner, serta mengompres tinggi hero mobile (`min-height: 420px`) agar pas dan tidak terlalu tinggi.
+  - Mengubah warna indikator garis aktif menjadi putih murni (`#ffffff`) solid melayang di bawah tengah hero banner, memindahkan tombol panah mobile ke bawah pojok kiri dan kanan sejajar indikator (`bottom: 12px`), serta mengompres tinggi hero mobile (`min-height: 350px`) agar pas dan proporsional tanpa menutupi konten.
+
 
 
 
