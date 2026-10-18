@@ -571,7 +571,7 @@
                     </div>
                     <div class="footer-contact-item">
                         <i class="bi bi-instagram"></i>
-                        <a href="https://instagram.com/smkn1bangsri" target="_blank" class="footer-nav-link text-white-50">
+                        <a href="https://instagram.com/smkn1bangsri.official" target="_blank" class="footer-nav-link text-white-50">
                             <span>@smkn1bangsri</span>
                         </a>
                     </div>
