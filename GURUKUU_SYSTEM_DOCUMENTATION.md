@@ -156,7 +156,7 @@ Sistem memiliki 2 mode peringkat di `Guru::leaderboardFor()`:
 ### G. Panduan Interaktif Pemula (*Callout Guide Tooltip*)
 * **Penunjuk Otomatis Menu "Daftar Guru":** Tooltip pill interaktif ("👉 Ketuk di sini untuk menilai") menunjuk menu navigasi evaluasi guru pada dashboard siswa.
 * **Pelacakan Posisi Dinamis (*Dynamic Geometry Anchoring*):** Menggunakan `ResizeObserver`, listener scroll container sidebar, dan sinkronisasi `requestAnimationFrame` untuk memastikan posisi tooltip selalu presisi dan sejajar tegak lurus (`centerY`) di sebelah item "Daftar Guru", bahkan ketika ukuran sidebar membesar/mengecil atau terjadi pergeseran layout.
-* **Penyimpanan Status (*Dismissal Persistence*):** Ketika tombol tutup `(X)` diklik, status ditandai secara permanen pada `localStorage` dan `sessionStorage` sehingga tidak mengganggu sesi siswa berikutnya.
+* **Siklus Hidup Status (*Session-Based Dismissal*):** Ketika tombol silang `(X)` diklik, status disimpan di `sessionStorage` agar tidak muncul lagi selama siswa sedang bernavigasi di website. Saat siswa keluar web (tutup tab/browser) atau keluar akun (logout) lalu login ulang, flag otomatis di-reset sehingga panduan muncul kembali. Flag permanen `localStorage` telah dibersihkan.
 
 ---
 

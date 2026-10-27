@@ -605,6 +605,10 @@ document.getElementById('togglePassword')?.addEventListener('click', function() 
 
 document.addEventListener('DOMContentLoaded', function() {
     updateForm();
+    try {
+        sessionStorage.removeItem('gk_dismiss_guide_guru');
+        localStorage.removeItem('gk_dismiss_guide_guru');
+    } catch(e) {}
 });
 </script>
 @endsection

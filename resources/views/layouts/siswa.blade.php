@@ -673,6 +673,18 @@
 
         <script>
             (function() {
+                // Bersihkan flag lama dari localStorage
+                try {
+                    localStorage.removeItem('gk_dismiss_guide_guru');
+                } catch(err) {}
+
+                @if(session('success') || session('show_welcome_landing_popup') || session('sso_entry_token'))
+                // Reset otomatis saat login baru / login ulang
+                try {
+                    sessionStorage.removeItem('gk_dismiss_guide_guru');
+                } catch(err) {}
+                @endif
+
                 window.dismissGkGuide = function(e) {
                     if (e) {
                         if (typeof e.preventDefault === 'function') e.preventDefault();
@@ -680,8 +692,8 @@
                         if (typeof e.stopImmediatePropagation === 'function') e.stopImmediatePropagation();
                     }
                     try {
+                        // Hanya simpan di sessionStorage selama tab web aktif saat ini
                         sessionStorage.setItem('gk_dismiss_guide_guru', '1');
-                        localStorage.setItem('gk_dismiss_guide_guru', '1');
                     } catch(err) {}
 
                     const d = document.getElementById('gkGuideDaftarGuruDesktop');
@@ -699,7 +711,8 @@
 
                 function isGuideDismissed() {
                     try {
-                        return sessionStorage.getItem('gk_dismiss_guide_guru') === '1' || localStorage.getItem('gk_dismiss_guide_guru') === '1';
+                        // Hanya abaikan jika pengguna sudah menutupnya di sesi penelusuran web ini
+                        return sessionStorage.getItem('gk_dismiss_guide_guru') === '1';
                     } catch(err) {
                         return false;
                     }
