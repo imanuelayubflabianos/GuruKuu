@@ -106,30 +106,17 @@ class LoginHistory extends Model
         try {
             if (!Schema::hasTable('login_histories')) return;
 
-            // Dapatkan riwayat terurut: prioritaskan yang masih aktif, lalu aktivitas terbaru
-            $histories = self::where('user_id', $userId)
-                ->orderByDesc('is_active')
+            // 🛡️ Jangan pernah menghapus sesi yang berstatus aktif (is_active = true)
+            // Hanya bersihkan riwayat lama yang sudah logout jika melebihi 25 catatan
+            $oldLoggedOutIds = self::where('user_id', $userId)
+                ->where('is_active', false)
                 ->orderByDesc('last_activity')
-                ->get();
+                ->skip(25)
+                ->take(100)
+                ->pluck('id');
 
-            $seenDevices = [];
-            $toDeleteIds = [];
-
-            foreach ($histories as $item) {
-                $ip = $item->ip_address ?: '127.0.0.1';
-                $device = $item->device_name ?: 'Unknown';
-                $key = "{$ip}|{$device}";
-
-                if (!isset($seenDevices[$key])) {
-                    $seenDevices[$key] = $item->id;
-                } else {
-                    // Record kedua dan seterusnya untuk perangkat & IP yang sama dihapus agar tidak menumpuk
-                    $toDeleteIds[] = $item->id;
-                }
-            }
-
-            if (!empty($toDeleteIds)) {
-                self::whereIn('id', $toDeleteIds)->delete();
+            if ($oldLoggedOutIds->isNotEmpty()) {
+                self::whereIn('id', $oldLoggedOutIds)->delete();
             }
         } catch (\Throwable $e) {
             // Silently fail
@@ -147,26 +134,13 @@ class LoginHistory extends Model
             $ip = $request->ip() ?: '127.0.0.1';
 
             if (Schema::hasTable('login_histories')) {
-                // Cari apakah perangkat & IP ini sudah pernah login sebelumnya
+                // 🛡️ Cari sesi secara presisi berdasarkan session_id (tiap browser/perangkat memiliki session_id unik)
                 $existing = self::where('user_id', $user->id)
-                    ->where(function($q) use ($sessionId, $ip, $userAgent, $parsed) {
-                        $q->where('session_id', $sessionId)
-                          ->orWhere(function($sub) use ($ip, $userAgent) {
-                              $sub->where('ip_address', $ip)
-                                  ->where('user_agent', $userAgent);
-                          })
-                          ->orWhere(function($sub) use ($ip, $parsed) {
-                              $sub->where('ip_address', $ip)
-                                  ->where('device_name', $parsed['device_name']);
-                          });
-                    })
-                    ->orderByDesc('is_active')
-                    ->orderByDesc('last_activity')
+                    ->where('session_id', $sessionId)
                     ->first();
 
                 if ($existing) {
                     $existing->update([
-                        'session_id' => $sessionId,
                         'ip_address' => $ip,
                         'user_agent' => $userAgent,
                         'device_name' => $parsed['device_name'],
@@ -175,7 +149,7 @@ class LoginHistory extends Model
                         'browser' => $parsed['browser'],
                         'status' => 'active',
                         'is_active' => true,
-                        'login_at' => now(),
+                        'login_at' => $existing->login_at ?: now(),
                         'last_activity' => now(),
                         'logout_at' => null,
                     ]);

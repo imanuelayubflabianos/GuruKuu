@@ -140,6 +140,12 @@ Sistem memiliki 2 mode peringkat di `Guru::leaderboardFor()`:
 * Ditangani oleh middleware `CheckSiswaMaintenance.php` dan `MaintenanceService.php`.
 * Saat aktif: Siswa tetap bisa membaca dashboard, melihat profil guru, dan ulasan, tetapi form pengiriman nilai dan kirim pesan dikunci (*read-only* dengan modal informasi).
 
+### E. Pelacakan Sesi & Multi-Device Login Audit (`LoginHistory`)
+* Setiap browser/perangkat diidentifikasi secara unik menggunakan token kriptografi **`session_id`** Laravel.
+* Meskipun beberapa perangkat berada di **jaringan WiFi yang sama (IP sama)** atau browser yang identik, setiap perangkat dicatat sebagai baris sesi terpisah.
+* Terintegrasi penuh baik pada form login manual (`LoginController`) maupun autentikasi SSO SiPintu (`OAuthController`).
+* Fitur *revoke* / "Keluarkan Perangkat Lain" dan "Keluarkan Semua Perangkat" menghapus sesi dari tabel `sessions` dan menandai riwayat sebagai `logged_out` secara instan.
+
 ---
 
 ## 5. Peta Hak Akses & Peran Pengguna (*Roles & Permissions*)

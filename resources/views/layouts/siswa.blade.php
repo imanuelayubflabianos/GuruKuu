@@ -222,18 +222,27 @@
         }
 
         .gk-guide-close {
-            background: transparent;
-            border: none;
-            color: rgba(255, 255, 255, 0.65);
-            font-size: 1.25rem;
-            line-height: 1;
-            padding: 0 0.15rem 0 0.5rem;
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: #ffffff;
+            width: 22px;
+            height: 22px;
+            min-width: 22px;
+            min-height: 22px;
+            border-radius: 50%;
+            margin-left: 0.45rem;
             cursor: pointer;
-            transition: color 0.2s ease, transform 0.2s ease;
+            transition: all 0.2s ease;
             display: inline-flex;
             align-items: center;
+            justify-content: center;
+            padding: 0;
+            line-height: 1;
+            z-index: 1055;
+            position: relative;
         }
         .gk-guide-close:hover {
+            background: rgba(255, 255, 255, 0.4);
             color: #ffffff;
             transform: scale(1.15);
         }
@@ -629,7 +638,9 @@
                 <span class="gk-guide-badge">Panduan</span>
                 <span class="gk-guide-text">Ketuk di sini untuk menilai</span>
             </a>
-            <button type="button" class="gk-guide-close" onclick="dismissGkGuide(event)" aria-label="Tutup panduan" title="Tutup panduan">&times;</button>
+            <button type="button" class="gk-guide-close" onclick="event.stopPropagation(); event.preventDefault(); dismissGkGuide(event);" aria-label="Tutup panduan" title="Tutup panduan">
+                <i class="bi bi-x-lg" style="font-size: 10px; pointer-events: none;"></i>
+            </button>
         </div>
 
         {{-- Panduan Interaktif Mobile: Menunjuk ke Tab Guru di Bottom Nav --}}
@@ -639,14 +650,48 @@
                 <span class="gk-guide-text">Ketuk di sini untuk menilai</span>
                 <span class="gk-guide-hand">👇</span>
             </a>
-            <button type="button" class="gk-guide-close" onclick="dismissGkGuide(event)" aria-label="Tutup panduan" title="Tutup panduan">&times;</button>
+            <button type="button" class="gk-guide-close" onclick="event.stopPropagation(); event.preventDefault(); dismissGkGuide(event);" aria-label="Tutup panduan" title="Tutup panduan">
+                <i class="bi bi-x-lg" style="font-size: 10px; pointer-events: none;"></i>
+            </button>
             <div class="gk-guide-mobile-arrow"></div>
         </div>
 
         <script>
             (function() {
+                window.dismissGkGuide = function(e) {
+                    if (e) {
+                        if (typeof e.preventDefault === 'function') e.preventDefault();
+                        if (typeof e.stopPropagation === 'function') e.stopPropagation();
+                        if (typeof e.stopImmediatePropagation === 'function') e.stopImmediatePropagation();
+                    }
+                    try {
+                        sessionStorage.setItem('gk_dismiss_guide_guru', '1');
+                        localStorage.setItem('gk_dismiss_guide_guru', '1');
+                    } catch(err) {}
+
+                    const d = document.getElementById('gkGuideDaftarGuruDesktop');
+                    const m = document.getElementById('gkGuideDaftarGuruMobile');
+                    if (d) {
+                        d.style.setProperty('display', 'none', 'important');
+                        d.remove();
+                    }
+                    if (m) {
+                        m.style.setProperty('display', 'none', 'important');
+                        m.remove();
+                    }
+                    document.querySelectorAll('.gk-menu-highlight').forEach(el => el.classList.remove('gk-menu-highlight'));
+                };
+
+                function isGuideDismissed() {
+                    try {
+                        return sessionStorage.getItem('gk_dismiss_guide_guru') === '1' || localStorage.getItem('gk_dismiss_guide_guru') === '1';
+                    } catch(err) {
+                        return false;
+                    }
+                }
+
                 function initGkGuide() {
-                    if (sessionStorage.getItem('gk_dismiss_guide_guru')) {
+                    if (isGuideDismissed()) {
                         return;
                     }
 
@@ -656,7 +701,7 @@
                     const mobileTarget = document.getElementById('mobileNavDaftarGuruLink');
 
                     function updatePositions() {
-                        if (sessionStorage.getItem('gk_dismiss_guide_guru')) return;
+                        if (isGuideDismissed()) return;
 
                         if (window.innerWidth >= 992) {
                             if (desktopGuide && sidebarTarget) {
@@ -677,27 +722,12 @@
                         }
                     }
 
-                    // Jalankan update posisi awal
                     setTimeout(updatePositions, 100);
                     setTimeout(updatePositions, 500);
 
                     window.addEventListener('resize', updatePositions);
                     window.addEventListener('scroll', updatePositions);
                 }
-
-                window.dismissGkGuide = function(e) {
-                    if (e) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                    }
-                    sessionStorage.setItem('gk_dismiss_guide_guru', '1');
-                    const d = document.getElementById('gkGuideDaftarGuruDesktop');
-                    const m = document.getElementById('gkGuideDaftarGuruMobile');
-                    if (d) d.style.display = 'none';
-                    if (m) m.style.display = 'none';
-                    const hl = document.querySelector('.gk-menu-highlight');
-                    if (hl) hl.classList.remove('gk-menu-highlight');
-                };
 
                 if (document.readyState === 'loading') {
                     document.addEventListener('DOMContentLoaded', initGkGuide);

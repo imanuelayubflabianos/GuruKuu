@@ -210,6 +210,9 @@ class OAuthController extends Controller
         // 10. Regenerasi session untuk mencegah session fixation & aman
         $request->session()->regenerate();
 
+        // 🛡️ Catat riwayat login perangkat untuk SSO SiPintu
+        \App\Models\LoginHistory::recordLogin($user, $request);
+
         Log::info("SSO SiPintu berhasil untuk user ID: {$user->id}, Role: {$user->role}, NIS/NIP: {$user->nis}");
 
         // Tandai agar muncul pop-up konfirmasi beranda/dashboard KHUSUS masuk lewat SSO gateway SiPintu
