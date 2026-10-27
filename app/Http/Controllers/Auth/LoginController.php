@@ -153,53 +153,36 @@ class LoginController extends Controller
                 }
             }
 
-            $isValidPassword = ($password === 'password') ||
-                               ($password === (string)$user->nis) ||
-                               Hash::check($password, $user->password);
+            // 🔐 VERIFIKASI KREDENSIAL: SiPintu sebagai Single Source of Truth
+            $verifyResult = $this->siPintu->verifyCredentials($nis, $password);
+            $isValidPassword = false;
 
-            if (!$isValidPassword) {
-                // 🔄 FALLBACK REAL-TIME: Jika verifikasi lokal gagal (misal user baru ganti password di SiPintu)
-                $baseUrl = rtrim(config('services.sipintu.base_url', env('SIPINTU_BASE_URL', 'https://sipintu.smkn1bangsri.sch.id')), '/');
-                $clientId = config('services.sipintu.client_id', env('SIPINTU_CLIENT_ID'));
-                $clientSecret = config('services.sipintu.client_secret', env('SIPINTU_CLIENT_SECRET'));
-
-                if ($clientId && $clientSecret) {
-                    try {
-                        $verifyResponse = \Illuminate\Support\Facades\Http::timeout(5)->asForm()->acceptJson()->post("{$baseUrl}/api/v1/auth/verify-credentials", [
-                            'client_id'     => $clientId,
-                            'client_secret' => $clientSecret,
-                            'identity'      => $nis,
-                            'password'      => $password,
-                        ]);
-
-                        if ($verifyResponse->successful() && $verifyResponse->json('valid')) {
-                            $newHash = $verifyResponse->json('password_hash');
-                            if ($newHash) {
-                                \Illuminate\Support\Facades\DB::table('users')->where('id', $user->id)->update([
-                                    'password' => $newHash,
-                                    'sipintu_last_synced_at' => now(),
-                                ]);
-                            } else {
-                                $user->password = Hash::make($password);
-                                $user->sipintu_last_synced_at = now();
-                                $user->save();
-                            }
-                            $isValidPassword = true;
-                        }
-                    } catch (\Throwable $e) {
-                        Log::warning('Fallback verifikasi password siswa ke SiPintu gagal: ' . $e->getMessage());
-                    }
+            if ($verifyResult['reachable']) {
+                if ($verifyResult['valid']) {
+                    // Password valid di SiPintu! Perbarui password hash di database lokal
+                    $newHash = $verifyResult['password_hash'] ?? Hash::make($password);
+                    \Illuminate\Support\Facades\DB::table('users')->where('id', $user->id)->update([
+                        'password' => $newHash,
+                        'sipintu_last_synced_at' => now(),
+                    ]);
+                    $user->refresh();
+                    $isValidPassword = true;
+                } elseif (($verifyResult['status'] ?? '') === 'user_not_found') {
+                    // Akun tidak terdaftar di SiPintu (misal akun testing lokal) -> fallback verifikasi hash lokal
+                    $isValidPassword = Hash::check($password, $user->password);
+                } else {
+                    // SiPintu secara tegas menolak kredensial (password salah atau password lama yang sudah diganti di SiPintu)
+                    // TOLAK secara tegas agar password lama tidak bisa dipakai lagi!
+                    $isValidPassword = false;
                 }
+            } else {
+                // Gateway SiPintu offline / timeout -> Gunakan hash lokal sebagai redundansi darurat
+                $isValidPassword = Hash::check($password, $user->password);
             }
 
             if (!$isValidPassword) {
                 \Illuminate\Support\Facades\RateLimiter::hit($throttleKey, 60);
                 return back()->withErrors(['password' => 'Password salah.'])->withInput();
-            }
-
-            if (!Hash::check($password, $user->password)) {
-                $user->password = Hash::make($password);
-                $user->save();
             }
 
             // Reset rate limiter saat berhasil login
@@ -346,53 +329,36 @@ class LoginController extends Controller
                 }
             }
 
-            $isValidPassword = ($password === 'password') ||
-                               ($password === (string)$user->nis) ||
-                               Hash::check($password, $user->password);
+            // 🔐 VERIFIKASI KREDENSIAL GURU: SiPintu sebagai Single Source of Truth
+            $verifyResult = $this->siPintu->verifyCredentials($nis, $password);
+            $isValidPassword = false;
 
-            // 🌐 JARING PENGAMAN: Fallback verifikasi langsung ke SiPintu Gateway (Langkah 5)
-            if (!$isValidPassword) {
-                $baseUrl = rtrim(env('SIPINTU_BASE_URL', config('services.sipintu.base_url', 'http://localhost:8000')), '/');
-                $clientId = env('SIPINTU_CLIENT_ID', config('services.sipintu.client_id'));
-                $clientSecret = env('SIPINTU_CLIENT_SECRET', config('services.sipintu.client_secret'));
-
-                if ($baseUrl && $clientId && $clientSecret) {
-                    try {
-                        $verifyResponse = \Illuminate\Support\Facades\Http::asForm()->timeout(5)->acceptJson()->post("{$baseUrl}/api/v1/auth/verify-credentials", [
-                            'client_id'     => $clientId,
-                            'client_secret' => $clientSecret,
-                            'identity'      => $nis,
-                            'password'      => $password,
-                        ]);
-
-                        if ($verifyResponse->successful() && $verifyResponse->json('valid')) {
-                            $newHash = $verifyResponse->json('password_hash');
-                            if ($newHash) {
-                                \Illuminate\Support\Facades\DB::table('users')->where('id', $user->id)->update([
-                                    'password' => $newHash,
-                                    'sipintu_last_synced_at' => now(),
-                                ]);
-                            } else {
-                                $user->password = Hash::make($password);
-                                $user->sipintu_last_synced_at = now();
-                                $user->save();
-                            }
-                            $isValidPassword = true;
-                        }
-                    } catch (\Throwable $e) {
-                        Log::warning('Fallback verifikasi password guru ke SiPintu gagal: ' . $e->getMessage());
-                    }
+            if ($verifyResult['reachable']) {
+                if ($verifyResult['valid']) {
+                    // Password valid di SiPintu! Perbarui password hash di database lokal
+                    $newHash = $verifyResult['password_hash'] ?? Hash::make($password);
+                    \Illuminate\Support\Facades\DB::table('users')->where('id', $user->id)->update([
+                        'password' => $newHash,
+                        'sipintu_last_synced_at' => now(),
+                    ]);
+                    $user->refresh();
+                    $isValidPassword = true;
+                } elseif (($verifyResult['status'] ?? '') === 'user_not_found') {
+                    // Akun Guru tidak terdaftar di SiPintu -> fallback verifikasi hash lokal
+                    $isValidPassword = Hash::check($password, $user->password);
+                } else {
+                    // SiPintu menolak kredensial (password salah atau password lama yang sudah diganti di SiPintu)
+                    // TOLAK secara tegas agar password lama tidak bisa dipakai lagi!
+                    $isValidPassword = false;
                 }
+            } else {
+                // Gateway SiPintu offline / timeout -> Gunakan hash lokal sebagai redundansi darurat
+                $isValidPassword = Hash::check($password, $user->password);
             }
 
             if (!$isValidPassword) {
                 \Illuminate\Support\Facades\RateLimiter::hit($throttleKey, 60);
                 return back()->withErrors(['password' => 'Password Guru salah.'])->withInput();
-            }
-
-            if (!Hash::check($password, $user->password)) {
-                $user->password = Hash::make($password);
-                $user->save();
             }
 
             // Reset rate limiter saat berhasil login

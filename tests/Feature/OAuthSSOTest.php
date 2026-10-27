@@ -71,7 +71,7 @@ class OAuthSSOTest extends TestCase
         $this->assertFalse(Auth::check());
     }
 
-    public function test_callback_fails_when_user_not_found_locally()
+    public function test_callback_fails_when_user_cannot_be_provisioned()
     {
         Http::fake([
             'https://sipintu.test/oauth/token' => Http::response([
@@ -82,9 +82,8 @@ class OAuthSSOTest extends TestCase
             'https://sipintu.test/api/v1/user' => Http::response([
                 'data' => [
                     'id' => 999,
-                    'name' => 'Unknown Student',
-                    'nis' => '99999',
-                    'email' => 'unknown@example.com',
+                    'name' => 'Unknown Guest',
+                    'role' => 'tamu',
                 ],
             ], 200),
         ]);
@@ -94,7 +93,32 @@ class OAuthSSOTest extends TestCase
         $response->assertRedirect(route('login'));
         $response->assertSessionHasErrors(['nis']);
         $this->assertFalse(Auth::check());
-        $this->assertDatabaseMissing('users', ['nis' => '99999']);
+    }
+
+    public function test_callback_auto_provisions_new_student_when_not_found_locally()
+    {
+        Http::fake([
+            'https://sipintu.test/oauth/token' => Http::response([
+                'access_token' => 'mock_token_abc',
+                'token_type' => 'Bearer',
+                'expires_in' => 3600,
+            ], 200),
+            'https://sipintu.test/api/v1/user' => Http::response([
+                'data' => [
+                    'id' => 999,
+                    'name' => 'Auto Provisioned Student',
+                    'nis' => '99999',
+                    'email' => 'provisioned@example.com',
+                    'role' => 'siswa',
+                ],
+            ], 200),
+        ]);
+
+        $response = $this->get('/oauth/callback?code=valid_code_new');
+
+        $response->assertRedirect(route('siswa.dashboard'));
+        $this->assertTrue(Auth::check());
+        $this->assertDatabaseHas('users', ['nis' => '99999']);
     }
 
     public function test_callback_fails_when_user_is_deactivated()
@@ -252,5 +276,102 @@ class OAuthSSOTest extends TestCase
         $postResponse->assertRedirect(route('siswa.dashboard'));
         $this->assertTrue(Auth::check());
         $this->assertEquals($user->id, Auth::id());
+    }
+
+    public function test_login_rejects_old_password_when_sipintu_reports_invalid_credentials()
+    {
+        // Pengguna memiliki hash password lama di database lokal
+        $user = User::factory()->create([
+            'nis' => '33333',
+            'password' => bcrypt('password_lama'),
+            'role' => 'siswa',
+            'is_active' => true,
+        ]);
+
+        // SiPintu Gateway melaporkan bahwa kata sandi ini sudah ditolak (karena di SiPintu sudah diganti)
+        Http::fake([
+            'https://sipintu.test/api/v1/auth/verify-credentials' => Http::response([
+                'valid' => false,
+                'status' => 'invalid_credentials',
+                'message' => 'Kata sandi tidak cocok dengan data master SiPintu Gateway.',
+            ], 401),
+        ]);
+
+        $postResponse = $this->post('/login', [
+            'nis' => '33333',
+            'login_role' => 'siswa',
+            'password' => 'password_lama',
+        ]);
+
+        // Login WAJIB ditolak, tidak boleh lolos dengan password lama
+        $postResponse->assertSessionHasErrors(['password']);
+        $this->assertFalse(Auth::check());
+    }
+
+    public function test_login_succeeds_and_updates_local_password_when_sipintu_accepts_new_password()
+    {
+        $oldHash = bcrypt('password_lama');
+        $user = User::factory()->create([
+            'nis' => '44444',
+            'password' => $oldHash,
+            'role' => 'siswa',
+            'is_active' => true,
+        ]);
+
+        $newHash = bcrypt('password_baru_123');
+
+        // SiPintu Gateway memvalidasi password baru dan memberikan hash terbaru
+        Http::fake([
+            'https://sipintu.test/api/v1/auth/verify-credentials' => Http::response([
+                'valid' => true,
+                'status' => 'valid',
+                'password_hash' => $newHash,
+                'message' => 'Kredensial valid.',
+            ], 200),
+        ]);
+
+        $postResponse = $this->post('/login', [
+            'nis' => '44444',
+            'login_role' => 'siswa',
+            'password' => 'password_baru_123',
+        ]);
+
+        $postResponse->assertRedirect(route('siswa.dashboard'));
+        $this->assertTrue(Auth::check());
+        $this->assertEquals($user->id, Auth::id());
+
+        // Password lokal di database GuruKuu otomatis diperbarui ke hash baru
+        $user->refresh();
+        $this->assertEquals($newHash, $user->password);
+    }
+
+    public function test_webhook_sync_user_updates_password_hash()
+    {
+        $user = User::factory()->create([
+            'nis' => '55555',
+            'password' => bcrypt('password_lama'),
+            'role' => 'siswa',
+            'is_active' => true,
+        ]);
+
+        $newHash = bcrypt('password_sync_baru');
+        $payload = [
+            'user' => [
+                'nis' => '55555',
+                'password_hash' => $newHash,
+            ],
+        ];
+
+        $secret = 'test_client_secret';
+        $content = json_encode($payload);
+        $signature = hash_hmac('sha256', $content, $secret);
+
+        $response = $this->postJson('/api/sipintu/sync-user', $payload, [
+            'X-SiPintu-Signature' => $signature,
+        ]);
+
+        $response->assertStatus(200);
+        $user->refresh();
+        $this->assertEquals($newHash, $user->password);
     }
 }

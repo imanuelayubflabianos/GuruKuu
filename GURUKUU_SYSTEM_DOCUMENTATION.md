@@ -146,6 +146,13 @@ Sistem memiliki 2 mode peringkat di `Guru::leaderboardFor()`:
 * Terintegrasi penuh baik pada form login manual (`LoginController`) maupun autentikasi SSO SiPintu (`OAuthController`).
 * Fitur *revoke* / "Keluarkan Perangkat Lain" dan "Keluarkan Semua Perangkat" menghapus sesi dari tabel `sessions` dan menandai riwayat sebagai `logged_out` secara instan.
 
+### F. Autentikasi Terpusat & Sinkronisasi Kata Sandi SiPintu (*Single Source of Truth*)
+* **Otoritas Kredensial:** Server induk **SiPintu Gateway** (`/api/v1/auth/verify-credentials`) berfungsi sebagai otoritas kebenaran tunggal (*Single Source of Truth*) untuk kata sandi Siswa dan Guru.
+* **Penolakan Kata Sandi Lama:** Form login (`LoginController`) memvalidasi kredensial langsung ke SiPintu terlebih dahulu. Jika pengguna telah mengganti kata sandi di SiPintu, SiPintu akan menolak kredensial lama (`invalid_credentials`), dan GuruKuu secara otomatis menolak akses login sehingga kata sandi lama **tidak dapat digunakan lagi**.
+* **Sinkronisasi Otomatis Hash Baru:** Saat pengguna login dengan kata sandi baru, SiPintu mengonfirmasi kevalidan dan GuruKuu secara otomatis menyelaraskan hash kata sandi lokal di database (`users.password`) serta mencatat `sipintu_last_synced_at`.
+* **Dukungan Webhook & SSO Callback:** Webhook `/api/sipintu/sync-user` dan alur OAuth `/oauth/callback` otomatis memperbarui hash kata sandi lokal jika dikirimkan oleh SiPintu Gateway.
+* **Redundansi Darurat (*Disaster Recovery*):** Hanya jika gateway SiPintu offline / gagal koneksi, GuruKuu menggunakan hash lokal terakhir sebagai cadangan darurat agar operasional sekolah tetap berjalan. Akun lokal khusus (admin / testing) tetap didukung mulus.
+
 ---
 
 ## 5. Peta Hak Akses & Peran Pengguna (*Roles & Permissions*)

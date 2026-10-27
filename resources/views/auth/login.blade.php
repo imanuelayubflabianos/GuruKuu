@@ -235,6 +235,30 @@
         border-color: #38bdf8;
         color: #38bdf8;
     }
+    .btn-sipintu-sso {
+        border-radius: 12px;
+        font-size: 0.88rem;
+        background: #f8fafc;
+        border: 1px solid var(--border, #e2e8f0);
+        color: var(--text-dark, #0f172a);
+        transition: all 0.25s ease;
+    }
+    .btn-sipintu-sso:hover {
+        background: #f1f5f9;
+        border-color: #cbd5e1;
+        color: var(--text-dark, #0f172a);
+        transform: translateY(-1px);
+    }
+    [data-theme="dark"] .btn-sipintu-sso {
+        background: rgba(255, 255, 255, 0.05);
+        border-color: rgba(255, 255, 255, 0.12);
+        color: #f8fafc !important;
+    }
+    [data-theme="dark"] .btn-sipintu-sso:hover {
+        background: rgba(255, 255, 255, 0.1);
+        border-color: rgba(255, 255, 255, 0.2);
+        color: #ffffff !important;
+    }
 </style>
 
 <div class="auth-desktop-wrapper">
@@ -497,9 +521,9 @@
                     <hr class="flex-grow-1 border-secondary opacity-25 m-0">
                 </div>
 
-                <a href="{{ route('login.sipintu') }}" class="btn btn-outline-light border w-100 py-2.5 d-flex align-items-center justify-content-center gap-2 text-dark shadow-xs" style="border-radius: 12px; font-size: 0.88rem; background: #f8fafc;">
+                <a href="{{ route('login.sipintu') }}" class="btn btn-sipintu-sso w-100 py-2.5 d-flex align-items-center justify-content-center gap-2 shadow-xs">
                     <img src="{{ asset('images/sipintu-logo.png') }}" alt="SiPintu" style="width: 20px; height: 20px; object-fit: contain;">
-                    <span class="fw-semibold text-dark">Masuk dengan Portal SiPintu</span>
+                    <span class="fw-semibold">Masuk dengan Portal SiPintu</span>
                 </a>
 
                 {{-- BANTUAN KENDALA LOGIN & TOMBOL KEMBALI DI BAWAH HUBUNGI ADMIN --}}

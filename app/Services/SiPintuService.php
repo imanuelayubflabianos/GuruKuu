@@ -191,6 +191,83 @@ class SiPintuService
         }
     }
 
+    /**
+     * Verifikasi kredensial pengguna secara real-time ke SiPintu Identity Gateway
+     * POST {SIPINTU_BASE_URL}/api/v1/auth/verify-credentials
+     *
+     * @param string $identity NIS Siswa, NIP Guru, atau email/username
+     * @param string $password Password yang dimasukkan pada form
+     * @return array [
+     *     'reachable'     => bool,   // true jika Gateway SiPintu merespons
+     *     'valid'         => bool,   // true jika kredensial valid di SiPintu
+     *     'status'        => string, // status code string: 'valid', 'invalid_credentials', 'user_not_found', 'unreachable'
+     *     'password_hash' => ?string,// hash password terbaru dari SiPintu jika ada
+     *     'message'       => string,
+     * ]
+     */
+    public function verifyCredentials(string $identity, string $password): array
+    {
+        if (empty($this->clientId) || empty($this->clientSecret) || empty($this->baseUrl)) {
+            return [
+                'reachable'     => false,
+                'valid'         => false,
+                'status'        => 'config_missing',
+                'password_hash' => null,
+                'message'       => 'Konfigurasi SiPintu belum lengkap.',
+            ];
+        }
+
+        try {
+            $http = Http::connectTimeout(3)->timeout(5)->acceptJson();
+            if (!$this->verifySsl) {
+                $http = $http->withoutVerifying();
+            }
+
+            $response = $http->asForm()->post("{$this->baseUrl}/api/v1/auth/verify-credentials", [
+                'client_id'     => $this->clientId,
+                'client_secret' => $this->clientSecret,
+                'identity'      => $identity,
+                'password'      => $password,
+            ]);
+
+            $json = $response->json() ?? [];
+            $isValid = (bool) ($json['valid'] ?? false);
+            $statusCode = $response->status();
+
+            // Identifikasi status spesifik dari SiPintu
+            $status = $json['status'] ?? null;
+            if (!$status) {
+                if ($isValid) {
+                    $status = 'valid';
+                } elseif ($statusCode === 404 || str_contains(strtolower($json['message'] ?? ''), 'tidak ditemukan')) {
+                    $status = 'user_not_found';
+                } else {
+                    $status = 'invalid_credentials';
+                }
+            }
+
+            $passwordHash = $json['password_hash'] ?? null;
+
+            return [
+                'reachable'     => true,
+                'valid'         => $isValid,
+                'status'        => $status,
+                'password_hash' => $passwordHash,
+                'data'          => $json,
+                'message'       => $json['message'] ?? ($isValid ? 'Kredensial valid.' : 'Password tidak cocok dengan SiPintu.'),
+            ];
+        } catch (\Throwable $e) {
+            Log::warning("SiPintu verifyCredentials koneksi gagal untuk [{$identity}]: " . $e->getMessage());
+            return [
+                'reachable'     => false,
+                'valid'         => false,
+                'status'        => 'unreachable',
+                'password_hash' => null,
+                'message'       => 'Gateway SiPintu tidak dapat dihubungi: ' . $e->getMessage(),
+            ];
+        }
+    }
+
     protected function client()
     {
         $timeout = $this->timeout > 0 ? $this->timeout : 60;

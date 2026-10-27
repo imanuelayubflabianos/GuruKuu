@@ -204,6 +204,20 @@ class OAuthController extends Controller
             }
         }
 
+        // 8.5 Sinkronkan password hash jika dikirimkan oleh profil pengguna SiPintu
+        $incomingPassword = $userData['password_hash'] ?? $userData['password'] ?? null;
+        if (!empty($incomingPassword)) {
+            $hashToSave = \Illuminate\Support\Str::startsWith($incomingPassword, ['$2y$', '$2a$', '$argon2'])
+                ? $incomingPassword
+                : \Illuminate\Support\Facades\Hash::make($incomingPassword);
+
+            \Illuminate\Support\Facades\DB::table('users')->where('id', $user->id)->update([
+                'password' => $hashToSave,
+                'sipintu_last_synced_at' => now(),
+            ]);
+            $user->refresh();
+        }
+
         // 9. Login ke session lokal menggunakan Auth::login($user, true)
         Auth::login($user, true);
 
@@ -370,9 +384,15 @@ class OAuthController extends Controller
         $user->save();
 
         // 6. SINKRONISASI PASSWORD: Gunakan DB::table() langsung agar TIDAK terkena cast 'hashed' (Mencegah Double-Hashing)
-        if (! empty($userData['password'])) {
+        $incomingPassword = $userData['password_hash'] ?? $userData['password'] ?? $userData['new_password'] ?? null;
+        if (! empty($incomingPassword)) {
+            $hashToSave = \Illuminate\Support\Str::startsWith($incomingPassword, ['$2y$', '$2a$', '$argon2'])
+                ? $incomingPassword
+                : \Illuminate\Support\Facades\Hash::make($incomingPassword);
+
             \Illuminate\Support\Facades\DB::table('users')->where('id', $user->id)->update([
-                'password' => $userData['password'],
+                'password' => $hashToSave,
+                'sipintu_last_synced_at' => $syncTime,
             ]);
         }
 
