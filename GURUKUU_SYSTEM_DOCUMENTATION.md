@@ -153,6 +153,11 @@ Sistem memiliki 2 mode peringkat di `Guru::leaderboardFor()`:
 * **Dukungan Webhook & SSO Callback:** Webhook `/api/sipintu/sync-user` dan alur OAuth `/oauth/callback` otomatis memperbarui hash kata sandi lokal jika dikirimkan oleh SiPintu Gateway.
 * **Redundansi Darurat (*Disaster Recovery*):** Hanya jika gateway SiPintu offline / gagal koneksi, GuruKuu menggunakan hash lokal terakhir sebagai cadangan darurat agar operasional sekolah tetap berjalan. Akun lokal khusus (admin / testing) tetap didukung mulus.
 
+### G. Panduan Interaktif Pemula (*Callout Guide Tooltip*)
+* **Penunjuk Otomatis Menu "Daftar Guru":** Tooltip pill interaktif ("👉 Ketuk di sini untuk menilai") menunjuk menu navigasi evaluasi guru pada dashboard siswa.
+* **Pelacakan Posisi Dinamis (*Dynamic Geometry Anchoring*):** Menggunakan `ResizeObserver`, listener scroll container sidebar, dan sinkronisasi `requestAnimationFrame` untuk memastikan posisi tooltip selalu presisi dan sejajar tegak lurus (`centerY`) di sebelah item "Daftar Guru", bahkan ketika ukuran sidebar membesar/mengecil atau terjadi pergeseran layout.
+* **Penyimpanan Status (*Dismissal Persistence*):** Ketika tombol tutup `(X)` diklik, status ditandai secara permanen pada `localStorage` dan `sessionStorage` sehingga tidak mengganggu sesi siswa berikutnya.
+
 ---
 
 ## 5. Peta Hak Akses & Peran Pengguna (*Roles & Permissions*)

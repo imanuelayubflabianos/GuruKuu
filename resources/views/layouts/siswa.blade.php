@@ -154,8 +154,6 @@
 
         .gk-guide-popover {
             position: fixed;
-            left: 295px;
-            top: 200px;
             z-index: 1050;
             display: inline-flex;
             align-items: center;
@@ -165,15 +163,28 @@
             border-radius: 50px;
             box-shadow: 0 10px 25px -3px rgba(0, 51, 102, 0.4), 0 0 0 1.5px rgba(255, 255, 255, 0.2);
             animation: gkGuideBounceX 1.6s infinite ease-in-out, gkGuideGlow 2.5s infinite ease-in-out;
-            transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1), transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: opacity 0.25s ease;
             cursor: pointer;
             text-decoration: none !important;
             user-select: none;
+            transform: translateY(-50%);
+            will-change: top, left, transform;
+            opacity: 0;
+        }
+
+        [data-theme="dark"] .gk-guide-popover {
+            background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+            box-shadow: 0 10px 25px -3px rgba(2, 132, 199, 0.5), 0 0 0 1.5px rgba(255, 255, 255, 0.3);
         }
 
         .gk-guide-popover:hover {
             background: linear-gradient(135deg, #002244 0%, #003f80 100%);
             box-shadow: 0 12px 28px -2px rgba(0, 51, 102, 0.5), 0 0 0 2px rgba(56, 189, 248, 0.7);
+        }
+
+        [data-theme="dark"] .gk-guide-popover:hover {
+            background: linear-gradient(135deg, #0369a1 0%, #075985 100%);
+            box-shadow: 0 12px 28px -2px rgba(2, 132, 199, 0.6), 0 0 0 2px rgba(255, 255, 255, 0.6);
         }
 
         .gk-guide-arrow {
@@ -186,6 +197,10 @@
             border-top: 7px solid transparent;
             border-bottom: 7px solid transparent;
             border-right: 8px solid #003366;
+        }
+
+        [data-theme="dark"] .gk-guide-arrow {
+            border-right-color: #0284c7;
         }
 
         .gk-guide-content {
@@ -248,8 +263,8 @@
         }
 
         @keyframes gkGuideBounceX {
-            0%, 100% { transform: translateX(0); }
-            50% { transform: translateX(-7px); }
+            0%, 100% { transform: translateY(-50%) translateX(0); }
+            50% { transform: translateY(-50%) translateX(-6px); }
         }
 
         @keyframes gkGuideGlow {
@@ -631,7 +646,7 @@
 
     @if(request()->routeIs('siswa.dashboard'))
         {{-- Panduan Interaktif Desktop: Menunjuk ke Menu Daftar Guru di Sidebar --}}
-        <div id="gkGuideDaftarGuruDesktop" class="gk-guide-popover d-none d-lg-flex" role="tooltip" style="display: none;">
+        <div id="gkGuideDaftarGuruDesktop" class="gk-guide-popover d-none d-lg-flex" role="tooltip" style="display: none; opacity: 0;">
             <div class="gk-guide-arrow"></div>
             <a href="{{ route('siswa.guru.index') }}" class="gk-guide-content">
                 <span class="gk-guide-hand">👈</span>
@@ -644,7 +659,7 @@
         </div>
 
         {{-- Panduan Interaktif Mobile: Menunjuk ke Tab Guru di Bottom Nav --}}
-        <div id="gkGuideDaftarGuruMobile" class="gk-guide-mobile-popover d-lg-none" role="tooltip" style="display: none;">
+        <div id="gkGuideDaftarGuruMobile" class="gk-guide-mobile-popover d-lg-none" role="tooltip" style="display: none; opacity: 0;">
             <a href="{{ route('siswa.guru.index') }}" class="gk-guide-content">
                 <span class="gk-guide-badge">Panduan</span>
                 <span class="gk-guide-text">Ketuk di sini untuk menilai</span>
@@ -699,6 +714,7 @@
                     const mobileGuide = document.getElementById('gkGuideDaftarGuruMobile');
                     const sidebarTarget = document.getElementById('sidebarDaftarGuruLink');
                     const mobileTarget = document.getElementById('mobileNavDaftarGuruLink');
+                    const sidebarEl = document.querySelector('.sidebar') || (sidebarTarget ? sidebarTarget.closest('.sidebar') : null);
 
                     function updatePositions() {
                         if (isGuideDismissed()) return;
@@ -706,27 +722,76 @@
                         if (window.innerWidth >= 992) {
                             if (desktopGuide && sidebarTarget) {
                                 const rect = sidebarTarget.getBoundingClientRect();
-                                desktopGuide.style.top = (rect.top + (rect.height / 2) - (desktopGuide.offsetHeight / 2)) + 'px';
-                                desktopGuide.style.left = (rect.right + 12) + 'px';
+                                const sRect = sidebarEl ? sidebarEl.getBoundingClientRect() : null;
+
+                                // Jangan tampilkan jika sidebar/target tidak terlihat atau ukuran 0
+                                if (rect.height === 0 || (sRect && sRect.width === 0)) {
+                                    desktopGuide.style.display = 'none';
+                                    return;
+                                }
+
+                                const centerY = Math.round(rect.top + (rect.height / 2));
+                                const leftPos = Math.round((sRect ? sRect.right : rect.right) + 12);
+
+                                desktopGuide.style.top = centerY + 'px';
+                                desktopGuide.style.left = leftPos + 'px';
                                 desktopGuide.style.display = 'inline-flex';
+                                desktopGuide.style.opacity = '1';
                             }
                             if (mobileGuide) mobileGuide.style.display = 'none';
                         } else {
                             if (mobileGuide && mobileTarget) {
                                 const rect = mobileTarget.getBoundingClientRect();
-                                mobileGuide.style.left = (rect.left + (rect.width / 2)) + 'px';
-                                mobileGuide.style.bottom = (window.innerHeight - rect.top + 8) + 'px';
+                                if (rect.height === 0) {
+                                    mobileGuide.style.display = 'none';
+                                    return;
+                                }
+                                const centerX = Math.round(rect.left + (rect.width / 2));
+                                const bottomPos = Math.round(window.innerHeight - rect.top + 8);
+
+                                mobileGuide.style.left = centerX + 'px';
+                                mobileGuide.style.bottom = bottomPos + 'px';
                                 mobileGuide.style.display = 'inline-flex';
+                                mobileGuide.style.opacity = '1';
                             }
                             if (desktopGuide) desktopGuide.style.display = 'none';
                         }
                     }
 
-                    setTimeout(updatePositions, 100);
-                    setTimeout(updatePositions, 500);
+                    // 1. Eksekusi awal dengan continuous loop (requestAnimationFrame ~60 frames)
+                    // Menjamin posisi selalu sejajar selama layout/font/gambar sedang me-render
+                    let frameCount = 0;
+                    function frameLoop() {
+                        if (isGuideDismissed()) return;
+                        updatePositions();
+                        frameCount++;
+                        if (frameCount < 60) {
+                            requestAnimationFrame(frameLoop);
+                        }
+                    }
+                    requestAnimationFrame(frameLoop);
 
-                    window.addEventListener('resize', updatePositions);
-                    window.addEventListener('scroll', updatePositions);
+                    // 2. ResizeObserver: mendeteksi perubahan ukuran/layout sidebar dan target secara real-time
+                    if (window.ResizeObserver) {
+                        const ro = new ResizeObserver(() => {
+                            updatePositions();
+                        });
+                        if (sidebarTarget) ro.observe(sidebarTarget);
+                        if (sidebarEl) ro.observe(sidebarEl);
+                        if (mobileTarget) ro.observe(mobileTarget);
+                        ro.observe(document.body);
+                    }
+
+                    // 3. Event listener scroll pada sidebar dan window
+                    if (sidebarEl) {
+                        sidebarEl.addEventListener('scroll', updatePositions, { passive: true });
+                    }
+                    window.addEventListener('scroll', updatePositions, { passive: true });
+                    window.addEventListener('resize', updatePositions, { passive: true });
+                    window.addEventListener('load', updatePositions);
+                    if (document.fonts && document.fonts.ready) {
+                        document.fonts.ready.then(updatePositions);
+                    }
                 }
 
                 if (document.readyState === 'loading') {
