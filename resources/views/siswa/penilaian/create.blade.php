@@ -565,7 +565,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     updateCounters();
 
-    // Form submit validation
+    // Form submit validation & anti-double-submission
     document.getElementById('penilaianForm').addEventListener('submit', function(e) {
         const inputs = document.querySelectorAll('.rating-input');
         let unfilled = [];
@@ -592,6 +592,11 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
+        const submitBtn = document.getElementById('submitBtn');
+        if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> Mengirim Penilaian...';
+        }
     });
 });
 </script>

@@ -74,13 +74,25 @@
 {{-- FILTER & PENCARIAN --}}
 <div class="card-custom p-3 mb-4">
     <form method="GET" action="{{ route('admin.kritik-saran.index') }}" class="row g-2 align-items-center">
-        <div class="col-md-4 col-lg-5">
+        <div class="col-12 col-md-4 col-lg-3">
             <div class="input-group input-group-sm">
                 <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-search"></i></span>
-                <input type="text" name="search" class="form-control border-start-0" placeholder="Cari nama guru, NIP, siswa, NIS, atau isi ulasan..." value="{{ request('search') }}">
+                <input type="text" name="search" class="form-control border-start-0" placeholder="Cari guru, NIP, siswa, NIS, ulasan..." value="{{ request('search') }}">
             </div>
         </div>
-        <div class="col-sm-6 col-md-3 col-lg-2">
+        <div class="col-6 col-md-4 col-lg-2">
+            <select name="kelas_id" class="form-select form-select-sm" onchange="this.form.submit()">
+                <option value="">Semua Kelas</option>
+                @if(isset($kelasList))
+                    @foreach($kelasList as $k)
+                        <option value="{{ $k->id }}" {{ request('kelas_id') == $k->id ? 'selected' : '' }}>
+                            {{ $k->label_singkat }}
+                        </option>
+                    @endforeach
+                @endif
+            </select>
+        </div>
+        <div class="col-6 col-md-4 col-lg-2">
             <select name="rating" class="form-select form-select-sm" onchange="this.form.submit()">
                 <option value="">Semua Rating Bintang</option>
                 <option value="5" {{ request('rating') == '5' ? 'selected' : '' }}>5 Bintang</option>
@@ -90,24 +102,25 @@
                 <option value="1" {{ request('rating') == '1' ? 'selected' : '' }}>1 Bintang</option>
             </select>
         </div>
-        <div class="col-sm-6 col-md-3 col-lg-2">
+        <div class="col-6 col-md-4 col-lg-2">
+            <select name="cakupan" class="form-select form-select-sm" onchange="this.form.submit()">
+                <option value="" {{ (!request('cakupan') || request('cakupan') == 'semua') ? 'selected' : '' }}>Semua Penilaian / Vote</option>
+                <option value="ada_teks" {{ request('cakupan') == 'ada_teks' ? 'selected' : '' }}>Hanya Ada Kritik/Saran</option>
+                <option value="hanya_bintang" {{ request('cakupan') == 'hanya_bintang' ? 'selected' : '' }}>Hanya Rating Bintang</option>
+            </select>
+        </div>
+        <div class="col-6 col-md-4 col-lg-2">
             <select name="status" class="form-select form-select-sm" onchange="this.form.submit()">
                 <option value="">Semua Status Sensor</option>
                 <option value="clean" {{ request('status') == 'clean' ? 'selected' : '' }}>Normal / Terbuka</option>
                 <option value="censored" {{ request('status') == 'censored' ? 'selected' : '' }}>Disensor / Peringatan</option>
             </select>
         </div>
-        <div class="col-sm-6 col-md-2 col-lg-2">
-            <select name="cakupan" class="form-select form-select-sm" onchange="this.form.submit()">
-                <option value="" {{ request('cakupan') != 'semua' ? 'selected' : '' }}>Ada Kritik/Saran</option>
-                <option value="semua" {{ request('cakupan') == 'semua' ? 'selected' : '' }}>Semua Penilaian</option>
-            </select>
-        </div>
-        <div class="col-sm-6 col-md-auto d-flex gap-1">
+        <div class="col-12 col-md-auto d-flex gap-1 ms-auto">
             <button type="submit" class="btn btn-sm btn-primary-custom px-3">
                 Cari
             </button>
-            @if(request()->anyFilled(['search', 'rating', 'status', 'cakupan']))
+            @if(request()->anyFilled(['search', 'kelas_id', 'rating', 'status', 'cakupan']))
                 <a href="{{ route('admin.kritik-saran.index') }}" class="btn btn-sm btn-outline-secondary" title="Reset Filter">
                     <i class="bi bi-arrow-counterclockwise"></i>
                 </a>
@@ -122,7 +135,7 @@
         @method('DELETE')
         <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
             <div class="d-flex align-items-center gap-3">
-                <span class="small text-muted">Menampilkan {{ $feedbacks->firstItem() ?? 0 }}–{{ $feedbacks->lastItem() ?? 0 }} dari {{ $feedbacks->total() }} ulasan</span>
+                <span class="small text-muted">Menampilkan {{ $feedbacks->firstItem() ?? 0 }}–{{ $feedbacks->lastItem() ?? 0 }} dari {{ $feedbacks->total() }} penilaian</span>
                 <span class="badge bg-light text-dark border">15 per halaman</span>
             </div>
             <div id="bulkDeleteBar" class="d-none align-items-center gap-2">
@@ -182,7 +195,7 @@
                             <div class="small text-muted font-mono" style="font-size: 0.78rem;">NIS: {{ $f->siswa->nis }}</div>
                             <div class="mt-1 d-flex flex-wrap gap-1 align-items-center">
                                 <span class="badge bg-light text-dark border" style="font-size: 0.72rem;">
-                                    {{ $f->kelas?->label_singkat ?? ($f->siswa->kelas?->label_singkat ?? 'Kelas -') }}
+                                    <i class="bi bi-mortarboard text-primary me-1"></i>{{ $f->kelas?->label_singkat ?? ($f->siswa->kelas?->first()?->label_singkat ?? $f->siswa->nama_kelas ?? 'Kelas -') }}
                                 </span>
                                 <span class="badge bg-secondary-subtle text-secondary border" style="font-size: 0.65rem;" title="Identitas siswa dirahasiakan dari guru & publik, namun dapat dilihat oleh Admin">
                                     Anonim Publik
@@ -199,6 +212,21 @@
                         <div class="fw-semibold text-dark" style="font-size: 0.88rem;">{{ $f->created_at->format('d/m/Y') }}</div>
                         <div class="text-muted font-mono" style="font-size: 0.75rem;">
                             {{ $f->created_at->format('H:i') }} WIB
+                        </div>
+                        <div class="d-flex align-items-center gap-1.5 mt-1">
+                            <span class="text-warning small" style="font-size: 0.75rem;">
+                                <i class="bi bi-star-fill"></i>
+                            </span>
+                            <span class="fw-bold font-mono text-dark" style="font-size: 0.78rem;">{{ number_format($f->total_nilai / 5, 1) }}</span>
+                            @if(!empty(trim($f->kritik ?? '')) || !empty(trim($f->saran ?? '')))
+                                <span class="badge bg-info-subtle text-info border border-info-subtle" style="font-size: 0.65rem;" title="Memiliki ulasan teks kritik/saran">
+                                    <i class="bi bi-chat-text"></i> Teks
+                                </span>
+                            @else
+                                <span class="badge bg-light text-muted border" style="font-size: 0.65rem;" title="Rating bintang saja (tanpa ulasan teks)">
+                                    Vote Bintang
+                                </span>
+                            @endif
                         </div>
                         @if($f->periode)
                             <div class="mt-1">
@@ -283,7 +311,7 @@
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="6" class="text-center py-5 text-muted">
+                    <td colspan="7" class="text-center py-5 text-muted">
                         <i class="bi bi-chat-left-text fs-1 d-block mb-2 text-secondary"></i>
                         Belum ada evaluasi & ulasan kritik/saran yang sesuai dengan kriteria filter.
                     </td>
@@ -393,7 +421,7 @@
                                     <div class="text-muted font-mono" style="font-size: 0.75rem;">NIS: {{ $f->siswa->nis }}</div>
                                     <div class="d-flex align-items-center gap-1.5 mt-1.5">
                                         <span class="badge bg-light text-dark border" style="font-size: 0.72rem;">
-                                            <i class="bi bi-mortarboard me-1 text-primary"></i>{{ $f->kelas?->label_singkat ?? ($f->siswa->kelas?->label_singkat ?? 'Kelas -') }}
+                                            <i class="bi bi-mortarboard me-1 text-primary"></i>{{ $f->kelas?->label_singkat ?? ($f->siswa?->kelas?->first()?->label_singkat ?? $f->siswa?->nama_kelas ?? 'Kelas -') }}
                                         </span>
                                         <span class="badge bg-secondary-subtle text-secondary border" style="font-size: 0.68rem;">
                                             <i class="bi bi-shield-lock-fill me-0.5"></i>Anonim Publik & Guru

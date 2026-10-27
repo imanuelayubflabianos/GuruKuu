@@ -156,7 +156,24 @@ Sistem memiliki 2 mode peringkat di `Guru::leaderboardFor()`:
 ### G. Panduan Interaktif Pemula (*Callout Guide Tooltip*)
 * **Penunjuk Otomatis Menu "Daftar Guru":** Tooltip pill interaktif ("👉 Ketuk di sini untuk menilai") menunjuk menu navigasi evaluasi guru pada dashboard siswa.
 * **Pelacakan Posisi Dinamis (*Dynamic Geometry Anchoring*):** Menggunakan `ResizeObserver`, listener scroll container sidebar, dan sinkronisasi `requestAnimationFrame` untuk memastikan posisi tooltip selalu presisi dan sejajar tegak lurus (`centerY`) di sebelah item "Daftar Guru", bahkan ketika ukuran sidebar membesar/mengecil atau terjadi pergeseran layout.
-* **Siklus Hidup Status (*Session-Based Dismissal*):** Ketika tombol silang `(X)` diklik, status disimpan di `sessionStorage` agar tidak muncul lagi selama siswa sedang bernavigasi di website. Saat siswa keluar web (tutup tab/browser) atau keluar akun (logout) lalu login ulang, flag otomatis di-reset sehingga panduan muncul kembali. Flag permanen `localStorage` telah dibersihkan.
+* **Sinkronisasi Titik Biru & Popover (*Coupled Indicator*):** Titik biru berdenyut (`gk-menu-highlight`) pada item "Daftar Guru" dikendalikan terpadu secara dinamis bersama popover panduan. Titik biru hanya aktif jika panduan aktif; saat tombol silang `(X)` diklik atau saat siswa berpindah tab/halaman lalu kembali, titik biru tidak akan muncul jika panduan sedang dalam status ditutup.
+* **Siklus Hidup Status (*Session-Based Dismissal*):** Ketika tombol silang `(X)` diklik, status disimpan di `sessionStorage` agar tidak muncul lagi selama siswa sedang bernavigasi di website. Saat siswa keluar web (tutup tab/browser) atau keluar akun (logout) lalu login ulang, flag otomatis di-reset sehingga panduan dan titik penunjuk muncul kembali. Flag permanen `localStorage` telah dibersihkan.
+
+### H. Histori Penilaian, Moderasi Kritik & Saran, dan Concurrency Voting
+* **Inklusi Seluruh Evaluasi & Vote Secara Default (`Admin\KritikSaranController`):**
+  * Halaman moderasi Kritik & Saran (`/admin/kritik-saran`) secara default menampilkan **seluruh penilaian/vote** (termasuk yang hanya memberikan skor rating bintang tanpa teks kritik/saran). Hal ini mencegah hilangnya data evaluasi dari pantauan admin ketika siswa hanya mengisi penilaian bintang 1–5.
+  * Opsi filter cakupan ulasan:
+    * `Semua Penilaian / Vote` (default): Menampilkan seluruh rekaman penilaian siswa.
+    * `Hanya Ada Kritik/Saran`: Memfilter penilaian yang memiliki teks pesan kritik/saran tertulis.
+    * `Hanya Rating Bintang`: Memfilter evaluasi yang murni berisi rating bintang tanpa teks masukan.
+* **Filter Berdasarkan Kelas (`kelas_id`):**
+  * Dilengkapi filter dropdown kelas pada toolbar pencarian admin (`/admin/kritik-saran`), mempermudah pemantauan feedback dan partisipasi per kelas tertentu.
+  * Menggunakan pencarian gabungan relasi langsung `class_id` maupun relasi `siswa.kelas` untuk memastikan keakuratan data.
+* **Proteksi Konkurensi & Anti-Double Submit (`Siswa\PenilaianController`):**
+  * **Transaksi Database Atomik & Retry:** Proses penyimpanan penilaian dan pembaruan rata-rata nilai guru dibungkus dalam `DB::transaction(..., 3)` dengan `lockForUpdate()` untuk mencegah kondisi balapan (*race condition*) saat puluhan siswa mengirimkan vote secara bersamaan.
+  * **Penanganan Duplikasi Anggun (*Graceful Duplicate Handling*):** Jika terjadi balapan jaringan atau klik ganda yang memicu `UniqueConstraintViolationException` / error SQLSTATE 23000, sistem secara anggun mengarahkan siswa ke halaman profil guru dengan notifikasi informasi bahwa penilaian telah tersimpan, tanpa melemparkan error 500.
+  * **Resolusi Kelas Fleksibel (*Fallback Mapping*):** Mengidentifikasi kelas aktif siswa dengan fallback berjenjang (`wherePivot` $\rightarrow$ relasi `kelas` $\rightarrow$ nama kelas string) sehingga kolom `class_id` pada tabel `penilaian` selalu terisi dengan benar.
+  * **Anti-Double Click Frontend:** Tombol pengiriman penilaian pada form siswa otomatis dimatikan (*disabled*) dan menampilkan indikator loading saat proses submit berjalan.
 
 ---
 

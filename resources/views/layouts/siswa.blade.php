@@ -410,7 +410,7 @@
 
         <ul class="sidebar-menu">
             <li><a href="{{ route('siswa.dashboard') }}" class="{{ request()->routeIs('siswa.dashboard') ? 'active' : '' }}"><i class="bi bi-grid"></i> Dashboard</a></li>
-            <li><a href="{{ route('siswa.guru.index') }}" class="{{ request()->routeIs('siswa.guru.*') ? 'active' : '' }} {{ request()->routeIs('siswa.dashboard') ? 'gk-menu-highlight' : '' }}" id="sidebarDaftarGuruLink"><i class="bi bi-person-badge"></i> Daftar Guru</a></li>
+            <li><a href="{{ route('siswa.guru.index') }}" class="{{ request()->routeIs('siswa.guru.*') ? 'active' : '' }}" id="sidebarDaftarGuruLink"><i class="bi bi-person-badge"></i> Daftar Guru</a></li>
             <li><a href="{{ route('siswa.riwayat') }}" class="{{ request()->routeIs('siswa.riwayat') ? 'active' : '' }}"><i class="bi bi-clock-history"></i> Riwayat Penilaian</a></li>
             <li><a href="{{ route('siswa.leaderboard.index') }}" class="{{ request()->routeIs('siswa.leaderboard.*') ? 'active' : '' }}"><i class="bi bi-trophy"></i> Leaderboard</a></li>
             <li><a href="{{ route('siswa.pengaturan') }}" class="{{ request()->routeIs('siswa.pengaturan*') ? 'active' : '' }}"><i class="bi bi-gear"></i> Pengaturan</a></li>
@@ -696,6 +696,12 @@
                         sessionStorage.setItem('gk_dismiss_guide_guru', '1');
                     } catch(err) {}
 
+                    const target = document.getElementById('sidebarDaftarGuruLink');
+                    if (target) {
+                        target.classList.remove('gk-menu-highlight');
+                    }
+                    document.querySelectorAll('.gk-menu-highlight').forEach(el => el.classList.remove('gk-menu-highlight'));
+
                     const d = document.getElementById('gkGuideDaftarGuruDesktop');
                     const m = document.getElementById('gkGuideDaftarGuruMobile');
                     if (d) {
@@ -706,7 +712,6 @@
                         m.style.setProperty('display', 'none', 'important');
                         m.remove();
                     }
-                    document.querySelectorAll('.gk-menu-highlight').forEach(el => el.classList.remove('gk-menu-highlight'));
                 };
 
                 function isGuideDismissed() {
@@ -719,13 +724,22 @@
                 }
 
                 function initGkGuide() {
+                    const sidebarTarget = document.getElementById('sidebarDaftarGuruLink');
+
                     if (isGuideDismissed()) {
+                        if (sidebarTarget) {
+                            sidebarTarget.classList.remove('gk-menu-highlight');
+                        }
                         return;
+                    }
+
+                    // Tampilkan titik biru animasi berdenyut jika panduan belum ditutup
+                    if (sidebarTarget) {
+                        sidebarTarget.classList.add('gk-menu-highlight');
                     }
 
                     const desktopGuide = document.getElementById('gkGuideDaftarGuruDesktop');
                     const mobileGuide = document.getElementById('gkGuideDaftarGuruMobile');
-                    const sidebarTarget = document.getElementById('sidebarDaftarGuruLink');
                     const mobileTarget = document.getElementById('mobileNavDaftarGuruLink');
                     const sidebarEl = document.querySelector('.sidebar') || (sidebarTarget ? sidebarTarget.closest('.sidebar') : null);
 

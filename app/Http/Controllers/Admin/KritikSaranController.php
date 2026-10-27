@@ -11,15 +11,38 @@ class KritikSaranController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Penilaian::with(['guru.jurusan', 'siswa', 'kelas', 'periode', 'balasans.user']);
+        $query = Penilaian::with(['guru.jurusan', 'siswa.kelas', 'kelas', 'periode', 'balasans.user']);
 
-        // Filter cakupan data (default: hanya yang memiliki kritik atau saran tertulis)
-        if ($request->get('cakupan') !== 'semua') {
+        // Filter Kelas
+        if ($request->filled('kelas_id')) {
+            $kelasId = (int) $request->kelas_id;
+            $query->where(function ($q) use ($kelasId) {
+                $q->where('class_id', $kelasId)
+                  ->orWhereHas('siswa.kelas', function ($sk) use ($kelasId) {
+                      $sk->where('kelas.id', $kelasId);
+                  });
+            });
+        }
+
+        // Filter cakupan data ulasan / vote:
+        // Default: semua evaluasi/vote masuk (agar rating bintang tanpa kritik/saran tetap tampil & tidak hilang).
+        // Pilihan:
+        // - 'ada_teks': hanya penilaian yang memiliki kritik atau saran tertulis
+        // - 'hanya_bintang': hanya penilaian rating bintang murni tanpa teks
+        if ($request->get('cakupan') === 'ada_teks') {
             $query->where(function ($q) {
                 $q->where(function ($sub) {
                     $sub->whereNotNull('kritik')->whereRaw("TRIM(kritik) != ''");
                 })->orWhere(function ($sub) {
                     $sub->whereNotNull('saran')->whereRaw("TRIM(saran) != ''");
+                });
+            });
+        } elseif ($request->get('cakupan') === 'hanya_bintang') {
+            $query->where(function ($q) {
+                $q->where(function ($sub) {
+                    $sub->whereNull('kritik')->orWhereRaw("TRIM(kritik) = ''");
+                })->where(function ($sub) {
+                    $sub->whereNull('saran')->orWhereRaw("TRIM(saran) = ''");
                 });
             });
         }
@@ -62,6 +85,12 @@ class KritikSaranController extends Controller
             ->paginate(15)
             ->withQueryString();
 
+        // Data Kelas untuk dropdown filter
+        $kelasList = \App\Models\Kelas::with('jurusan')
+            ->orderBy('tingkat', 'asc')
+            ->orderBy('nama_kelas', 'asc')
+            ->get();
+
         // Statistik ringkas untuk cards
         $avgTotal = Penilaian::avg('total_nilai');
         $stats = [
@@ -75,7 +104,7 @@ class KritikSaranController extends Controller
             'total_disensor' => Penilaian::where('is_censored', true)->count(),
         ];
 
-        return view('admin.kritik-saran.index', compact('feedbacks', 'stats'));
+        return view('admin.kritik-saran.index', compact('feedbacks', 'stats', 'kelasList'));
     }
 
     public function destroy(Penilaian $kritikSaran)

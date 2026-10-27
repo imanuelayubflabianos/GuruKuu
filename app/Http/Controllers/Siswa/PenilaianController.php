@@ -7,6 +7,7 @@ use App\Models\Guru;
 use App\Models\Penilaian;
 use App\Models\Periode;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class PenilaianController extends Controller
 {
@@ -21,7 +22,9 @@ class PenilaianController extends Controller
 
         $kelasAktif = $user->kelas()
                           ->wherePivot('tahun_ajaran', $periodeAktif->tahun_ajaran)
-                          ->first();
+                          ->first()
+                      ?: $user->kelas()->first()
+                      ?: ($user->kelas ? \App\Models\Kelas::where('nama_kelas', $user->kelas)->first() : null);
 
         // 🛡️ ATURAN RESMI: Siswa hanya dapat menilai guru yang mengajar di kelasnya
         if ($kelasAktif) {
@@ -68,7 +71,9 @@ class PenilaianController extends Controller
 
         $kelasAktif = $user->kelas()
                           ->wherePivot('tahun_ajaran', $periodeAktif->tahun_ajaran)
-                          ->first();
+                          ->first()
+                      ?: $user->kelas()->first()
+                      ?: ($user->kelas ? \App\Models\Kelas::where('nama_kelas', $user->kelas)->first() : null);
 
         // 🛡️ ATURAN RESMI: Siswa hanya dapat menilai guru yang mengajar di kelasnya
         if ($kelasAktif) {
@@ -115,44 +120,52 @@ class PenilaianController extends Controller
                 ->with('violation_popup', 'Ulasan Anda mengandung kata yang dilarang dan teks masukan telah dikosongkan. Nilai bintang Anda tetap tersimpan, silakan perbaiki kritik dan saran dengan bahasa yang sopan.');
         }
 
-        $periodeAktif = Periode::where('status', 'aktif')->first();
-
-        if (!$periodeAktif) {
-            return back()->with('error', 'Tidak ada periode aktif saat ini.');
-        }
-
-        $kelasAktif = $user->kelas()
-                          ->wherePivot('tahun_ajaran', $periodeAktif->tahun_ajaran)
-                          ->first();
-
-        // Cek unique constraint
-        $sudahMenilai = Penilaian::where('siswa_id', $user->id)
-                                 ->where('guru_id', $guru->id)
-                                 ->where('periode_id', $periodeAktif->id)
-                                 ->exists();
-
-        if ($sudahMenilai) {
-            return back()->with('error', 'Anda sudah menilai guru ini pada periode ini.');
-        }
-
         $totalNilai = Penilaian::hitungTotal($request->all());
 
-        Penilaian::create([
-            'siswa_id' => $user->id,
-            'guru_id' => $guru->id,
-            'periode_id' => $periodeAktif->id,
-            'class_id' => $kelasAktif?->id, // ✅ Simpan class_id jika ada, null jika belum dipetakan
-            'kedisiplinan' => $request->kedisiplinan,
-            'komunikasi' => $request->komunikasi,
-            'tanggung_jawab' => $request->tanggung_jawab,
-            'kreativitas' => $request->kreativitas,
-            'keramahan' => $request->keramahan,
-            'total_nilai' => $totalNilai,
-            'kritik' => $request->filled('kritik') ? strip_tags(trim($request->kritik)) : null,
-            'saran' => $request->filled('saran') ? strip_tags(trim($request->saran)) : null,
-        ]);
+        try {
+            DB::transaction(function () use ($user, $guru, $periodeAktif, $kelasAktif, $request, $totalNilai) {
+                // Cek apakah sudah pernah menilai guru ini pada periode aktif (lock for update hindari race condition)
+                $sudahMenilai = Penilaian::where('siswa_id', $user->id)
+                                         ->where('guru_id', $guru->id)
+                                         ->where('periode_id', $periodeAktif->id)
+                                         ->lockForUpdate()
+                                         ->exists();
 
-        $guru->updateRataRata();
+                if ($sudahMenilai) {
+                    throw new \DomainException('Anda sudah menilai guru ini pada periode ini.');
+                }
+
+                Penilaian::create([
+                    'siswa_id' => $user->id,
+                    'guru_id' => $guru->id,
+                    'periode_id' => $periodeAktif->id,
+                    'class_id' => $kelasAktif?->id, // ✅ Simpan class_id
+                    'kedisiplinan' => $request->kedisiplinan,
+                    'komunikasi' => $request->komunikasi,
+                    'tanggung_jawab' => $request->tanggung_jawab,
+                    'kreativitas' => $request->kreativitas,
+                    'keramahan' => $request->keramahan,
+                    'total_nilai' => $totalNilai,
+                    'kritik' => $request->filled('kritik') ? strip_tags(trim($request->kritik)) : null,
+                    'saran' => $request->filled('saran') ? strip_tags(trim($request->saran)) : null,
+                ]);
+
+                $guru->updateRataRata($periodeAktif->id);
+            }, 3);
+        } catch (\Illuminate\Database\UniqueConstraintViolationException $e) {
+            return redirect()->route('siswa.guru.show', $guru)->with('info', 'Penilaian Anda untuk guru ini sudah tersimpan.');
+        } catch (\Illuminate\Database\QueryException $e) {
+            if ($e->getCode() == 23000 || str_contains($e->getMessage(), 'Duplicate entry')) {
+                return redirect()->route('siswa.guru.show', $guru)->with('info', 'Penilaian Anda untuk guru ini sudah tersimpan.');
+            }
+            \Illuminate\Support\Facades\Log::error('QueryException pada penilaian store: ' . $e->getMessage());
+            return back()->with('error', 'Terjadi kendala saat menyimpan penilaian. Silakan coba kembali.');
+        } catch (\DomainException $e) {
+            return back()->with('error', $e->getMessage());
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('Error pada penilaian store: ' . $e->getMessage());
+            return back()->with('error', 'Terjadi kesalahan sistem saat menyimpan penilaian. Silakan coba kembali.');
+        }
 
         return redirect()->route('siswa.guru.show', $guru)->with('success', 'Penilaian berhasil dikirim! Terima kasih atas kontribusi Anda.');
     }
