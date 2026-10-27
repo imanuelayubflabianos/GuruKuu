@@ -373,7 +373,7 @@
                     <th style="width: 80px;" class="text-center align-middle">RANKING</th>
                     <th class="align-middle">NAMA GURU</th>
                     <th class="text-center align-middle">JURUSAN / KEAHLIAN</th>
-                    <th style="width: 200px;" class="align-middle">{{ $mode === 'partisipasi' ? 'PARTISIPASI KELAS' : 'RATING KEPUASAN' }}</th>
+                    <th style="width: 200px;" class="align-middle">RATING KEPUASAN</th>
                     <th class="text-center align-middle">{{ $mode === 'partisipasi' ? 'SISWA YANG MENILAI' : 'TOTAL ULASAN' }}</th>
                     <th class="text-center align-middle" style="width: 140px;">AKSI</th>
                 </tr>

@@ -147,22 +147,28 @@ class Guru extends Model
             // Bagi 2 grup: Memenuhi syarat (>= MIN) & Belum memenuhi syarat (1 s/d < MIN)
             $eligible = $gurusWithData->filter(fn ($g) => $g->is_eligible_leaderboard)
                 ->sort(function ($a, $b) {
-                    if ($b->partisipasi_persen != $a->partisipasi_persen) {
-                        return $b->partisipasi_persen <=> $a->partisipasi_persen;
+                    if ($b->rata_rata_nilai != $a->rata_rata_nilai) {
+                        return $b->rata_rata_nilai <=> $a->rata_rata_nilai;
                     }
                     if ($b->total_penilaian != $a->total_penilaian) {
                         return $b->total_penilaian <=> $a->total_penilaian;
+                    }
+                    if ($b->partisipasi_persen != $a->partisipasi_persen) {
+                        return $b->partisipasi_persen <=> $a->partisipasi_persen;
                     }
                     return strcmp($a->nama, $b->nama);
                 })->values();
 
             $notEligible = $gurusWithData->filter(fn ($g) => !$g->is_eligible_leaderboard)
                 ->sort(function ($a, $b) {
-                    if ($b->partisipasi_persen != $a->partisipasi_persen) {
-                        return $b->partisipasi_persen <=> $a->partisipasi_persen;
+                    if ($b->rata_rata_nilai != $a->rata_rata_nilai) {
+                        return $b->rata_rata_nilai <=> $a->rata_rata_nilai;
                     }
                     if ($b->total_penilaian != $a->total_penilaian) {
                         return $b->total_penilaian <=> $a->total_penilaian;
+                    }
+                    if ($b->partisipasi_persen != $a->partisipasi_persen) {
+                        return $b->partisipasi_persen <=> $a->partisipasi_persen;
                     }
                     return strcmp($a->nama, $b->nama);
                 })->values();

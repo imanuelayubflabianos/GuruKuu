@@ -115,15 +115,19 @@ erDiagram
 ### B. Rumus & Algoritma Leaderboard
 Sistem memiliki 2 mode peringkat di `Guru::leaderboardFor()`:
 
-1. **Mode Rating Kepuasan (Ranking Kinerja Utama):**
+1. **Mode Rating Kepuasan (Semua Guru):**
    * Menghitung rata-rata skor bintang dari seluruh siswa yang menilai guru di periode aktif.
    * **Ambang Batas Kelayakan (Eligible):** Minimal memiliki **5 penilaian** (`MIN_PENILAIAN_LEADERBOARD = 5`). Guru dengan < 5 ulasan diletakkan di grup sekunder tanpa nomor rank untuk menjaga validitas statistik.
    * **Tie-breaker:** Jika nilai sama, guru dengan volume penilai lebih banyak menempati urutan lebih tinggi.
-   * *(Opsi Peningkatan: Formula Weighted Bayesian Rating).*
 
-2. **Mode Partisipasi Penilaian:**
-   * **Per Kelas:** Dihitung dari `(Siswa yang menilai di Kelas X / Total Siswa Kelas X) * 100%`.
-   * **Proporsional:** Menggunakan penyebut kelas bersangkutan, bukan total sekolah, sehingga guru dengan jam mengajar sedikit tidak dirugikan.
+2. **Mode Berdasarkan Kelas (Guru Mengajar di Kelas X):**
+   * Menghitung rata-rata nilai bintang dari siswa kelas bersangkutan (`class_id`).
+   * **Hirarki Pengurutan yang Adil:**
+     1. **Rating Kepuasan Utama (`rata_rata_nilai` DESC):** Guru dengan skor bintang tertinggi di kelas tersebut berhak menempati peringkat teratas (mencegah distorsi visual di mana skor rendah mengalahkan skor tinggi).
+     2. **Tie-Breaker 1 (`total_penilaian` DESC):** Jika nilai bintang sama, guru dengan jumlah siswa penilai terbanyak menempati peringkat lebih tinggi.
+     3. **Tie-Breaker 2 (`partisipasi_persen` DESC):** Persentase partisipasi siswa kelas `(siswa penilai / total siswa kelas) * 100%`.
+     4. **Tie-Breaker 3 (`nama` ASC):** Urutan alfabetis nama.
+   * **Ambang Batas:** Tetap menerapkan minimal 5 penilaian (`MIN_PENILAIAN_LEADERBOARD = 5`) agar memenuhi prinsip ukuran sampel yang valid.
 
 ### C. Keamanan & Filter Konten Cerdas (*Profanity Filter Service*)
 * `ProfanityFilterService.php`:
