@@ -108,17 +108,51 @@ class KritikSaranController extends Controller
             ->orderBy('nama_kelas', 'asc')
             ->get();
 
-        // Statistik ringkas untuk cards
-        $avgTotal = Penilaian::avg('total_nilai');
+        // Statistik ringkas untuk cards (sinkron dinamis mengikuti filter periode, kelas, dan pencarian)
+        $statsBase = Penilaian::query();
+
+        if ($request->filled('periode_id')) {
+            $statsBase->where('periode_id', $request->periode_id);
+        }
+
+        if ($request->filled('kelas_id')) {
+            $kelasId = (int) $request->kelas_id;
+            $statsBase->where(function ($q) use ($kelasId) {
+                $q->where('class_id', $kelasId)
+                  ->orWhereHas('siswa.kelas', function ($sk) use ($kelasId) {
+                      $sk->where('kelas.id', $kelasId);
+                  });
+            });
+        }
+
+        if ($request->filled('search')) {
+            $terms = preg_split('/\s+/', trim($request->search), -1, PREG_SPLIT_NO_EMPTY);
+            foreach ($terms as $term) {
+                $statsBase->where(function ($q) use ($term) {
+                    $q->where('kritik', 'like', "%{$term}%")
+                      ->orWhere('saran', 'like', "%{$term}%")
+                      ->orWhereHas('guru', function ($g) use ($term) {
+                          $g->where('nama', 'like', "%{$term}%")
+                            ->orWhere('nip', 'like', "%{$term}%");
+                      })
+                      ->orWhereHas('siswa', function ($s) use ($term) {
+                          $s->where('name', 'like', "%{$term}%")
+                            ->orWhere('nis', 'like', "%{$term}%");
+                      });
+                });
+            }
+        }
+
+        $avgTotal = (clone $statsBase)->avg('total_nilai');
         $stats = [
-            'total_ulasan' => Penilaian::where(function ($q) {
+            'total_ulasan' => (clone $statsBase)->where(function ($q) {
                 $q->whereNotNull('kritik')->whereRaw("TRIM(kritik) != ''")
                   ->orWhereNotNull('saran')->whereRaw("TRIM(saran) != ''");
             })->count(),
-            'total_penilaian' => Penilaian::count(),
+            'total_penilaian' => (clone $statsBase)->count(),
             'rata_rata_bintang' => $avgTotal ? round($avgTotal / 5, 2) : 0,
-            'bintang_5' => Penilaian::whereRaw('ROUND(total_nilai / 5) = 5')->count(),
-            'total_disensor' => Penilaian::where('is_censored', true)->count(),
+            'bintang_5' => (clone $statsBase)->whereRaw('ROUND(total_nilai / 5) = 5')->count(),
+            'total_disensor' => (clone $statsBase)->where('is_censored', true)->count(),
         ];
 
         return view('admin.kritik-saran.index', compact('feedbacks', 'stats', 'kelasList', 'semuaPeriode'));
