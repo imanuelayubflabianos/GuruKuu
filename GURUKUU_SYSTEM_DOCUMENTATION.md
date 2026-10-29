@@ -350,6 +350,9 @@ GuruKuu/
 * **2026-10-29 (Penghapusan Badge 'Tersemat di Atas' pada Ulasan Siswa):**
   - **Pembersihan Badge:** Menghapus label/badge bertuliskan *"Tersemat di Atas"* dan ikon pin pada kartu ulasan siswa di portal siswa (`resources/views/siswa/guru/show.blade.php`).
   - **Preservasi Posisi Prioritas:** Posisi ulasan siswa yang login tetap otomatis diposisikan paling atas secara alami di sisi database/controller (`orderByRaw CASE WHEN siswa_id = ? THEN 0 ELSE 1 END`) dengan label *"Ulasan Anda"* tanpa memunculkan teks/badge tersemat yang mencolok.
+* **2026-10-29 (Sanitasi & Pembersihan Kredensial Sensitif di `.env.example`):**
+  - **Pembersihan Total:** Mengosongkan seluruh nilai kredensial SiPintu (`SIPINTU_CLIENT_ID` dan `SIPINTU_CLIENT_SECRET`) yang sebelumnya tertulis di file `.env.example` dari commit lama (24 Sep 2026).
+  - **Audit Repositori Git:** Memastikan tidak ada file git lain yang mengekspos kredensial rahasia; seluruh konfigurasi kredensial sensitif kini murni berada di `.env` lokal yang di-ignore oleh git.
 
 
 
