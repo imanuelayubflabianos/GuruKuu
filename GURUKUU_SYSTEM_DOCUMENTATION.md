@@ -337,6 +337,9 @@ GuruKuu/
 * **2026-10-29 (Penyederhanaan UI Tab Laporan Pengguna di Log Pelanggaran):**
   - **Penghapusan Avatar Inisial Kotak:** Menghilangkan kotak avatar inisial huruf dengan garis tepi (`avatar-circle-sm`) di samping nama siswa/penulis ulasan pada tab "Laporan dari User" agar tampilan nama rapi, bersih, dan tidak terkesan aneh/dobel inisial.
   - **Pembersihan Teks Subtitle Anti-Spam:** Menghapus teks subtitle panjang *"Sistem anti-spam aktif: Setiap pengguna hanya dapat mengirim 1 kali laporan per ulasan..."* dan sub-label baris tabel agar header kartu serta daftar ulasan yang dilaporkan tampil ringkas, proporsional, dan nyaman dibaca.
+* **2026-10-29 (Hover Interaktif Pemilihan Pengguna di Pesan Masuk Admin):**
+  - **Efek Seleksi & Visual Feedback Hover (`.kontak-user-item`):** Menambahkan efek visual interaktif (*interactive hover state*) pada daftar pesan masuk admin (`/admin/kontak`). Saat kursor diarahkan ke nama/kartu pengirim, kartu otomatis bertransformasi dengan latar belakang biru lembut (`#f0f7ff`), bingkai tepi halus (`#bfdbfe`), elevasi bayangan halus, perbesaran avatar inisial, dan teks nama berubah menjadi warna aksen utama.
+  - **Indikator Aksi "Buka Chat":** Menampilkan petunjuk interaktif dengan transisi meluncur halus (*"Buka Chat →"*) di sisi kanan baris pengguna saat di-hover, mempertegas kepada administrator bahwa baris tersebut dapat langsung diklik untuk membuka ruang percakapan.
 
 
 

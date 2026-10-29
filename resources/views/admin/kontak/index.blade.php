@@ -2,6 +2,56 @@
 @section('title', 'Pesan Masuk')
 
 @section('content')
+<style>
+    .kontak-user-item {
+        cursor: pointer;
+        background: transparent;
+        border: 1px solid transparent;
+        transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+    }
+    .kontak-user-item .kontak-avatar {
+        width: 42px;
+        height: 42px;
+        background: linear-gradient(135deg, #003366, #0055a5);
+        font-size: 0.95rem;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .kontak-user-item .kontak-action-hint {
+        opacity: 0;
+        transform: translateX(-8px);
+        transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+        font-size: 0.8rem;
+    }
+    .kontak-user-item:hover {
+        background: #f0f7ff !important;
+        border-color: #bfdbfe !important;
+        box-shadow: 0 4px 14px rgba(0, 51, 102, 0.08);
+        transform: translateX(4px);
+    }
+    .kontak-user-item:hover .kontak-avatar {
+        transform: scale(1.06);
+        box-shadow: 0 4px 10px rgba(0, 51, 102, 0.25);
+    }
+    .kontak-user-item:hover .kontak-user-name span {
+        color: var(--primary, #003366) !important;
+    }
+    .kontak-user-item:hover .kontak-action-hint {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    .kontak-user-item:hover .kontak-action-hint i {
+        transform: translateX(3px);
+    }
+    [data-theme="dark"] .kontak-user-item:hover {
+        background: rgba(30, 58, 138, 0.2) !important;
+        border-color: rgba(96, 165, 250, 0.3) !important;
+    }
+    [data-theme="dark"] .kontak-user-item:hover .kontak-user-name span {
+        color: #93c5fd !important;
+    }
+</style>
+
 <div class="page-header">
     <div>
         <div class="page-label">LAYANAN PENGADUAN</div>
@@ -55,23 +105,26 @@
                             <input type="checkbox" name="ids[]" value="{{ $k->id }}" class="form-check-input kontak-checkbox">
                         </td>
                         <td>
-                            <a href="{{ route('admin.kontak.chat', $k->identifier) }}" class="text-decoration-none d-flex align-items-center gap-3 p-2 rounded-3 hover-bg-light transition-all" style="cursor: pointer;" title="Klik untuk membuka ruang chat & membalas pesan">
-                                <div class="rounded-circle d-flex align-items-center justify-content-center text-white flex-shrink-0 fw-bold" style="width: 40px; height: 40px; background: linear-gradient(135deg, #003366, #0055a5); font-size: 0.95rem;">
+                            <a href="{{ route('admin.kontak.chat', $k->identifier) }}" class="kontak-user-item text-decoration-none d-flex align-items-center gap-3 p-2.5 rounded-3 w-100" title="Klik untuk membuka ruang percakapan dengan {{ $k->display_pengirim }}">
+                                <div class="kontak-avatar rounded-circle d-flex align-items-center justify-content-center text-white flex-shrink-0 fw-bold shadow-xs">
                                     {{ strtoupper(substr($k->display_pengirim, 0, 1) ?: 'U') }}
                                 </div>
-                                <div>
-                                    <div class="fw-bold text-dark d-flex align-items-center gap-1.5">
+                                <div class="flex-grow-1 min-w-0">
+                                    <div class="fw-bold text-dark d-flex align-items-center gap-1.5 kontak-user-name">
                                         <span>{{ $k->display_pengirim }}</span>
-                                        <i class="bi bi-box-arrow-up-right text-primary small" style="font-size: 0.72rem;"></i>
                                         @if(!$k->is_replied)
                                             <span class="badge rounded-pill bg-danger-subtle text-danger border border-danger ms-1" style="font-size: 0.65rem;">Menunggu Balasan</span>
                                         @else
                                             <span class="badge rounded-pill bg-success-subtle text-success border border-success ms-1" style="font-size: 0.65rem;">Dibalas</span>
                                         @endif
                                     </div>
-                                    <small class="text-muted font-mono" style="font-size: 0.78rem;">
+                                    <small class="text-muted font-mono d-block" style="font-size: 0.78rem;">
                                         {{ $k->is_siswa ? 'Siswa (NIS: ' . $k->identifier . ')' : 'Pengguna / Tamu (' . (substr($k->display_pengirim, 6) ?: '-') . ')' }}
                                     </small>
+                                </div>
+                                <div class="kontak-action-hint d-none d-md-flex align-items-center gap-1.5 text-primary fw-semibold small flex-shrink-0 pe-2">
+                                    <span>Buka Chat</span>
+                                    <i class="bi bi-arrow-right"></i>
                                 </div>
                             </a>
                         </td>
