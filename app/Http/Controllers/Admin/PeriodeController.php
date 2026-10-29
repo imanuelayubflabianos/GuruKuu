@@ -18,7 +18,7 @@ class PeriodeController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'nama_periode' => 'required|string|max:255',
+            'nama_periode' => ['required', 'string', 'max:255', 'unique:periode,nama_periode'],
             'tahun_ajaran' => 'required|string|max:20',
             'semester' => 'required|in:ganjil,genap',
             'tanggal_mulai' => 'required|date',
@@ -37,7 +37,7 @@ class PeriodeController extends Controller
     public function update(Request $request, Periode $periode)
     {
         $validated = $request->validate([
-            'nama_periode' => 'required|string|max:255',
+            'nama_periode' => ['required', 'string', 'max:255', \Illuminate\Validation\Rule::unique('periode', 'nama_periode')->ignore($periode->id)],
             'tahun_ajaran' => 'required|string|max:20',
             'semester' => 'required|in:ganjil,genap',
             'tanggal_mulai' => 'required|date',

@@ -953,6 +953,7 @@
             </div>
             <form action="{{ route('admin.pengaturan.periode') }}" method="POST" id="formPeriode" data-confirm="Apakah Anda yakin ingin menyimpan perubahan data periode ini?" data-confirm-title="Simpan Periode" data-confirm-btn="Ya, Simpan" data-confirm-type="warning">
                 @csrf
+                <input type="hidden" name="active_tab" value="#tabPeriode">
                 <input type="hidden" name="periode_id" id="periodeIdInput">
                 <div class="row g-3">
                     <div class="col-md-6">
@@ -1854,8 +1855,11 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     tabButtons.forEach(button => button.addEventListener('click', () => showTab(button.dataset.target)));
 
-    // Prioritaskan tab dari hash URL, atau jika tidak ada ambil dari localStorage
-    let initialTab = window.location.hash;
+    // Prioritaskan tab dari session/old atau hash URL atau localStorage
+    let initialTab = '{{ session("active_tab", old("active_tab", "")) }}';
+    if (!initialTab || !document.querySelector(initialTab)) {
+        initialTab = window.location.hash;
+    }
     if (!initialTab || !document.querySelector(initialTab)) {
         try {
             const saved = localStorage.getItem('admin_settings_active_tab');
@@ -1867,6 +1871,27 @@ document.addEventListener('DOMContentLoaded', function() {
     if (initialTab && document.querySelector(initialTab)) {
         showTab(initialTab, false);
     }
+
+    window.addEventListener('hashchange', function() {
+        if (window.location.hash && document.querySelector(window.location.hash)) {
+            showTab(window.location.hash, false);
+        }
+    });
+
+    // Otomatis pastikan semua form membawa parameter active_tab saat disubmit
+    document.querySelectorAll('form').forEach(form => {
+        form.addEventListener('submit', function() {
+            let input = this.querySelector('input[name="active_tab"]');
+            if (!input) {
+                input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'active_tab';
+                this.appendChild(input);
+            }
+            const currentActive = localStorage.getItem('admin_settings_active_tab') || window.location.hash || '#tabBrand';
+            input.value = currentActive;
+        });
+    });
 
     // FAQ Role Filter
     const faqFilterBtns = document.querySelectorAll('.faq-filter-btn');
@@ -1898,12 +1923,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function filterBadWords() {
         const query = (badWordInput ? badWordInput.value : '').toLowerCase().trim();
+        const tokens = query.split(/\s+/).filter(Boolean);
         let visibleCount = 0;
 
         badWordTags.forEach(tag => {
             const word = (tag.dataset.word || '').toLowerCase();
             const type = tag.dataset.type || '';
-            const matchesQuery = query === '' || word.includes(query);
+            const matchesQuery = tokens.length === 0 || tokens.every(t => word.includes(t));
             const matchesType = currentWordFilter === 'all' || type === currentWordFilter;
 
             if (matchesQuery && matchesType) {

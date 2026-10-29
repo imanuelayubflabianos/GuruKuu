@@ -12,10 +12,17 @@ use Maatwebsite\Excel\Concerns\WithTitle;
 
 class LeaderboardExport implements FromCollection, WithHeadings, WithMapping, WithTitle, WithColumnWidths
 {
+    protected ?int $periodeId;
+
+    public function __construct(?int $periodeId = null)
+    {
+        $this->periodeId = $periodeId;
+    }
+
     public function collection()
     {
-        $periodeAktif = Periode::where('status', 'aktif')->first();
-        return Guru::leaderboardFor('rating', null, $periodeAktif?->id);
+        $periode = $this->periodeId ? Periode::find($this->periodeId) : Periode::where('status', 'aktif')->first();
+        return Guru::leaderboardFor('rating', null, $periode?->id);
     }
 
     public function headings(): array

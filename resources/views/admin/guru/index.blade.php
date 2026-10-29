@@ -250,6 +250,12 @@
                                     @endif
                                 @endif
                                 <li>
+                                    <button type="button" class="dropdown-item py-1.5 px-3 d-flex align-items-center gap-2 text-dark" onclick="openResetPasswordGuruModal('{{ $g->id }}', '{{ addslashes($g->nama) }}')">
+                                        <i class="bi bi-key text-warning"></i>
+                                        <span>Reset Password</span>
+                                    </button>
+                                </li>
+                                <li>
                                     <a class="dropdown-item py-1.5 px-3 d-flex align-items-center gap-2 text-primary" href="{{ route('admin.guru.edit', $g) }}">
                                         <i class="bi bi-pencil text-primary"></i>
                                         <span>Edit Profil Guru</span>
@@ -458,10 +464,51 @@
     </div>
 </div>
 
+{{-- MODAL RESET PASSWORD GURU --}}
+<div class="modal fade" id="modalResetPasswordGuru" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+            <form id="formResetPasswordGuru" method="POST">
+                @csrf
+                @method('PATCH')
+                <div class="modal-header bg-warning text-dark p-3">
+                    <h5 class="modal-title fs-6 fw-bold"><i class="bi bi-key-fill me-2"></i>Reset Password Akun Guru</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <p class="small text-muted mb-3">
+                        Setel kata sandi baru untuk guru: <strong id="resetPasswordGuruName" class="text-dark"></strong>.
+                    </p>
+                    <div class="mb-3">
+                        <label class="form-label font-mono small fw-bold text-muted">PASSWORD BARU <span class="text-danger">*</span></label>
+                        <input type="password" name="password" class="form-control" placeholder="Minimal 6 karakter" required minlength="6" style="border-radius: 8px;">
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label font-mono small fw-bold text-muted">KONFIRMASI PASSWORD BARU <span class="text-danger">*</span></label>
+                        <input type="password" name="password_confirmation" class="form-control" placeholder="Ulangi password baru" required minlength="6" style="border-radius: 8px;">
+                    </div>
+                </div>
+                <div class="modal-footer bg-light px-4 py-3 border-top">
+                    <button type="button" class="btn btn-outline-custom" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary-custom px-4 shadow-sm">
+                        <i class="bi bi-check-lg me-1"></i> Simpan Password
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 @endsection
 
 @push('scripts')
 <script>
+function openResetPasswordGuruModal(id, name) {
+    document.getElementById('formResetPasswordGuru').action = '/admin/guru/' + id + '/reset-password';
+    document.getElementById('resetPasswordGuruName').innerText = name;
+    new bootstrap.Modal(document.getElementById('modalResetPasswordGuru')).show();
+}
+
 function openDeactivateGuruModal(id, name) {
     document.getElementById('formDeactivateGuru').action = '/admin/guru/' + id + '/toggle';
     document.getElementById('deactivateGuruName').innerText = name;

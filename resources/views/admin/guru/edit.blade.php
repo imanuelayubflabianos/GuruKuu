@@ -60,6 +60,12 @@
                             <option value="produktif" {{ old('kategori', $guru->kategori) === 'produktif' ? 'selected' : '' }}>Produktif</option>
                         </select>
                     </div>
+                    <div class="col-md-6">
+                        <label class="form-label font-mono small fw-bold text-muted">KATA SANDI BARU (OPSIONAL)</label>
+                        <input type="password" name="password" class="form-control" style="border-radius: 8px;" placeholder="Kosongkan jika tidak ingin mengubah password">
+                        <small class="text-muted" style="font-size: 0.73rem;">Isi minimal 6 karakter jika ingin menyetel password login guru ini.</small>
+                        @error('password')<div class="text-danger small">{{ $message }}</div>@enderror
+                    </div>
                     <div class="col-12">
                         <div class="card border p-3 bg-light-subtle rounded-3">
                             <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2">
@@ -191,10 +197,12 @@ function updateKelasCount() {
 }
 
 function filterKelasList() {
-    const query = (document.getElementById('searchKelasInput')?.value || '').toLowerCase().trim();
+    const raw = (document.getElementById('searchKelasInput')?.value || '').toLowerCase().trim();
+    const tokens = raw.split(/\s+/).filter(Boolean);
     document.querySelectorAll('.kelas-item').forEach(item => {
         const text = item.getAttribute('data-text') || '';
-        item.style.display = (query === '' || text.includes(query)) ? '' : 'none';
+        const match = tokens.length === 0 || tokens.every(token => text.includes(token));
+        item.style.display = match ? '' : 'none';
     });
 }
 </script>

@@ -1,6 +1,9 @@
 <div class="card-custom p-3 p-md-4 mb-4 shadow-sm" style="border-radius: 16px;" data-aos="fade-up">
     <form method="GET" action="{{ url()->current() }}" id="leaderboardFilterForm" class="row g-3 align-items-center">
         <input type="hidden" name="mode" id="leaderboardModeInput" value="{{ $mode }}">
+        @if(request()->filled('periode_id'))
+            <input type="hidden" name="periode_id" value="{{ request('periode_id') }}">
+        @endif
 
         <div class="col-12 {{ $mode === 'partisipasi' ? 'col-lg-7' : 'col-lg-12' }}" id="leaderboardCategoryCol">
             <label class="form-label small fw-bold text-muted mb-2 d-flex align-items-center gap-1">

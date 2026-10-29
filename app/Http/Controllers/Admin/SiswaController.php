@@ -17,9 +17,13 @@ class SiswaController extends Controller
         
         // Filter berdasarkan kelas
         if ($request->filled('kelas')) {
-            $query->whereHas('kelas', function($q) use ($request) {
-                $q->where('kelas.id', $request->kelas);
-            });
+            $kelasId = $request->kelas;
+            $classMatches = (clone $query)->whereHas('kelas', fn($q) => $q->where('kelas.id', $kelasId));
+            if (!$request->filled('search') || $classMatches->exists()) {
+                $query->whereHas('kelas', function($q) use ($kelasId) {
+                    $q->where('kelas.id', $kelasId);
+                });
+            }
         }
 
         // Filter berdasarkan status aktif/nonaktif
@@ -31,13 +35,17 @@ class SiswaController extends Controller
             }
         }
 
-        // Pencarian nama atau NIS
+        // Pencarian nama, NIS, email, atau rombel/kelas (mendukung multi-kata / token)
         if ($request->filled('search')) {
-            $s = trim($request->search);
-            $query->where(function ($q) use ($s) {
-                $q->where('name', 'like', "%{$s}%")
-                  ->orWhere('nis', 'like', "%{$s}%");
-            });
+            $terms = preg_split('/\s+/', trim($request->search), -1, PREG_SPLIT_NO_EMPTY);
+            foreach ($terms as $term) {
+                $query->where(function ($q) use ($term) {
+                    $q->where('name', 'like', "%{$term}%")
+                      ->orWhere('nis', 'like', "%{$term}%")
+                      ->orWhere('email', 'like', "%{$term}%")
+                      ->orWhereHas('kelas', fn($k) => $k->where('nama_kelas', 'like', "%{$term}%"));
+                });
+            }
         }
         
         $siswa = $query->latest()->paginate(20)->withQueryString();

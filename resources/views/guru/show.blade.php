@@ -56,22 +56,44 @@
             </div>
 
             @if($stats['total_penilaian'] > 0)
+            @php
+                $aspects = [
+                    'Ketepatan Waktu' => ['val' => $stats['rata_kedisiplinan'], 'icon' => 'bi-clock-history'],
+                    'Kehadiran di Kelas' => ['val' => $stats['rata_tanggung_jawab'], 'icon' => 'bi-calendar-check'],
+                    'Penyampaian Materi' => ['val' => $stats['rata_komunikasi'], 'icon' => 'bi-journal-bookmark'],
+                    'Interaksi dengan Siswa' => ['val' => $stats['rata_keramahan'], 'icon' => 'bi-chat-dots'],
+                    'Keterlibatan & Suasana Belajar' => ['val' => $stats['rata_kreativitas'], 'icon' => 'bi-emoji-smile'],
+                ];
+                $overallTotal = ($stats['rata_kedisiplinan'] + $stats['rata_tanggung_jawab'] + $stats['rata_komunikasi'] + $stats['rata_keramahan'] + $stats['rata_kreativitas']) / 5;
+                $overallPct = round(($overallTotal / 5) * 100);
+            @endphp
+            <div class="p-2.5 p-sm-3 rounded-3 mb-3 border d-flex align-items-center justify-content-between flex-wrap gap-2" style="background: rgba(0, 51, 102, 0.03); border-color: rgba(0, 51, 102, 0.1) !important;">
+                <div class="d-flex align-items-center gap-2">
+                    <span class="text-muted small fw-semibold text-uppercase font-mono" style="font-size: 0.72rem;">SKOR KESELURUHAN:</span>
+                    <span class="badge rounded-pill px-2.5 py-1 font-mono fw-bold" style="background: rgba(245, 158, 11, 0.15); color: #b45309; border: 1px solid rgba(245, 158, 11, 0.3);">
+                        <i class="bi bi-star-fill text-warning me-1"></i>{{ number_format($overallTotal, 2) }} / 5.0
+                    </span>
+                </div>
+                <div>
+                    <span class="badge rounded-pill bg-primary-subtle text-primary fw-bold font-mono px-2.5 py-1" style="font-size: 0.75rem;">
+                        {{ $overallPct }}% Kepuasan Siswa
+                    </span>
+                </div>
+            </div>
             <div class="row g-3">
-                @php
-                    $aspects = [
-                        'Ketepatan Waktu' => $stats['rata_kedisiplinan'],
-                        'Kehadiran di Kelas' => $stats['rata_tanggung_jawab'],
-                        'Penyampaian Materi' => $stats['rata_komunikasi'],
-                        'Interaksi dengan Siswa' => $stats['rata_keramahan'],
-                        'Keterlibatan & Suasana Belajar' => $stats['rata_kreativitas'],
-                    ];
+                @foreach($aspects as $label => $info)
+                @php 
+                    $value = $info['val'];
+                    $valPct = round(($value / 5) * 100); 
                 @endphp
-                @foreach($aspects as $label => $value)
-                @php $valPct = round(($value / 5) * 100); @endphp
                 <div class="col-md-6">
-                    <div class="d-flex justify-content-between mb-1">
-                        <small class="fw-bold text-dark">{{ $label }}</small>
-                        <small class="text-primary fw-bold font-mono">{{ $valPct }}%</small>
+                    <div class="d-flex justify-content-between align-items-baseline mb-1">
+                        <small class="fw-bold text-dark"><i class="bi {{ $info['icon'] }} me-1 text-primary"></i>{{ $label }}</small>
+                        <div class="d-flex align-items-center gap-1.5 font-mono">
+                            <span class="text-warning small"><i class="bi bi-star-fill"></i></span>
+                            <span class="fw-bold text-dark small">{{ number_format($value, 1) }}</span>
+                            <span class="badge bg-light text-primary border px-1.5 py-0.5 fw-bold" style="font-size: 0.7rem;">{{ $valPct }}%</span>
+                        </div>
                     </div>
                     <div class="progress" style="height: 8px; border-radius: 10px; background-color: #e2e8f0;">
                         <div class="progress-bar rounded-pill {{ $valPct >= 75 ? 'gk-bar-blue-high' : ($valPct >= 50 ? 'gk-bar-blue-mid' : 'gk-bar-blue-low') }}" style="width: {{ $valPct }}%;"></div>
@@ -114,8 +136,25 @@
                     <i class="bi bi-incognito fs-5 text-secondary"></i>
                 </div>
                 <div>
-                    <div class="d-flex align-items-center gap-2">
+                    <div class="d-flex align-items-center gap-2 flex-wrap">
                         <strong class="small text-dark">Siswa (Anonim)</strong>
+                        @php
+                            $jObjFb = $fb->kelas?->jurusan ?? $fb->siswa?->jurusan;
+                            $kJurusanFb = $jObjFb?->kode_jurusan;
+                            $nJurusanFb = $jObjFb?->nama_jurusan;
+                            if (!$kJurusanFb && !$nJurusanFb && $fb->kelas) {
+                                $rawKFb = $fb->kelas->nama_kelas;
+                                if (preg_match('/(PPLG|RPL|MPLB|OTKP|AP|AKL|AK|TO|TKRO|TBSM|PM|BDP)/i', $rawKFb, $m)) {
+                                    $kJurusanFb = strtoupper($m[1]);
+                                }
+                            }
+                            $lblJurusanFb = $kJurusanFb ? 'Jurusan ' . $kJurusanFb : ($nJurusanFb ? 'Jurusan ' . $nJurusanFb : null);
+                        @endphp
+                        @if($lblJurusanFb)
+                            <span class="badge bg-light text-dark border font-mono" style="font-size: 0.68rem;" title="{{ $nJurusanFb ?? $lblJurusanFb }}">
+                                <i class="bi bi-mortarboard text-primary me-0.5"></i>{{ $lblJurusanFb }}
+                            </span>
+                        @endif
                         <span class="badge {{ $fbColor }} text-white font-mono" style="font-size: 0.72rem;">
                             Skor: {{ $fbScore }}%
                         </span>

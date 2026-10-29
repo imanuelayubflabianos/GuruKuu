@@ -24,7 +24,11 @@ class LeaderboardController extends Controller
         if ($mode === 'rating') {
             $kelasId = null;
         }
-        $leaderboard = Guru::leaderboardFor($mode, $kelasId, $periodeAktif?->id);
+        // Tampilan siswa dibatasi: Top 10 (Semua Guru) & Top 5 (Berdasarkan Kelas)
+        $limit = ($mode === 'partisipasi') ? 5 : 10;
+        $leaderboard = Guru::leaderboardFor($mode, $kelasId, $periodeAktif?->id)
+            ->filter(fn($g) => !empty($g->leaderboard_rank))
+            ->take($limit);
 
         return view('siswa.leaderboard.index', compact(
             'periodeAktif', 'leaderboard', 'kelasList', 'mode', 'kelasId'

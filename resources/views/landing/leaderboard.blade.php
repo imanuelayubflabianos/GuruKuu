@@ -55,7 +55,7 @@
                 </div>
                 <h6 class="fw-bold text-dark mb-1">Belum Ada Guru di Ranking Podium</h6>
                 <p class="text-muted small mb-0" style="max-width: 580px; margin: 0 auto; line-height: 1.5;">
-                    Sesuai ketentuan, guru harus memiliki <strong>minimal 5 penilaian</strong> dari siswa untuk dapat masuk dalam peringkat leaderboard. Seluruh nilai guru tetap tercatat dan dapat dilihat pada tabel di bawah.
+                    Belum ada guru yang memenuhi peringkat leaderboard pada periode ini.
                 </p>
             </div>
         @endif
@@ -378,8 +378,11 @@
         {{-- Tabel Ranking Unified --}}
         <div class="card-custom" data-aos="fade-up">
             <div class="card-header bg-white px-4 py-3.5 border-bottom d-flex justify-content-between align-items-center">
-                <h6 class="fw-bold mb-0 d-flex align-items-center gap-2"><i class="bi bi-trophy-fill text-warning fs-5"></i><span>Daftar Peringkat Guru</span></h6>
-                <span class="badge bg-primary px-3 py-1.5 rounded-pill">{{ $list->count() }} Guru</span>
+                <h6 class="fw-bold mb-0 d-flex align-items-center gap-2">
+                    <i class="bi bi-trophy-fill text-warning fs-5"></i>
+                    <span>Daftar Peringkat {{ $mode === 'partisipasi' ? 'Top 5 Guru' : 'Top 10 Guru' }}</span>
+                </h6>
+                <span class="badge bg-primary px-3 py-1.5 rounded-pill">{{ $list->count() }} Guru (Top {{ $mode === 'partisipasi' ? '5' : '10' }})</span>
             </div>
             <div class="table-responsive">
                 <table class="table table-custom mb-0 align-middle">
@@ -402,10 +405,6 @@
                                 @elseif($g->leaderboard_rank === 2) <span class="gk-rank-medal">🥈</span>
                                 @elseif($g->leaderboard_rank === 3) <span class="gk-rank-medal">🥉</span>
                                 @elseif($g->leaderboard_rank) <span class="gk-rank-badge font-mono">#{{ $g->leaderboard_rank }}</span>
-                                @else
-                                    <span class="badge rounded-pill px-2.5 py-1 text-muted" style="background: rgba(0, 51, 102, 0.05); border: 1px solid rgba(0, 51, 102, 0.12); font-size: 0.7rem; font-weight: 600;" data-bs-toggle="tooltip" title="Belum cukup data untuk masuk peringkat leaderboard (minimal 5 penilaian)">
-                                        Belum cukup data ({{ $g->total_penilaian }}/5)
-                                    </span>
                                 @endif
                             </td>
                             <td class="align-middle">

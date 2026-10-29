@@ -450,9 +450,9 @@
                 @if($errors->any())
                     <div class="alert alert-danger border-0 mb-3 p-3 rounded-3 shadow-xs" style="background: #fff1f2; border-left: 4px solid #ef4444 !important; color: #991b1b;">
                         @foreach($errors->all() as $error)
-                            <div class="d-flex align-items-start gap-2.5 mb-1.5 last:mb-0">
-                                <i class="bi bi-exclamation-triangle-fill text-danger fs-5 flex-shrink-0 mt-0.5"></i>
-                                <div class="small text-start" style="line-height: 1.55; color: #881337; font-weight: 500;">
+                            <div class="d-flex align-items-center gap-2 mb-1.5 last:mb-0">
+                                <i class="bi bi-exclamation-triangle-fill text-danger fs-5 flex-shrink-0"></i>
+                                <div class="small text-start fw-semibold" style="line-height: 1.4; color: #881337;">
                                     {{ $error }}
                                 </div>
                             </div>
@@ -471,12 +471,12 @@
                     <div class="mb-2.5">
                         <label class="form-label font-mono small fw-bold text-muted mb-1" style="font-size: 0.7rem; letter-spacing: 0.8px;">PILIH PERAN PENGGUNA</label>
                         <div class="role-segmented-control">
-                            <input type="radio" class="btn-check" name="login_role" id="roleSiswa" value="siswa" checked onchange="updateForm()">
+                            <input type="radio" class="btn-check" name="login_role" id="roleSiswa" value="siswa" {{ old('login_role', 'siswa') === 'siswa' ? 'checked' : '' }} onchange="updateForm()">
                             <label class="role-segmented-btn py-1.5" for="roleSiswa">
                                 <i class="bi bi-person-fill"></i> Siswa
                             </label>
 
-                            <input type="radio" class="btn-check" name="login_role" id="roleGuru" value="guru" onchange="updateForm()">
+                            <input type="radio" class="btn-check" name="login_role" id="roleGuru" value="guru" {{ old('login_role') === 'guru' ? 'checked' : '' }} onchange="updateForm()">
                             <label class="role-segmented-btn py-1.5" for="roleGuru">
                                 <i class="bi bi-person-badge-fill"></i> Guru
                             </label>
@@ -549,10 +549,10 @@
 
 <script>
 const roleInputs = {
-    siswa: { nis: document.getElementById('inputNis')?.value || '', password: '' },
-    guru: { nis: '', password: '' }
+    siswa: { nis: '{{ old('login_role', 'siswa') === 'siswa' ? addslashes(old('nis', '')) : '' }}', password: '' },
+    guru: { nis: '{{ old('login_role') === 'guru' ? addslashes(old('nis', '')) : '' }}', password: '' }
 };
-let activeRole = 'siswa';
+let activeRole = '{{ old('login_role', 'siswa') }}';
 
 function updateForm() {
     const roleSiswa = document.getElementById('roleSiswa');
@@ -581,11 +581,15 @@ function updateForm() {
         inputNis.placeholder = 'Masukkan NIS siswa';
         btnSubmit.innerHTML = '<i class="bi bi-box-arrow-in-right"></i> Masuk sebagai Siswa';
     } else {
-        labelNis.textContent = 'NIP GURU';
-        inputNis.placeholder = 'Masukkan NIP guru';
+        labelNis.textContent = 'NIP / EMAIL GURU';
+        inputNis.placeholder = 'Masukkan NIP atau Email guru';
         btnSubmit.innerHTML = '<i class="bi bi-box-arrow-in-right"></i> Masuk sebagai Guru';
     }
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+    updateForm();
+});
 
 document.getElementById('togglePassword')?.addEventListener('click', function() {
     const passwordInput = document.getElementById('inputPassword');

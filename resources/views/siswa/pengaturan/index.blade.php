@@ -396,20 +396,25 @@
         updateSiswaChatCounter();
         scrollSiswaChat();
 
-        if (window.location.hash === '#tabChat') {
-            const chatTrigger = document.querySelector('button[data-bs-target="#tabChat"]');
-            if (chatTrigger) {
-                bootstrap.Tab.getOrCreateInstance(chatTrigger).show();
-                setTimeout(scrollSiswaChat, 150);
+        const activeHash = window.location.hash || localStorage.getItem('siswa_settings_tab');
+        if (activeHash) {
+            const trigger = document.querySelector(`button[data-bs-target="${activeHash}"]`);
+            if (trigger) {
+                bootstrap.Tab.getOrCreateInstance(trigger).show();
+                if (activeHash === '#tabChat') setTimeout(scrollSiswaChat, 150);
             }
         }
 
-        const chatTabBtn = document.querySelector('button[data-bs-target="#tabChat"]');
-        if (chatTabBtn) {
-            chatTabBtn.addEventListener('shown.bs.tab', function() {
-                setTimeout(scrollSiswaChat, 100);
+        document.querySelectorAll('#siswaPengaturanTabs button[data-bs-toggle="pill"]').forEach(btn => {
+            btn.addEventListener('shown.bs.tab', function(e) {
+                const target = e.target.getAttribute('data-bs-target');
+                if (target) {
+                    history.replaceState(null, '', target);
+                    localStorage.setItem('siswa_settings_tab', target);
+                    if (target === '#tabChat') setTimeout(scrollSiswaChat, 100);
+                }
             });
-        }
+        });
     });
 
     function openEditModalSiswa(id, text) {

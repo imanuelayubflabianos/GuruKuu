@@ -16,14 +16,17 @@ class GuruController extends Controller
     {
         $query = Guru::with('jurusan');
 
-        // Pencarian nama, NIP, atau email
+        // Pencarian nama, NIP, email, atau keahlian/jurusan (mendukung multi-kata / token)
         if ($request->filled('search')) {
-            $s = trim($request->search);
-            $query->where(function ($q) use ($s) {
-                $q->where('nama', 'like', "%{$s}%")
-                  ->orWhere('nip', 'like', "%{$s}%")
-                  ->orWhere('email', 'like', "%{$s}%");
-            });
+            $terms = preg_split('/\s+/', trim($request->search), -1, PREG_SPLIT_NO_EMPTY);
+            foreach ($terms as $term) {
+                $query->where(function ($q) use ($term) {
+                    $q->where('nama', 'like', "%{$term}%")
+                      ->orWhere('nip', 'like', "%{$term}%")
+                      ->orWhere('email', 'like', "%{$term}%")
+                      ->orWhereHas('jurusan', fn($j) => $j->where('nama_jurusan', 'like', "%{$term}%"));
+                });
+            }
         }
         
         // Filter kategori (normada / produktif)
@@ -34,9 +37,15 @@ class GuruController extends Controller
         // Filter kelas yang diajar
         $kelasId = $request->input('kelas_id', $request->input('kelas'));
         if (!empty($kelasId)) {
-            $query->whereHas('kelas', function ($kelas) use ($kelasId) {
+            $classMatches = (clone $query)->whereHas('kelas', function ($kelas) use ($kelasId) {
                 $kelas->whereKey($kelasId);
             });
+            // Jika admin melakukan pencarian kata kunci dan guru tidak ada di kelas filter, tetap tampilkan agar tidak hilang
+            if (!$request->filled('search') || $classMatches->exists()) {
+                $query->whereHas('kelas', function ($kelas) use ($kelasId) {
+                    $kelas->whereKey($kelasId);
+                });
+            }
         }
 
         // Filter status akun aktif / nonaktif
@@ -480,6 +489,7 @@ class GuruController extends Controller
             'nama'       => 'required|string|max:255',
             'email'      => 'nullable|email|max:255|unique:guru,email,' . $guru->id,
             'phone'      => 'nullable|string|max:50',
+            'password'   => 'nullable|min:6',
             'kategori'   => 'nullable|in:normada,produktif',
             'kelas_ids'  => 'nullable|array',
             'kelas_ids.*' => 'exists:kelas,id',
@@ -493,7 +503,10 @@ class GuruController extends Controller
             return back()->withInput()->with('error', 'Nama atau deskripsi diri guru mengandung kata yang melanggar etika moderasi bahasa.');
         }
 
-        $data = $request->except(['photo', 'kelas_ids', 'badge_ids']);
+        $oldNip = $guru->nip;
+        $oldEmail = $guru->email;
+
+        $data = $request->except(['photo', 'kelas_ids', 'badge_ids', 'password']);
         $data['kategori'] = $request->input('kategori') ?: ($guru->kategori ?: 'normada');
 
         if ($request->hasFile('photo')) {
@@ -531,24 +544,53 @@ class GuruController extends Controller
             }
         }
 
-        // Sinkronkan ke akun User jika guru ini memiliki akun login sistem
-        $linkedUser = \App\Models\User::where('nis', $guru->nip)
-            ->orWhere('email', $guru->email)
-            ->where('role', 'guru')
+        // Sinkronkan ke akun User login sistem
+        $linkedUser = \App\Models\User::where('role', 'guru')
+            ->where(function($q) use ($oldNip, $oldEmail, $guru) {
+                if ($oldNip !== null && $oldNip !== '') {
+                    $q->where('nis', (string) $oldNip);
+                }
+                if (!empty($oldEmail)) {
+                    $q->orWhere('email', $oldEmail);
+                }
+                if ($guru->nip !== null && $guru->nip !== '') {
+                    $q->orWhere('nis', (string) $guru->nip);
+                }
+                if (!empty($guru->email)) {
+                    $q->orWhere('email', $guru->email);
+                }
+            })
             ->first();
 
         if ($linkedUser) {
-            $userUpdate = ['name' => $guru->nama];
+            $userUpdate = [
+                'name' => $guru->nama,
+                'nis'  => (string) $guru->nip,
+            ];
             if (!empty($data['photo'])) {
                 $userUpdate['photo'] = $data['photo'];
             }
             if (!empty($data['email'])) {
                 $userUpdate['email'] = $data['email'];
             }
+            if ($request->filled('password')) {
+                $userUpdate['password'] = \Illuminate\Support\Facades\Hash::make($request->password);
+            }
             $linkedUser->update($userUpdate);
+        } else {
+            \App\Models\User::create([
+                'name' => $guru->nama,
+                'nis'  => (string) $guru->nip,
+                'email' => $guru->email ?: ($guru->nip . '@gurukuu.local'),
+                'password' => \Illuminate\Support\Facades\Hash::make($request->filled('password') ? $request->password : (string) $guru->nip),
+                'role' => 'guru',
+                'is_active' => true,
+            ]);
         }
 
-        return redirect()->route('admin.guru.index')->with('success', 'Data guru dan sinkronisasi akun berhasil diperbarui!');
+        \App\Models\Guru::clearLeaderboardCache();
+
+        return redirect()->route('admin.guru.index')->with('success', 'Data guru dan sinkronisasi akun login berhasil diperbarui!');
     }
 
     public function destroy(Guru $guru)

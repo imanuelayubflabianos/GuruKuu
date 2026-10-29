@@ -119,6 +119,7 @@ Sistem memiliki 2 mode peringkat di `Guru::leaderboardFor()`:
    * Menghitung rata-rata skor bintang dari seluruh siswa yang menilai guru di periode aktif.
    * **Ambang Batas Kelayakan (Eligible):** Minimal memiliki **5 penilaian** (`MIN_PENILAIAN_LEADERBOARD = 5`). Guru dengan < 5 ulasan diletakkan di grup sekunder tanpa nomor rank untuk menjaga validitas statistik.
    * **Tie-breaker:** Jika nilai sama, guru dengan volume penilai lebih banyak menempati urutan lebih tinggi.
+   * **Batasan Tampilan Publik / Pengguna:** Dibatasi hanya menampilkan **Top 10** (`take(10)`).
 
 2. **Mode Berdasarkan Kelas (Guru Mengajar di Kelas X):**
    * Menghitung rata-rata nilai bintang dari siswa kelas bersangkutan (`class_id`).
@@ -128,6 +129,13 @@ Sistem memiliki 2 mode peringkat di `Guru::leaderboardFor()`:
      3. **Tie-Breaker 2 (`partisipasi_persen` DESC):** Persentase partisipasi siswa kelas `(siswa penilai / total siswa kelas) * 100%`.
      4. **Tie-Breaker 3 (`nama` ASC):** Urutan alfabetis nama.
    * **Ambang Batas:** Tetap menerapkan minimal 5 penilaian (`MIN_PENILAIAN_LEADERBOARD = 5`) agar memenuhi prinsip ukuran sampel yang valid.
+   * **Batasan Tampilan Publik / Pengguna:** Dibatasi hanya menampilkan **Top 5** (`take(5)`).
+
+3. **Kebijakan Tampilan & Privasi Leaderboard:**
+   * **Penyembunyian Keterangan Minimal:** Keterangan teknis seperti *"minimal 5 ulasan untuk masuk top"* dihilangkan dari antarmuka publik, siswa, dan guru agar tampilan bersih dan elegan.
+   * **Akses Penuh Administrator:** Halaman Admin Leaderboard (`/admin/leaderboard`) tetap menampilkan seluruh guru dan seluruh peringkat tanpa pemotongan limit (tidak dibatasi Top 10/Top 5) untuk keperluan audit.
+   * **Peringkat Pribadi Guru (*Private Personal Ranking*):** Di Dashboard Guru (`/guru/dashboard`) dan Leaderboard Guru (`/guru/leaderboard`), guru dapat melihat posisi peringkat sekolahnya sendiri secara rahasia (misal *"Peringkat #15 dari 60 Guru"*). Guru di luar Top 10 tidak muncul di leaderboard publik sehingga aman dari ledekan, sekaligus tetap memberi ruang refleksi diri pribadi.
+   * **Klaim Anonimitas Penuh Siswa:** Di Dashboard Guru dan Halaman Ulasan Guru (`/guru/ulasan`), detail kelas spesifik (seperti *MPLB 2 Kelas 11*) disamarkan menjadi hanya nama/kode jurusan (seperti *Jurusan MPLB*) agar identitas siswa tidak teridentifikasi.
 
 ### C. Keamanan & Filter Konten Cerdas (*Profanity Filter Service*)
 * `ProfanityFilterService.php`:
@@ -152,6 +160,12 @@ Sistem memiliki 2 mode peringkat di `Guru::leaderboardFor()`:
 * **Sinkronisasi Otomatis Hash Baru:** Saat pengguna login dengan kata sandi baru, SiPintu mengonfirmasi kevalidan dan GuruKuu secara otomatis menyelaraskan hash kata sandi lokal di database (`users.password`) serta mencatat `sipintu_last_synced_at`.
 * **Dukungan Webhook & SSO Callback:** Webhook `/api/sipintu/sync-user` dan alur OAuth `/oauth/callback` otomatis memperbarui hash kata sandi lokal jika dikirimkan oleh SiPintu Gateway.
 * **Redundansi Darurat (*Disaster Recovery*):** Hanya jika gateway SiPintu offline / gagal koneksi, GuruKuu menggunakan hash lokal terakhir sebagai cadangan darurat agar operasional sekolah tetap berjalan. Akun lokal khusus (admin / testing) tetap didukung mulus.
+* **Penanganan Fleksibel NIP 0 / Guru Tanpa NIP & Login via Email:**
+  * Guru yang memiliki NIP `0` atau belum memiliki NIP resmi (contoh: guru honorer/baru dari SiPintu) dapat login menggunakan alamat **Email** terdaftar maupun NIP.
+  * Form login guru mendukung input ganda: NIP atau Email (`where('nip', $nis)->orWhere('email', $nis)`).
+  * Admin dapat mengubah/menyetel NIP sementara guru di menu **Edit Profil Guru** (`/admin/guru/{id}/edit`). Saat NIP diubah, sistem otomatis memperbarui `users.nis` agar selaras dengan `guru.nip` tanpa merusak riwayat ulasan siswa maupun pembagian kelas mengajar.
+  * Tersedia fitur **Reset Password Guru** langsung di menu aksi dropdown tabel Admin (`/admin/guru`) serta opsi ubah password di halaman Edit Guru, dengan fallback verifikasi hash lokal jika kredensial diset manual oleh admin.
+  * Logika sinkronisasi SiPintu (`syncTeacherToLocal`) dirancang cerdas: jika guru lokal telah memiliki NIP kustom/valid yang diset admin, penarikan data berkala dari SiPintu yang membawa NIP `'0'` **tidak akan menimpa** NIP lokal kembali ke `'0'` dan tidak menimbulkan duplikasi guru.
 
 ### G. Panduan Interaktif Pemula (*Callout Guide Tooltip*)
 * **Penunjuk Otomatis Menu "Daftar Guru":** Tooltip pill interaktif ("👉 Ketuk di sini untuk menilai") menunjuk menu navigasi evaluasi guru pada dashboard siswa.
@@ -174,6 +188,13 @@ Sistem memiliki 2 mode peringkat di `Guru::leaderboardFor()`:
   * **Penanganan Duplikasi Anggun (*Graceful Duplicate Handling*):** Jika terjadi balapan jaringan atau klik ganda yang memicu `UniqueConstraintViolationException` / error SQLSTATE 23000, sistem secara anggun mengarahkan siswa ke halaman profil guru dengan notifikasi informasi bahwa penilaian telah tersimpan, tanpa melemparkan error 500.
   * **Resolusi Kelas Fleksibel (*Fallback Mapping*):** Mengidentifikasi kelas aktif siswa dengan fallback berjenjang (`wherePivot` $\rightarrow$ relasi `kelas` $\rightarrow$ nama kelas string) sehingga kolom `class_id` pada tabel `penilaian` selalu terisi dengan benar.
   * **Anti-Double Click Frontend:** Tombol pengiriman penilaian pada form siswa otomatis dimatikan (*disabled*) dan menampilkan indikator loading saat proses submit berjalan.
+
+### I. Anonimitas Siswa & Penyamaran Identitas Kelas di Portal Guru
+* **Prinsip Anonimitas Mutlak bagi Guru & Publik:** Guru yang dinilai tidak boleh mengetahui identitas siswa penilai (nama, NIS, maupun rombel/kelas detail siswa).
+* **Penyamaran Kelas Menjadi Jurusan Saja:**
+  * Pada riwayat ulasan guru (`/guru/ulasan`) dan feed dashboard guru (`/guru/dashboard`), rincian kelas siswa (misalnya `MPLB 2 Kelas 11` atau `PPLG 1 Kelas 12`) **wajib disamarkan** dan hanya menampilkan **Jurusan** saja (misalnya `Jurusan MPLB` atau `Jurusan PPLG`).
+  * Hal ini menjamin guru tidak dapat melacak atau menyimpulkan siswa penilai dari kelas atau tingkat tertentu, menjaga kenyamanan dan objektivitas siswa saat memberikan evaluasi.
+  * Hanya Administrator sekolah (`/admin/kritik-saran`) yang memiliki hak akses melihat rincian kelas dan NIS/nama siswa demi keperluan pengawasan etika dan akuntabilitas.
 
 ---
 
@@ -262,6 +283,36 @@ GuruKuu/
   - Menambahkan rute dan controller `PUT /penilaian-balasan/{balasan}` (`PenilaianBalasanController@update`) dengan proteksi keamanan (cek kepemilikan author, sensor kata kasar / anti-toxic bilingual, pencegahan link luar, dan sinkronisasi real-time ulasan).
   - Mengimplementasikan fitur **Edit Pesan Diskusi** inline secara instan via AJAX dan **Hapus Pesan Diskusi** dengan konfirmasi SweetAlert untuk siswa dan guru pada ulasan mereka sendiri.
   - Memperbaiki pengecekan ID author `(int)$currentUser->id === (int)$b->user_id` agar tombol kontrol edit & hapus selalu tampil akurat tanpa masalah perbedaan tipe data PHP.
+* **2026-10-29 (Leaderboard Capping, Tampilan Peringkat Privat Guru, & Anonimitas Kelas):**
+  - Mengubah tampilan leaderboard pengguna/publik (Landing, Siswa, Guru): Mode rating Semua Guru dibatasi **Top 10**, dan mode Berdasarkan Kelas dibatasi **Top 5**.
+  - Menghapus teks teknis "minimal 5 ulasan untuk masuk top" pada semua tampilan leaderboard publik dan pengguna.
+  - Menjaga akses **Admin Leaderboard** tetap lengkap tanpa pemotongan limit sehingga admin dapat memantau seluruh peringkat.
+  - Menambahkan kartu **Peringkat Pribadi** di Dashboard Guru (`/guru/dashboard`) dan banner status pribadi di Leaderboard Guru (`/guru/leaderboard`), memungkinkan guru mengetahui posisi peringkatnya sendiri secara rahasia untuk sarana evaluasi diri tanpa khawatir dirundung jika di luar Top 10.
+  - Menyamarkan identitas kelas menjadi kode/nama jurusan (misal `Jurusan PPLG`) pada ulasan di Dashboard Guru dan Halaman Ulasan Guru untuk menjaga anonimitas siswa 100%.
+* **2026-10-29 (Penanganan NIP 0, Login Guru via Email, & Sinkronisasi Akun Lokal):**
+  - Memperbaiki alur login guru (`LoginController`) agar dapat mendeteksi kredensial via NIP maupun Email (`emarosma20@gmail.com`).
+  - Menyelaraskan form login guru dengan label dan placeholder "NIP / EMAIL GURU".
+  - Memperbaiki sinkronisasi akun guru pada menu Edit Guru (`Admin\GuruController@update`): saat admin mengubah NIP sementara dari `0` ke NIP baru, `users.nis` otomatis ikut terupdate dan sinkron.
+  - Menambahkan fitur **Reset Password Guru** langsung di menu aksi dropdown tabel admin (`/admin/guru`) serta opsi ganti password di form Edit Guru.
+  - Mengamankan proses sinkronisasi SiPintu (`syncTeacherToLocal`): NIP guru yang telah diset kustom/valid oleh admin tidak akan ditimpa kembali menjadi `0` saat ada sinkronisasi berkala dari SiPintu Gateway.
+* **2026-10-29 (Pengarsipan Periode, Filter Ulasan Dinamis, Persistensi Tab, & Pembersihan Bug UI/UX):**
+  - **Pengarsipan Ulasan Periode Lalu & Dashboard Guru:** Ulasan pada `Guru\DashboardController::index` difilter sesuai periode aktif (`where('periode_id', $periodeAktif->id)`) sehingga ulasan semester sebelumnya otomatis masuk arsip dan tidak menumpuk di dashboard aktif guru.
+  - **Penghapusan Penilaian & Leaderboard Cache:** Menambahkan model event `booted()` pada `Penilaian` (`deleted` dan `saved`) yang otomatis memicu `Guru::clearLeaderboardCache()` dan `guru->updateRataRata($penilaian->periode_id)` saat ulasan dihapus atau diubah.
+  - **Nama Periode Unik:** Menambahkan validasi `Rule::unique('periode', 'nama_periode')` pada `PengaturanController` dan `PeriodeController` untuk mencegah duplikasi nama periode yang membingungkan.
+  - **Histori Periode Admin Leaderboard:** Admin kini dapat memilih periode riwayat/arsip pada Leaderboard (`/admin/leaderboard`) serta mengekspor Excel/PDF sesuai periode yang dipilih.
+  - **Header & Catatan Leaderboard Rapi:** Judul, subjudul, dan kotak catatan pada Admin Leaderboard telah dipusatkan (*text-center*) secara simetris.
+  - **Persistensi Tab Login (Guru vs Siswa):** Saat login gagal (password salah), tab peran yang dipilih tetap dipertahankan (`old('login_role')`), dan alert error disejajarkan simetris (`align-items-center gap-2`).
+  - **Persistensi Tab Pengaturan (Admin, Guru, Siswa):** Tab aktif disimpan via URL hash, `active_tab` session, dan `localStorage` agar tidak melompat ke tab pertama saat refresh atau submit.
+  - **Kartu Statistik Ulasan Guru Dinamis:** Di `/guru/ulasan`, kartu metrik Total Ulasan, Sudah Dibalas, dan Belum Dibalas kini tersinkronisasi dinamis mengikuti filter periode semester dan filter teks yang dipilih guru.
+  - **Sinkronisasi Titik Biru Panduan Siswa:** Titik biru dan popover panduan kini hanya di-reset pada login baru (`fresh_login_for_guide`) dan dipastikan tetap hilang di semua tab sidebar saat sudah ditutup pengguna.
+* **2026-10-29 (Penyempurnaan Total Sistem Pencarian Global & Penghapusan Auto-Suggest Siswa):**
+  - **Penghapusan Auto-Suggest Siswa:** Menghapus autocomplete dropdown pop-up (`#guruSearchSuggestions`) pada portal siswa (`/siswa/guru`) agar siswa dapat mengetik nama guru sendiri dengan leluasa dan mencari secara alami via Enter atau tombol Cari.
+  - **Pencarian Multi-Kata & Tokenisasi Fleksibel:** Mengganti pencarian string kaku menjadi pencarian token kata terpisah (`preg_split('/\s+/')`) pada seluruh modul web (Portal Siswa, Data Guru Admin, Data Siswa Admin, Kritik & Saran, Pelanggaran, Manajemen Akun, SiPintu Gateway, dan Pencarian Publik). Mencari kata penggalan seperti *"latif"* atau susunan kata terbalik seperti *"latif abdul"* kini 100% akurat menemukan *"M. Abdul Latif, S.Pd."*.
+  - **Resolusi Konflik Filter Kelas vs Pencarian:** Jika pengguna mencari nama guru atau siswa saat filter kelas sedang aktif, sistem secara cerdas mengecek apakah hasil pencarian ada di kelas tersebut; jika guru/siswa yang dicari mengajar/berada di kelas lain, sistem tidak lagi memblokir atau menghasilkan halaman kosong, melainkan tetap menampilkan guru/siswa yang dicari.
+* **2026-10-29 (Tampilan Rincian 5 Kriteria Penilaian, Bintang, & Persentase di Portal Guru):**
+  - **Halaman Ulasan Guru (`/guru/ulasan`):** Menambahkan kartu ringkasan kriteria evaluasi di atas 3 kartu metrik ulasan. Menampilkan skor keseluruhan (bintang dan persentase) serta rincian 5 kriteria pembelajaran (Ketepatan Waktu, Kehadiran di Kelas, Penyampaian Materi, Interaksi dengan Siswa, Suasana Belajar) lengkap dengan rating bintang (⭐), persentase kepuasan, dan progress bar yang tersinkronisasi dinamis dengan filter semester.
+  - **Detail Guru (`/guru/detail-guru/{id}`):** Memperbarui kartu statistik evaluasi periode berjalan agar menampilkan skor keseluruhan di bagian atas dan menyandingkan rating bintang (⭐) bersama persentase (%) pada masing-masing dari 5 kriteria.
+  - **Dashboard Guru (`/guru/dashboard`):** Menambahkan kartu "Detail Kriteria Evaluasi" pada kolom utama dashboard yang menampilkan capaian 5 kriteria pengajaran guru (bintang dan persentase) pada semester berjalan secara transparan dan detail.
 
 
 

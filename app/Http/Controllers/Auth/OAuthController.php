@@ -233,6 +233,7 @@ class OAuthController extends Controller
         $ssoToken = uniqid('sipintu_', true);
         $request->session()->flash('show_welcome_landing_popup', true);
         $request->session()->flash('sso_entry_token', $ssoToken);
+        $request->session()->flash('fresh_login_for_guide', true);
 
         // 11. Redirect ke dashboard yang sesuai (mencegah redirect loop)
         if ($user->role === 'admin') {

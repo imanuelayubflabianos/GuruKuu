@@ -98,6 +98,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::post('/guru/import-jadwal', [AdminGuruController::class, 'importJadwal'])->name('guru.import-jadwal');
     Route::resource('guru', AdminGuruController::class);
     Route::patch('/guru/{guru}/toggle', [AdminGuruController::class, 'toggleStatus'])->name('guru.toggle');
+    Route::patch('/guru/{guru}/reset-password', [AdminGuruController::class, 'resetPassword'])->name('guru.reset-password');
     Route::resource('siswa', AdminSiswaController::class);
     Route::patch('/siswa/{siswa}/toggle', [AdminSiswaController::class, 'toggleStatus'])->name('siswa.toggle');
 

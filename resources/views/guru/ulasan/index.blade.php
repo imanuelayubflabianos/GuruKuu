@@ -14,6 +14,59 @@
     </div>
 </div>
 
+{{-- RINGKASAN KRITERIA EVALUASI SISWA (PERSENTASE & BINTANG 5 KRITERIA) --}}
+@if(isset($kriteriaStats) && $kriteriaStats['total_evaluasi'] > 0)
+<div class="card-custom p-3 p-md-4 mb-3 mb-md-4 shadow-sm border" style="background: #ffffff; border-radius: 14px;">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3 pb-2.5 border-bottom">
+        <div class="d-flex align-items-center gap-2">
+            <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 36px; height: 36px; background: rgba(0, 51, 102, 0.08); color: #003366;">
+                <i class="bi bi-star-fill text-warning"></i>
+            </div>
+            <div>
+                <h6 class="fw-bold mb-0 text-dark" style="font-size: 0.95rem;">Ringkasan Kriteria Evaluasi Siswa</h6>
+                <small class="text-muted" style="font-size: 0.72rem;">Rata-rata penilaian bintang & kepuasan dari {{ $kriteriaStats['total_evaluasi'] }} ulasan</small>
+            </div>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            <span class="badge rounded-pill px-3 py-1.5" style="background: rgba(245, 158, 11, 0.12); color: #b45309; font-weight: 700; font-size: 0.8rem; border: 1px solid rgba(245, 158, 11, 0.25);">
+                <i class="bi bi-star-fill text-warning me-1"></i>{{ number_format($kriteriaStats['overall_avg'], 2) }} / 5.0
+            </span>
+            <span class="badge rounded-pill px-3 py-1.5" style="background: rgba(0, 51, 102, 0.08); color: #003366; font-weight: 700; font-size: 0.8rem; border: 1px solid rgba(0, 51, 102, 0.15);">
+                {{ $kriteriaStats['overall_pct'] }}% Kepuasan
+            </span>
+        </div>
+    </div>
+
+    {{-- GRID 5 KRITERIA PENILAIAN --}}
+    <div class="row g-2 g-md-3">
+        @foreach($kriteriaStats['aspects'] as $label => $data)
+        <div class="col-6 col-md-4 col-lg">
+            <div class="p-2.5 rounded-3 border h-100 d-flex flex-column justify-content-between" style="background: var(--bg-light, #f8fafc); border-color: rgba(0, 51, 102, 0.08) !important;">
+                <div>
+                    <div class="d-flex align-items-center justify-content-between gap-1 mb-1">
+                        <span class="text-truncate fw-semibold text-dark" style="font-size: 0.75rem;" title="{{ $label }}">
+                            <i class="bi {{ $data['icon'] }} me-1 text-primary"></i>{{ $label }}
+                        </span>
+                    </div>
+                    <div class="d-flex align-items-baseline justify-content-between mt-1">
+                        <span class="fw-bold text-dark font-mono" style="font-size: 0.95rem;">
+                            <i class="bi bi-star-fill text-warning me-0.5" style="font-size: 0.8rem;"></i>{{ number_format($data['avg'], 1) }}
+                        </span>
+                        <span class="badge rounded-pill px-2 py-0.5 font-mono" style="background: rgba(0, 51, 102, 0.08); color: #003366; font-size: 0.7rem; font-weight: 700;">
+                            {{ $data['pct'] }}%
+                        </span>
+                    </div>
+                </div>
+                <div class="progress mt-2" style="height: 5px; border-radius: 10px; background-color: #e2e8f0;">
+                    <div class="progress-bar rounded-pill" style="width: {{ $data['pct'] }}%; background: linear-gradient(90deg, #003366, #0284c7);"></div>
+                </div>
+            </div>
+        </div>
+        @endforeach
+    </div>
+</div>
+@endif
+
 {{-- STATS SUMMARY WIDGET (3 KOLOM SEJAJAR TIDAK BUANG RUANG & RAPI PROPORSI JARAKNYA) --}}
 <div class="row g-2 g-md-3 mb-4">
     <div class="col-4">
@@ -91,9 +144,28 @@
                     <span class="badge bg-secondary-subtle text-secondary border px-2 py-1" style="font-size: 0.75rem;">
                         <i class="bi bi-shield-lock-fill me-1"></i>Siswa (Anonim)
                     </span>
-                    @if($review->kelas)
-                        <span class="badge bg-light text-dark border px-2 py-1" style="font-size: 0.75rem;">
-                            {{ $review->kelas->nama_kelas }} Kelas {{ $review->kelas->tingkat }}
+                    @php
+                        $jurusanObj = $review->kelas?->jurusan ?? $review->siswa?->jurusan;
+                        $kodeJurusan = $jurusanObj?->kode_jurusan;
+                        $namaJurusan = $jurusanObj?->nama_jurusan;
+
+                        if (!$kodeJurusan && !$namaJurusan && $review->kelas) {
+                            $rawNamaKelas = $review->kelas->nama_kelas;
+                            if (preg_match('/(PPLG|RPL|MPLB|OTKP|AP|AKL|AK|TO|TKRO|TBSM|PM|BDP)/i', $rawNamaKelas, $matches)) {
+                                $kodeJurusan = strtoupper($matches[1]);
+                            } else {
+                                $clean = trim(preg_replace('/[0-9]+/', '', str_ireplace(['kelas', 'tingkat'], '', $rawNamaKelas)));
+                                if (!empty($clean)) {
+                                    $kodeJurusan = $clean;
+                                }
+                            }
+                        }
+
+                        $labelJurusan = $kodeJurusan ? 'Jurusan ' . $kodeJurusan : ($namaJurusan ? 'Jurusan ' . $namaJurusan : null);
+                    @endphp
+                    @if($labelJurusan)
+                        <span class="badge bg-light text-dark border px-2 py-1" style="font-size: 0.75rem;" title="{{ $namaJurusan ?? $labelJurusan }}">
+                            <i class="bi bi-mortarboard text-primary me-1"></i>{{ $labelJurusan }}
                         </span>
                     @endif
                     @if($review->periode)

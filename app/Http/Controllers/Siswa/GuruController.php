@@ -27,15 +27,26 @@ class GuruController extends Controller
         $mode = $request->input('mode', 'kelas');
         $query = Guru::with('jurusan')->orderBy('nama');
 
-        if ($mode === 'kelas' && $kelasAktif) {
-            $query->whereHas('kelas', fn ($kelas) => $kelas->whereKey($kelasAktif->id));
+        $isSearchActive = $request->filled('search');
+        if ($isSearchActive) {
+            $terms = preg_split('/\s+/', trim($request->search), -1, PREG_SPLIT_NO_EMPTY);
+            foreach ($terms as $term) {
+                $query->where(function($q) use ($term) {
+                    $q->where('nama', 'LIKE', "%{$term}%")
+                      ->orWhere('nip', 'LIKE', "%{$term}%")
+                      ->orWhere('email', 'LIKE', "%{$term}%")
+                      ->orWhereHas('jurusan', fn($j) => $j->where('nama_jurusan', 'LIKE', "%{$term}%"));
+                });
+            }
         }
 
-        if ($request->filled('search')) {
-            $search = trim($request->search);
-            $query->where(function($q) use ($search) {
-                                $q->where('nama', 'LIKE', "%{$search}%");
-            });
+        if ($mode === 'kelas' && $kelasAktif) {
+            $classMatches = (clone $query)->whereHas('kelas', fn ($kelas) => $kelas->whereKey($kelasAktif->id));
+            if (!$isSearchActive || $classMatches->exists()) {
+                $query->whereHas('kelas', fn ($kelas) => $kelas->whereKey($kelasAktif->id));
+            } else {
+                $mode = 'semua';
+            }
         }
 
         if ($request->filled('kategori') && in_array($request->kategori, ['normada', 'produktif'])) {
@@ -53,9 +64,7 @@ class GuruController extends Controller
 
         $sudahMenilaiIds = $penilaianSayaMap->keys()->toArray();
 
-        $allTeacherNames = Guru::orderBy('nama')->pluck('nama')->toArray();
-
-        return view('siswa.guru.index', compact('guru', 'kelasAktif', 'periodeId', 'sudahMenilaiIds', 'penilaianSayaMap', 'mode', 'allTeacherNames', 'guruKelasSayaIds'));
+        return view('siswa.guru.index', compact('guru', 'kelasAktif', 'periodeId', 'sudahMenilaiIds', 'penilaianSayaMap', 'mode', 'guruKelasSayaIds'));
     }
 
     public function show(Guru $guru)

@@ -465,11 +465,13 @@ class SiPintuService
             }
 
             if (!empty($params['search'])) {
-                $query = strtolower(trim((string) $params['search']));
-                $teachers = array_values(array_filter($teachers, function ($t) use ($query) {
-                    return str_contains(strtolower($t['nama'] ?? ''), $query) ||
-                           str_contains(strtolower($t['nip'] ?? ''), $query) ||
-                           str_contains(strtolower($t['email'] ?? ''), $query);
+                $terms = preg_split('/\s+/', strtolower(trim((string) $params['search'])), -1, PREG_SPLIT_NO_EMPTY);
+                $teachers = array_values(array_filter($teachers, function ($t) use ($terms) {
+                    $combined = strtolower(($t['nama'] ?? '') . ' ' . ($t['nip'] ?? '') . ' ' . ($t['email'] ?? ''));
+                    foreach ($terms as $term) {
+                        if (!str_contains($combined, $term)) return false;
+                    }
+                    return true;
                 }));
             }
 
@@ -579,12 +581,13 @@ class SiPintuService
             }
 
             if (!empty($params['search'])) {
-                $query = strtolower(trim((string) $params['search']));
-                $students = array_values(array_filter($students, function ($s) use ($query) {
-                    return str_contains(strtolower($s['nama'] ?? ''), $query) ||
-                           str_contains(strtolower($s['nis'] ?? ''), $query) ||
-                           str_contains(strtolower($s['kelas'] ?? ''), $query) ||
-                           str_contains(strtolower($s['email'] ?? ''), $query);
+                $terms = preg_split('/\s+/', strtolower(trim((string) $params['search'])), -1, PREG_SPLIT_NO_EMPTY);
+                $students = array_values(array_filter($students, function ($s) use ($terms) {
+                    $combined = strtolower(($s['nama'] ?? '') . ' ' . ($s['nis'] ?? '') . ' ' . ($s['kelas'] ?? '') . ' ' . ($s['email'] ?? ''));
+                    foreach ($terms as $term) {
+                        if (!str_contains($combined, $term)) return false;
+                    }
+                    return true;
                 }));
             }
 
@@ -727,27 +730,64 @@ class SiPintuService
                 if ($matchedJurusan) $jurusanId = $matchedJurusan->id;
             }
 
+            // Cari guru yang sudah ada: prioritaskan NIP non-nol, lalu fallback ke Email atau Nama
+            $existingGuru = null;
+            if ($nip !== '' && $nip !== '0') {
+                $existingGuru = Guru::where('nip', (string) $nip)->first();
+            }
+            if (!$existingGuru && !empty($email)) {
+                $existingGuru = Guru::where('email', $email)->first();
+            }
+            if (!$existingGuru && ($nip === '0' || $nip === '')) {
+                $existingGuru = Guru::where('nip', '0')->orWhere('nama', $nama)->first();
+            }
+
+            // Jika guru sudah ada di lokal dan memiliki NIP kustom/valid (bukan '0'), jangan timpa kembali dengan '0'
+            if ($existingGuru && (!empty($existingGuru->nip) && $existingGuru->nip !== '0') && ($nip === '0' || $nip === '')) {
+                $nip = $existingGuru->nip;
+            }
+
             // KEAMANAN DATA: Jangan pernah timpa foto guru yang sudah diupload manual di web jika data SiPintu kosong/hanya avatar bawaan
-            $existingGuru = Guru::where('nip', (string) $nip)->first();
             if ($existingGuru && !empty($existingGuru->photo)) {
                 if (empty($photo) || str_contains((string)$photo, 'ui-avatars.com')) {
                     $photo = $existingGuru->photo;
                 }
             }
 
-            $guru = Guru::updateOrCreate(['nip' => (string) $nip], [
-                'nama' => $nama,
-                'email' => $email,
-                'phone' => $phone,
-                'photo' => $photo,
-                'kategori' => $kategori,
-                'jurusan_id' => $jurusanId,
-                'bio' => $bio,
-            ]);
+            if ($existingGuru) {
+                $existingGuru->update([
+                    'nip' => (string) $nip,
+                    'nama' => $nama,
+                    'email' => $email ?: $existingGuru->email,
+                    'phone' => $phone ?: $existingGuru->phone,
+                    'photo' => $photo,
+                    'kategori' => $kategori,
+                    'jurusan_id' => $jurusanId ?: $existingGuru->jurusan_id,
+                    'bio' => $bio,
+                ]);
+                $guru = $existingGuru;
+            } else {
+                $guru = Guru::create([
+                    'nip' => (string) $nip,
+                    'nama' => $nama,
+                    'email' => $email,
+                    'phone' => $phone,
+                    'photo' => $photo,
+                    'kategori' => $kategori,
+                    'jurusan_id' => $jurusanId,
+                    'bio' => $bio,
+                ]);
+            }
 
             // Sinkronkan atau buat akun User login untuk Guru
             $guruUserEmail = $email ?: (($nip !== '0' && $nip !== '') ? ($nip . '@gurukuu.local') : ('guru.' . ($teacherData['id'] ?? uniqid()) . '@gurukuu.local'));
-            $user = User::where('nis', (string) $nip)->orWhere('email', $guruUserEmail)->first();
+            $user = User::where('role', 'guru')
+                ->where(function($q) use ($nip, $guruUserEmail, $existingGuru) {
+                    if ($nip !== '') $q->where('nis', (string) $nip);
+                    if ($guruUserEmail) $q->orWhere('email', $guruUserEmail);
+                    if ($existingGuru && $existingGuru->nip !== '') $q->orWhere('nis', (string) $existingGuru->nip);
+                })->first();
+
             if ($user) {
                 $user->update([
                     'name' => $nama,

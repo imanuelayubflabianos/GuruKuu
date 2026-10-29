@@ -28,6 +28,7 @@ class DashboardController extends Controller
 
         // Ambil ulasan & kritik saran dari siswa untuk guru ini (100% Anonim, tidak disensor) dengan paginasi efisien
         $ulasanQuery = Penilaian::where('guru_id', $guru->id)
+            ->when($periodeAktif, fn($q) => $q->where('periode_id', $periodeAktif->id))
             ->where(function ($query) {
                 $query->where(function ($q) {
                     $q->whereNotNull('kritik')->whereRaw("TRIM(kritik) != ''");
@@ -38,17 +39,74 @@ class DashboardController extends Controller
             ->where(function ($query) {
                 $query->where('is_censored', false)->orWhereNull('is_censored');
             })
-            ->with(['periode', 'balasans'])
+            ->with(['periode', 'balasans', 'kelas.jurusan', 'siswa.jurusan'])
             ->latest();
 
         $totalUlasanCount = (clone $ulasanQuery)->count();
         $ulasanTerbaru = $ulasanQuery->paginate(3)->withQueryString();
 
+        // Hitung peringkat pribadi guru di sekolah (mode Semua Guru / rating) secara privat
+        $semuaGuruRanked = Guru::leaderboardFor('rating', null, $periodeAktif?->id);
+        $myRankEntry = $semuaGuruRanked->first(fn($g) => $g->id === $guru->id);
+        $mySchoolRank = $myRankEntry?->leaderboard_rank;
+        $totalEvaluatedGurus = $semuaGuruRanked->filter(fn($g) => $g->total_penilaian > 0)->count();
+
+        // Statistik Detail 5 Kriteria Penilaian Siswa untuk Dashboard Guru
+        $activePenilaians = Penilaian::where('guru_id', $guru->id)
+            ->when($periodeAktif, fn($q) => $q->where('periode_id', $periodeAktif->id))
+            ->get();
+
+        $totalResponden = $activePenilaians->count();
+        $avgWaktu = $totalResponden > 0 ? ($activePenilaians->avg('kedisiplinan') ?? 0) : 0;
+        $avgKehadiran = $totalResponden > 0 ? ($activePenilaians->avg('tanggung_jawab') ?? 0) : 0;
+        $avgMateri = $totalResponden > 0 ? ($activePenilaians->avg('komunikasi') ?? 0) : 0;
+        $avgInteraksi = $totalResponden > 0 ? ($activePenilaians->avg('keramahan') ?? 0) : 0;
+        $avgSuasana = $totalResponden > 0 ? ($activePenilaians->avg('kreativitas') ?? 0) : 0;
+
+        $overallTotalAvg = $totalResponden > 0 ? (($avgWaktu + $avgKehadiran + $avgMateri + $avgInteraksi + $avgSuasana) / 5) : 0;
+        $overallPct = round(($overallTotalAvg / 5) * 100);
+
+        $kriteriaDashboard = [
+            'total_responden' => $totalResponden,
+            'overall_avg' => round($overallTotalAvg, 2),
+            'overall_pct' => $overallPct,
+            'aspects' => [
+                'Ketepatan Waktu' => [
+                    'avg' => round($avgWaktu, 1),
+                    'pct' => round(($avgWaktu / 5) * 100),
+                    'icon' => 'bi-clock-history',
+                ],
+                'Kehadiran di Kelas' => [
+                    'avg' => round($avgKehadiran, 1),
+                    'pct' => round(($avgKehadiran / 5) * 100),
+                    'icon' => 'bi-calendar-check',
+                ],
+                'Penyampaian Materi' => [
+                    'avg' => round($avgMateri, 1),
+                    'pct' => round(($avgMateri / 5) * 100),
+                    'icon' => 'bi-journal-bookmark',
+                ],
+                'Interaksi dengan Siswa' => [
+                    'avg' => round($avgInteraksi, 1),
+                    'pct' => round(($avgInteraksi / 5) * 100),
+                    'icon' => 'bi-chat-dots',
+                ],
+                'Keterlibatan & Suasana' => [
+                    'avg' => round($avgSuasana, 1),
+                    'pct' => round(($avgSuasana / 5) * 100),
+                    'icon' => 'bi-emoji-smile',
+                ],
+            ]
+        ];
+
         return view('guru.dashboard', compact(
             'guru',
             'ulasanTerbaru',
             'totalUlasanCount',
-            'periodeAktif'
+            'periodeAktif',
+            'mySchoolRank',
+            'totalEvaluatedGurus',
+            'kriteriaDashboard'
         ));
     }
 
@@ -66,7 +124,7 @@ class DashboardController extends Controller
         $periodeAktif = Periode::where('status', 'aktif')->first();
         $semuaPeriode = Periode::orderBy('tahun_ajaran', 'desc')->orderBy('semester', 'desc')->get();
 
-        $query = Penilaian::where('guru_id', $guru->id)->with(['periode', 'kelas']);
+        $query = Penilaian::where('guru_id', $guru->id)->with(['periode', 'kelas.jurusan', 'siswa.jurusan']);
 
         // Filter status balasan
         if ($request->filled('status')) {
@@ -99,9 +157,68 @@ class DashboardController extends Controller
 
         $semuaUlasan = (clone $query)->latest()->paginate(10)->withQueryString();
 
-        $totalUlasan = Penilaian::where('guru_id', $guru->id)->count();
-        $totalDibalas = Penilaian::where('guru_id', $guru->id)->whereNotNull('balasan_guru')->whereRaw("TRIM(balasan_guru) != ''")->count();
+        $statsBase = Penilaian::where('guru_id', $guru->id);
+        if ($request->filled('periode_id')) {
+            $statsBase->where('periode_id', $request->periode_id);
+        }
+        if ($request->filled('tipe')) {
+            if ($request->tipe === 'ada_teks') {
+                $statsBase->where(function ($q) {
+                    $q->where(function ($sub) {
+                        $sub->whereNotNull('kritik')->whereRaw("TRIM(kritik) != ''");
+                    })->orWhere(function ($sub) {
+                        $sub->whereNotNull('saran')->whereRaw("TRIM(saran) != ''");
+                    });
+                });
+            }
+        }
+
+        $totalUlasan = (clone $statsBase)->count();
+        $totalDibalas = (clone $statsBase)->whereNotNull('balasan_guru')->whereRaw("TRIM(balasan_guru) != ''")->count();
         $totalBelumDibalas = $totalUlasan - $totalDibalas;
+
+        // Rata-rata 5 Kriteria Penilaian Siswa (sinkron dinamis dengan filter periode semester & teks)
+        $avgWaktu = (clone $statsBase)->avg('kedisiplinan') ?? 0;
+        $avgKehadiran = (clone $statsBase)->avg('tanggung_jawab') ?? 0;
+        $avgMateri = (clone $statsBase)->avg('komunikasi') ?? 0;
+        $avgInteraksi = (clone $statsBase)->avg('keramahan') ?? 0;
+        $avgSuasana = (clone $statsBase)->avg('kreativitas') ?? 0;
+
+        $overallTotalAvg = $totalUlasan > 0 ? (($avgWaktu + $avgKehadiran + $avgMateri + $avgInteraksi + $avgSuasana) / 5) : 0;
+        $overallPct = round(($overallTotalAvg / 5) * 100);
+
+        $kriteriaStats = [
+            'total_evaluasi' => $totalUlasan,
+            'overall_avg' => round($overallTotalAvg, 2),
+            'overall_pct' => $overallPct,
+            'aspects' => [
+                'Ketepatan Waktu' => [
+                    'avg' => round($avgWaktu, 1),
+                    'pct' => round(($avgWaktu / 5) * 100),
+                    'icon' => 'bi-clock-history',
+                ],
+                'Kehadiran di Kelas' => [
+                    'avg' => round($avgKehadiran, 1),
+                    'pct' => round(($avgKehadiran / 5) * 100),
+                    'icon' => 'bi-calendar-check',
+                ],
+                'Penyampaian Materi' => [
+                    'avg' => round($avgMateri, 1),
+                    'pct' => round(($avgMateri / 5) * 100),
+                    'icon' => 'bi-journal-bookmark',
+                ],
+                'Interaksi dengan Siswa' => [
+                    'avg' => round($avgInteraksi, 1),
+                    'pct' => round(($avgInteraksi / 5) * 100),
+                    'icon' => 'bi-chat-dots',
+                ],
+                'Keterlibatan & Suasana' => [
+                    'avg' => round($avgSuasana, 1),
+                    'pct' => round(($avgSuasana / 5) * 100),
+                    'icon' => 'bi-emoji-smile',
+                ],
+            ]
+        ];
 
         return view('guru.ulasan.index', compact(
             'guru',
@@ -110,7 +227,8 @@ class DashboardController extends Controller
             'totalDibalas',
             'totalBelumDibalas',
             'periodeAktif',
-            'semuaPeriode'
+            'semuaPeriode',
+            'kriteriaStats'
         ));
     }
 
@@ -199,6 +317,11 @@ class DashboardController extends Controller
 
     public function leaderboard(Request $request)
     {
+        $user = Auth::user();
+        $myGuru = Guru::where('nip', $user->nis)
+            ->orWhere('email', $user->email)
+            ->first();
+
         $periodeAktif = Periode::where('status', 'aktif')->first();
         $kelasList = \App\Models\Kelas::with('jurusan')->orderBy('tingkat')->orderBy('nama_kelas')->get();
         $mode = $request->input('mode', 'rating');
@@ -209,10 +332,37 @@ class DashboardController extends Controller
         if ($mode === 'rating') {
             $kelasId = null;
         }
-        $leaderboard = Guru::leaderboardFor($mode, $kelasId, $periodeAktif?->id);
+
+        // Hitung leaderboard lengkap seluruh guru
+        $fullLeaderboard = Guru::leaderboardFor($mode, $kelasId, $periodeAktif?->id);
+
+        // Ambil info peringkat pribadi guru yang sedang login (bersifat privat)
+        $myRankInfo = null;
+        if ($myGuru) {
+            $myEntry = $fullLeaderboard->first(fn($g) => $g->id === $myGuru->id);
+            $limit = ($mode === 'partisipasi') ? 5 : 10;
+            $totalEvaluated = $fullLeaderboard->filter(fn($g) => $g->total_penilaian > 0)->count();
+
+            $myRankInfo = [
+                'guru' => $myGuru,
+                'rank' => $myEntry?->leaderboard_rank,
+                'total_penilaian' => $myEntry?->total_penilaian ?? 0,
+                'rata_rata' => $myEntry?->rata_rata_nilai ?? 0.0,
+                'total_gurus' => $totalEvaluated,
+                'limit' => $limit,
+                'is_top_limit' => $myEntry && !empty($myEntry->leaderboard_rank) && $myEntry->leaderboard_rank <= $limit,
+                'mode' => $mode,
+            ];
+        }
+
+        // Tampilan umum user dibatasi: Top 10 (Semua Guru) & Top 5 (Berdasarkan Kelas)
+        $limit = ($mode === 'partisipasi') ? 5 : 10;
+        $leaderboard = $fullLeaderboard
+            ->filter(fn($g) => !empty($g->leaderboard_rank))
+            ->take($limit);
 
         return view('guru.leaderboard', compact(
-            'periodeAktif', 'leaderboard', 'kelasList', 'mode', 'kelasId'
+            'periodeAktif', 'leaderboard', 'kelasList', 'mode', 'kelasId', 'myRankInfo'
         ));
     }
 
@@ -234,7 +384,7 @@ class DashboardController extends Controller
             'rata_keramahan' => $allPenilaian->avg('keramahan') ?? 0,
         ];
 
-        $semuaFeedback = Penilaian::with('siswa')
+        $semuaFeedback = Penilaian::with(['siswa.jurusan', 'kelas.jurusan'])
             ->where('guru_id', $guru->id)
             ->where(function($q) {
                 $q->where('is_censored', false)->orWhereNull('is_censored');
@@ -248,7 +398,7 @@ class DashboardController extends Controller
                 $q->where('guru_id', $guru->id);
             })
             ->with(['penilaian' => function($q) use ($guru) {
-                $q->where('guru_id', $guru->id)->latest();
+                $q->where('guru_id', $guru->id)->with(['siswa.jurusan', 'kelas.jurusan'])->latest();
             }])
             ->latest('tanggal_mulai')
             ->get();

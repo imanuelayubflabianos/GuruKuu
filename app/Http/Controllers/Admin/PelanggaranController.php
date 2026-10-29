@@ -32,20 +32,23 @@ class PelanggaranController extends Controller
             $query->where('tipe', $request->tipe);
         }
 
-        // Pencarian teks / NIS / Nama Siswa
+        // Pencarian teks / NIS / Nama Siswa / Guru (mendukung multi-kata / token)
         if ($request->filled('search')) {
-            $search = trim($request->search);
-            $query->where(function ($q) use ($search) {
-                $q->where('isi_teks', 'like', "%{$search}%")
-                  ->orWhere('kata_terdeteksi', 'like', "%{$search}%")
-                  ->orWhereHas('user', function ($u) use ($search) {
-                      $u->where('name', 'like', "%{$search}%")
-                        ->orWhere('nis', 'like', "%{$search}%");
-                  })
-                  ->orWhereHas('guru', function ($g) use ($search) {
-                      $g->where('nama', 'like', "%{$search}%");
-                  });
-            });
+            $terms = preg_split('/\s+/', trim($request->search), -1, PREG_SPLIT_NO_EMPTY);
+            foreach ($terms as $term) {
+                $query->where(function ($q) use ($term) {
+                    $q->where('isi_teks', 'like', "%{$term}%")
+                      ->orWhere('kata_terdeteksi', 'like', "%{$term}%")
+                      ->orWhereHas('user', function ($u) use ($term) {
+                          $u->where('name', 'like', "%{$term}%")
+                            ->orWhere('nis', 'like', "%{$term}%");
+                      })
+                      ->orWhereHas('guru', function ($g) use ($term) {
+                          $g->where('nama', 'like', "%{$term}%")
+                            ->orWhere('nip', 'like', "%{$term}%");
+                      });
+                });
+            }
         }
 
         $pelanggarans = $query->latest()->paginate(15)->withQueryString();

@@ -17,15 +17,17 @@ use ZipArchive;
 
 class ExportController extends Controller
 {
-    public function leaderboardExcel()
+    public function leaderboardExcel(Request $request)
     {
+        $periodeId = $request->input('periode_id');
         $filename = 'leaderboard_guru_' . date('Y-m-d_His') . '.xlsx';
-        return Excel::download(new LeaderboardExport, $filename);
+        return Excel::download(new LeaderboardExport($periodeId ? (int)$periodeId : null), $filename);
     }
 
-    public function leaderboardPdf()
+    public function leaderboardPdf(Request $request)
     {
-        $periodeAktif = Periode::where('status', 'aktif')->first();
+        $periodeId = $request->input('periode_id');
+        $periodeAktif = $periodeId ? Periode::find($periodeId) : Periode::where('status', 'aktif')->first();
         $leaderboard = Guru::leaderboardFor('rating', null, $periodeAktif?->id);
 
         $pdf = Pdf::loadView('exports.leaderboard-pdf', compact('leaderboard', 'periodeAktif'))

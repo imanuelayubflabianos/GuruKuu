@@ -266,6 +266,101 @@
                     </div>
                 </div>
             </div>
+
+            {{-- DETAIL 5 KRITERIA PENILAIAN SISWA (PERSENTASE & BINTANG) --}}
+            <div class="gk-metric-card p-3 p-md-3.5">
+                <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom flex-wrap gap-2">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; background: rgba(0, 51, 102, 0.08); color: #003366;">
+                            <i class="bi bi-ui-checks-grid"></i>
+                        </div>
+                        <div>
+                            <span class="fw-bold text-uppercase" style="font-size: 0.72rem; letter-spacing: 0.6px; color: #003366;">DETAIL KRITERIA EVALUASI</span>
+                            <div class="text-muted" style="font-size: 0.7rem; line-height: 1.2;">Capaian per aspek pembelajaran siswa</div>
+                        </div>
+                    </div>
+                    @if(isset($kriteriaDashboard) && $kriteriaDashboard['total_responden'] > 0)
+                        <div class="d-flex align-items-center gap-1.5 font-mono">
+                            <span class="badge rounded-pill px-2.5 py-1" style="background: rgba(245, 158, 11, 0.12); color: #b45309; font-weight: 700; font-size: 0.75rem; border: 1px solid rgba(245, 158, 11, 0.25);">
+                                <i class="bi bi-star-fill text-warning me-1"></i>{{ number_format($kriteriaDashboard['overall_avg'], 2) }} / 5.0
+                            </span>
+                            <span class="badge rounded-pill px-2.5 py-1" style="background: rgba(0, 51, 102, 0.08); color: #003366; font-weight: 700; font-size: 0.75rem;">
+                                {{ $kriteriaDashboard['overall_pct'] }}%
+                            </span>
+                        </div>
+                    @endif
+                </div>
+
+                @if(isset($kriteriaDashboard) && $kriteriaDashboard['total_responden'] > 0)
+                    <div class="d-flex flex-column gap-2.5">
+                        @foreach($kriteriaDashboard['aspects'] as $label => $info)
+                            <div>
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <span class="small fw-semibold text-dark" style="font-size: 0.78rem;">
+                                        <i class="bi {{ $info['icon'] }} me-1.5 text-primary"></i>{{ $label }}
+                                    </span>
+                                    <div class="d-flex align-items-center gap-1.5 font-mono">
+                                        <span class="text-warning small" style="font-size: 0.75rem;"><i class="bi bi-star-fill"></i></span>
+                                        <span class="fw-bold text-dark small" style="font-size: 0.82rem;">{{ number_format($info['avg'], 1) }}</span>
+                                        <span class="badge rounded-pill px-2 py-0.5" style="background: rgba(0, 51, 102, 0.08); color: #003366; font-size: 0.68rem; font-weight: 700;">
+                                            {{ $info['pct'] }}%
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="progress" style="height: 6px; border-radius: 10px; background-color: #e2e8f0;">
+                                    <div class="progress-bar rounded-pill" style="width: {{ $info['pct'] }}%; background: linear-gradient(90deg, #003366, #0284c7);"></div>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                @else
+                    <div class="text-center py-3 text-muted small">
+                        <i class="bi bi-bar-chart fs-3 d-block mb-1 text-muted opacity-50"></i>
+                        Belum ada evaluasi masuk pada periode aktif saat ini.
+                    </div>
+                @endif
+            </div>
+
+            {{-- KARTU POSISI PERINGKAT PRIBADI GURU (BERSIFAT PRIVAT & AMAN) --}}
+            <div class="gk-metric-card p-3" style="background: linear-gradient(135deg, rgba(0, 51, 102, 0.04) 0%, rgba(2, 132, 199, 0.08) 100%); border-left: 4px solid #003366 !important;">
+                <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                    <div class="d-flex align-items-center gap-2.5">
+                        <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 42px; height: 42px; background: rgba(0, 51, 102, 0.1); color: #003366; font-size: 1.25rem;">
+                            <i class="bi bi-trophy-fill text-warning"></i>
+                        </div>
+                        <div>
+                            <div class="d-flex align-items-center gap-2 flex-wrap">
+                                <span class="fw-bold text-uppercase" style="font-size: 0.68rem; letter-spacing: 0.6px; color: #003366;">PERINGKAT PRIBADI ANDA</span>
+                                <span class="badge rounded-pill bg-light text-secondary border font-mono" style="font-size: 0.65rem;">Privat</span>
+                            </div>
+                            <div class="fw-bold text-dark mt-0.5" style="font-size: 1.05rem;">
+                                @if(!empty($mySchoolRank))
+                                    <span class="text-primary font-mono fw-extrabold">Peringkat #{{ $mySchoolRank }}</span>
+                                    <span class="text-muted fw-normal" style="font-size: 0.82rem;">dari {{ $totalEvaluatedGurus }} Guru</span>
+                                    @if($mySchoolRank <= 10)
+                                        <span class="badge bg-success-subtle text-success border border-success-subtle ms-1" style="font-size: 0.68rem;">Top 10 Sekolah</span>
+                                    @endif
+                                @else
+                                    <span class="text-muted fw-semibold" style="font-size: 0.88rem;">Belum Masuk Peringkat</span>
+                                @endif
+                            </div>
+                            <small class="text-muted d-block" style="font-size: 0.72rem; line-height: 1.3;">
+                                @if(!empty($mySchoolRank) && $mySchoolRank > 10)
+                                    Peringkat Anda tidak dipublikasikan di leaderboard umum (Top 10) demi kenyamanan & privasi Anda.
+                                @else
+                                    Data peringkat ini hanya dapat dilihat oleh Anda sebagai sarana refleksi & evaluasi diri.
+                                @endif
+                            </small>
+                        </div>
+                    </div>
+                    <div>
+                        <a href="{{ route('guru.leaderboard') }}" class="btn btn-sm btn-outline-primary d-inline-flex align-items-center gap-1.5 px-3 py-1.5" style="border-radius: 8px; font-size: 0.78rem; font-weight: 600;">
+                            <span>Lihat Leaderboard</span>
+                            <i class="bi bi-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -295,10 +390,29 @@
             <div class="gk-feed-scroll flex-grow-1 overflow-y-auto pe-1" style="max-height: 380px;">
                 @forelse($ulasanTerbaru as $review)
                 <div class="p-3 mb-3 rounded-3 border bg-white" style="border-color: rgba(0, 51, 102, 0.1) !important; box-shadow: 0 1px 4px rgba(0, 51, 102, 0.04);">
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <span class="badge rounded-pill px-2.5 py-1" style="background: rgba(0, 51, 102, 0.06); color: #003366; font-size: 0.72rem; border: 1px solid rgba(0, 51, 102, 0.12); font-weight: 600;">
-                            Siswa (Anonim)
-                        </span>
+                    <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-1">
+                        <div class="d-flex align-items-center gap-1.5 flex-wrap">
+                            <span class="badge rounded-pill px-2.5 py-1" style="background: rgba(0, 51, 102, 0.06); color: #003366; font-size: 0.72rem; border: 1px solid rgba(0, 51, 102, 0.12); font-weight: 600;">
+                                Siswa (Anonim)
+                            </span>
+                            @php
+                                $jObjDash = $review->kelas?->jurusan ?? $review->siswa?->jurusan;
+                                $kJurusanDash = $jObjDash?->kode_jurusan;
+                                $nJurusanDash = $jObjDash?->nama_jurusan;
+                                if (!$kJurusanDash && !$nJurusanDash && $review->kelas) {
+                                    $rawKDash = $review->kelas->nama_kelas;
+                                    if (preg_match('/(PPLG|RPL|MPLB|OTKP|AP|AKL|AK|TO|TKRO|TBSM|PM|BDP)/i', $rawKDash, $m)) {
+                                        $kJurusanDash = strtoupper($m[1]);
+                                    }
+                                }
+                                $lblJurusanDash = $kJurusanDash ? 'Jurusan ' . $kJurusanDash : ($nJurusanDash ? 'Jurusan ' . $nJurusanDash : null);
+                            @endphp
+                            @if($lblJurusanDash)
+                                <span class="badge bg-light text-dark border px-2 py-0.5" style="font-size: 0.68rem;" title="{{ $nJurusanDash ?? $lblJurusanDash }}">
+                                    <i class="bi bi-mortarboard text-primary me-0.5"></i>{{ $lblJurusanDash }}
+                                </span>
+                            @endif
+                        </div>
                         <small class="text-muted font-mono" style="font-size: 0.7rem;">
                             {{ $review->created_at->format('d M Y, H:i') }}
                         </small>

@@ -678,8 +678,8 @@
                     localStorage.removeItem('gk_dismiss_guide_guru');
                 } catch(err) {}
 
-                @if(session('success') || session('show_welcome_landing_popup') || session('sso_entry_token'))
-                // Reset otomatis saat login baru / login ulang
+                @if(session('fresh_login_for_guide'))
+                // Reset otomatis hanya saat login baru / login ulang
                 try {
                     sessionStorage.removeItem('gk_dismiss_guide_guru');
                 } catch(err) {}
@@ -829,6 +829,16 @@
             })();
         </script>
     @endif
+    <script>
+        (function() {
+            try {
+                if (sessionStorage.getItem('gk_dismiss_guide_guru') === '1') {
+                    var el = document.getElementById('sidebarDaftarGuruLink');
+                    if (el) el.classList.remove('gk-menu-highlight');
+                }
+            } catch(e) {}
+        })();
+    </script>
     @stack('scripts')
 </body>
 </html>

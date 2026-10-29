@@ -783,20 +783,31 @@ class PengaturanController extends Controller
 
     public function simpanPeriode(Request $request)
     {
-        $request->validate([
-            'nama_periode'    => 'required|string|max:255',
+        $periodeId = $request->input('periode_id');
+
+        $validator = Validator::make($request->all(), [
+            'nama_periode'    => ['required', 'string', 'max:255', \Illuminate\Validation\Rule::unique('periode', 'nama_periode')->ignore($periodeId)],
             'tahun_ajaran'    => 'required|string|max:20',
             'semester'        => 'required|in:ganjil,genap',
             'tanggal_mulai'   => 'required|date',
             'tanggal_selesai' => 'required|date|after:tanggal_mulai',
             'status'          => 'required|in:aktif,nonaktif',
         ], [
+            'nama_periode.unique' => 'Nama periode sudah terdaftar dalam riwayat database. Gunakan nama yang berbeda agar tidak menimbulkan kebingungan sistem.',
             'tanggal_selesai.after' => 'Tanggal selesai harus setelah tanggal mulai periode.',
         ]);
+
+        if ($validator->fails()) {
+            return redirect()->to(route('admin.pengaturan.index') . '#tabPeriode')
+                ->withErrors($validator)
+                ->withInput()
+                ->with('active_tab', '#tabPeriode');
+        }
 
         if (!\App\Services\ProfanityFilterService::isClean($request->nama_periode)) {
             return redirect()->to(route('admin.pengaturan.index') . '#tabPeriode')
                 ->withInput()
+                ->with('active_tab', '#tabPeriode')
                 ->with('error', 'Nama periode mengandung kata yang tidak pantas atau dilarang oleh filter moderasi.');
         }
 
@@ -833,7 +844,9 @@ class PengaturanController extends Controller
             $pesan = 'Pengaturan periode ' . $periode->nama_periode . ' berhasil disimpan!';
         }
 
-        return redirect()->to(route('admin.pengaturan.index') . '#tabPeriode')->with('success', $pesan);
+        return redirect()->to(route('admin.pengaturan.index') . '#tabPeriode')
+            ->with('active_tab', '#tabPeriode')
+            ->with('success', $pesan);
     }
 
     public function aktifkanPeriode(Periode $periode)
@@ -846,6 +859,7 @@ class PengaturanController extends Controller
         Setting::set('active_periode_name', $periode->nama_periode);
 
         return redirect()->to(route('admin.pengaturan.index') . '#tabPeriode')
+            ->with('active_tab', '#tabPeriode')
             ->with('success', "Periode '{$periode->nama_periode}' sekarang aktif! Seluruh statistik & leaderboard telah disinkronkan ke periode ini.");
     }
 
@@ -853,6 +867,7 @@ class PengaturanController extends Controller
     {
         if ($periode->status === 'aktif') {
             return redirect()->to(route('admin.pengaturan.index') . '#tabPeriode')
+                ->with('active_tab', '#tabPeriode')
                 ->with('error', 'Periode yang sedang aktif tidak dapat dihapus. Nonaktifkan atau aktifkan periode lain terlebih dahulu.');
         }
 
@@ -866,6 +881,7 @@ class PengaturanController extends Controller
         Guru::recalculateAll($activePeriode?->id);
 
         return redirect()->to(route('admin.pengaturan.index') . '#tabPeriode')
+            ->with('active_tab', '#tabPeriode')
             ->with('success', "Periode '{$nama}' dan seluruh data ulasan di dalamnya berhasil dihapus.");
     }
 }

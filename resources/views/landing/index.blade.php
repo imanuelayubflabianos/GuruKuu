@@ -1793,7 +1793,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         </div>
                         <h6 class="fw-bold text-dark mb-1">Belum Ada Guru di Ranking Podium</h6>
                         <p class="text-muted small mb-0" style="max-width: 580px; margin: 0 auto; line-height: 1.5;">
-                            Sesuai ketentuan, guru harus memiliki <strong>minimal 5 penilaian</strong> dari siswa untuk dapat masuk dalam peringkat leaderboard. Seluruh nilai guru tetap tercatat dan dapat dilihat pada leaderboard lengkap.
+                            Belum ada guru yang memenuhi peringkat leaderboard pada periode ini.
                         </p>
                     </div>
                 </div>

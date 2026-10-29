@@ -184,10 +184,12 @@ function updateKelasCount() {
 }
 
 function filterKelasList() {
-    const query = (document.getElementById('searchKelasInput')?.value || '').toLowerCase().trim();
+    const raw = (document.getElementById('searchKelasInput')?.value || '').toLowerCase().trim();
+    const tokens = raw.split(/\s+/).filter(Boolean);
     document.querySelectorAll('.kelas-item').forEach(item => {
         const text = item.getAttribute('data-text') || '';
-        item.style.display = (query === '' || text.includes(query)) ? '' : 'none';
+        const match = tokens.length === 0 || tokens.every(token => text.includes(token));
+        item.style.display = match ? '' : 'none';
     });
 }
 document.addEventListener('DOMContentLoaded', updateKelasCount);

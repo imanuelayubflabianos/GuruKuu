@@ -20,8 +20,10 @@ class LandingController extends Controller
             ? Penilaian::where('periode_id', $periodeAktif->id)->count() 
             : Penilaian::count();
 
-        // Leaderboard resmi menggunakan aturan standar sistem (minimal 5 ulasan)
-        $leaderboard = Guru::leaderboardFor('rating', null, $periodeAktif?->id);
+        // Leaderboard resmi menggunakan aturan standar sistem (Top 10 Publik)
+        $leaderboard = Guru::leaderboardFor('rating', null, $periodeAktif?->id)
+            ->filter(fn($g) => !empty($g->leaderboard_rank))
+            ->take(10);
 
         return view('landing.index', compact(
             'periodeAktif',
@@ -44,7 +46,12 @@ class LandingController extends Controller
         if ($mode === 'rating') {
             $kelasId = null;
         }
-        $leaderboard = Guru::leaderboardFor($mode, $kelasId, $periodeAktif?->id);
+
+        // Tampilan publik dibatasi: Top 10 (Semua Guru) & Top 5 (Berdasarkan Kelas)
+        $limit = ($mode === 'partisipasi') ? 5 : 10;
+        $leaderboard = Guru::leaderboardFor($mode, $kelasId, $periodeAktif?->id)
+            ->filter(fn($g) => !empty($g->leaderboard_rank))
+            ->take($limit);
 
         return view('landing.leaderboard', compact(
             'periodeAktif', 'leaderboard', 'kelasList', 'mode', 'kelasId'
@@ -53,12 +60,22 @@ class LandingController extends Controller
 
     public function search(Request $request)
     {
-        $search = $request->get('q');
-        
-        $guru = Guru::where('nama', 'like', "%{$search}%")
-            ->orWhere('nip', 'like', "%{$search}%")
-            ->limit(20)
-            ->get();
+        $search = trim((string) $request->get('q', $request->get('search', '')));
+        $query = Guru::with('jurusan');
+
+        if (!empty($search)) {
+            $terms = preg_split('/\s+/', $search, -1, PREG_SPLIT_NO_EMPTY);
+            foreach ($terms as $term) {
+                $query->where(function ($q) use ($term) {
+                    $q->where('nama', 'like', "%{$term}%")
+                      ->orWhere('nip', 'like', "%{$term}%")
+                      ->orWhere('email', 'like', "%{$term}%")
+                      ->orWhereHas('jurusan', fn($j) => $j->where('nama_jurusan', 'like', "%{$term}%"));
+                });
+            }
+        }
+
+        $guru = $query->limit(20)->get();
 
         return view('landing.search', compact('guru', 'search'));
     }

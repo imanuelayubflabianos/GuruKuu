@@ -442,20 +442,25 @@ window.addEventListener('DOMContentLoaded', function() {
     updateGuruChatCounter();
     scrollGuruChat();
 
-    if (window.location.hash === '#tabChat') {
-        const chatTrigger = document.querySelector('button[data-bs-target="#tabChat"]');
-        if (chatTrigger) {
-            bootstrap.Tab.getOrCreateInstance(chatTrigger).show();
-            setTimeout(scrollGuruChat, 150);
+    const activeHash = window.location.hash || localStorage.getItem('guru_settings_tab');
+    if (activeHash) {
+        const trigger = document.querySelector(`button[data-bs-target="${activeHash}"]`);
+        if (trigger) {
+            bootstrap.Tab.getOrCreateInstance(trigger).show();
+            if (activeHash === '#tabChat') setTimeout(scrollGuruChat, 150);
         }
     }
 
-    const chatTabBtn = document.querySelector('button[data-bs-target="#tabChat"]');
-    if (chatTabBtn) {
-        chatTabBtn.addEventListener('shown.bs.tab', function() {
-            setTimeout(scrollGuruChat, 100);
+    document.querySelectorAll('#guruPengaturanTabs button[data-bs-toggle="pill"]').forEach(btn => {
+        btn.addEventListener('shown.bs.tab', function(e) {
+            const target = e.target.getAttribute('data-bs-target');
+            if (target) {
+                history.replaceState(null, '', target);
+                localStorage.setItem('guru_settings_tab', target);
+                if (target === '#tabChat') setTimeout(scrollGuruChat, 100);
+            }
         });
-    }
+    });
 });
 
 function openEditModalGuru(id, text) {

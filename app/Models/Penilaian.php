@@ -40,6 +40,15 @@ class Penilaian extends Model
             // Hapus relasi log pelanggaran yang terkait ulasan ini jika ada
             \App\Models\Pelanggaran::where('penilaian_id', $penilaian->id)->delete();
         });
+
+        static::deleted(function ($penilaian) {
+            \App\Models\Guru::clearLeaderboardCache();
+            $penilaian->guru?->updateRataRata($penilaian->periode_id);
+        });
+
+        static::saved(function ($penilaian) {
+            \App\Models\Guru::clearLeaderboardCache();
+        });
     }
 
     // ==================== RELASI ====================

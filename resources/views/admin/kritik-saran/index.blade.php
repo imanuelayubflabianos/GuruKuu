@@ -81,6 +81,18 @@
             </div>
         </div>
         <div class="col-6 col-md-4 col-lg-2">
+            <select name="periode_id" class="form-select form-select-sm" onchange="this.form.submit()">
+                <option value="">Semua Periode</option>
+                @if(isset($semuaPeriode))
+                    @foreach($semuaPeriode as $p)
+                        <option value="{{ $p->id }}" {{ request('periode_id') == $p->id ? 'selected' : '' }}>
+                            {{ $p->nama_periode }} {{ $p->status === 'aktif' ? '(Aktif)' : '' }}
+                        </option>
+                    @endforeach
+                @endif
+            </select>
+        </div>
+        <div class="col-6 col-md-4 col-lg-2">
             <select name="kelas_id" class="form-select form-select-sm" onchange="this.form.submit()">
                 <option value="">Semua Kelas</option>
                 @if(isset($kelasList))
@@ -120,7 +132,7 @@
             <button type="submit" class="btn btn-sm btn-primary-custom px-3">
                 Cari
             </button>
-            @if(request()->anyFilled(['search', 'kelas_id', 'rating', 'status', 'cakupan']))
+            @if(request()->anyFilled(['search', 'periode_id', 'kelas_id', 'rating', 'status', 'cakupan']))
                 <a href="{{ route('admin.kritik-saran.index') }}" class="btn btn-sm btn-outline-secondary" title="Reset Filter">
                     <i class="bi bi-arrow-counterclockwise"></i>
                 </a>

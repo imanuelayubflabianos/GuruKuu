@@ -16,12 +16,20 @@ class KritikSaranController extends Controller
         // Filter Kelas
         if ($request->filled('kelas_id')) {
             $kelasId = (int) $request->kelas_id;
-            $query->where(function ($q) use ($kelasId) {
+            $classMatches = (clone $query)->where(function ($q) use ($kelasId) {
                 $q->where('class_id', $kelasId)
                   ->orWhereHas('siswa.kelas', function ($sk) use ($kelasId) {
                       $sk->where('kelas.id', $kelasId);
                   });
             });
+            if (!$request->filled('search') || $classMatches->exists()) {
+                $query->where(function ($q) use ($kelasId) {
+                    $q->where('class_id', $kelasId)
+                      ->orWhereHas('siswa.kelas', function ($sk) use ($kelasId) {
+                          $sk->where('kelas.id', $kelasId);
+                      });
+                });
+            }
         }
 
         // Filter cakupan data ulasan / vote:
@@ -47,21 +55,23 @@ class KritikSaranController extends Controller
             });
         }
 
-        // Pencarian (Siswa, Guru, NIS, NIP, isi kritik atau saran)
+        // Pencarian (Siswa, Guru, NIS, NIP, isi kritik atau saran - multi kata)
         if ($request->filled('search')) {
-            $search = trim($request->search);
-            $query->where(function ($q) use ($search) {
-                $q->where('kritik', 'like', "%{$search}%")
-                  ->orWhere('saran', 'like', "%{$search}%")
-                  ->orWhereHas('guru', function ($g) use ($search) {
-                      $g->where('nama', 'like', "%{$search}%")
-                        ->orWhere('nip', 'like', "%{$search}%");
-                  })
-                  ->orWhereHas('siswa', function ($s) use ($search) {
-                      $s->where('name', 'like', "%{$search}%")
-                        ->orWhere('nis', 'like', "%{$search}%");
-                  });
-            });
+            $terms = preg_split('/\s+/', trim($request->search), -1, PREG_SPLIT_NO_EMPTY);
+            foreach ($terms as $term) {
+                $query->where(function ($q) use ($term) {
+                    $q->where('kritik', 'like', "%{$term}%")
+                      ->orWhere('saran', 'like', "%{$term}%")
+                      ->orWhereHas('guru', function ($g) use ($term) {
+                          $g->where('nama', 'like', "%{$term}%")
+                            ->orWhere('nip', 'like', "%{$term}%");
+                      })
+                      ->orWhereHas('siswa', function ($s) use ($term) {
+                          $s->where('name', 'like', "%{$term}%")
+                            ->orWhere('nis', 'like', "%{$term}%");
+                      });
+                });
+            }
         }
 
         // Filter Rating Bintang (1 - 5) berdasarkan pembulatan nilai rata-rata (total_nilai / 5)
@@ -81,9 +91,16 @@ class KritikSaranController extends Controller
             }
         }
 
+        // Filter Periode
+        if ($request->filled('periode_id')) {
+            $query->where('periode_id', $request->periode_id);
+        }
+
         $feedbacks = $query->latest()
             ->paginate(15)
             ->withQueryString();
+
+        $semuaPeriode = \App\Models\Periode::orderBy('tahun_ajaran', 'desc')->orderBy('semester', 'desc')->get();
 
         // Data Kelas untuk dropdown filter
         $kelasList = \App\Models\Kelas::with('jurusan')
@@ -104,7 +121,7 @@ class KritikSaranController extends Controller
             'total_disensor' => Penilaian::where('is_censored', true)->count(),
         ];
 
-        return view('admin.kritik-saran.index', compact('feedbacks', 'stats', 'kelasList'));
+        return view('admin.kritik-saran.index', compact('feedbacks', 'stats', 'kelasList', 'semuaPeriode'));
     }
 
     public function destroy(Penilaian $kritikSaran)

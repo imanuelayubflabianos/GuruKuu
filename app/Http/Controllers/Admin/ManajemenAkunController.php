@@ -24,12 +24,16 @@ class ManajemenAkunController extends Controller
             $query->where('is_active', false);
         }
 
-        // Search by NIS atau nama
-        if ($request->search) {
-            $query->where(function($q) use ($request) {
-                $q->where('nis', 'like', "%{$request->search}%")
-                  ->orWhere('name', 'like', "%{$request->search}%");
-            });
+        // Search by NIS, nama, atau email (multi-kata / token)
+        if ($request->filled('search')) {
+            $terms = preg_split('/\s+/', trim($request->search), -1, PREG_SPLIT_NO_EMPTY);
+            foreach ($terms as $term) {
+                $query->where(function($q) use ($term) {
+                    $q->where('nis', 'like', "%{$term}%")
+                      ->orWhere('name', 'like', "%{$term}%")
+                      ->orWhere('email', 'like', "%{$term}%");
+                });
+            }
         }
 
         $siswa = $query->with('jurusan')->latest()->paginate(15);

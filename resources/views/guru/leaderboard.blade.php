@@ -20,11 +20,56 @@
 
 @include('components.leaderboard-filter')
 
+{{-- BANNER POSISI PERINGKAT PRIBADI GURU (BERSIFAT PRIVAT & HANYA DILIHAT OLEH GURU INI) --}}
+@if(isset($myRankInfo))
+<div class="card-custom p-3 p-md-3.5 mb-4 border shadow-sm" style="background: linear-gradient(135deg, rgba(0, 51, 102, 0.04) 0%, rgba(2, 132, 199, 0.08) 100%); border-left: 5px solid #003366 !important; border-radius: 14px;">
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+        <div class="d-flex align-items-center gap-3">
+            <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 48px; height: 48px; background: #003366; color: #ffffff; font-size: 1.3rem;">
+                <i class="bi bi-person-badge-fill"></i>
+            </div>
+            <div>
+                <div class="d-flex align-items-center gap-2 flex-wrap">
+                    <span class="badge rounded-pill bg-primary px-2.5 py-1 font-mono" style="font-size: 0.72rem;">STATUS PRIBADI ANDA</span>
+                    <small class="text-muted" style="font-size: 0.75rem;">Hanya dapat dilihat oleh Anda</small>
+                </div>
+                <h5 class="fw-bold mb-0 text-dark mt-1" style="font-size: 1.05rem;">
+                    @if($myRankInfo['rank'])
+                        Posisi Anda: <span class="text-primary font-mono fw-extrabold">Peringkat #{{ $myRankInfo['rank'] }}</span>
+                        <span class="text-muted fw-normal" style="font-size: 0.85rem;">dari {{ $myRankInfo['total_gurus'] }} Guru</span>
+                        @if($myRankInfo['is_top_limit'])
+                            <span class="badge bg-success-subtle text-success border border-success-subtle ms-1" style="font-size: 0.7rem;">Top {{ $myRankInfo['limit'] }}</span>
+                        @endif
+                    @else
+                        Posisi Anda: <span class="text-muted fw-semibold">Belum Masuk Peringkat</span>
+                    @endif
+                </h5>
+                <p class="text-muted small mb-0 mt-0.5" style="font-size: 0.78rem;">
+                    @if($myRankInfo['is_top_limit'])
+                        Profil Anda berhasil masuk ke daftar Top {{ $myRankInfo['limit'] }} leaderboard. Terus pertahankan apresiasi belajar ini!
+                    @elseif($myRankInfo['rank'])
+                        Peringkat Anda tersimpan aman secara privat untuk bahan evaluasi diri dan <strong>tidak dipublikasikan</strong> ke leaderboard umum (aman dari ledekan).
+                    @else
+                        Tingkatkan evaluasi dan pembelajaran bersama siswa untuk memperoleh peringkat.
+                    @endif
+                </p>
+            </div>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            <div class="text-end d-none d-sm-block">
+                <span class="text-muted small d-block" style="font-size: 0.7rem;">Rata-rata Nilai Anda</span>
+                <span class="fw-bold font-mono text-dark" style="font-size: 1.1rem;">{{ number_format($myRankInfo['rata_rata'], 2) }} / 5.0</span>
+            </div>
+        </div>
+    </div>
+</div>
+@endif
+
 <div class="mb-3">
     <div class="page-label">PENCAPAIAN TERTINGGI</div>
 </div>
 
-{{-- Podium Top 3 (Hanya Guru yang Memenuhi Syarat Minimal 5 Penilaian) --}}
+{{-- Podium Top 3 --}}
 @php
     $list = $leaderboard ?? collect();
     if (!($list instanceof \Illuminate\Support\Collection)) {
@@ -43,7 +88,7 @@
         </div>
         <h6 class="fw-bold text-dark mb-1">Belum Ada Guru di Ranking Podium</h6>
         <p class="text-muted small mb-0" style="max-width: 580px; margin: 0 auto; line-height: 1.5;">
-            Sesuai ketentuan, guru harus memiliki <strong>minimal 5 penilaian</strong> dari siswa untuk dapat masuk dalam peringkat leaderboard. Seluruh nilai guru tetap tercatat dan dapat dilihat pada tabel di bawah.
+            Belum ada guru yang memenuhi peringkat leaderboard pada periode ini.
         </p>
     </div>
 @endif
@@ -361,8 +406,11 @@
 {{-- Tabel Ranking Unified --}}
 <div class="card-custom">
     <div class="card-header bg-white px-4 py-3.5 border-bottom d-flex justify-content-between align-items-center">
-        <h6 class="fw-bold mb-0 d-flex align-items-center gap-2"><i class="bi bi-trophy-fill text-warning fs-5"></i><span>Daftar Peringkat Guru</span></h6>
-        <span class="badge bg-primary px-3 py-1.5 rounded-pill">{{ $list->count() }} Guru</span>
+        <h6 class="fw-bold mb-0 d-flex align-items-center gap-2">
+            <i class="bi bi-trophy-fill text-warning fs-5"></i>
+            <span>Daftar Peringkat {{ $mode === 'partisipasi' ? 'Top 5 Guru' : 'Top 10 Guru' }}</span>
+        </h6>
+        <span class="badge bg-primary px-3 py-1.5 rounded-pill">{{ $list->count() }} Guru (Top {{ $mode === 'partisipasi' ? '5' : '10' }})</span>
     </div>
     <div class="table-responsive">
         <table class="table table-custom mb-0 align-middle">
@@ -388,10 +436,6 @@
                         @elseif($g->leaderboard_rank === 2) <span class="gk-rank-medal">🥈</span>
                         @elseif($g->leaderboard_rank === 3) <span class="gk-rank-medal">🥉</span>
                         @elseif($g->leaderboard_rank) <span class="gk-rank-badge font-mono">#{{ $g->leaderboard_rank }}</span>
-                        @else
-                            <span class="badge rounded-pill px-2.5 py-1 text-muted" style="background: rgba(0, 51, 102, 0.05); border: 1px solid rgba(0, 51, 102, 0.12); font-size: 0.7rem; font-weight: 600;" data-bs-toggle="tooltip" title="Belum cukup data untuk masuk peringkat leaderboard (minimal 5 penilaian)">
-                                Belum cukup data ({{ $g->total_penilaian }}/5)
-                            </span>
                         @endif
                     </td>
                     <td class="align-middle">

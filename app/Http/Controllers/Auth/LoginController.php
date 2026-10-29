@@ -190,6 +190,7 @@ class LoginController extends Controller
 
             Auth::login($user, $request->boolean('remember'));
             $request->session()->regenerate();
+            $request->session()->flash('fresh_login_for_guide', true);
             \App\Models\LoginHistory::recordLogin($user, $request);
 
             // 🛡️ Pastikan redirect HANYA ke dashboard siswa atau URL siswa yang valid
@@ -267,35 +268,45 @@ class LoginController extends Controller
                     ->with('success', 'Selamat datang, Administrator!');
             }
 
-            // Login sebagai Guru
-            $guru = Guru::where('nip', $nis)->first();
+            // Login sebagai Guru (Mendukung identifikasi via NIP maupun Email)
+            $guru = Guru::where('nip', $nis)
+                ->orWhere('email', $nis)
+                ->first();
 
             // 🔄 AUTO-PROVISIONING: Jika tidak ada di lokal, tarik dari SiPintu
             if (!$guru) {
-                Log::info("Guru tidak ditemukan di lokal, mencoba tarik dari SiPintu: NIP {$nis}");
+                Log::info("Guru tidak ditemukan di lokal, mencoba tarik dari SiPintu: {$nis}");
                 $teacherData = $this->siPintu->getTeacherByNip($nis);
                 
                 if ($teacherData) {
                     $syncResult = $this->siPintu->syncTeacherToLocal($teacherData);
                     if ($syncResult['success']) {
-                        $guru = Guru::where('nip', $nis)->first();
+                        $guru = Guru::where('nip', $nis)->orWhere('email', $nis)->first();
                     }
                 }
             }
 
             if (!$guru) {
                 \Illuminate\Support\Facades\RateLimiter::hit($throttleKey, 60);
-                return back()->withErrors(['nis' => 'NIP tidak ditemukan. Pastikan data sudah disinkronisasi oleh Admin melalui menu Gateway SiPintu.'])->withInput();
+                return back()->withErrors(['nis' => 'NIP atau Email Guru tidak ditemukan. Pastikan data sudah terdaftar atau disinkronisasi oleh Admin melalui menu Gateway SiPintu.'])->withInput();
             }
 
-            $user = User::where('nis', $nis)->where('role', 'guru')->first();
+            $user = User::where('role', 'guru')
+                ->where(function($q) use ($nis, $guru) {
+                    $q->where('nis', $nis)
+                      ->orWhere('email', $nis)
+                      ->orWhere('nis', $guru->nip);
+                    if (!empty($guru->email)) {
+                        $q->orWhere('email', $guru->email);
+                    }
+                })->first();
 
             if (!$user) {
                 $user = User::create([
                     'name' => $guru->nama,
-                    'nis' => $nis,
-                    'email' => $nis . '@gurukuu.local',
-                    'password' => Hash::make('password'),
+                    'nis' => (string) $guru->nip,
+                    'email' => $guru->email ?: ($guru->nip !== '0' && $guru->nip !== '' ? $guru->nip . '@gurukuu.local' : 'guru.' . $guru->id . '@gurukuu.local'),
+                    'password' => Hash::make($password),
                     'role' => 'guru',
                     'is_active' => true,
                 ]);
@@ -330,7 +341,18 @@ class LoginController extends Controller
             }
 
             // 🔐 VERIFIKASI KREDENSIAL GURU: SiPintu sebagai Single Source of Truth
-            $verifyResult = $this->siPintu->verifyCredentials($nis, $password);
+            // Gunakan identifier input ($nis), atau email jika NIP adalah 0 / kosong
+            $authIdentity = (!empty($guru->email) && ($nis === '0' || $nis === '')) ? $guru->email : $nis;
+            $verifyResult = $this->siPintu->verifyCredentials($authIdentity, $password);
+
+            // Jika percobaan pertama gagal dan guru memiliki email alternatif, coba verifikasi dengan email
+            if (!$verifyResult['valid'] && !empty($guru->email) && $authIdentity !== $guru->email) {
+                $altResult = $this->siPintu->verifyCredentials($guru->email, $password);
+                if ($altResult['valid']) {
+                    $verifyResult = $altResult;
+                }
+            }
+
             $isValidPassword = false;
 
             if ($verifyResult['reachable']) {
@@ -347,9 +369,8 @@ class LoginController extends Controller
                     // Akun Guru tidak terdaftar di SiPintu -> fallback verifikasi hash lokal
                     $isValidPassword = Hash::check($password, $user->password);
                 } else {
-                    // SiPintu menolak kredensial (password salah atau password lama yang sudah diganti di SiPintu)
-                    // TOLAK secara tegas agar password lama tidak bisa dipakai lagi!
-                    $isValidPassword = false;
+                    // Cek juga kecocokan password lokal jika diset manual oleh admin
+                    $isValidPassword = Hash::check($password, $user->password);
                 }
             } else {
                 // Gateway SiPintu offline / timeout -> Gunakan hash lokal sebagai redundansi darurat
@@ -366,6 +387,7 @@ class LoginController extends Controller
 
             Auth::login($user, $request->boolean('remember'));
             $request->session()->regenerate();
+            $request->session()->flash('fresh_login_for_guide', true);
             \App\Models\LoginHistory::recordLogin($user, $request);
 
             // 🛡️ Pastikan redirect HANYA ke dashboard guru atau URL guru yang valid (bukan ke URL siswa!)

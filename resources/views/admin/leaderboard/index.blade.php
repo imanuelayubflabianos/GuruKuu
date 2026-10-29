@@ -2,41 +2,68 @@
 @section('title', 'Leaderboard Guru')
 
 @section('content')
-<div class="page-header d-flex justify-content-between align-items-center flex-wrap gap-3">
-    <div>
-        <h1 class="page-title mb-1">Leaderboard Guru</h1>
-        <p class="page-subtitle text-muted mb-0">Monitoring peringkat guru terbaik berdasarkan evaluasi dan ulasan siswa.</p>
-    </div>
+<div class="text-center mb-4">
+    <h1 class="page-title fw-bold text-dark mb-1" style="font-size: 1.85rem;">Leaderboard Guru</h1>
+    <p class="text-muted mb-2" style="font-size: 0.95rem;">Monitoring peringkat guru terbaik berdasarkan evaluasi dan ulasan siswa.</p>
     @php
         $lbCatatan = \App\Models\Setting::get('leaderboard_catatan', 'Leaderboard ini hanyalah fitur apresiasi tambahan. Fokus utama evaluasi adalah refleksi pembelajaran, dedikasi, serta kedisiplinan guru dalam mengajar.');
     @endphp
     @if(!empty(trim($lbCatatan)))
-    <div class="w-100 mt-2">
-        <div class="d-inline-flex align-items-center gap-2 px-3 py-1.5 rounded-pill border" style="background: rgba(0, 51, 102, 0.04); border-color: rgba(0, 51, 102, 0.12) !important;">
-            <i class="bi bi-info-circle text-primary flex-shrink-0" style="font-size: 0.85rem;"></i>
-            <span class="text-muted small" style="font-size: 0.8rem; line-height: 1.4;">
-                <strong>Catatan:</strong> {{ $lbCatatan }}
-            </span>
-        </div>
+    <div class="d-inline-flex align-items-center justify-content-center gap-2 px-3 py-1.5 rounded-pill border" style="background: rgba(0, 51, 102, 0.04); border-color: rgba(0, 51, 102, 0.12) !important; max-width: 680px;">
+        <i class="bi bi-info-circle text-primary flex-shrink-0" style="font-size: 0.85rem;"></i>
+        <span class="text-muted small" style="font-size: 0.8rem; line-height: 1.4;">
+            <strong>Catatan:</strong> {{ $lbCatatan }}
+        </span>
     </div>
     @endif
-    <div class="d-flex gap-2 align-items-center">
-        <div class="dropdown">
-            <button class="btn btn-primary-custom dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                <i class="bi bi-download me-1"></i> Export Laporan
-            </button>
-            <ul class="dropdown-menu dropdown-menu-end shadow-sm">
-                <li>
-                    <a class="dropdown-item" href="{{ route('admin.export.leaderboard.excel') }}">
-                        <i class="bi bi-file-earmark-excel text-success me-2"></i> Export Excel (.xlsx)
-                    </a>
-                </li>
-                <li>
-                    <a class="dropdown-item" href="{{ route('admin.export.leaderboard.pdf') }}">
-                        <i class="bi bi-file-earmark-pdf text-danger me-2"></i> Export PDF (.pdf)
-                    </a>
-                </li>
-            </ul>
+</div>
+
+{{-- TOOLBAR FILTER PERIODE & HISTORI (KHUSUS ADMIN) --}}
+<div class="card-custom p-3 mb-4 border shadow-sm" style="border-radius: 14px; background: #ffffff;">
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2.5">
+        <div class="d-flex align-items-center gap-2 flex-wrap">
+            <span class="badge bg-primary-subtle text-primary border border-primary-subtle font-mono px-2.5 py-1">
+                <i class="bi bi-clock-history me-1"></i>FILTER PERIODE
+            </span>
+            <form method="GET" action="{{ route('admin.leaderboard.index') }}" class="d-inline-flex align-items-center gap-2 m-0" id="adminPeriodeFilterForm">
+                <input type="hidden" name="mode" value="{{ $mode }}">
+                @if(!empty($kelasId)) <input type="hidden" name="kelas_id" value="{{ $kelasId }}"> @endif
+                <select name="periode_id" class="form-select form-select-sm fw-semibold" style="border-radius: 8px; min-width: 260px;" onchange="this.form.submit()">
+                    @foreach($semuaPeriode as $p)
+                        <option value="{{ $p->id }}" {{ (string)($selectedPeriode?->id) === (string)$p->id ? 'selected' : '' }}>
+                            {{ $p->nama_periode }} {{ $p->status === 'aktif' ? '(Sedang Aktif)' : '(Histori / Lalu)' }}
+                        </option>
+                    @endforeach
+                </select>
+            </form>
+            @if($selectedPeriode && $selectedPeriode->status !== 'aktif')
+                <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle rounded-pill px-2.5 py-1 font-mono" style="font-size: 0.72rem;">
+                    <i class="bi bi-archive-fill me-1"></i>Arsip Periode Lampau
+                </span>
+            @else
+                <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-2.5 py-1 font-mono" style="font-size: 0.72rem;">
+                    <i class="bi bi-check-circle-fill me-1"></i>Periode Aktif
+                </span>
+            @endif
+        </div>
+        <div>
+            <div class="dropdown">
+                <button class="btn btn-sm btn-primary-custom dropdown-toggle px-3 py-1.5 shadow-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="border-radius: 8px; font-size: 0.82rem;">
+                    <i class="bi bi-download me-1"></i> Export Laporan
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                    <li>
+                        <a class="dropdown-item" href="{{ route('admin.export.leaderboard.excel', ['periode_id' => $selectedPeriode?->id]) }}">
+                            <i class="bi bi-file-earmark-excel text-success me-2"></i> Export Excel (.xlsx)
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" href="{{ route('admin.export.leaderboard.pdf', ['periode_id' => $selectedPeriode?->id]) }}">
+                            <i class="bi bi-file-earmark-pdf text-danger me-2"></i> Export PDF (.pdf)
+                        </a>
+                    </li>
+                </ul>
+            </div>
         </div>
     </div>
 </div>
