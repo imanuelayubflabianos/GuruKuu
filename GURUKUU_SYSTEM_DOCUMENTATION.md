@@ -319,6 +319,13 @@ GuruKuu/
   - **Desain Mewah Arsip Riwayat Periode Lalu:** Tampilan ulasan arsip periode lalu di portal guru (`resources/views/guru/show.blade.php`) dan siswa (`resources/views/siswa/guru/show.blade.php`) diperbarui menjadi kartu ulasan lengkap berskala penuh dengan rincian 5 aspek penilaian (bintang ⭐ dan nilai /5), persentase total, progress bar, kotak kritik/saran tematik, serta tombol laporkan di pojok kanan bawah.
   - **Reversi Form Login Guru:** Mengembalikan teks label dan placeholder input guru di `resources/views/auth/login.blade.php` menjadi **NIP GURU** dan *"Masukkan NIP guru"*.
   - **Reposisi Tombol Laporkan Ulasan:** Pada halaman profil guru (`resources/views/guru/show.blade.php`), tombol "Laporkan" dipindahkan dari header samping waktu/anonim ke pojok kanan bawah kartu ulasan, sejajar rapi dengan desain standar ulasan siswa.
+* **2026-10-29 (Pemisahan Log Laporan Pengguna vs Pelanggaran Terbukti, Detail Pelapor/Terlapor, & Verifikasi Moderasi Admin):**
+  - Mengubah label Tab 1 dari "Semua Log Pelanggaran" menjadi **"Semua Log"**.
+  - Memisahkan secara tegas ulasan yang baru dilaporkan pengguna (`tipe: 'laporan_pengguna'` / status `menunggu_verifikasi_admin`) dari pelanggaran sistem yang sudah terbukti. Laporan yang belum diverifikasi tidak lagi dianggap sebagai pelanggaran terbukti dan dikecualikan dari akumulasi "Peringkat Siswa Melanggar" maupun "Peringkat Guru Melanggar".
+  - Memperkaya tabel "Semua Log" dengan informasi detail kedua belah pihak: Siswa/penulis yang dilaporkan (*Terlapor*) dan identitas pelapor (*Pelapor*: Nama, peran/role, NIS/NIP/IP, alasan pelaporan, serta catatan keluhan tambahan).
+  - Memperbarui badge tipe menjadi **"Laporan Pengguna (Belum Terverifikasi)"** dengan warna peringatan (*warning*) oranye-kuning, bukan badge merah/hitam pelanggaran terbukti.
+  - Memperbarui popup modal "Lihat Ulasan" dengan banner peringatan telaah objektif, informasi rincian pelapor, teks lengkap ulasan, serta tombol moderasi instan: **Setujui Laporan & Sensor** atau **Tolak Laporan (Ulasan Bersih)**.
+
 
 
 

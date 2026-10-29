@@ -146,8 +146,8 @@
     <ul class="nav nav-pills mb-4 gap-2 border-bottom pb-3" id="pelanggaranTab" role="tablist">
         <li class="nav-item" role="presentation">
             <button class="nav-link active rounded-pill px-3 py-1.5 fw-semibold d-inline-flex align-items-center gap-1.5" id="tab-log-btn" data-bs-toggle="pill" data-bs-target="#tab-log-pane" type="button" role="tab" aria-selected="true">
-                <i class="bi bi-card-list"></i>
-                <span>Semua Log Pelanggaran</span>
+                <i class="bi bi-shield-exclamation text-primary"></i>
+                <span>Semua Log</span>
                 <span class="badge bg-secondary-subtle text-dark rounded-pill ms-1">{{ $pelanggarans->total() }}</span>
             </button>
         </li>
@@ -189,9 +189,10 @@
                     </div>
                     <div class="col-md-3">
                         <select name="tipe" class="form-select form-select-sm" onchange="this.form.submit()">
-                            <option value="">Semua Tipe Pelanggaran</option>
+                            <option value="">Semua Tipe Log</option>
                             <option value="penilaian_toxic" {{ request('tipe') === 'penilaian_toxic' ? 'selected' : '' }}>Ulasan Guru Kasar / Toxic</option>
                             <option value="kontak_toxic" {{ request('tipe') === 'kontak_toxic' ? 'selected' : '' }}>Pesan Kontak Terlarang</option>
+                            <option value="laporan_pengguna" {{ request('tipe') === 'laporan_pengguna' ? 'selected' : '' }}>Laporan Pengguna (Menunggu Verifikasi)</option>
                             <option value="komentar_disensor" {{ request('tipe') === 'komentar_disensor' ? 'selected' : '' }}>Ulasan Disensor Manual</option>
                         </select>
                     </div>
@@ -219,17 +220,39 @@
                         <thead>
                             <tr class="text-muted font-mono" style="font-size: 0.74rem; letter-spacing: 0.5px; background: #f8fafc; border-bottom: 2px solid #e2e8f0;">
                                 <th class="text-center py-3" style="width: 50px;">STATUS</th>
-                                <th class="py-3" style="width: 140px;">WAKTU</th>
-                                <th class="py-3" style="min-width: 200px;">IDENTITAS PELANGGAR</th>
-                                <th class="py-3" style="min-width: 160px;">TIPE & SASARAN</th>
-                                <th class="py-3" style="min-width: 130px;">KATA TERDETEKSI</th>
-                                <th class="text-center py-3" style="width: 130px;">ISI ULASAN</th>
-                                <th class="py-3" style="min-width: 140px;">TINDAKAN</th>
-                                <th class="text-center py-3" style="width: 85px;">AKSI</th>
+                                <th class="py-3" style="width: 135px;">WAKTU</th>
+                                <th class="py-3" style="min-width: 230px;">PENGGUNA / TERLAPOR & PELAPOR</th>
+                                <th class="py-3" style="min-width: 170px;">TIPE & SASARAN</th>
+                                <th class="py-3" style="min-width: 140px;">KATA TERDETEKSI / ALASAN</th>
+                                <th class="text-center py-3" style="width: 125px;">ISI ULASAN</th>
+                                <th class="py-3" style="min-width: 140px;">TINDAKAN / STATUS</th>
+                                <th class="text-center py-3" style="width: 95px;">AKSI</th>
                             </tr>
                         </thead>
                         <tbody>
                             @forelse($pelanggarans as $p)
+                                @php
+                                    $isLaporan = ($p->tipe === 'laporan_pengguna' || str_contains((string)$p->tipe, 'report'));
+                                    $reportObj = $p->reports->first();
+                                    $pelaporUser = $reportObj?->user;
+                                    
+                                    // Informasi Pelapor
+                                    $pelaporNama = $pelaporUser?->name 
+                                        ?? ($p->kata_terdeteksi['pelapor_nama'] ?? null) 
+                                        ?? ($reportObj?->ip_address ? 'Tamu Publik (IP: ' . $reportObj->ip_address . ')' : 'Pengguna / Siswa Lain');
+                                        
+                                    $pelaporRole = $pelaporUser?->role 
+                                        ? strtoupper($pelaporUser->role) 
+                                        : ($p->kata_terdeteksi['pelapor_role'] ?? 'USER');
+                                        
+                                    $pelaporIdentitas = $pelaporUser 
+                                        ? ($pelaporUser->role === 'guru' ? 'NIP: ' . ($pelaporUser->nis ?? '-') : 'NIS: ' . ($pelaporUser->nis ?? '-') . ($pelaporUser->nama_kelas ? ' • ' . $pelaporUser->nama_kelas : ''))
+                                        : ($p->kata_terdeteksi['pelapor_identitas'] ?? ($reportObj?->ip_address ? 'IP: ' . $reportObj->ip_address : ''));
+
+                                    $alasanLaporan = $reportObj?->alasan_label 
+                                        ?? ($p->kata_terdeteksi['alasan'] ?? (is_array($p->kata_terdeteksi) && isset($p->kata_terdeteksi[0]) && is_string($p->kata_terdeteksi[0]) ? $p->kata_terdeteksi[0] : 'Laporan Pengguna'));
+                                    $catatanLaporan = $reportObj?->catatan ?? ($p->kata_terdeteksi['catatan'] ?? null);
+                                @endphp
                                 <tr class="{{ !$p->is_read ? 'bg-danger-subtle bg-opacity-10' : '' }}">
                                     <td class="text-center">
                                         @if(!$p->is_read)
@@ -243,71 +266,121 @@
                                         <div class="text-muted font-mono" style="font-size: 0.72rem;">{{ $p->created_at->format('H:i') }} WIB <br>({{ $p->created_at->diffForHumans() }})</div>
                                     </td>
                                     <td>
-                                        @if($p->user)
-                                            <div class="d-flex align-items-center gap-1.5 mb-1">
-                                                @if($p->user->role === 'guru')
-                                                    <span class="badge bg-primary text-white px-1.5 py-0.5 font-mono" style="font-size: 0.68rem;">GURU</span>
-                                                @else
-                                                    <span class="badge bg-warning text-dark px-1.5 py-0.5 font-mono" style="font-size: 0.68rem;">SISWA</span>
-                                                @endif
-                                                <span class="fw-bold text-dark" style="font-size: 0.92rem;">{{ $p->user->name }}</span>
+                                        @if($isLaporan)
+                                            {{-- LAPORAN USER: TAMPILKAN DENGAN DETAIL SIAPA TERLAPOR & SIAPA PELAPOR --}}
+                                            <div class="mb-2">
+                                                <div class="text-muted font-mono small mb-0.5" style="font-size: 0.68rem; letter-spacing: 0.5px; font-weight: 700;">PENULIS ULASAN (TERLAPOR):</div>
+                                                <div class="d-flex align-items-center gap-1.5 mb-0.5">
+                                                    <span class="badge bg-warning text-dark px-1.5 py-0.5 font-mono" style="font-size: 0.65rem;">{{ strtoupper($p->user?->role ?? 'SISWA') }}</span>
+                                                    <span class="fw-bold text-dark" style="font-size: 0.88rem;">{{ $p->user?->name ?? 'Anonim' }}</span>
+                                                </div>
+                                                <div class="text-muted font-mono" style="font-size: 0.72rem;">
+                                                    NIS: <strong>{{ $p->user?->nis ?? '-' }}</strong> &bull; {{ $p->user?->nama_kelas ?? '-' }}
+                                                </div>
                                             </div>
-
-                                            <div class="small text-muted font-mono mb-1" style="font-size: 0.75rem;">
-                                                @if($p->user->role === 'guru')
-                                                    NIP: <strong>{{ $p->user->nis ?? '-' }}</strong> &bull; {{ $p->user->jurusan?->nama_jurusan ?? 'Guru Pengajar' }}
-                                                @else
-                                                    NIS: <strong>{{ $p->user->nis ?? '-' }}</strong> &bull; {{ $p->user->nama_kelas }}
+                                            <div class="p-2 rounded-2 border border-warning-subtle" style="background: rgba(254, 243, 199, 0.45);">
+                                                <div class="text-warning-emphasis font-mono small mb-0.5" style="font-size: 0.68rem; font-weight: 700;">
+                                                    <i class="bi bi-flag-fill text-warning me-1"></i>DILAPORKAN OLEH:
+                                                </div>
+                                                <div class="fw-semibold text-dark" style="font-size: 0.82rem;">
+                                                    {{ $pelaporNama }} <span class="badge bg-secondary-subtle text-secondary font-mono" style="font-size: 0.62rem;">{{ $pelaporRole }}</span>
+                                                </div>
+                                                @if($pelaporIdentitas)
+                                                    <div class="text-muted font-mono" style="font-size: 0.7rem;">{{ $pelaporIdentitas }}</div>
                                                 @endif
-                                            </div>
-
-                                            <div class="d-flex flex-wrap gap-1 align-items-center">
-                                                @if($p->user->is_active)
-                                                    <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-2 py-0.5 font-mono" style="font-size: 0.68rem;">
-                                                        <i class="bi bi-check-circle-fill me-0.5"></i> Aktif
-                                                    </span>
-                                                @elseif($p->user->deactivation_type === 'berkala')
-                                                    <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle rounded-pill px-2 py-0.5 font-mono" style="font-size: 0.68rem;">
-                                                        <i class="bi bi-clock-history me-0.5"></i> Nonaktif s/d {{ $p->user->deactivated_until?->format('d M Y') }}
-                                                    </span>
-                                                @else
-                                                    <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill px-2 py-0.5 font-mono" style="font-size: 0.68rem;">
-                                                        <i class="bi bi-slash-circle me-0.5"></i> Dinonaktifkan
-                                                    </span>
-                                                @endif
-
-                                                @if($p->user->warning_count > 0)
-                                                    <span class="badge bg-warning text-dark px-1.5 py-0.5 font-mono" style="font-size: 0.68rem;">
-                                                        ⚠️ {{ $p->user->warning_count }}x Peringatan
-                                                    </span>
+                                                @if($catatanLaporan)
+                                                    <div class="text-dark small mt-1 p-1 bg-white rounded border border-light-subtle" style="font-size: 0.72rem;">
+                                                        <span class="text-muted">Catatan:</span> "{{ Str::limit($catatanLaporan, 60) }}"
+                                                    </div>
                                                 @endif
                                             </div>
                                         @else
-                                            <span class="badge bg-secondary">Tamu Publik (Anonim)</span>
-                                            <div class="text-muted font-mono" style="font-size: 0.75rem;">IP: {{ $p->ip_address ?? '-' }}</div>
+                                            {{-- PELANGGARAN TERDETEKSI OTOMATIS OLEH SISTEM --}}
+                                            @if($p->user)
+                                                <div class="d-flex align-items-center gap-1.5 mb-1">
+                                                    @if($p->user->role === 'guru')
+                                                        <span class="badge bg-primary text-white px-1.5 py-0.5 font-mono" style="font-size: 0.68rem;">GURU</span>
+                                                    @else
+                                                        <span class="badge bg-danger text-white px-1.5 py-0.5 font-mono" style="font-size: 0.68rem;">SISWA</span>
+                                                    @endif
+                                                    <span class="fw-bold text-dark" style="font-size: 0.92rem;">{{ $p->user->name }}</span>
+                                                </div>
+
+                                                <div class="small text-muted font-mono mb-1" style="font-size: 0.75rem;">
+                                                    @if($p->user->role === 'guru')
+                                                        NIP: <strong>{{ $p->user->nis ?? '-' }}</strong> &bull; {{ $p->user->jurusan?->nama_jurusan ?? 'Guru Pengajar' }}
+                                                    @else
+                                                        NIS: <strong>{{ $p->user->nis ?? '-' }}</strong> &bull; {{ $p->user->nama_kelas }}
+                                                    @endif
+                                                </div>
+
+                                                <div class="d-flex flex-wrap gap-1 align-items-center">
+                                                    @if($p->user->is_active)
+                                                        <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-2 py-0.5 font-mono" style="font-size: 0.68rem;">
+                                                            <i class="bi bi-check-circle-fill me-0.5"></i> Aktif
+                                                        </span>
+                                                    @elseif($p->user->deactivation_type === 'berkala')
+                                                        <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle rounded-pill px-2 py-0.5 font-mono" style="font-size: 0.68rem;">
+                                                            <i class="bi bi-clock-history me-0.5"></i> Nonaktif s/d {{ $p->user->deactivated_until?->format('d M Y') }}
+                                                        </span>
+                                                    @else
+                                                        <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill px-2 py-0.5 font-mono" style="font-size: 0.68rem;">
+                                                            <i class="bi bi-slash-circle me-0.5"></i> Dinonaktifkan
+                                                        </span>
+                                                    @endif
+
+                                                    @if($p->user->warning_count > 0)
+                                                        <span class="badge bg-warning text-dark px-1.5 py-0.5 font-mono" style="font-size: 0.68rem;">
+                                                            ⚠️ {{ $p->user->warning_count }}x Peringatan
+                                                        </span>
+                                                    @endif
+                                                </div>
+                                            @else
+                                                <span class="badge bg-secondary">Tamu Publik (Anonim)</span>
+                                                <div class="text-muted font-mono" style="font-size: 0.75rem;">IP: {{ $p->ip_address ?? '-' }}</div>
+                                            @endif
                                         @endif
                                     </td>
                                     <td>
-                                        <span class="badge {{ $p->tipe_badge_class }} mb-1" style="font-size: 0.75rem;">
-                                            {{ $p->tipe_label }}
-                                        </span>
-                                        @if($p->guru)
-                                            <div class="small text-muted">
-                                                Sasaran: <span class="fw-semibold text-dark">{{ $p->guru->nama }}</span>
-                                            </div>
-                                        @endif
-                                    </td>
-                                    <td>
-                                        @if(is_array($p->kata_terdeteksi) && count($p->kata_terdeteksi) > 0)
-                                            <div class="d-flex flex-wrap gap-1">
-                                                @foreach($p->kata_terdeteksi as $kata)
-                                                    <span class="badge bg-danger-subtle text-danger border border-danger-subtle fw-semibold px-2">
-                                                        {{ $kata }}
-                                                    </span>
-                                                @endforeach
-                                            </div>
+                                        @if($isLaporan)
+                                            <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle mb-1" style="font-size: 0.74rem;">
+                                                <i class="bi bi-flag-fill me-1"></i>Laporan Pengguna (Belum Terverifikasi)
+                                            </span>
+                                            @if($p->guru)
+                                                <div class="small text-muted">
+                                                    Sasaran Guru: <span class="fw-semibold text-dark">{{ $p->guru->nama }}</span>
+                                                </div>
+                                            @endif
                                         @else
-                                            <span class="text-muted small">-</span>
+                                            <span class="badge {{ $p->tipe_badge_class }} mb-1" style="font-size: 0.75rem;">
+                                                {{ $p->tipe_label }}
+                                            </span>
+                                            @if($p->guru)
+                                                <div class="small text-muted">
+                                                    Sasaran: <span class="fw-semibold text-dark">{{ $p->guru->nama }}</span>
+                                                </div>
+                                            @endif
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @if($isLaporan)
+                                            <span class="badge bg-warning-subtle text-dark border border-warning-subtle fw-semibold px-2 py-1" style="font-size: 0.74rem;">
+                                                {{ $alasanLaporan }}
+                                            </span>
+                                        @else
+                                            @if(is_array($p->kata_terdeteksi) && count($p->kata_terdeteksi) > 0)
+                                                <div class="d-flex flex-wrap gap-1">
+                                                    @foreach($p->kata_terdeteksi as $kata)
+                                                        @if(is_string($kata))
+                                                            <span class="badge bg-danger-subtle text-danger border border-danger-subtle fw-semibold px-2">
+                                                                {{ $kata }}
+                                                            </span>
+                                                        @endif
+                                                    @endforeach
+                                                </div>
+                                            @else
+                                                <span class="text-muted small">-</span>
+                                            @endif
                                         @endif
                                     </td>
                                     <td class="text-center">
@@ -324,13 +397,24 @@
                                             data-kata='@json($p->kata_terdeteksi ?? [])'
                                             data-isi="{{ e($p->isi_teks) }}"
                                             data-tindakan="{{ e($p->tindakan) }}"
+                                            data-is-laporan="{{ $isLaporan ? '1' : '0' }}"
+                                            data-penilaian-id="{{ $p->penilaian_id ?? '' }}"
+                                            data-pelapor-nama="{{ e($pelaporNama) }}"
+                                            data-pelapor-role="{{ e($pelaporRole) }}"
+                                            data-pelapor-identitas="{{ e($pelaporIdentitas) }}"
+                                            data-alasan-laporan="{{ e($alasanLaporan) }}"
+                                            data-catatan-laporan="{{ e($catatanLaporan ?? '') }}"
                                             title="Klik untuk melihat teks ulasan lengkap">
                                             <i class="bi bi-chat-quote-fill"></i>
                                             <span class="fw-semibold" style="font-size: 0.78rem;">Lihat Ulasan</span>
                                         </button>
                                     </td>
                                     <td>
-                                        @if($p->tindakan === 'dinonaktifkan_permanen')
+                                        @if($isLaporan && $p->tindakan === 'menunggu_verifikasi_admin')
+                                            <span class="badge rounded-pill px-2.5 py-1 text-warning-emphasis border border-warning" style="background: rgba(245, 158, 11, 0.12); font-size: 0.72rem; font-weight: 600;">
+                                                <i class="bi bi-hourglass-split me-1"></i>Menunggu Verifikasi
+                                            </span>
+                                        @elseif($p->tindakan === 'dinonaktifkan_permanen')
                                             <span class="badge bg-danger text-white border"><i class="bi bi-slash-circle me-1"></i>Nonaktif Permanen</span>
                                         @elseif($p->tindakan === 'dinonaktifkan_berkala')
                                             <span class="badge bg-warning text-dark border border-warning"><i class="bi bi-clock-history me-1"></i>Nonaktif Berkala</span>
@@ -340,12 +424,29 @@
                                             <span class="badge bg-warning-subtle text-warning border border-warning">Diberi Peringatan</span>
                                         @elseif($p->tindakan === 'diblokir_otomatis')
                                             <span class="badge bg-secondary-subtle text-secondary border">Diblokir Sistem</span>
+                                        @elseif($p->tindakan === 'disensor')
+                                            <span class="badge bg-secondary text-white border"><i class="bi bi-eye-slash me-1"></i>Disensor Admin</span>
                                         @else
                                             <span class="badge bg-light text-dark border">{{ $p->tindakan }}</span>
                                         @endif
                                     </td>
                                     <td class="text-center">
                                         <div class="d-flex align-items-center justify-content-center gap-1">
+                                            @if($isLaporan && $p->penilaian_id && $p->tindakan === 'menunggu_verifikasi_admin')
+                                                {{-- AKSI CEPAT VERIFIKASI LAPORAN: SENSOR ATAU TOLAK --}}
+                                                <form action="{{ route('admin.pelanggaran.report.censor', $p->penilaian_id) }}" method="POST" class="d-inline" data-confirm="Setujui laporan ini dan sensor ulasan siswa agar tidak tampil di publik?" data-confirm-title="Setujui Laporan & Sensor Ulasan?" data-confirm-btn="Ya, Sensor" data-confirm-type="danger" title="Setujui Laporan & Sensor Ulasan">
+                                                    @csrf
+                                                    <button type="submit" class="btn btn-sm btn-light border text-danger rounded-circle p-1" style="width: 28px; height: 28px;">
+                                                        <i class="bi bi-shield-x"></i>
+                                                    </button>
+                                                </form>
+                                                <form action="{{ route('admin.pelanggaran.report.dismiss', $p->penilaian_id) }}" method="POST" class="d-inline" data-confirm="Tolak laporan ini karena ulasan dinilai wajar dan tidak melanggar?" data-confirm-title="Tolak Laporan Pengguna?" data-confirm-btn="Ya, Tolak Laporan" data-confirm-type="warning" title="Tolak Laporan (Ulasan Bersih)">
+                                                    @csrf @method('DELETE')
+                                                    <button type="submit" class="btn btn-sm btn-light border text-secondary rounded-circle p-1" style="width: 28px; height: 28px;">
+                                                        <i class="bi bi-x-lg"></i>
+                                                    </button>
+                                                </form>
+                                            @endif
                                             @if(!$p->is_read)
                                                 <form action="{{ route('admin.pelanggaran.read', $p) }}" method="POST" class="d-inline" title="Tandai Ditinjau">
                                                     @csrf @method('PATCH')
@@ -354,7 +455,7 @@
                                                     </button>
                                                 </form>
                                             @endif
-                                            <form action="{{ route('admin.pelanggaran.destroy', $p) }}" method="POST" class="d-inline" data-confirm="Hapus catatan log pelanggaran ini?" data-confirm-title="Hapus Log Pelanggaran?" data-confirm-btn="Ya, Hapus" data-confirm-type="danger" title="Hapus Log">
+                                            <form action="{{ route('admin.pelanggaran.destroy', $p) }}" method="POST" class="d-inline" data-confirm="Hapus catatan log ini?" data-confirm-title="Hapus Catatan Log?" data-confirm-btn="Ya, Hapus" data-confirm-type="danger" title="Hapus Log">
                                                 @csrf @method('DELETE')
                                                 <button type="submit" class="btn btn-sm btn-light border text-danger rounded-circle p-1" style="width: 28px; height: 28px;">
                                                     <i class="bi bi-trash"></i>
@@ -967,20 +1068,54 @@
             <div class="modal-header border-bottom py-3 px-4" style="background: #f8fafc;">
                 <div class="d-flex align-items-center gap-2">
                     <div class="rounded-circle d-flex align-items-center justify-content-center text-primary" style="width: 38px; height: 38px; background: rgba(0, 51, 102, 0.08);">
-                        <i class="bi bi-chat-quote-fill fs-5"></i>
+                        <i class="bi bi-chat-quote-fill fs-5" id="modalUlasanIcon"></i>
                     </div>
                     <div>
-                        <h5 class="modal-title fw-bold text-dark mb-0">Isi Ulasan / Pesan Melanggar</h5>
+                        <h5 class="modal-title fw-bold text-dark mb-0" id="modalUlasanTitle">Isi Ulasan / Pesan Melanggar</h5>
                         <small class="text-muted font-mono" id="modalUlasanWaktu">-</small>
                     </div>
                 </div>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body p-4">
+                {{-- BANNER PERINGATAN LAPORAN BELUM DIVERIFIKASI --}}
+                <div id="modalLaporanNotice" class="alert alert-warning d-flex align-items-start gap-2 mb-3 py-2.5 px-3 border-warning-subtle d-none" style="border-radius: 10px;">
+                    <i class="bi bi-exclamation-triangle-fill text-warning flex-shrink-0 mt-0.5"></i>
+                    <div class="small">
+                        <strong>Laporan Pengguna (Belum Terverifikasi):</strong> Ulasan ini dilaporkan oleh pengguna lain dan belum terbukti melanggar aturan. Mohon telaah teks ulasan dengan bijak & objektif sebelum menyetujui sensor atau menolak laporan.
+                    </div>
+                </div>
+
+                {{-- INFO PELAPOR (JIKA LAPORAN) --}}
+                <div id="modalLaporanSection" class="p-3 rounded-3 bg-warning-subtle border border-warning-subtle mb-3 d-none">
+                    <div class="d-flex align-items-center gap-1.5 mb-2">
+                        <i class="bi bi-flag-fill text-warning"></i>
+                        <span class="fw-bold text-dark font-mono small" style="font-size: 0.76rem;">RINCIAN PELAPOR & ALASAN LAPORAN:</span>
+                    </div>
+                    <div class="row g-2 small">
+                        <div class="col-sm-6">
+                            <span class="text-muted d-block font-mono" style="font-size: 0.72rem;">DILAPORKAN OLEH:</span>
+                            <div class="d-flex align-items-center gap-1 mt-0.5">
+                                <span class="badge bg-dark font-mono px-1.5 py-0.5" id="modalPelaporRole" style="font-size: 0.68rem;">PENGGUNA</span>
+                                <strong class="text-dark" id="modalPelaporNama">-</strong>
+                            </div>
+                            <small class="text-muted font-mono" id="modalPelaporIdentitas">-</small>
+                        </div>
+                        <div class="col-sm-6">
+                            <span class="text-muted d-block font-mono" style="font-size: 0.72rem;">ALASAN LAPORAN:</span>
+                            <span class="badge bg-warning text-dark border border-warning mt-0.5" id="modalAlasanLaporan">-</span>
+                            <div id="modalCatatanContainer" class="mt-1 d-none">
+                                <span class="text-muted d-block font-mono" style="font-size: 0.7rem;">CATATAN PELAPOR:</span>
+                                <em class="text-secondary d-block" id="modalCatatanLaporan" style="font-size: 0.8rem;"></em>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 {{-- INFO PELANGGAR & SASARAN --}}
                 <div class="row g-3 p-3 rounded-3 bg-light border mb-3">
                     <div class="col-sm-6">
-                        <span class="text-muted small d-block font-mono mb-1" style="font-size: 0.72rem;">IDENTITAS PENGIRIM:</span>
+                        <span class="text-muted small d-block font-mono mb-1" style="font-size: 0.72rem;" id="modalLabelPengirim">IDENTITAS PENGIRIM:</span>
                         <div class="d-flex align-items-center gap-1.5 mb-1">
                             <span class="badge bg-primary text-white font-mono px-2 py-0.5" id="modalUlasanRole" style="font-size: 0.7rem;">SISWA</span>
                             <strong class="text-dark fs-6" id="modalUlasanNama">-</strong>
@@ -1002,7 +1137,7 @@
 
                 {{-- ISI LENGKAP ULASAN / TEKS --}}
                 <div class="mb-3">
-                    <label class="form-label font-mono small fw-bold text-dark mb-1.5" style="font-size: 0.72rem; letter-spacing: 0.5px;">TEKS LENGKAP PERCOBAAN KOMENTAR / ULASAN:</label>
+                    <label class="form-label font-mono small fw-bold text-dark mb-1.5" style="font-size: 0.72rem; letter-spacing: 0.5px;" id="modalLabelTeks">TEKS LENGKAP PERCOBAAN KOMENTAR / ULASAN:</label>
                     <div class="p-3 rounded-3 border position-relative" style="background: #ffffff; border-left: 4px solid var(--primary, #003366) !important; font-size: 0.95rem; line-height: 1.6; color: #1e293b;">
                         <i class="bi bi-quote text-muted opacity-25 position-absolute" style="font-size: 3rem; right: 10px; bottom: -5px; pointer-events: none;"></i>
                         <p class="mb-0 text-break font-sans" id="modalUlasanTeks" style="white-space: pre-wrap; font-size: 0.92rem;"></p>
@@ -1011,12 +1146,28 @@
 
                 {{-- STATUS TINDAKAN SISTEM --}}
                 <div class="d-flex align-items-center justify-content-between p-2.5 bg-light rounded-3 border">
-                    <span class="text-muted small font-mono">Tindakan Sistem Terpasang:</span>
+                    <span class="text-muted small font-mono">Tindakan / Status:</span>
                     <span class="badge bg-dark px-2.5 py-1 font-mono" id="modalUlasanTindakan">-</span>
                 </div>
             </div>
-            <div class="modal-footer border-top py-2.5 px-4 bg-light justify-content-end">
-                <button type="button" class="btn btn-secondary btn-sm px-3 rounded-pill" data-bs-dismiss="modal">Tutup</button>
+            <div class="modal-footer border-top py-2.5 px-4 bg-light d-flex justify-content-between align-items-center">
+                <div id="modalLaporanActions" class="d-flex align-items-center gap-2 d-none">
+                    <form id="formModalCensor" method="POST" action="" data-confirm="Setujui laporan ini dan sensor ulasan siswa agar tidak tampil di publik?" data-confirm-title="Setujui Laporan & Sensor Ulasan?" data-confirm-btn="Ya, Sensor" data-confirm-type="danger">
+                        @csrf
+                        <button type="submit" class="btn btn-danger btn-sm px-3 rounded-pill d-inline-flex align-items-center gap-1.5">
+                            <i class="bi bi-shield-x"></i>
+                            <span>Setujui Laporan & Sensor</span>
+                        </button>
+                    </form>
+                    <form id="formModalDismiss" method="POST" action="" data-confirm="Tolak laporan ini karena ulasan dinilai wajar dan tidak melanggar?" data-confirm-title="Tolak Laporan Pengguna?" data-confirm-btn="Ya, Tolak Laporan" data-confirm-type="warning">
+                        @csrf @method('DELETE')
+                        <button type="submit" class="btn btn-outline-secondary btn-sm px-3 rounded-pill d-inline-flex align-items-center gap-1.5">
+                            <i class="bi bi-x-lg"></i>
+                            <span>Tolak Laporan (Ulasan Bersih)</span>
+                        </button>
+                    </form>
+                </div>
+                <button type="button" class="btn btn-secondary btn-sm px-3 rounded-pill ms-auto" data-bs-dismiss="modal">Tutup</button>
             </div>
         </div>
     </div>
@@ -1046,12 +1197,56 @@ function openModalDetailUlasan(btn) {
     const waktu = btn.dataset.waktu || '-';
     const isi = btn.dataset.isi || '';
     const tindakan = btn.dataset.tindakan || '-';
+    const isLaporan = btn.dataset.isLaporan === '1';
+    const penilaianId = btn.dataset.penilaianId || '';
+    const pelaporNama = btn.dataset.pelaporNama || '-';
+    const pelaporRole = btn.dataset.pelaporRole || 'PENGGUNA';
+    const pelaporIdentitas = btn.dataset.pelaporIdentitas || '-';
+    const alasanLaporan = btn.dataset.alasanLaporan || '-';
+    const catatanLaporan = btn.dataset.catatanLaporan || '';
     
     let kata = [];
     try {
         kata = JSON.parse(btn.dataset.kata || '[]');
     } catch(e) {
         kata = [];
+    }
+
+    if (isLaporan) {
+        document.getElementById('modalUlasanTitle').innerText = 'Detail Ulasan yang Dilaporkan Pengguna';
+        document.getElementById('modalUlasanIcon').className = 'bi bi-flag-fill fs-5 text-warning';
+        document.getElementById('modalLabelPengirim').innerText = 'SISWA / PENULIS YANG DILAPORKAN:';
+        document.getElementById('modalLabelTeks').innerText = 'TEKS ULASAN YANG DILAPORKAN:';
+        document.getElementById('modalLaporanNotice').classList.remove('d-none');
+        document.getElementById('modalLaporanSection').classList.remove('d-none');
+        
+        document.getElementById('modalPelaporNama').innerText = pelaporNama;
+        document.getElementById('modalPelaporRole').innerText = pelaporRole.toUpperCase();
+        document.getElementById('modalPelaporIdentitas').innerText = pelaporIdentitas;
+        document.getElementById('modalAlasanLaporan').innerText = alasanLaporan;
+        
+        if (catatanLaporan) {
+            document.getElementById('modalCatatanContainer').classList.remove('d-none');
+            document.getElementById('modalCatatanLaporan').innerText = '"' + catatanLaporan + '"';
+        } else {
+            document.getElementById('modalCatatanContainer').classList.add('d-none');
+        }
+
+        if (penilaianId && (tindakan === 'menunggu_verifikasi_admin' || tindakan === 'Menunggu Verifikasi')) {
+            document.getElementById('formModalCensor').action = '/admin/pelanggaran/report/' + penilaianId + '/censor';
+            document.getElementById('formModalDismiss').action = '/admin/pelanggaran/report/' + penilaianId + '/dismiss';
+            document.getElementById('modalLaporanActions').classList.remove('d-none');
+        } else {
+            document.getElementById('modalLaporanActions').classList.add('d-none');
+        }
+    } else {
+        document.getElementById('modalUlasanTitle').innerText = 'Isi Ulasan / Pesan Melanggar';
+        document.getElementById('modalUlasanIcon').className = 'bi bi-chat-quote-fill fs-5 text-primary';
+        document.getElementById('modalLabelPengirim').innerText = 'IDENTITAS PENGIRIM:';
+        document.getElementById('modalLabelTeks').innerText = 'TEKS LENGKAP PERCOBAAN KOMENTAR / ULASAN:';
+        document.getElementById('modalLaporanNotice').classList.add('d-none');
+        document.getElementById('modalLaporanSection').classList.add('d-none');
+        document.getElementById('modalLaporanActions').classList.add('d-none');
     }
 
     document.getElementById('modalUlasanNama').innerText = nama;
@@ -1066,14 +1261,16 @@ function openModalDetailUlasan(btn) {
 
     const badgesContainer = document.getElementById('modalUlasanKataBadges');
     badgesContainer.innerHTML = '';
-    if (kata && kata.length > 0) {
+    if (kata && kata.length > 0 && !isLaporan) {
         document.getElementById('modalUlasanKataContainer').classList.remove('d-none');
         kata.forEach(k => {
-            const badge = document.createElement('span');
-            badge.className = 'badge bg-danger text-white px-2 py-1 font-mono';
-            badge.style.fontSize = '0.78rem';
-            badge.innerText = k;
-            badgesContainer.appendChild(badge);
+            if (typeof k === 'string') {
+                const badge = document.createElement('span');
+                badge.className = 'badge bg-danger text-white px-2 py-1 font-mono';
+                badge.style.fontSize = '0.78rem';
+                badge.innerText = k;
+                badgesContainer.appendChild(badge);
+            }
         });
     } else {
         document.getElementById('modalUlasanKataContainer').classList.add('d-none');

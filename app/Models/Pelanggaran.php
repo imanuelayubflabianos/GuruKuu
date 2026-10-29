@@ -49,6 +49,11 @@ class Pelanggaran extends Model
         return $this->belongsTo(Penilaian::class, 'penilaian_id');
     }
 
+    public function reports()
+    {
+        return $this->hasMany(UlasanReport::class, 'penilaian_id', 'penilaian_id');
+    }
+
     public function scopeUnread($query)
     {
         return $query->where('is_read', false);
@@ -60,7 +65,7 @@ class Pelanggaran extends Model
     }
 
     /**
-     * Label tipe pelanggaran
+     * Label tipe pelanggaran / log insiden
      */
     public function getTipeLabelAttribute(): string
     {
@@ -70,6 +75,7 @@ class Pelanggaran extends Model
             'komentar_disensor' => 'Ulasan Disensor oleh Admin',
             'ulasan_dihapus' => 'Penilaian Dihapus oleh Admin',
             'peringatan_manual' => 'Peringatan Pelanggaran Manual',
+            'laporan_pengguna', 'ulasan_reported' => 'Laporan Pengguna (Belum Terverifikasi)',
             default => 'Pelanggaran Kebijakan',
         };
     }
@@ -85,6 +91,7 @@ class Pelanggaran extends Model
             'komentar_disensor' => 'bg-secondary text-white',
             'ulasan_dihapus' => 'bg-danger text-white',
             'peringatan_manual' => 'bg-info text-white',
+            'laporan_pengguna', 'ulasan_reported' => 'bg-warning-subtle text-warning-emphasis border border-warning-subtle',
             default => 'bg-dark text-white',
         };
     }

@@ -15,7 +15,7 @@ class PelanggaranController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Pelanggaran::with(['user.jurusan', 'user.kelas', 'guru', 'penilaian']);
+        $query = Pelanggaran::with(['user.jurusan', 'user.kelas', 'guru', 'penilaian', 'reports.user']);
 
 
         // Filter status baca
@@ -66,7 +66,12 @@ class PelanggaranController extends Controller
         ];
 
         // Peringkat Siswa yang melanggar aturan (role siswa)
+        // HANYA menghitung pelanggaran pasti (bukan laporan pengguna yang masih menunggu verifikasi admin)
         $topSiswa = Pelanggaran::whereHas('user', fn($q) => $q->where('role', 'siswa'))
+            ->where(function ($q) {
+                $q->where('tipe', '!=', 'laporan_pengguna')
+                  ->orWhere('tindakan', '!=', 'menunggu_verifikasi_admin');
+            })
             ->selectRaw('user_id, count(*) as total_pelanggaran, max(created_at) as latest_violation')
             ->groupBy('user_id')
             ->orderByDesc('total_pelanggaran')
@@ -74,6 +79,10 @@ class PelanggaranController extends Controller
             ->get()
             ->map(function ($item) {
                 $item->pelanggaran_list = Pelanggaran::where('user_id', $item->user_id)
+                    ->where(function ($q) {
+                        $q->where('tipe', '!=', 'laporan_pengguna')
+                          ->orWhere('tindakan', '!=', 'menunggu_verifikasi_admin');
+                    })
                     ->latest()
                     ->take(8)
                     ->get();
@@ -82,6 +91,10 @@ class PelanggaranController extends Controller
 
         // Peringkat Guru yang melanggar aturan (role guru)
         $topGuru = Pelanggaran::whereHas('user', fn($q) => $q->where('role', 'guru'))
+            ->where(function ($q) {
+                $q->where('tipe', '!=', 'laporan_pengguna')
+                  ->orWhere('tindakan', '!=', 'menunggu_verifikasi_admin');
+            })
             ->selectRaw('user_id, count(*) as total_pelanggaran, max(created_at) as latest_violation')
             ->groupBy('user_id')
             ->orderByDesc('total_pelanggaran')
@@ -89,6 +102,10 @@ class PelanggaranController extends Controller
             ->get()
             ->map(function ($item) {
                 $item->pelanggaran_list = Pelanggaran::where('user_id', $item->user_id)
+                    ->where(function ($q) {
+                        $q->where('tipe', '!=', 'laporan_pengguna')
+                          ->orWhere('tindakan', '!=', 'menunggu_verifikasi_admin');
+                    })
                     ->latest()
                     ->take(8)
                     ->get();
@@ -351,7 +368,15 @@ class PelanggaranController extends Controller
             'alasan_sensor' => 'Disensor oleh Administrator setelah menerima laporan pengguna.'
         ]);
 
-        return back()->with('success', 'Ulasan siswa berhasil disensor dan disembunyikan dari tampilan publik.');
+        // Tandai pelanggaran sebagai terverifikasi (disensor)
+        Pelanggaran::where('penilaian_id', $penilaian->id)
+            ->whereIn('tipe', ['ulasan_reported', 'laporan_pengguna'])
+            ->update([
+                'tindakan' => 'disensor',
+                'is_read' => true,
+            ]);
+
+        return back()->with('success', 'Ulasan siswa berhasil disensor dan diverifikasi sebagai pelanggaran.');
     }
 
     public function dismissReportedReview($penilaian)
@@ -360,7 +385,7 @@ class PelanggaranController extends Controller
         if (Schema::hasTable('ulasan_reports')) {
             UlasanReport::where('penilaian_id', $penilaianId)->delete();
         }
-        Pelanggaran::where('penilaian_id', $penilaianId)->where('tipe', 'ulasan_reported')->delete();
+        Pelanggaran::where('penilaian_id', $penilaianId)->whereIn('tipe', ['ulasan_reported', 'laporan_pengguna'])->delete();
 
         return back()->with('success', 'Laporan ulasan berhasil ditolak dan dibersihkan dari daftar laporan.');
     }

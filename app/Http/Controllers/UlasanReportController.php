@@ -81,13 +81,28 @@ class UlasanReportController extends Controller
             default => 'Pelanggaran Kebijakan',
         };
 
+        $reporterUser = auth()->user();
+        $reporterName = $reporterUser ? $reporterUser->name : 'Anonim / Tamu';
+        $reporterRole = $reporterUser ? strtoupper($reporterUser->role) : 'UMUM';
+        $reporterIdentitas = $reporterUser 
+            ? ($reporterUser->role === 'guru' ? 'NIP: ' . ($reporterUser->nis ?? '-') : 'NIS: ' . ($reporterUser->nis ?? '-')) 
+            : ('IP: ' . $ip);
+
         Pelanggaran::create([
             'user_id' => $penilaian->siswa_id,
             'guru_id' => $penilaian->guru_id,
             'penilaian_id' => $penilaian->id,
             'tipe' => 'laporan_pengguna',
             'isi_teks' => "Kritik: " . ($penilaian->kritik ?: '-') . " | Saran: " . ($penilaian->saran ?: '-'),
-            'kata_terdeteksi' => ['Report: ' . $alasanLabel],
+            'kata_terdeteksi' => [
+                'alasan' => $alasanLabel,
+                'pelapor_id' => $userId,
+                'pelapor_nama' => $reporterName,
+                'pelapor_role' => $reporterRole,
+                'pelapor_identitas' => $reporterIdentitas,
+                'catatan' => $validated['catatan'] ?? null,
+                'label' => 'Laporan: ' . $alasanLabel,
+            ],
             'ip_address' => $ip,
             'user_agent' => $request->userAgent(),
             'tindakan' => 'menunggu_verifikasi_admin',
