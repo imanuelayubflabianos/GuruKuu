@@ -242,7 +242,7 @@
                         @endif
                     </a>
                     <a href="{{ route('admin.pelanggaran.index') }}" class="sidebar-link d-flex align-items-center justify-content-between {{ request()->routeIs('admin.pelanggaran.*') ? 'active' : '' }}">
-                        <span>Log Pelanggaran</span>
+                        <span>Log Pelanggaran Dll</span>
                         @if(($unreadPelanggaranCount ?? 0) > 0)
                             <span class="badge bg-danger rounded-pill px-2" style="font-size: 0.65rem;">{{ $unreadPelanggaranCount }} baru</span>
                         @endif

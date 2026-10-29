@@ -325,6 +325,8 @@ GuruKuu/
   - Memperkaya tabel "Semua Log" dengan informasi detail kedua belah pihak: Siswa/penulis yang dilaporkan (*Terlapor*) dan identitas pelapor (*Pelapor*: Nama, peran/role, NIS/NIP/IP, alasan pelaporan, serta catatan keluhan tambahan).
   - Memperbarui badge tipe menjadi **"Laporan Pengguna (Belum Terverifikasi)"** dengan warna peringatan (*warning*) oranye-kuning, bukan badge merah/hitam pelanggaran terbukti.
   - Memperbarui popup modal "Lihat Ulasan" dengan banner peringatan telaah objektif, informasi rincian pelapor, teks lengkap ulasan, serta tombol moderasi instan: **Setujui Laporan & Sensor** atau **Tolak Laporan (Ulasan Bersih)**.
+  - **Penyelarasan Tampilan & Menu Titik Tiga (Meatballs Dropdown):** Mengganti deretan tombol aksi individual pada kolom AKSI tabel "Semua Log" menjadi tombol dropdown titik tiga (`...`) yang seragam dan rapi (berisi aksi: Sensor Ulasan, Sanksi Akun, Hapus Ulasan, Tolak Laporan, Tandai Sudah Ditinjau, Hapus Log). Mempercantik baris identitas Terlapor & Pelapor agar proporsional dan sejajar rapi dengan standar tabel modul admin lainnya.
+  - **Pembaruan Label Sidebar:** Memperbarui label item navigasi sidebar Admin dari "Log Pelanggaran" menjadi **"Log Pelanggaran Dll"** (`resources/views/layouts/admin.blade.php`).
 
 
 
