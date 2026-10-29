@@ -271,6 +271,10 @@ class SiPintuController extends Controller
             return back()->with('error', 'Tidak ada data guru yang dapat ditarik dari SiPintu.');
         }
 
+        if (!empty($result['is_fallback'])) {
+            return back()->with('warning', 'Gateway SiPintu sedang tidak dapat dihubungi (404/Offline). Sinkronisasi massal dibatalkan karena sistem sedang berjalan dalam mode cadangan lokal.');
+        }
+
         $count = 0;
         foreach ($result['data'] as $t) {
             $res = $this->siPintu->syncTeacherToLocal($t);
@@ -299,6 +303,10 @@ class SiPintuController extends Controller
         $result = $this->siPintu->getStudents(['only_active' => $onlyActive, 'refresh' => true]);
         if (!$result['success'] || empty($result['data'])) {
             return back()->with('error', 'Tidak ada data siswa yang dapat ditarik dari SiPintu.');
+        }
+
+        if (!empty($result['is_fallback'])) {
+            return back()->with('warning', 'Gateway SiPintu sedang tidak dapat dihubungi. Sinkronisasi massal dibatalkan karena sistem sedang berjalan dalam mode cadangan lokal.');
         }
 
         // Siapkan lookup map Kelas in-memory untuk efisiensi maksimal tanpa ribuan query

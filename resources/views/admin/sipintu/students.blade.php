@@ -40,6 +40,17 @@
         <i class="bi bi-arrow-clockwise me-1"></i> Coba Lagi
     </a>
 </div>
+@elseif(!empty($result['is_fallback']))
+<div class="alert alert-info border-0 shadow-sm d-flex align-items-center gap-3 mb-4" style="border-radius: 12px; background: #eff6ff; border-left: 5px solid #3b82f6 !important;">
+    <i class="bi bi-cloud-slash-fill text-primary fs-3"></i>
+    <div class="flex-grow-1">
+        <h6 class="mb-1 fw-bold text-dark">Mode Cadangan Lokal Aktif (Gateway SiPintu Bermasalah)</h6>
+        <p class="mb-0 text-muted small">Server SiPintu Gateway sedang tidak dapat dihubungi. Sistem secara otomatis menampilkan cadangan data siswa lokal.</p>
+    </div>
+    <a href="{{ route('admin.sipintu.siswa', ['refresh' => 1]) }}" class="btn btn-sm btn-outline-primary">
+        <i class="bi bi-arrow-clockwise me-1"></i> Cek Ulang Gateway
+    </a>
+</div>
 @endif
 
 {{-- FILTER & SEARCH BOX --}}

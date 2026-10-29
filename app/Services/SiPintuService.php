@@ -400,25 +400,94 @@ class SiPintuService
         try {
             $forceRefresh = !empty($params['refresh']);
             $cacheKey = 'sipintu_teachers_raw';
+            $backupKey = 'sipintu_teachers_raw_backup';
+            $isFallback = false;
 
             if ($forceRefresh) {
                 Cache::forget($cacheKey);
             }
 
-            $rawTeachers = Cache::remember($cacheKey, 300, function () {
-                $response = $this->client()->get("{$this->baseUrl}/api/v1/sijuna/teachers");
-                if ($response->successful()) {
-                    return $this->extractDataArray($response->json(), 'teachers');
+            $rawTeachers = Cache::remember($cacheKey, 300, function () use ($backupKey) {
+                try {
+                    $response = $this->client()->get("{$this->baseUrl}/api/v1/sijuna/teachers");
+                    if ($response->successful()) {
+                        $extracted = $this->extractDataArray($response->json(), 'teachers');
+                        if (!empty($extracted)) {
+                            Cache::forever($backupKey, $extracted);
+                        }
+                        return $extracted;
+                    }
+                } catch (\Throwable $e) {
+                    Log::warning("SiPintu getTeachers remote call failed: " . $e->getMessage());
                 }
                 return null;
             });
 
             if ($rawTeachers === null) {
-                $response = $this->client()->get("{$this->baseUrl}/api/v1/sijuna/teachers");
-                if (!$response->successful()) {
-                    return ['success' => false, 'status_code' => $response->status(), 'data' => [], 'total' => 0, 'raw' => $response->json(), 'message' => "Gagal mengambil data guru. Status: {$response->status()}"];
+                $response = null;
+                try {
+                    $response = $this->client()->get("{$this->baseUrl}/api/v1/sijuna/teachers");
+                    if ($response->successful()) {
+                        $rawTeachers = $this->extractDataArray($response->json(), 'teachers');
+                        if (!empty($rawTeachers)) {
+                            Cache::put($cacheKey, $rawTeachers, 300);
+                            Cache::forever($backupKey, $rawTeachers);
+                        }
+                    }
+                } catch (\Throwable $e) {
+                    Log::warning("SiPintu getTeachers fetch direct failed: " . $e->getMessage());
                 }
-                $rawTeachers = $this->extractDataArray($response->json(), 'teachers');
+
+                if ($rawTeachers === null) {
+                    // Cek persistent backup cache terlebih dahulu
+                    $rawTeachers = Cache::get($backupKey);
+                    if (!empty($rawTeachers)) {
+                        $isFallback = true;
+                    } else {
+                        // Resilient Fallback: Rekonstruksi dari database lokal GuruKuu
+                        try {
+                            $localGurus = Guru::with('jurusan')->get();
+                            if ($localGurus->isNotEmpty()) {
+                                $rawTeachers = $localGurus->map(function ($g) {
+                                    return [
+                                        'id' => $g->id,
+                                        'nip' => $g->nip,
+                                        'nik' => $g->nip,
+                                        'nama' => $g->nama,
+                                        'nama_guru' => $g->nama,
+                                        'email' => $g->email,
+                                        'user' => ['email' => $g->email],
+                                        'hp' => $g->no_hp,
+                                        'telepon' => $g->no_hp,
+                                        'kategori' => $g->kategori ?? 'normada',
+                                        'foto' => $g->foto,
+                                        'photo' => $g->foto,
+                                        'bio' => $g->bio,
+                                        'status' => $g->status === 'aktif' ? 1 : 0,
+                                        'jurusan' => $g->jurusan ? [
+                                            'id' => $g->jurusan->id,
+                                            'nama_jurusan' => $g->jurusan->nama_jurusan,
+                                            'nama' => $g->jurusan->nama_jurusan,
+                                        ] : null,
+                                    ];
+                                })->toArray();
+                                $isFallback = true;
+                                Cache::forever($backupKey, $rawTeachers);
+                            }
+                        } catch (\Throwable $e) {
+                            Log::warning("SiPintu getTeachers DB reconstruction failed: " . $e->getMessage());
+                        }
+                    }
+
+                    if (empty($rawTeachers)) {
+                        $status = $response ? $response->status() : 0;
+                        return ['success' => false, 'status_code' => $status, 'data' => [], 'total' => 0, 'raw' => $response?->json(), 'message' => "Gagal mengambil data guru. Status: {$status}"];
+                    }
+                }
+            } else {
+                if (!Cache::has($backupKey) && !empty($rawTeachers)) {
+                    Cache::forever($backupKey, $rawTeachers);
+                }
             }
 
             $statusFilter = $params['status'] ?? null;
@@ -475,7 +544,17 @@ class SiPintuService
                 }));
             }
 
-            return ['success' => true, 'status_code' => 200, 'data' => $teachers, 'total' => count($teachers), 'raw' => $rawTeachers, 'message' => 'Berhasil mengambil data guru.'];
+            return [
+                'success'     => true,
+                'status_code' => 200,
+                'is_fallback' => $isFallback,
+                'data'        => $teachers,
+                'total'       => count($teachers),
+                'raw'         => $rawTeachers,
+                'message'     => $isFallback
+                    ? 'Endpoint SiPintu Gateway sedang pemeliharaan (404/Offline). Menampilkan data cadangan guru lokal.'
+                    : 'Berhasil mengambil data guru.',
+            ];
         } catch (\Exception $e) {
             Log::error("SiPintu getTeachers Exception: " . $e->getMessage());
             return ['success' => false, 'status_code' => 0, 'data' => [], 'total' => 0, 'raw' => null, 'message' => "Error: " . $e->getMessage()];
@@ -491,6 +570,8 @@ class SiPintuService
         try {
             $forceRefresh = !empty($params['refresh']);
             $cacheKey = 'sipintu_students_raw_list';
+            $backupKey = 'sipintu_students_raw_backup';
+            $isFallback = false;
 
             if ($forceRefresh) {
                 try { Cache::store('file')->forget($cacheKey); } catch (\Exception $e) { Cache::forget($cacheKey); }
@@ -498,22 +579,89 @@ class SiPintuService
 
             $rawStudents = null;
             try {
-                $rawStudents = Cache::store('file')->remember($cacheKey, 300, function () {
-                    $response = $this->client()->get("{$this->baseUrl}/api/v1/sijuna/students");
-                    if ($response->successful()) return $this->extractDataArray($response->json(), 'students');
+                $rawStudents = Cache::store('file')->remember($cacheKey, 300, function () use ($backupKey) {
+                    try {
+                        $response = $this->client()->get("{$this->baseUrl}/api/v1/sijuna/students");
+                        if ($response->successful()) {
+                            $extracted = $this->extractDataArray($response->json(), 'students');
+                            if (!empty($extracted)) {
+                                Cache::forever($backupKey, $extracted);
+                            }
+                            return $extracted;
+                        }
+                    } catch (\Throwable $e) {
+                        Log::warning("SiPintu getStudents remote call failed: " . $e->getMessage());
+                    }
                     return null;
                 });
             } catch (\Exception $e) {
-                $response = $this->client()->get("{$this->baseUrl}/api/v1/sijuna/students");
-                if ($response->successful()) $rawStudents = $this->extractDataArray($response->json(), 'students');
+                // Ignore file store exception if any
             }
 
             if ($rawStudents === null) {
-                $response = $this->client()->get("{$this->baseUrl}/api/v1/sijuna/students");
-                if (!$response->successful()) {
-                    return ['success' => false, 'status_code' => $response->status(), 'data' => [], 'total' => 0, 'raw' => $response->json(), 'message' => "Gagal mengambil data siswa. Status: {$response->status()}"];
+                $response = null;
+                try {
+                    $response = $this->client()->get("{$this->baseUrl}/api/v1/sijuna/students");
+                    if ($response->successful()) {
+                        $rawStudents = $this->extractDataArray($response->json(), 'students');
+                        if (!empty($rawStudents)) {
+                            Cache::store('file')->put($cacheKey, $rawStudents, 300);
+                            Cache::forever($backupKey, $rawStudents);
+                        }
+                    }
+                } catch (\Throwable $e) {
+                    Log::warning("SiPintu getStudents direct fetch failed: " . $e->getMessage());
                 }
-                $rawStudents = $this->extractDataArray($response->json(), 'students');
+
+                if ($rawStudents === null) {
+                    $rawStudents = Cache::get($backupKey);
+                    if (!empty($rawStudents)) {
+                        $isFallback = true;
+                    } else {
+                        // Resilient Fallback: Rekonstruksi dari database lokal User role siswa
+                        try {
+                            $localStudents = User::where('role', 'siswa')->with('kelas.jurusan')->get();
+                            if ($localStudents->isNotEmpty()) {
+                                $rawStudents = $localStudents->map(function ($s) {
+                                    return [
+                                        'id' => $s->id,
+                                        'nis' => $s->nis,
+                                        'nisn' => $s->nis,
+                                        'nama' => $s->name,
+                                        'name' => $s->name,
+                                        'email' => $s->email,
+                                        'user' => ['email' => $s->email],
+                                        'hp' => $s->no_hp,
+                                        'telepon' => $s->no_hp,
+                                        'alamat' => $s->alamat ?? '-',
+                                        'jk' => $s->jk === 'P' || $s->jk == 2 ? 2 : 1,
+                                        'classroom' => $s->kelas ? [
+                                            'id' => $s->kelas->id,
+                                            'name' => $s->kelas->nama_kelas,
+                                            'nama' => $s->kelas->nama_kelas,
+                                            'status' => 1,
+                                        ] : null,
+                                        'classroom_id' => $s->kelas_id,
+                                        'status' => $s->status === 'aktif' ? 1 : 0,
+                                    ];
+                                })->toArray();
+                                $isFallback = true;
+                                Cache::forever($backupKey, $rawStudents);
+                            }
+                        } catch (\Throwable $e) {
+                            Log::warning("SiPintu getStudents DB fallback failed: " . $e->getMessage());
+                        }
+                    }
+
+                    if ($rawStudents === null) {
+                        $status = $response ? $response->status() : 0;
+                        return ['success' => false, 'status_code' => $status, 'data' => [], 'total' => 0, 'raw' => $response?->json(), 'message' => "Gagal mengambil data siswa. Status: {$status}"];
+                    }
+                }
+            } else {
+                if (!Cache::has($backupKey) && !empty($rawStudents)) {
+                    Cache::forever($backupKey, $rawStudents);
+                }
             }
 
             $statusFilter = $params['status'] ?? null;
@@ -591,7 +739,18 @@ class SiPintuService
                 }));
             }
 
-            return ['success' => true, 'status_code' => 200, 'data' => $students, 'total' => count($students), 'total_raw' => count($rawStudents), 'raw' => $rawStudents, 'message' => 'Berhasil mengambil data siswa.'];
+            return [
+                'success'     => true,
+                'status_code' => 200,
+                'is_fallback' => $isFallback,
+                'data'        => $students,
+                'total'       => count($students),
+                'total_raw'   => count($rawStudents),
+                'raw'         => $rawStudents,
+                'message'     => $isFallback
+                    ? 'Endpoint SiPintu Gateway sedang pemeliharaan (Offline). Menampilkan data cadangan siswa lokal.'
+                    : 'Berhasil mengambil data siswa.',
+            ];
         } catch (\Exception $e) {
             Log::error("SiPintu getStudents Exception: " . $e->getMessage());
             return ['success' => false, 'status_code' => 0, 'data' => [], 'total' => 0, 'raw' => null, 'message' => "Error: " . $e->getMessage()];
