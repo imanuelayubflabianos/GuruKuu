@@ -71,7 +71,7 @@ class GuruController extends Controller
     {
         $guru->load(['jurusan', 'penghargaan.badge']);
         $user = auth()->user();
-        $periodeAktif = Periode::where('status', 'aktif')->first();
+        $periodeAktif = Periode::getActivePeriode();
         $periodeId = $periodeAktif?->id;
 
         $kelasAktif = $user->kelas()
@@ -93,22 +93,26 @@ class GuruController extends Controller
 
         // Ambil semua penilaian/feedback siswa untuk guru ini (Ulasan siswa yang login diposisikan paling atas khusus untuk siswa tsb)
         $userId = $user->id;
-        $semuaFeedback = Penilaian::with(['siswa', 'balasans.user'])
-            ->where('guru_id', $guru->id)
-            ->where('periode_id', $periodeId)
-            ->where(function($q) use ($userId) {
-                $q->where(function($sub) {
-                    $sub->where('is_censored', false)->orWhereNull('is_censored');
-                })->orWhere('siswa_id', $userId);
-            })
-            ->orderByRaw("CASE WHEN siswa_id = ? THEN 0 ELSE 1 END", [$userId])
-            ->latest()
-            ->get();
+        $semuaFeedback = $periodeId
+            ? Penilaian::with(['siswa', 'balasans.user'])
+                ->where('guru_id', $guru->id)
+                ->where('periode_id', $periodeId)
+                ->where(function($q) use ($userId) {
+                    $q->where(function($sub) {
+                        $sub->where('is_censored', false)->orWhereNull('is_censored');
+                    })->orWhere('siswa_id', $userId);
+                })
+                ->orderByRaw("CASE WHEN siswa_id = ? THEN 0 ELSE 1 END", [$userId])
+                ->latest()
+                ->get()
+            : collect();
 
         // Statistik evaluasi
-        $allPenilaian = Penilaian::where('guru_id', $guru->id)
-            ->where('periode_id', $periodeId)
-            ->get();
+        $allPenilaian = $periodeId
+            ? Penilaian::where('guru_id', $guru->id)
+                ->where('periode_id', $periodeId)
+                ->get()
+            : collect();
 
         $stats = [
             'total_penilaian' => $allPenilaian->count(),
@@ -119,13 +123,16 @@ class GuruController extends Controller
             'rata_keramahan' => $allPenilaian->avg('keramahan') ?? 0,
         ];
 
-        // Arsip penilaian dari periode-periode lampau
-        $arsipPeriode = Periode::where('id', '!=', $periodeId)
+        // Arsip penilaian dari periode-periode nonaktif (lampau)
+        $arsipPeriode = Periode::where('status', 'nonaktif')
             ->whereHas('penilaian', function($q) use ($guru) {
                 $q->where('guru_id', $guru->id);
             })
             ->with(['penilaian' => function($q) use ($guru, $userId) {
                 $q->where('guru_id', $guru->id)
+                  ->where(function($sub) {
+                      $sub->where('is_censored', false)->orWhereNull('is_censored');
+                  })
                   ->orderByRaw("CASE WHEN siswa_id = ? THEN 0 ELSE 1 END", [$userId])
                   ->latest();
             }])

@@ -118,10 +118,10 @@
         <div class="col-md-4">
             <label class="form-label small fw-bold text-muted">Filter Periode Semester</label>
             <select name="periode_id" class="form-select form-select-sm" style="border-radius: 8px;" onchange="this.form.submit()">
-                <option value="">Semua Periode</option>
+                <option value="all" {{ ($selectedPeriodeId ?? '') === 'all' ? 'selected' : '' }}>Semua Periode</option>
                 @foreach($semuaPeriode as $p)
-                    <option value="{{ $p->id }}" {{ request('periode_id') == $p->id ? 'selected' : '' }}>
-                        {{ $p->nama_periode }} {{ $p->status === 'aktif' ? '(Aktif)' : '' }}
+                    <option value="{{ $p->id }}" {{ ($selectedPeriodeId ?? '') == $p->id ? 'selected' : '' }}>
+                        {{ $p->nama_periode }} {{ $p->status === 'aktif' ? '(Aktif)' : '(Arsip)' }}
                     </option>
                 @endforeach
             </select>

@@ -836,11 +836,24 @@ class PengaturanController extends Controller
         if ($request->status === 'aktif') {
             Periode::where('id', '!=', $periode->id)->update(['status' => 'nonaktif']);
             Guru::recalculateAll($periode->id);
+            Guru::clearLeaderboardCache();
             Setting::set('active_periode_changed_at', (string)now()->timestamp);
             Setting::set('active_periode_id', (string)$periode->id);
             Setting::set('active_periode_name', $periode->nama_periode);
-            $pesan = 'Periode ' . $periode->nama_periode . ' berhasil diaktifkan! Statistik leaderboard semester baru kini berjalan aktif (data periode sebelumnya tersimpan rapi sebagai histori).';
+            $pesan = 'Periode ' . $periode->nama_periode . ' berhasil diaktifkan! Ulasan periode ini otomatis tampil di ulasan utama, dan periode sebelumnya tersimpan rapi sebagai arsip.';
         } else {
+            $adaAktif = Periode::where('status', 'aktif')->where('id', '!=', $periode->id)->first();
+            if (!$adaAktif) {
+                $periodeLain = Periode::where('id', '!=', $periode->id)->latest('tanggal_mulai')->first();
+                if ($periodeLain) {
+                    $periodeLain->update(['status' => 'aktif']);
+                    Guru::recalculateAll($periodeLain->id);
+                    Guru::clearLeaderboardCache();
+                    Setting::set('active_periode_changed_at', (string)now()->timestamp);
+                    Setting::set('active_periode_id', (string)$periodeLain->id);
+                    Setting::set('active_periode_name', $periodeLain->nama_periode);
+                }
+            }
             $pesan = 'Pengaturan periode ' . $periode->nama_periode . ' berhasil disimpan!';
         }
 
@@ -854,13 +867,14 @@ class PengaturanController extends Controller
         Periode::where('id', '!=', $periode->id)->update(['status' => 'nonaktif']);
         $periode->update(['status' => 'aktif']);
         Guru::recalculateAll($periode->id);
+        Guru::clearLeaderboardCache();
         Setting::set('active_periode_changed_at', (string)now()->timestamp);
         Setting::set('active_periode_id', (string)$periode->id);
         Setting::set('active_periode_name', $periode->nama_periode);
 
         return redirect()->to(route('admin.pengaturan.index') . '#tabPeriode')
             ->with('active_tab', '#tabPeriode')
-            ->with('success', "Periode '{$periode->nama_periode}' sekarang aktif! Seluruh statistik & leaderboard telah disinkronkan ke periode ini.");
+            ->with('success', "Periode '{$periode->nama_periode}' sekarang aktif! Seluruh ulasan periode ini otomatis tampil di ulasan utama, dan periode lain diarsipkan.");
     }
 
     public function destroyPeriode(Periode $periode)

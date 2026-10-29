@@ -83,7 +83,7 @@ class LandingController extends Controller
     public function guruDetail(Guru $guru)
     {
         $guru->load(['jurusan', 'penghargaan.badge']);
-        $periodeAktif = Periode::where('status', 'aktif')->first();
+        $periodeAktif = Periode::getActivePeriode();
         $periodeId = $periodeAktif?->id;
 
         $sudahMenilai = false;
@@ -95,9 +95,9 @@ class LandingController extends Controller
         }
 
         // Statistik evaluasi periode berjalan
-        $allPenilaian = Penilaian::where('guru_id', $guru->id)
-            ->when($periodeId, fn($q) => $q->where('periode_id', $periodeId))
-            ->get();
+        $allPenilaian = $periodeId
+            ? Penilaian::where('guru_id', $guru->id)->where('periode_id', $periodeId)->get()
+            : collect();
 
         $stats = [
             'total_penilaian' => $allPenilaian->count(),
@@ -109,22 +109,28 @@ class LandingController extends Controller
         ];
 
         // Semua ulasan & masukan siswa periode berjalan
-        $semuaFeedback = Penilaian::with(['siswa', 'balasans.user'])
-            ->where('guru_id', $guru->id)
-            ->when($periodeId, fn($q) => $q->where('periode_id', $periodeId))
-            ->where(function ($query) {
-                $query->where('is_censored', false)->orWhereNull('is_censored');
-            })
-            ->latest()
-            ->get();
+        $semuaFeedback = $periodeId
+            ? Penilaian::with(['siswa', 'balasans.user'])
+                ->where('guru_id', $guru->id)
+                ->where('periode_id', $periodeId)
+                ->where(function ($query) {
+                    $query->where('is_censored', false)->orWhereNull('is_censored');
+                })
+                ->latest()
+                ->get()
+            : collect();
 
-        // Arsip penilaian dari periode-periode lampau
-        $arsipPeriode = Periode::where('id', '!=', $periodeId)
+        // Arsip penilaian dari periode-periode nonaktif (lampau)
+        $arsipPeriode = Periode::where('status', 'nonaktif')
             ->whereHas('penilaian', function($q) use ($guru) {
                 $q->where('guru_id', $guru->id);
             })
             ->with(['penilaian' => function($q) use ($guru) {
-                $q->where('guru_id', $guru->id)->latest();
+                $q->where('guru_id', $guru->id)
+                  ->where(function($sub) {
+                      $sub->where('is_censored', false)->orWhereNull('is_censored');
+                  })
+                  ->latest();
             }])
             ->latest('tanggal_mulai')
             ->get();

@@ -24,11 +24,11 @@ class DashboardController extends Controller
             return redirect()->route('login')->with('error', 'Data profil Guru tidak ditemukan dalam sistem.');
         }
 
-        $periodeAktif = Periode::where('status', 'aktif')->first();
+        $periodeAktif = Periode::getActivePeriode();
 
         // Ambil ulasan & kritik saran dari siswa untuk guru ini (100% Anonim, tidak disensor) dengan paginasi efisien
         $ulasanQuery = Penilaian::where('guru_id', $guru->id)
-            ->when($periodeAktif, fn($q) => $q->where('periode_id', $periodeAktif->id))
+            ->when($periodeAktif, fn($q) => $q->where('periode_id', $periodeAktif->id), fn($q) => $q->whereRaw('1 = 0'))
             ->where(function ($query) {
                 $query->where(function ($q) {
                     $q->whereNotNull('kritik')->whereRaw("TRIM(kritik) != ''");
@@ -53,7 +53,7 @@ class DashboardController extends Controller
 
         // Statistik Detail 5 Kriteria Penilaian Siswa untuk Dashboard Guru
         $activePenilaians = Penilaian::where('guru_id', $guru->id)
-            ->when($periodeAktif, fn($q) => $q->where('periode_id', $periodeAktif->id))
+            ->when($periodeAktif, fn($q) => $q->where('periode_id', $periodeAktif->id), fn($q) => $q->whereRaw('1 = 0'))
             ->get();
 
         $totalResponden = $activePenilaians->count();
@@ -121,8 +121,14 @@ class DashboardController extends Controller
             return redirect()->route('login')->with('error', 'Data profil Guru tidak ditemukan dalam sistem.');
         }
 
-        $periodeAktif = Periode::where('status', 'aktif')->first();
+        $periodeAktif = Periode::getActivePeriode();
         $semuaPeriode = Periode::orderBy('tahun_ajaran', 'desc')->orderBy('semester', 'desc')->get();
+
+        // Default filter periode: jika tidak diset di query string, gunakan periode aktif berjalan
+        $selectedPeriodeId = $request->input('periode_id');
+        if ($selectedPeriodeId === null) {
+            $selectedPeriodeId = $periodeAktif ? (string)$periodeAktif->id : 'all';
+        }
 
         $query = Penilaian::where('guru_id', $guru->id)->with(['periode', 'kelas.jurusan', 'siswa.jurusan']);
 
@@ -138,8 +144,8 @@ class DashboardController extends Controller
         }
 
         // Filter periode
-        if ($request->filled('periode_id')) {
-            $query->where('periode_id', $request->periode_id);
+        if ($selectedPeriodeId !== 'all' && !empty($selectedPeriodeId)) {
+            $query->where('periode_id', $selectedPeriodeId);
         }
 
         // Filter kritik & saran teks
@@ -158,8 +164,8 @@ class DashboardController extends Controller
         $semuaUlasan = (clone $query)->latest()->paginate(10)->withQueryString();
 
         $statsBase = Penilaian::where('guru_id', $guru->id);
-        if ($request->filled('periode_id')) {
-            $statsBase->where('periode_id', $request->periode_id);
+        if ($selectedPeriodeId !== 'all' && !empty($selectedPeriodeId)) {
+            $statsBase->where('periode_id', $selectedPeriodeId);
         }
         if ($request->filled('tipe')) {
             if ($request->tipe === 'ada_teks') {
@@ -228,6 +234,7 @@ class DashboardController extends Controller
             'totalBelumDibalas',
             'periodeAktif',
             'semuaPeriode',
+            'selectedPeriodeId',
             'kriteriaStats'
         ));
     }
@@ -368,12 +375,12 @@ class DashboardController extends Controller
 
     public function detailGuru(Guru $guru)
     {
-        $periodeAktif = Periode::where('status', 'aktif')->first();
+        $periodeAktif = Periode::getActivePeriode();
         $periodeId = $periodeAktif?->id;
 
-        $allPenilaian = Penilaian::where('guru_id', $guru->id)
-            ->when($periodeId, fn($q) => $q->where('periode_id', $periodeId))
-            ->get();
+        $allPenilaian = $periodeId
+            ? Penilaian::where('guru_id', $guru->id)->where('periode_id', $periodeId)->get()
+            : collect();
 
         $stats = [
             'total_penilaian' => $allPenilaian->count(),
@@ -384,21 +391,30 @@ class DashboardController extends Controller
             'rata_keramahan' => $allPenilaian->avg('keramahan') ?? 0,
         ];
 
-        $semuaFeedback = Penilaian::with(['siswa.jurusan', 'kelas.jurusan'])
-            ->where('guru_id', $guru->id)
-            ->where(function($q) {
-                $q->where('is_censored', false)->orWhereNull('is_censored');
-            })
-            ->when($periodeId, fn($q) => $q->where('periode_id', $periodeId))
-            ->latest()
-            ->get();
+        // Ulasan periode berjalan / aktif
+        $semuaFeedback = $periodeId
+            ? Penilaian::with(['siswa.jurusan', 'kelas.jurusan'])
+                ->where('guru_id', $guru->id)
+                ->where('periode_id', $periodeId)
+                ->where(function($q) {
+                    $q->where('is_censored', false)->orWhereNull('is_censored');
+                })
+                ->latest()
+                ->get()
+            : collect();
 
-        $arsipPeriode = Periode::where('id', '!=', $periodeId)
+        // Arsip ulasan dari periode-periode nonaktif (lampau)
+        $arsipPeriode = Periode::where('status', 'nonaktif')
             ->whereHas('penilaian', function($q) use ($guru) {
                 $q->where('guru_id', $guru->id);
             })
             ->with(['penilaian' => function($q) use ($guru) {
-                $q->where('guru_id', $guru->id)->with(['siswa.jurusan', 'kelas.jurusan'])->latest();
+                $q->where('guru_id', $guru->id)
+                  ->where(function($sub) {
+                      $sub->where('is_censored', false)->orWhereNull('is_censored');
+                  })
+                  ->with(['siswa.jurusan', 'kelas.jurusan'])
+                  ->latest();
             }])
             ->latest('tanggal_mulai')
             ->get();

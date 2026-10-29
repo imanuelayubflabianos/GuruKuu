@@ -340,6 +340,13 @@ GuruKuu/
 * **2026-10-29 (Hover Interaktif Pemilihan Pengguna di Pesan Masuk Admin):**
   - **Efek Seleksi & Visual Feedback Hover (`.kontak-user-item`):** Menambahkan efek visual interaktif (*interactive hover state*) pada daftar pesan masuk admin (`/admin/kontak`). Saat kursor diarahkan ke nama/kartu pengirim, kartu otomatis bertransformasi dengan latar belakang biru lembut (`#f0f7ff`), bingkai tepi halus (`#bfdbfe`), elevasi bayangan halus, perbesaran avatar inisial, dan teks nama berubah menjadi warna aksen utama.
   - **Indikator Aksi "Buka Chat":** Menampilkan petunjuk interaktif dengan transisi meluncur halus (*"Buka Chat →"*) di sisi kanan baris pengguna saat di-hover, mempertegas kepada administrator bahwa baris tersebut dapat langsung diklik untuk membuka ruang percakapan.
+* **2026-10-29 (Sinkronisasi Otomatis Periode Aktif vs Arsip & Perpindahan Ulasan):**
+  - **Integritas Periode Tunggal Terjamin (`Periode::booted`):** Menerapkan model event `saved` pada `Periode` di mana jika ada satu periode diset atau disimpan berstatus `'aktif'`, seluruh periode lain di database secara otomatis dipaksa menjadi `'nonaktif'` (arsip). Dilengkapi metode `getActivePeriode()` mandiri (*self-healing*) yang menjamin selalu ada tepat 1 periode aktif.
+  - **Pemisahan Tegas Ulasan Aktif vs Ulasan Arsip:** Memperbarui seluruh controller detail guru (`Guru\DashboardController@detailGuru`, `Siswa\GuruController@show`, `Admin\GuruController@show`, `LandingController@guruDetail`) sehingga:
+    * **Halaman Ulasan Utama / Berjalan:** Hanya menampilkan ulasan yang `periode_id`-nya sama dengan periode aktif berjalan.
+    * **Arsip Periode Lalu:** Mengelompokkan seluruh periode berstatus `'nonaktif'` yang memiliki ulasan.
+    * **Pertukaran Sempurna (*Clean Swap*):** Saat admin mengaktifkan periode lampau/arsip, seluruh ulasan periode tersebut seketika berpindah ke halaman ulasan utama, sementara periode yang sebelumnya aktif seketika berpindah menjadi kartu arsip periode lalu tanpa ada ulasan yang bocor atau ganda.
+  - **Filter Default Ulasan Guru (`/guru/ulasan`):** Halaman riwayat ulasan guru kini secara default langsung memilih periode aktif berjalan (`(Aktif)`), dan guru dapat dengan mudah melihat arsip ulasan lampau atau semua periode melalui dropdown filter.
 
 
 
