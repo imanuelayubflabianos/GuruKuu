@@ -362,6 +362,35 @@
                                         </div>
                                         <small class="text-muted font-mono" style="font-size: 0.72rem;">{{ $fbLalu->created_at->format('d M Y') }}</small>
                                     </div>
+
+                                    {{-- RINCIAN BINTANG PER KRITERIA (ARSIP) --}}
+                                    <div class="p-2 rounded mb-2" style="background: var(--bg-light, #f8fafc); border: 1px solid var(--border, #e2e8f0);">
+                                        <div class="small fw-bold text-muted mb-1" style="font-size: 0.68rem; letter-spacing: 0.5px;">
+                                            <i class="bi bi-star-fill text-warning me-1"></i> RINCIAN NILAI PER ASPEK:
+                                        </div>
+                                        <div class="row g-1 text-center">
+                                            @php
+                                                $aspectsLalu = [
+                                                    'Ketepatan Waktu' => $fbLalu->kedisiplinan,
+                                                    'Kehadiran di Kelas' => $fbLalu->tanggung_jawab,
+                                                    'Penyampaian Materi' => $fbLalu->komunikasi,
+                                                    'Interaksi dengan Siswa' => $fbLalu->keramahan,
+                                                    'Keterlibatan & Suasana' => $fbLalu->kreativitas,
+                                                ];
+                                            @endphp
+                                            @foreach($aspectsLalu as $aspLabel => $aspVal)
+                                                <div class="col-6 col-sm">
+                                                    <div class="bg-white p-1 rounded border" style="font-size: 0.68rem;">
+                                                        <div class="text-truncate text-muted fw-semibold" title="{{ $aspLabel }}">{{ $aspLabel }}</div>
+                                                        <div class="text-warning mt-0.5 d-flex align-items-center justify-content-center gap-0.5">
+                                                            <i class="bi bi-star-fill" style="font-size: 0.65rem;"></i>
+                                                            <span class="fw-bold font-mono text-dark" style="font-size: 0.72rem;">{{ $aspVal ?? '-' }}<span class="text-muted fw-normal" style="font-size: 0.62rem;">/5</span></span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                    </div>
                                     @if($fbLalu->is_censored)
                                         <div class="small text-muted fst-italic mb-1"><i class="bi bi-shield-exclamation text-warning me-1"></i>Ulasan ini disembunyikan karena tidak memenuhi kriteria kebijakan.</div>
                                     @else

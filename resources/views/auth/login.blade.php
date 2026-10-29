@@ -581,8 +581,8 @@ function updateForm() {
         inputNis.placeholder = 'Masukkan NIS siswa';
         btnSubmit.innerHTML = '<i class="bi bi-box-arrow-in-right"></i> Masuk sebagai Siswa';
     } else {
-        labelNis.textContent = 'NIP / EMAIL GURU';
-        inputNis.placeholder = 'Masukkan NIP atau Email guru';
+        labelNis.textContent = 'NIP GURU';
+        inputNis.placeholder = 'Masukkan NIP guru';
         btnSubmit.innerHTML = '<i class="bi bi-box-arrow-in-right"></i> Masuk sebagai Guru';
     }
 }

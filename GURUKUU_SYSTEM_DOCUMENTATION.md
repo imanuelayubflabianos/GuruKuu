@@ -117,18 +117,18 @@ Sistem memiliki 2 mode peringkat di `Guru::leaderboardFor()`:
 
 1. **Mode Rating Kepuasan (Semua Guru):**
    * Menghitung rata-rata skor bintang dari seluruh siswa yang menilai guru di periode aktif.
-   * **Ambang Batas Kelayakan (Eligible):** Minimal memiliki **5 penilaian** (`MIN_PENILAIAN_LEADERBOARD = 5`). Guru dengan < 5 ulasan diletakkan di grup sekunder tanpa nomor rank untuk menjaga validitas statistik.
-   * **Tie-breaker:** Jika nilai sama, guru dengan volume penilai lebih banyak menempati urutan lebih tinggi.
+   * **Isolasi Ketat Periode:** Penilaian wajib difilter secara ketat dengan `where('periode_id', $periodeId)` sehingga ulasan arsip periode lampau tidak pernah bocor ke periode berjalan. Jika tidak ada periode aktif/valid, sistem langsung mengembalikan koleksi kosong (`collect()`).
+   * **Kelayakan Peringkat:** Seluruh guru yang memiliki penilaian (`total_penilaian > 0`) pada periode aktif diberikan nomor peringkat berurutan (#1, #2, dst.) yang diurutkan berdasarkan `rata_rata_nilai` DESC, `total_penilaian` DESC, dan `nama` ASC.
    * **Batasan Tampilan Publik / Pengguna:** Dibatasi hanya menampilkan **Top 10** (`take(10)`).
 
 2. **Mode Berdasarkan Kelas (Guru Mengajar di Kelas X):**
-   * Menghitung rata-rata nilai bintang dari siswa kelas bersangkutan (`class_id`).
+   * Menghitung rata-rata nilai bintang dari siswa kelas bersangkutan (`class_id`) pada periode aktif yang dipilih.
    * **Hirarki Pengurutan yang Adil:**
-     1. **Rating Kepuasan Utama (`rata_rata_nilai` DESC):** Guru dengan skor bintang tertinggi di kelas tersebut berhak menempati peringkat teratas (mencegah distorsi visual di mana skor rendah mengalahkan skor tinggi).
-     2. **Tie-Breaker 1 (`total_penilaian` DESC):** Jika nilai bintang sama, guru dengan jumlah siswa penilai terbanyak menempati peringkat lebih tinggi.
+     1. **Rating Kepuasan Utama (`rata_rata_nilai` DESC):** Guru dengan skor bintang tertinggi di kelas tersebut berhak menempati peringkat teratas.
+     2. **Tie-Breaker 1 (`total_penilaian` DESC):** Jika nilai bintang sama, guru dengan jumlah siswa penilai terbanyak di kelas tersebut menempati peringkat lebih tinggi.
      3. **Tie-Breaker 2 (`partisipasi_persen` DESC):** Persentase partisipasi siswa kelas `(siswa penilai / total siswa kelas) * 100%`.
      4. **Tie-Breaker 3 (`nama` ASC):** Urutan alfabetis nama.
-   * **Ambang Batas:** Tetap menerapkan minimal 5 penilaian (`MIN_PENILAIAN_LEADERBOARD = 5`) agar memenuhi prinsip ukuran sampel yang valid.
+   * **Kelayakan Peringkat:** Seluruh guru pengajar kelas tersebut yang telah menerima evaluasi (`total_penilaian > 0`) otomatis mendapatkan peringkat berurutan (#1 s/d #N) tanpa dieliminasi oleh ambang batas 5 suara, sehingga leaderboard kelas tidak pernah kosong.
    * **Batasan Tampilan Publik / Pengguna:** Dibatasi hanya menampilkan **Top 5** (`take(5)`).
 
 3. **Kebijakan Tampilan & Privasi Leaderboard:**
@@ -313,6 +313,12 @@ GuruKuu/
   - **Halaman Ulasan Guru (`/guru/ulasan`):** Menambahkan kartu ringkasan kriteria evaluasi di atas 3 kartu metrik ulasan. Menampilkan skor keseluruhan (bintang dan persentase) serta rincian 5 kriteria pembelajaran (Ketepatan Waktu, Kehadiran di Kelas, Penyampaian Materi, Interaksi dengan Siswa, Suasana Belajar) lengkap dengan rating bintang (⭐), persentase kepuasan, dan progress bar yang tersinkronisasi dinamis dengan filter semester.
   - **Detail Guru (`/guru/detail-guru/{id}`):** Memperbarui kartu statistik evaluasi periode berjalan agar menampilkan skor keseluruhan di bagian atas dan menyandingkan rating bintang (⭐) bersama persentase (%) pada masing-masing dari 5 kriteria.
   - **Dashboard Guru (`/guru/dashboard`):** Menambahkan kartu "Detail Kriteria Evaluasi" pada kolom utama dashboard yang menampilkan capaian 5 kriteria pengajaran guru (bintang dan persentase) pada semester berjalan secara transparan dan detail.
+* **2026-10-29 (Isolasi Ketat Periode Leaderboard, Pemeringkatan Kelas Adil, Reversi Label Login NIP Guru, & Reposisi Tombol Laporkan):**
+  - **Isolasi Ketat Periode Leaderboard:** Pada `Guru::leaderboardFor()`, penilaian kini secara ketat wajib difilter dengan `where('periode_id', $periodeId)` dan langsung mengembalikan koleksi kosong jika tidak ada periode aktif/valid. Memastikan ulasan lampau tidak akan pernah mencemari atau masuk ke perhitungan leaderboard periode berjalan.
+  - **Pemeringkatan Leaderboard Berdasarkan Kelas & Resolusi Otomatis Kelas Siswa:** Seluruh guru pengajar yang telah menerima penilaian dari kelas tersebut (`total_penilaian > 0`) langsung mendapatkan ranking berurutan (#1, #2, dst.) tanpa digugurkan oleh ambang batas 5 suara. Ditambahkan method `resolveKelasSiswa()` pada `PenilaianController` yang secara cerdas mendeteksi kelas siswa (relasi pivot, kolom string teks kelas, dan auto-sinkronisasi pivot) sehingga kolom `penilaian.class_id` tersimpan 100% akurat dan tidak ada suara siswa baru yang hilang di filter kelas. Query leaderboard kelas kini juga menyertakan deteksi ganda via `penilaian.class_id` maupun relasi kelas siswa pemilih.
+  - **Desain Mewah Arsip Riwayat Periode Lalu:** Tampilan ulasan arsip periode lalu di portal guru (`resources/views/guru/show.blade.php`) dan siswa (`resources/views/siswa/guru/show.blade.php`) diperbarui menjadi kartu ulasan lengkap berskala penuh dengan rincian 5 aspek penilaian (bintang ⭐ dan nilai /5), persentase total, progress bar, kotak kritik/saran tematik, serta tombol laporkan di pojok kanan bawah.
+  - **Reversi Form Login Guru:** Mengembalikan teks label dan placeholder input guru di `resources/views/auth/login.blade.php` menjadi **NIP GURU** dan *"Masukkan NIP guru"*.
+  - **Reposisi Tombol Laporkan Ulasan:** Pada halaman profil guru (`resources/views/guru/show.blade.php`), tombol "Laporkan" dipindahkan dari header samping waktu/anonim ke pojok kanan bawah kartu ulasan, sejajar rapi dengan desain standar ulasan siswa.
 
 
 

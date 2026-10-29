@@ -101,6 +101,11 @@ class Guru extends Model
             $periodeId = $periodeAktif?->id;
         }
 
+        // Jika tidak ada periode aktif/valid, cegah kebocoran data dengan mengembalikan koleksi kosong
+        if (!$periodeId) {
+            return collect();
+        }
+
         $cacheKey = 'guru_lb_' . $mode . '_' . ($kelasId ?? 0) . '_' . ($periodeId ?? 0);
         if (isset(self::$leaderboardCache[$cacheKey])) {
             return self::$leaderboardCache[$cacheKey];
@@ -111,19 +116,28 @@ class Guru extends Model
 
         if ($mode === 'partisipasi') {
             if (!$kelasId) return collect();
-            // Hanya guru yang terdaftar mengajar di kelas ini sesuai relasi resmi di database
-            $query->whereHas('kelas', fn ($kelas) => $kelas->whereKey($kelasId));
 
             $kelas = Kelas::find($kelasId);
             $totalSiswa = $kelas?->jumlah_siswa ?: ($kelas?->siswa()->count() ?: 0);
 
-            // Ambil penilaian siswa unik (1 siswa tidak dihitung ganda untuk guru yang sama)
+            // Ambil penilaian siswa unik pada kelas dan periode ini (mencegah ulasan periode lain bocor)
+            // Mendeteksi baik melalui penilaian.class_id MAUPUN siswa yang terdaftar di kelas bersangkutan
             $penilaians = Penilaian::select('id', 'guru_id', 'siswa_id', 'total_nilai', 'periode_id', 'class_id')
-                ->where('class_id', $kelasId)
-                ->when($periodeId, fn ($penilaian) => $penilaian->where('periode_id', $periodeId))
+                ->where('periode_id', $periodeId)
+                ->where(function ($q) use ($kelasId) {
+                    $q->where('class_id', $kelasId)
+                      ->orWhereHas('siswa.kelas', fn ($sk) => $sk->whereKey($kelasId));
+                })
                 ->latest()
                 ->get()
                 ->unique(fn ($p) => $p->guru_id . '_' . $p->siswa_id);
+
+            // Guru yang terdaftar mengajar di kelas ini ATAU guru yang menerima evaluasi dari kelas ini
+            $evaluatedGuruIds = $penilaians->pluck('guru_id')->filter()->unique();
+            $query->where(function ($q) use ($kelasId, $evaluatedGuruIds) {
+                $q->whereHas('kelas', fn ($k) => $k->whereKey($kelasId))
+                  ->orWhereIn('id', $evaluatedGuruIds);
+            });
 
             $gurus = $query->get()->map(function ($guru) use ($penilaians, $totalSiswa) {
                 $guruPenilaians = $penilaians->where('guru_id', $guru->id);
@@ -136,30 +150,13 @@ class Guru extends Model
                 $guru->setAttribute('rata_rata_nilai', $rataRata);
                 $guru->setAttribute('persentase_kepuasan', round(($rataRata / 5) * 100));
                 $guru->setAttribute('partisipasi_persen', $persentase);
-                $guru->setAttribute('is_eligible_leaderboard', $jumlahMemilih >= self::MIN_PENILAIAN_LEADERBOARD);
+                $guru->setAttribute('is_eligible_leaderboard', $jumlahMemilih > 0);
 
                 return $guru;
             });
 
-            // Hanya tampilkan guru yang memiliki setidaknya 1 penilaian pada kelas ini
-            $gurusWithData = $gurus->filter(fn ($g) => $g->total_penilaian > 0);
-
-            // Bagi 2 grup: Memenuhi syarat (>= MIN) & Belum memenuhi syarat (1 s/d < MIN)
-            $eligible = $gurusWithData->filter(fn ($g) => $g->is_eligible_leaderboard)
-                ->sort(function ($a, $b) {
-                    if ($b->rata_rata_nilai != $a->rata_rata_nilai) {
-                        return $b->rata_rata_nilai <=> $a->rata_rata_nilai;
-                    }
-                    if ($b->total_penilaian != $a->total_penilaian) {
-                        return $b->total_penilaian <=> $a->total_penilaian;
-                    }
-                    if ($b->partisipasi_persen != $a->partisipasi_persen) {
-                        return $b->partisipasi_persen <=> $a->partisipasi_persen;
-                    }
-                    return strcmp($a->nama, $b->nama);
-                })->values();
-
-            $notEligible = $gurusWithData->filter(fn ($g) => !$g->is_eligible_leaderboard)
+            // Hanya tampilkan guru yang memiliki setidaknya 1 penilaian pada kelas dan periode ini
+            $ranked = $gurus->filter(fn ($g) => $g->total_penilaian > 0)
                 ->sort(function ($a, $b) {
                     if ($b->rata_rata_nilai != $a->rata_rata_nilai) {
                         return $b->rata_rata_nilai <=> $a->rata_rata_nilai;
@@ -174,20 +171,17 @@ class Guru extends Model
                 })->values();
 
             $rank = 1;
-            foreach ($eligible as $guru) {
+            foreach ($ranked as $guru) {
                 $guru->setAttribute('leaderboard_rank', $rank++);
             }
-            foreach ($notEligible as $guru) {
-                $guru->setAttribute('leaderboard_rank', null);
-            }
 
-            return self::$leaderboardCache[$cacheKey] = $eligible->concat($notEligible);
+            return self::$leaderboardCache[$cacheKey] = $ranked;
         }
 
         // Mode Semua Guru (Rating Kepuasan)
-        // Ambil penilaian periode aktif, pastikan 1 siswa tidak dihitung ganda untuk guru yang sama
+        // Ambil penilaian periode ini secara ketat (mencegah evaluasi periode lampau bercampur ke periode aktif)
         $penilaians = Penilaian::select('id', 'guru_id', 'siswa_id', 'total_nilai', 'periode_id')
-            ->when($periodeId, fn ($q) => $q->where('periode_id', $periodeId))
+            ->where('periode_id', $periodeId)
             ->latest()
             ->get()
             ->unique(fn ($p) => $p->guru_id . '_' . $p->siswa_id);
@@ -209,16 +203,13 @@ class Guru extends Model
             $guru->setAttribute('total_penilaian', $totalPenilaian);
             $guru->setAttribute('rata_rata_nilai', $rataRata);
             $guru->setAttribute('persentase_kepuasan', $persentaseKepuasan);
-            $guru->setAttribute('is_eligible_leaderboard', $totalPenilaian >= self::MIN_PENILAIAN_LEADERBOARD);
+            $guru->setAttribute('is_eligible_leaderboard', $totalPenilaian > 0);
 
             return $guru;
         });
 
         // Hanya tampilkan guru yang memiliki setidaknya 1 penilaian pada periode ini
-        $gurusWithData = $gurus->filter(fn ($g) => $g->total_penilaian > 0);
-
-        // Group 1: Memenuhi syarat ranking (minimal 5 penilaian)
-        $eligible = $gurusWithData->filter(fn ($g) => $g->is_eligible_leaderboard)
+        $ranked = $gurus->filter(fn ($g) => $g->total_penilaian > 0)
             ->sort(function ($a, $b) {
                 if ($b->rata_rata_nilai != $a->rata_rata_nilai) {
                     return $b->rata_rata_nilai <=> $a->rata_rata_nilai;
@@ -229,31 +220,15 @@ class Guru extends Model
                 return strcmp($a->nama, $b->nama);
             })->values();
 
-        // Group 2: Belum memenuhi syarat (< 5 penilaian)
-        $notEligible = $gurusWithData->filter(fn ($g) => !$g->is_eligible_leaderboard)
-            ->sort(function ($a, $b) {
-                if ($b->rata_rata_nilai != $a->rata_rata_nilai) {
-                    return $b->rata_rata_nilai <=> $a->rata_rata_nilai;
-                }
-                if ($b->total_penilaian != $a->total_penilaian) {
-                    return $b->total_penilaian <=> $a->total_penilaian;
-                }
-                return strcmp($a->nama, $b->nama);
-            })->values();
-
-        // Berikan nomor peringkat hanya untuk guru yang eligible
+        // Berikan nomor peringkat untuk semua guru yang dinilai pada periode ini
         $rank = 1;
-        foreach ($eligible as $guru) {
+        foreach ($ranked as $guru) {
             $guru->setAttribute('leaderboard_rank', $rank++);
         }
-        foreach ($notEligible as $guru) {
-            $guru->setAttribute('leaderboard_rank', null);
-        }
 
-        $result = $eligible->concat($notEligible);
-        self::$leaderboardCache[$cacheKey] = $result;
+        self::$leaderboardCache[$cacheKey] = $ranked;
 
-        return $result;
+        return $ranked;
     }
 
 

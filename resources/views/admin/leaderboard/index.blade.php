@@ -93,7 +93,7 @@
         </div>
         <h6 class="fw-bold text-dark mb-1">Belum Ada Guru di Ranking Podium</h6>
         <p class="text-muted small mb-0" style="max-width: 580px; margin: 0 auto; line-height: 1.5;">
-            Sesuai ketentuan, guru harus memiliki <strong>minimal 5 penilaian</strong> dari siswa untuk dapat masuk dalam peringkat leaderboard. Seluruh nilai guru tetap tercatat dan dapat dilihat pada tabel di bawah.
+            Belum ada guru yang menerima penilaian dari siswa pada periode ini.
         </p>
     </div>
 @endif
@@ -438,9 +438,7 @@
                         @elseif($g->leaderboard_rank === 3) <span class="gk-rank-medal">🥉</span>
                         @elseif($g->leaderboard_rank) <span class="gk-rank-badge font-mono">#{{ $g->leaderboard_rank }}</span>
                         @else
-                            <span class="badge rounded-pill px-2.5 py-1 text-muted" style="background: rgba(0, 51, 102, 0.05); border: 1px solid rgba(0, 51, 102, 0.12); font-size: 0.7rem; font-weight: 600;" data-bs-toggle="tooltip" title="Belum cukup data untuk masuk peringkat leaderboard (minimal 5 penilaian)">
-                                Belum cukup data ({{ $g->total_penilaian }}/5)
-                            </span>
+                            <span class="text-muted font-mono">-</span>
                         @endif
                     </td>
                     <td class="align-middle">

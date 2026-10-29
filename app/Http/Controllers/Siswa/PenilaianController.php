@@ -20,11 +20,7 @@ class PenilaianController extends Controller
             return redirect()->route('siswa.guru.index')->with('error', 'Tidak ada periode aktif saat ini.');
         }
 
-        $kelasAktif = $user->kelas()
-                          ->wherePivot('tahun_ajaran', $periodeAktif->tahun_ajaran)
-                          ->first()
-                      ?: $user->kelas()->first()
-                      ?: ($user->kelas ? \App\Models\Kelas::where('nama_kelas', $user->kelas)->first() : null);
+        $kelasAktif = $this->resolveKelasSiswa($user, $periodeAktif, $guru);
 
         // 🛡️ ATURAN RESMI: Siswa hanya dapat menilai guru yang mengajar di kelasnya
         if ($kelasAktif) {
@@ -69,11 +65,7 @@ class PenilaianController extends Controller
             return redirect()->route('siswa.guru.index')->with('error', 'Tidak ada periode aktif saat ini.');
         }
 
-        $kelasAktif = $user->kelas()
-                          ->wherePivot('tahun_ajaran', $periodeAktif->tahun_ajaran)
-                          ->first()
-                      ?: $user->kelas()->first()
-                      ?: ($user->kelas ? \App\Models\Kelas::where('nama_kelas', $user->kelas)->first() : null);
+        $kelasAktif = $this->resolveKelasSiswa($user, $periodeAktif, $guru);
 
         // 🛡️ ATURAN RESMI: Siswa hanya dapat menilai guru yang mengajar di kelasnya
         if ($kelasAktif) {
@@ -226,5 +218,51 @@ class PenilaianController extends Controller
 
         return redirect()->route('siswa.penilaian.create', $guru)
             ->with('success', 'Penilaian sebelumnya telah dihapus. Silakan berikan penilaian baru Anda.');
+    }
+
+    private function resolveKelasSiswa($user, $periodeAktif, ?Guru $guru = null): ?\App\Models\Kelas
+    {
+        // 1. Cek dari relasi resmi siswa_kelas untuk tahun ajaran aktif
+        $kelas = $user->kelas()
+            ->wherePivot('tahun_ajaran', $periodeAktif?->tahun_ajaran)
+            ->first();
+
+        // 2. Cek relasi siswa_kelas manapun
+        if (!$kelas) {
+            $kelas = $user->kelas()->first();
+        }
+
+        // 3. Cek dari kolom string kelas di tabel users
+        if (!$kelas) {
+            $rawKelas = $user->getRawOriginal('kelas') ?? $user->getAttributeFromArray('kelas');
+            if ($rawKelas) {
+                if (is_numeric($rawKelas)) {
+                    $kelas = \App\Models\Kelas::find((int) $rawKelas);
+                }
+                if (!$kelas) {
+                    $kelas = \App\Models\Kelas::all()->first(function ($k) use ($rawKelas) {
+                        $format1 = "Kelas {$k->tingkat} {$k->nama_kelas}";
+                        $format2 = "{$k->nama_kelas} Kelas {$k->tingkat}";
+                        return $k->nama_kelas === $rawKelas
+                            || strcasecmp($format1, $rawKelas) === 0
+                            || strcasecmp($format2, $rawKelas) === 0
+                            || stripos($rawKelas, $k->nama_kelas) !== false;
+                    });
+                }
+            }
+        }
+
+        // 4. Fallback: jika guru diberikan dan kelas belum terhubung, cari kelas yang diajar guru
+        if (!$kelas && $guru) {
+            $kelas = $guru->kelas()->first();
+        }
+
+        // Sinkronisasi otomatis ke tabel pivot siswa_kelas agar query berikutnya instan
+        if ($kelas && $user->kelas()->whereKey($kelas->id)->doesntExist()) {
+            $tahunAjaran = $periodeAktif?->tahun_ajaran ?? (now()->year . '/' . (now()->year + 1));
+            $user->kelas()->syncWithoutDetaching([$kelas->id => ['tahun_ajaran' => $tahunAjaran]]);
+        }
+
+        return $kelas;
     }
 }

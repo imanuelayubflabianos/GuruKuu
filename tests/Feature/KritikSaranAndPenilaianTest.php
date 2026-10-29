@@ -617,4 +617,125 @@ class KritikSaranAndPenilaianTest extends TestCase
         $resDetail->assertSee('SKOR KESELURUHAN:');
         $resDetail->assertSee('Ketepatan Waktu');
     }
+
+    public function test_leaderboard_strict_period_isolation_and_class_ranking()
+    {
+        $periodeAktif = Periode::where('status', 'aktif')->first();
+        $periodeLampau = Periode::create([
+            'nama_periode' => 'Semester Genap 2025/2026',
+            'tahun_ajaran' => '2025/2026',
+            'semester' => 'Genap',
+            'status' => 'nonaktif',
+            'tanggal_mulai' => now()->subYear()->startOfYear(),
+            'tanggal_selesai' => now()->subYear()->endOfYear(),
+        ]);
+
+        $guruA = Guru::create([
+            'nama' => 'Guru Isolasi A',
+            'nip' => '199111111111111101',
+            'kategori' => 'normada',
+        ]);
+        $guruB = Guru::create([
+            'nama' => 'Guru Isolasi B',
+            'nip' => '199111111111111102',
+            'kategori' => 'normada',
+        ]);
+
+        $jurusan = Jurusan::firstOrCreate(['kode_jurusan' => 'PPLG'], ['nama_jurusan' => 'PPLG']);
+        $kelas = Kelas::create([
+            'nama_kelas' => 'PPLG 1 Kelas 12',
+            'tingkat' => 12,
+            'jurusan_id' => $jurusan->id,
+            'jumlah_siswa' => 36,
+        ]);
+        $guruA->kelas()->attach($kelas->id, ['mata_pelajaran' => 'PBO']);
+
+        $siswa1 = User::factory()->create(['role' => 'siswa', 'is_active' => true]);
+        $siswa2 = User::factory()->create(['role' => 'siswa', 'is_active' => true]);
+
+        // Penilaian Periode Lampau untuk Guru B (seharusnya TIDAK masuk leaderboard periode aktif)
+        Penilaian::create([
+            'siswa_id' => $siswa1->id,
+            'guru_id' => $guruB->id,
+            'periode_id' => $periodeLampau->id,
+            'class_id' => $kelas->id,
+            'kedisiplinan' => 5,
+            'tanggung_jawab' => 5,
+            'komunikasi' => 5,
+            'keramahan' => 5,
+            'kreativitas' => 5,
+            'total_nilai' => 25,
+        ]);
+
+        // Penilaian Periode Aktif untuk Guru A (hanya 2 ulasan, < 5)
+        Penilaian::create([
+            'siswa_id' => $siswa1->id,
+            'guru_id' => $guruA->id,
+            'periode_id' => $periodeAktif->id,
+            'class_id' => $kelas->id,
+            'kedisiplinan' => 5,
+            'tanggung_jawab' => 5,
+            'komunikasi' => 5,
+            'keramahan' => 5,
+            'kreativitas' => 5,
+            'total_nilai' => 25,
+            'kritik' => 'Kritik konstruktif',
+            'saran' => 'Saran baik',
+        ]);
+        Penilaian::create([
+            'siswa_id' => $siswa2->id,
+            'guru_id' => $guruA->id,
+            'periode_id' => $periodeAktif->id,
+            'class_id' => $kelas->id,
+            'kedisiplinan' => 4,
+            'tanggung_jawab' => 4,
+            'komunikasi' => 4,
+            'keramahan' => 4,
+            'kreativitas' => 4,
+            'total_nilai' => 20,
+        ]);
+
+        // 1. Leaderboard aktif: Guru B TIDAK boleh ada (karena penilaian di periode lampau)
+        $lbAktif = Guru::leaderboardFor('rating', null, $periodeAktif->id);
+        $this->assertFalse($lbAktif->contains('id', $guruB->id));
+        $this->assertTrue($lbAktif->contains('id', $guruA->id));
+
+        // 2. Leaderboard kelas: Guru A harus tetap memiliki peringkat (#1) meski ulasannya < 5
+        $lbKelas = Guru::leaderboardFor('partisipasi', $kelas->id, $periodeAktif->id);
+        $entryA = $lbKelas->firstWhere('id', $guruA->id);
+        $this->assertNotNull($entryA);
+        $this->assertEquals(1, $entryA->leaderboard_rank);
+
+        // 3. Cek UI guru.detail: tombol laporkan harus ada di pojok bawah & arsip menampilkan rincian aspek
+        $userGuruA = User::factory()->create(['role' => 'guru', 'nis' => $guruA->nip, 'is_active' => true]);
+        $resGuruDetail = $this->actingAs($userGuruA)->get(route('guru.detail', $guruA));
+        $resGuruDetail->assertOk();
+        $resGuruDetail->assertSee('Laporkan');
+        $resGuruDetail->assertSee('RINCIAN NILAI PER ASPEK:');
+
+        // 4. Uji voting siswa dengan string kelas di users (tanpa pivot) tetap mencatat class_id & masuk leaderboard kelas
+        $siswaBaru = User::factory()->create([
+            'role' => 'siswa',
+            'kelas' => $kelas->nama_kelas,
+            'is_active' => true,
+        ]);
+        $resVote = $this->actingAs($siswaBaru)->post(route('siswa.penilaian.store', $guruA), [
+            'kedisiplinan' => 5,
+            'komunikasi' => 5,
+            'tanggung_jawab' => 5,
+            'kreativitas' => 5,
+            'keramahan' => 5,
+        ]);
+        $resVote->assertRedirect();
+        
+        $voteBaru = Penilaian::where('siswa_id', $siswaBaru->id)->where('guru_id', $guruA->id)->first();
+        $this->assertNotNull($voteBaru);
+        $this->assertEquals($kelas->id, $voteBaru->class_id);
+
+        // Leaderboard kelas terupdate dengan vote baru
+        Guru::clearLeaderboardCache();
+        $lbKelasUpdated = Guru::leaderboardFor('partisipasi', $kelas->id, $periodeAktif->id);
+        $entryAUpdated = $lbKelasUpdated->firstWhere('id', $guruA->id);
+        $this->assertEquals(3, $entryAUpdated->total_penilaian);
+    }
 }

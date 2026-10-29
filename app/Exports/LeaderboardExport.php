@@ -43,7 +43,7 @@ class LeaderboardExport implements FromCollection, WithHeadings, WithMapping, Wi
         $persen = round(($guru->rata_rata_nilai / 5) * 100);
         $rankText = $guru->leaderboard_rank 
             ? '#' . $guru->leaderboard_rank 
-            : 'Belum cukup data (' . $guru->total_penilaian . '/' . Guru::MIN_PENILAIAN_LEADERBOARD . ')';
+            : '-';
 
         return [
             $rankText,
