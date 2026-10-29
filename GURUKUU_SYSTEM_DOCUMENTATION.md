@@ -334,6 +334,9 @@ GuruKuu/
   - **Sistem Cadangan & Fallback Otomatis (`SiPintuService`):** Mengimplementasikan mekanisme *Persistent Backup Cache* (`sipintu_teachers_raw_backup` dan `sipintu_students_raw_backup`) serta rekonstruksi dinamis otomatis dari basis data lokal (`\App\Models\Guru` dan `\App\Models\User` peran siswa). Jika server SiPintu mati, timeout, atau endpoint-nya 404, GuruKuu secara otomatis beralih (*graceful fallback*) ke data lokal tanpa membiarkan tabel kosong menjadi 0 guru/siswa atau menyebabkan sistem macet.
   - **Indikator Mode Cadangan Lokal pada Tampilan Admin:** Memperbarui antarmuka admin SiPintu (`resources/views/admin/sipintu/teachers.blade.php` dan `students.blade.php`) dengan banner informasi mode cadangan lokal aktif (`is_fallback`), sehingga admin mengetahui kondisi server SiPintu hulu dengan jelas sembari tetap dapat meninjau dan mengelola data guru/siswa tanpa hambatan.
   - **Pengamanan Sinkronisasi Batch:** Melindungi controller `Admin\SiPintuController@syncAllTeachers` dan `syncAllStudents` dari proses penimpaan data yang tidak diinginkan saat server hulu sedang dalam mode cadangan / 404.
+* **2026-10-29 (Penyederhanaan UI Tab Laporan Pengguna di Log Pelanggaran):**
+  - **Penghapusan Avatar Inisial Kotak:** Menghilangkan kotak avatar inisial huruf dengan garis tepi (`avatar-circle-sm`) di samping nama siswa/penulis ulasan pada tab "Laporan dari User" agar tampilan nama rapi, bersih, dan tidak terkesan aneh/dobel inisial.
+  - **Pembersihan Teks Subtitle Anti-Spam:** Menghapus teks subtitle panjang *"Sistem anti-spam aktif: Setiap pengguna hanya dapat mengirim 1 kali laporan per ulasan..."* dan sub-label baris tabel agar header kartu serta daftar ulasan yang dilaporkan tampil ringkas, proporsional, dan nyaman dibaca.
 
 
 

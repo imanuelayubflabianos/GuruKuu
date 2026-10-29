@@ -774,13 +774,10 @@
             <div class="card-custom p-4 mb-4" style="border: 1px solid #e2e8f0;">
                 <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-2 mb-3 pb-3 border-bottom">
                     <div>
-                        <h6 class="fw-bold mb-1 text-dark d-flex align-items-center gap-2">
+                        <h6 class="fw-bold mb-0 text-dark d-flex align-items-center gap-2">
                             <i class="bi bi-flag-fill text-warning"></i>
                             <span>Daftar Ulasan yang Dilaporkan Pengguna</span>
                         </h6>
-                        <small class="text-muted">
-                            Sistem anti-spam aktif: Setiap pengguna hanya dapat mengirim 1 kali laporan per ulasan. Menampilkan ringkasan ulasan, jumlah pelapor, rincian alasan, serta tindakan sensor/hapus ulasan.
-                        </small>
                     </div>
                     <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle px-3 py-1.5 rounded-pill font-mono">
                         {{ $reportedReviews->total() }} Ulasan Dilaporkan
@@ -814,9 +811,6 @@
                                     <td>
                                         @if($pen)
                                             <div class="d-flex align-items-center gap-2 mb-1.5">
-                                                <div class="avatar-circle-sm bg-light text-dark fw-bold border">
-                                                    {{ strtoupper(substr($siswaUser->name ?? 'A', 0, 1)) }}
-                                                </div>
                                                 <div>
                                                     <span class="fw-bold text-dark d-block" style="font-size: 0.85rem;">
                                                         {{ $siswaUser->name ?? 'Siswa (Anonim)' }}
@@ -871,9 +865,6 @@
                                         <div class="badge bg-danger-subtle text-danger border border-danger-subtle px-2.5 py-1 rounded-pill fw-bold font-mono fs-7">
                                             <i class="bi bi-flag-fill me-1"></i> {{ $rep->total_reports }} Laporan
                                         </div>
-                                        <small class="text-muted d-block mt-1 font-mono" style="font-size: 0.7rem;">
-                                            1 Report/User Anti-Spam
-                                        </small>
                                     </td>
                                     <td>
                                         <div class="d-flex flex-column gap-1.5" style="max-height: 140px; overflow-y: auto;">
