@@ -695,16 +695,42 @@ class KritikSaranAndPenilaianTest extends TestCase
             'total_nilai' => 20,
         ]);
 
-        // 1. Leaderboard aktif: Guru B TIDAK boleh ada (karena penilaian di periode lampau)
+        // 1. Leaderboard aktif: Guru B TIDAK boleh ada (karena di periode lampau)
+        // Guru A juga TIDAK boleh ada karena ulasan baru 2 (< 5 ulasan)
         $lbAktif = Guru::leaderboardFor('rating', null, $periodeAktif->id);
         $this->assertFalse($lbAktif->contains('id', $guruB->id));
-        $this->assertTrue($lbAktif->contains('id', $guruA->id));
+        $this->assertFalse($lbAktif->contains('id', $guruA->id));
 
-        // 2. Leaderboard kelas: Guru A harus tetap memiliki peringkat (#1) meski ulasannya < 5
+        // 2. Leaderboard kelas: Guru A belum masuk peringkat karena ulasan belum minimal 5
         $lbKelas = Guru::leaderboardFor('partisipasi', $kelas->id, $periodeAktif->id);
-        $entryA = $lbKelas->firstWhere('id', $guruA->id);
+        $this->assertFalse($lbKelas->contains('id', $guruA->id));
+
+        // Tambah 3 ulasan lagi untuk Guru A agar totalnya mencapai minimal 5 ulasan
+        for ($k = 3; $k <= 5; $k++) {
+            $siswaK = User::factory()->create(['role' => 'siswa', 'is_active' => true]);
+            Penilaian::create([
+                'siswa_id' => $siswaK->id,
+                'guru_id' => $guruA->id,
+                'periode_id' => $periodeAktif->id,
+                'class_id' => $kelas->id,
+                'kedisiplinan' => 5,
+                'tanggung_jawab' => 5,
+                'komunikasi' => 5,
+                'keramahan' => 5,
+                'kreativitas' => 5,
+                'total_nilai' => 25,
+            ]);
+        }
+
+        Guru::clearLeaderboardCache();
+        $lbAktifEligible = Guru::leaderboardFor('rating', null, $periodeAktif->id);
+        $this->assertTrue($lbAktifEligible->contains('id', $guruA->id));
+
+        $lbKelasEligible = Guru::leaderboardFor('partisipasi', $kelas->id, $periodeAktif->id);
+        $entryA = $lbKelasEligible->firstWhere('id', $guruA->id);
         $this->assertNotNull($entryA);
         $this->assertEquals(1, $entryA->leaderboard_rank);
+        $this->assertEquals(5, $entryA->total_penilaian);
 
         // 3. Cek UI guru.detail: tombol laporkan harus ada di pojok bawah & arsip menampilkan rincian aspek
         $userGuruA = User::factory()->create(['role' => 'guru', 'nis' => $guruA->nip, 'is_active' => true]);
@@ -732,10 +758,10 @@ class KritikSaranAndPenilaianTest extends TestCase
         $this->assertNotNull($voteBaru);
         $this->assertEquals($kelas->id, $voteBaru->class_id);
 
-        // Leaderboard kelas terupdate dengan vote baru
+        // Leaderboard kelas terupdate dengan vote baru (total kini 6)
         Guru::clearLeaderboardCache();
         $lbKelasUpdated = Guru::leaderboardFor('partisipasi', $kelas->id, $periodeAktif->id);
         $entryAUpdated = $lbKelasUpdated->firstWhere('id', $guruA->id);
-        $this->assertEquals(3, $entryAUpdated->total_penilaian);
+        $this->assertEquals(6, $entryAUpdated->total_penilaian);
     }
 }

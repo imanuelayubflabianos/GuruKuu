@@ -150,13 +150,13 @@ class Guru extends Model
                 $guru->setAttribute('rata_rata_nilai', $rataRata);
                 $guru->setAttribute('persentase_kepuasan', round(($rataRata / 5) * 100));
                 $guru->setAttribute('partisipasi_persen', $persentase);
-                $guru->setAttribute('is_eligible_leaderboard', $jumlahMemilih > 0);
+                $guru->setAttribute('is_eligible_leaderboard', $jumlahMemilih >= 5);
 
                 return $guru;
             });
 
-            // Hanya tampilkan guru yang memiliki setidaknya 1 penilaian pada kelas dan periode ini
-            $ranked = $gurus->filter(fn ($g) => $g->total_penilaian > 0)
+            // Hanya tampilkan guru yang memenuhi syarat minimal 5 penilaian pada kelas dan periode ini
+            $ranked = $gurus->filter(fn ($g) => $g->total_penilaian >= 5)
                 ->sort(function ($a, $b) {
                     if ($b->rata_rata_nilai != $a->rata_rata_nilai) {
                         return $b->rata_rata_nilai <=> $a->rata_rata_nilai;
@@ -203,13 +203,13 @@ class Guru extends Model
             $guru->setAttribute('total_penilaian', $totalPenilaian);
             $guru->setAttribute('rata_rata_nilai', $rataRata);
             $guru->setAttribute('persentase_kepuasan', $persentaseKepuasan);
-            $guru->setAttribute('is_eligible_leaderboard', $totalPenilaian > 0);
+            $guru->setAttribute('is_eligible_leaderboard', $totalPenilaian >= 5);
 
             return $guru;
         });
 
-        // Hanya tampilkan guru yang memiliki setidaknya 1 penilaian pada periode ini
-        $ranked = $gurus->filter(fn ($g) => $g->total_penilaian > 0)
+        // Hanya tampilkan guru yang memenuhi syarat minimal 5 penilaian pada periode ini
+        $ranked = $gurus->filter(fn ($g) => $g->total_penilaian >= 5)
             ->sort(function ($a, $b) {
                 if ($b->rata_rata_nilai != $a->rata_rata_nilai) {
                     return $b->rata_rata_nilai <=> $a->rata_rata_nilai;

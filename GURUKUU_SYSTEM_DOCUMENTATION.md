@@ -118,7 +118,7 @@ Sistem memiliki 2 mode peringkat di `Guru::leaderboardFor()`:
 1. **Mode Rating Kepuasan (Semua Guru):**
    * Menghitung rata-rata skor bintang dari seluruh siswa yang menilai guru di periode aktif.
    * **Isolasi Ketat Periode:** Penilaian wajib difilter secara ketat dengan `where('periode_id', $periodeId)` sehingga ulasan arsip periode lampau tidak pernah bocor ke periode berjalan. Jika tidak ada periode aktif/valid, sistem langsung mengembalikan koleksi kosong (`collect()`).
-   * **Kelayakan Peringkat:** Seluruh guru yang memiliki penilaian (`total_penilaian > 0`) pada periode aktif diberikan nomor peringkat berurutan (#1, #2, dst.) yang diurutkan berdasarkan `rata_rata_nilai` DESC, `total_penilaian` DESC, dan `nama` ASC.
+   * **Kelayakan Peringkat (Wajib Minimal 5 Penilaian):** Hanya guru yang telah menerima setidaknya 5 penilaian (`total_penilaian >= 5`) pada periode berjalan yang berhak masuk pemeringkatan leaderboard dan podium. Guru dengan jumlah penilaian di bawah 5 tidak mendapatkan peringkat (`leaderboard_rank = null`) dan tidak dimunculkan di leaderboard. Pemeringkatan diurutkan berdasarkan `rata_rata_nilai` DESC, `total_penilaian` DESC, dan `nama` ASC.
    * **Batasan Tampilan Publik / Pengguna:** Dibatasi hanya menampilkan **Top 10** (`take(10)`).
 
 2. **Mode Berdasarkan Kelas (Guru Mengajar di Kelas X):**
@@ -128,7 +128,7 @@ Sistem memiliki 2 mode peringkat di `Guru::leaderboardFor()`:
      2. **Tie-Breaker 1 (`total_penilaian` DESC):** Jika nilai bintang sama, guru dengan jumlah siswa penilai terbanyak di kelas tersebut menempati peringkat lebih tinggi.
      3. **Tie-Breaker 2 (`partisipasi_persen` DESC):** Persentase partisipasi siswa kelas `(siswa penilai / total siswa kelas) * 100%`.
      4. **Tie-Breaker 3 (`nama` ASC):** Urutan alfabetis nama.
-   * **Kelayakan Peringkat:** Seluruh guru pengajar kelas tersebut yang telah menerima evaluasi (`total_penilaian > 0`) otomatis mendapatkan peringkat berurutan (#1 s/d #N) tanpa dieliminasi oleh ambang batas 5 suara, sehingga leaderboard kelas tidak pernah kosong.
+   * **Kelayakan Peringkat (Wajib Minimal 5 Penilaian Kelas):** Guru wajib memiliki setidaknya 5 penilaian dari siswa kelas tersebut (`total_penilaian >= 5`) pada periode berjalan untuk dapat masuk ke pemeringkatan leaderboard kelas dan podium.
    * **Batasan Tampilan Publik / Pengguna:** Dibatasi hanya menampilkan **Top 5** (`take(5)`).
 
 3. **Kebijakan Tampilan & Privasi Leaderboard:**
@@ -353,6 +353,10 @@ GuruKuu/
 * **2026-10-29 (Sanitasi & Pembersihan Kredensial Sensitif di `.env.example`):**
   - **Pembersihan Total:** Mengosongkan seluruh nilai kredensial SiPintu (`SIPINTU_CLIENT_ID` dan `SIPINTU_CLIENT_SECRET`) yang sebelumnya tertulis di file `.env.example` dari commit lama (24 Sep 2026).
   - **Audit Repositori Git:** Memastikan tidak ada file git lain yang mengekspos kredensial rahasia; seluruh konfigurasi kredensial sensitif kini murni berada di `.env` lokal yang di-ignore oleh git.
+* **2026-10-29 (Syarat Minimal 5 Penilaian untuk Leaderboard Semua Guru & Kelas):**
+  - **Pemberlakuan Ambang Batas Kelayakan (Threshold >= 5):** Mengembalikan dan menegakkan aturan bahwa guru wajib menerima minimal 5 penilaian (`total_penilaian >= 5`) untuk dapat masuk pemeringkatan leaderboard dan podium, baik pada mode Semua Guru (Top 10) maupun Berdasarkan Kelas (Top 5).
+  - **Pencegahan Distorsi Peringkat:** Guru yang menerima kurang dari 5 penilaian (meskipun memperoleh rating 5.0 bintang sempurna) tidak akan diberikan nomor peringkat (`leaderboard_rank = null`) dan tidak ditampilkan pada leaderboard sampai batas minimal 5 penilaian terpenuhi.
+  - **Penyelarasan Pengurutan:** Pemeringkatan tetap mengutamakan perolehan rata-rata skor rating tertinggi (`rata_rata_nilai` DESC), diikuti jumlah penilaian terbanyak (`total_penilaian` DESC) sebagai pemecah seri.
 
 
 
