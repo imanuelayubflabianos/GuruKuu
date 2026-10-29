@@ -204,11 +204,6 @@
                     <div>
                         <div class="d-flex align-items-center gap-2 flex-wrap">
                             <strong class="small text-dark">{{ $isMyReview ? 'Ulasan Anda' : 'Siswa (Anonim)' }}</strong>
-                            @if($isMyReview)
-                                <span class="badge bg-primary text-white font-mono" style="font-size: 0.68rem;">
-                                    <i class="bi bi-pin-angle-fill me-0.5"></i> Tersemat di Atas
-                                </span>
-                            @endif
                             <span class="badge {{ $fbColor }} text-white font-mono" style="font-size: 0.72rem;">
                                 Skor: {{ $fbScore }}%
                             </span>
@@ -353,11 +348,6 @@
                                         <div class="d-flex align-items-center gap-2">
                                             <i class="bi {{ $isMyReviewLalu ? 'bi-person-fill text-primary' : 'bi-incognito text-muted' }}"></i>
                                             <span class="small fw-bold">{{ $isMyReviewLalu ? 'Ulasan Anda' : 'Siswa (Anonim)' }}</span>
-                                            @if($isMyReviewLalu)
-                                                <span class="badge bg-primary text-white font-mono" style="font-size: 0.65rem;">
-                                                    <i class="bi bi-pin-angle-fill me-0.5"></i> Ulasan Anda
-                                                </span>
-                                            @endif
                                             <span class="badge bg-light text-dark border font-mono">Nilai: {{ $scoreLalu }}%</span>
                                         </div>
                                         <small class="text-muted font-mono" style="font-size: 0.72rem;">{{ $fbLalu->created_at->format('d M Y') }}</small>

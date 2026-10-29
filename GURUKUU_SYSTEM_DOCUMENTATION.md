@@ -347,6 +347,9 @@ GuruKuu/
     * **Arsip Periode Lalu:** Mengelompokkan seluruh periode berstatus `'nonaktif'` yang memiliki ulasan.
     * **Pertukaran Sempurna (*Clean Swap*):** Saat admin mengaktifkan periode lampau/arsip, seluruh ulasan periode tersebut seketika berpindah ke halaman ulasan utama, sementara periode yang sebelumnya aktif seketika berpindah menjadi kartu arsip periode lalu tanpa ada ulasan yang bocor atau ganda.
   - **Filter Default Ulasan Guru (`/guru/ulasan`):** Halaman riwayat ulasan guru kini secara default langsung memilih periode aktif berjalan (`(Aktif)`), dan guru dapat dengan mudah melihat arsip ulasan lampau atau semua periode melalui dropdown filter.
+* **2026-10-29 (Penghapusan Badge 'Tersemat di Atas' pada Ulasan Siswa):**
+  - **Pembersihan Badge:** Menghapus label/badge bertuliskan *"Tersemat di Atas"* dan ikon pin pada kartu ulasan siswa di portal siswa (`resources/views/siswa/guru/show.blade.php`).
+  - **Preservasi Posisi Prioritas:** Posisi ulasan siswa yang login tetap otomatis diposisikan paling atas secara alami di sisi database/controller (`orderByRaw CASE WHEN siswa_id = ? THEN 0 ELSE 1 END`) dengan label *"Ulasan Anda"* tanpa memunculkan teks/badge tersemat yang mencolok.
 
 
 
