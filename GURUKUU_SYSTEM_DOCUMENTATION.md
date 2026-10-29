@@ -328,6 +328,7 @@ GuruKuu/
   - **Penyelarasan Tampilan & Menu Titik Tiga (Meatballs Dropdown):** Mengganti deretan tombol aksi individual pada kolom AKSI tabel "Semua Log" menjadi tombol dropdown titik tiga (`...`) yang seragam dan rapi (berisi aksi: Sensor Ulasan, Sanksi Akun, Hapus Ulasan, Tolak Laporan, Tandai Sudah Ditinjau, Hapus Log). Mempercantik baris identitas Terlapor & Pelapor agar proporsional dan sejajar rapi dengan standar tabel modul admin lainnya.
   - **Pembaruan Label Sidebar:** Memperbarui label item navigasi sidebar Admin dari "Log Pelanggaran" menjadi **"Log Pelanggaran Dll"** (`resources/views/layouts/admin.blade.php`).
   - **Sinkronisasi Statistik Kritik & Saran dengan Filter Periode & Kelas:** Memperbarui `Admin\KritikSaranController::index()` agar 4 kartu statistik di bagian atas (Ulasan Teks Masuk, Total Evaluasi, Rata-rata Rating Bintang, Bintang 5 Sempurna, dan Ulasan Disensor) tersinkronisasi dinamis mengikuti filter `periode_id`, `kelas_id`, dan `search`. Menghilangkan bug di mana kartu metrik tetap menampilkan angka total seluruh periode (377 ulasan / 1075 evaluasi) saat admin memilih periode yang belum memiliki ulasan.
+  - **Pembaruan Label Tombol Detail Guru:** Mengubah label tombol di halaman detail profil guru (`resources/views/admin/guru/show.blade.php`) dari "Edit Data & Foto Guru" menjadi **"Ubah Data Guru"**.
 
 
 

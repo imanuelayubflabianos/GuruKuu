@@ -16,7 +16,7 @@
         </div>
         <div class="d-flex gap-2">
             <a href="{{ route('admin.guru.edit', $guru) }}" class="btn btn-warning">
-                <i class="bi bi-pencil-square me-1"></i> Edit Data & Foto Guru
+                <i class="bi bi-pencil-square me-1"></i> Ubah Data Guru
             </a>
         </div>
     </div>
