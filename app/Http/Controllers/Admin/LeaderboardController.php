@@ -14,7 +14,7 @@ class LeaderboardController extends Controller
 {
     public function index(Request $request)
     {
-        $periodeAktif = Periode::where('status', 'aktif')->first();
+        $periodeAktif = Periode::getActivePeriode();
         $semuaPeriode = Periode::orderBy('tahun_ajaran', 'desc')->orderBy('semester', 'desc')->get();
 
         // Admin dapat memilih melihat periode aktif maupun periode lampau (histori evaluasi)

@@ -329,7 +329,17 @@ class DashboardController extends Controller
             ->orWhere('email', $user->email)
             ->first();
 
-        $periodeAktif = Periode::where('status', 'aktif')->first();
+        $periodeAktif = Periode::getActivePeriode();
+        $semuaPeriode = Periode::orderBy('tahun_ajaran', 'desc')->orderBy('semester', 'desc')->get();
+
+        $selectedPeriodeId = $request->input('periode_id');
+        $selectedPeriode = $selectedPeriodeId ? Periode::find($selectedPeriodeId) : null;
+        if (!$selectedPeriode) {
+            $selectedPeriode = $periodeAktif ?: $semuaPeriode->first();
+        }
+        $periodeId = $selectedPeriode?->id;
+        $periodeAktif = $selectedPeriode ?: $periodeAktif;
+
         $kelasList = \App\Models\Kelas::with('jurusan')->orderBy('tingkat')->orderBy('nama_kelas')->get();
         $mode = $request->input('mode', 'rating');
         $kelasId = $request->integer('kelas_id') ?: null;
@@ -341,7 +351,7 @@ class DashboardController extends Controller
         }
 
         // Hitung leaderboard lengkap seluruh guru
-        $fullLeaderboard = Guru::leaderboardFor($mode, $kelasId, $periodeAktif?->id);
+        $fullLeaderboard = Guru::leaderboardFor($mode, $kelasId, $periodeId);
 
         // Ambil info peringkat pribadi guru yang sedang login (bersifat privat)
         $myRankInfo = null;

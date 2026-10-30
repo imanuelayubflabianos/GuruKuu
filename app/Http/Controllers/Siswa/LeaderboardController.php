@@ -14,7 +14,16 @@ class LeaderboardController extends Controller
 {
     public function index(Request $request)
     {
-        $periodeAktif = Periode::where('status', 'aktif')->first();
+        $periodeAktif = Periode::getActivePeriode();
+        $semuaPeriode = Periode::orderBy('tahun_ajaran', 'desc')->orderBy('semester', 'desc')->get();
+        $selectedPeriodeId = $request->input('periode_id');
+        $selectedPeriode = $selectedPeriodeId ? Periode::find($selectedPeriodeId) : null;
+        if (!$selectedPeriode) {
+            $selectedPeriode = $periodeAktif ?: $semuaPeriode->first();
+        }
+        $periodeId = $selectedPeriode?->id;
+        $periodeAktif = $selectedPeriode ?: $periodeAktif;
+
         $kelasList = Kelas::with('jurusan')->orderBy('tingkat')->orderBy('nama_kelas')->get();
         $mode = $request->input('mode', 'rating');
         $kelasId = $request->integer('kelas_id') ?: null;
@@ -26,7 +35,7 @@ class LeaderboardController extends Controller
         }
         // Tampilan siswa dibatasi: Top 10 (Semua Guru) & Top 5 (Berdasarkan Kelas)
         $limit = ($mode === 'partisipasi') ? 5 : 10;
-        $leaderboard = Guru::leaderboardFor($mode, $kelasId, $periodeAktif?->id)
+        $leaderboard = Guru::leaderboardFor($mode, $kelasId, $periodeId)
             ->filter(fn($g) => !empty($g->leaderboard_rank))
             ->take($limit);
 

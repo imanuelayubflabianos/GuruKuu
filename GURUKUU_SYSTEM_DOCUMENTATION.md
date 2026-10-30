@@ -128,7 +128,7 @@ Sistem memiliki 2 mode peringkat di `Guru::leaderboardFor()`:
      2. **Tie-Breaker 1 (`total_penilaian` DESC):** Jika nilai bintang sama, guru dengan jumlah siswa penilai terbanyak di kelas tersebut menempati peringkat lebih tinggi.
      3. **Tie-Breaker 2 (`partisipasi_persen` DESC):** Persentase partisipasi siswa kelas `(siswa penilai / total siswa kelas) * 100%`.
      4. **Tie-Breaker 3 (`nama` ASC):** Urutan alfabetis nama.
-   * **Kelayakan Peringkat (Wajib Minimal 5 Penilaian Kelas):** Guru wajib memiliki setidaknya 5 penilaian dari siswa kelas tersebut (`total_penilaian >= 5`) pada periode berjalan untuk dapat masuk ke pemeringkatan leaderboard kelas dan podium.
+   * **Kelayakan Peringkat Kelas (Langsung Tampil & Adil):** Seluruh guru yang telah menerima evaluasi dari siswa kelas bersangkutan (`total_penilaian > 0`) otomatis mendapatkan pemeringkatan Top 5 (#1 s/d #5) yang diurutkan secara adil, sehingga setiap suara siswa dari kelas tersebut langsung tercermin di leaderboard kelas tanpa tertahan atau hilang.
    * **Batasan Tampilan Publik / Pengguna:** Dibatasi hanya menampilkan **Top 5** (`take(5)`).
 
 3. **Kebijakan Tampilan & Privasi Leaderboard:**
@@ -353,10 +353,13 @@ GuruKuu/
 * **2026-10-29 (Sanitasi & Pembersihan Kredensial Sensitif di `.env.example`):**
   - **Pembersihan Total:** Mengosongkan seluruh nilai kredensial SiPintu (`SIPINTU_CLIENT_ID` dan `SIPINTU_CLIENT_SECRET`) yang sebelumnya tertulis di file `.env.example` dari commit lama (24 Sep 2026).
   - **Audit Repositori Git:** Memastikan tidak ada file git lain yang mengekspos kredensial rahasia; seluruh konfigurasi kredensial sensitif kini murni berada di `.env` lokal yang di-ignore oleh git.
-* **2026-10-29 (Syarat Minimal 5 Penilaian untuk Leaderboard Semua Guru & Kelas):**
-  - **Pemberlakuan Ambang Batas Kelayakan (Threshold >= 5):** Mengembalikan dan menegakkan aturan bahwa guru wajib menerima minimal 5 penilaian (`total_penilaian >= 5`) untuk dapat masuk pemeringkatan leaderboard dan podium, baik pada mode Semua Guru (Top 10) maupun Berdasarkan Kelas (Top 5).
-  - **Pencegahan Distorsi Peringkat:** Guru yang menerima kurang dari 5 penilaian (meskipun memperoleh rating 5.0 bintang sempurna) tidak akan diberikan nomor peringkat (`leaderboard_rank = null`) dan tidak ditampilkan pada leaderboard sampai batas minimal 5 penilaian terpenuhi.
-  - **Penyelarasan Pengurutan:** Pemeringkatan tetap mengutamakan perolehan rata-rata skor rating tertinggi (`rata_rata_nilai` DESC), diikuti jumlah penilaian terbanyak (`total_penilaian` DESC) sebagai pemecah seri.
+* **2026-10-30 (Sinkronisasi Penuh Leaderboard Berdasarkan Kelas Satu Web & Auto-Healing Deteksi Suara Siswa):**
+  - **Deteksi Menyeluruh Multi-Faktor Suara Siswa per Kelas (`Guru::leaderboardFor`):** Mengimplementasikan algoritma pendeteksi evaluasi kelas komprehensif yang mengenali suara siswa melalui 3 jalur sekaligus: `penilaian.class_id`, relasi pivot `siswa_kelas`, dan kolom teks `users.kelas` (mendukung angka tingkat, angka romawi X/XI/XII, format "Kelas 10 AKL 1", "10 AKL 1", "X AKL 1", maupun nama rombel).
+  - **Mekanisme *Auto-Healing* Basis Data:** Saat query leaderboard kelas berjalan, sistem secara otomatis melengkapi kolom `penilaian.class_id` yang kosong dan menautkan siswa ke tabel pivot `siswa_kelas` demi performa kueri berikutnya yang instan.
+  - **Sinkronisasi Otomatis Input Admin Siswa:** Pada penambahan dan penyuntingan siswa oleh Admin (`Admin\SiswaController`), sistem kini otomatis memetakan teks input kelas ke master kelas lokal dan menyinkronkan tabel pivot `siswa_kelas`.
+  - **Penyelarasan Leaderboard Satu Web Penuh:** Menyeragamkan seluruh controller (`LandingController@leaderboard`, `Siswa\LeaderboardController`, `Guru\DashboardController`, dan `Admin\LeaderboardController`) menggunakan resolusi periode handal `Periode::getActivePeriode()` dan dukungan parameter `periode_id`, menjamin konsistensi 100% di semua halaman.
+  - **Refleksi Cepat Suara Kelas:** Memastikan setiap penilaian yang diberikan siswa di kelasnya langsung tampil dan diperhitungkan pada Top 5 Leaderboard Berdasarkan Kelas (`total_penilaian > 0`), sembari tetap mempertahankan aturan ketat minimal 5 penilaian (`total_penilaian >= 5`) untuk pemeringkatan Top 10 Rating Semua Guru tingkat sekolah.
+
 
 
 

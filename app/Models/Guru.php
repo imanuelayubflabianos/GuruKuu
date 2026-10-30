@@ -97,7 +97,7 @@ class Guru extends Model
     {
         // Pastikan periode aktif jika tidak dispesifikasi
         if (!$periodeId) {
-            $periodeAktif = Periode::where('status', 'aktif')->first();
+            $periodeAktif = Periode::getActivePeriode();
             $periodeId = $periodeAktif?->id;
         }
 
@@ -117,20 +117,64 @@ class Guru extends Model
         if ($mode === 'partisipasi') {
             if (!$kelasId) return collect();
 
-            $kelas = Kelas::find($kelasId);
-            $totalSiswa = $kelas?->jumlah_siswa ?: ($kelas?->siswa()->count() ?: 0);
+            $kelas = Kelas::with('jurusan')->find($kelasId);
+            if (!$kelas) return collect();
+
+            $totalSiswa = $kelas->jumlah_siswa ?: ($kelas->siswa()->count() ?: 0);
+            if ($totalSiswa <= 0) {
+                $totalSiswa = User::where('role', 'siswa')
+                    ->where(function ($sq) use ($kelas) {
+                        $sq->where('kelas', (string)$kelas->id)
+                           ->orWhere('kelas', $kelas->nama_kelas)
+                           ->orWhere('kelas', 'like', "%{$kelas->nama_kelas}%");
+                    })->count();
+            }
+
+            $tingkat = (string) $kelas->tingkat;
+            $namaKelas = (string) $kelas->nama_kelas;
+            $roman = match ((int)$tingkat) {
+                10 => 'X',
+                11 => 'XI',
+                12 => 'XII',
+                default => $tingkat,
+            };
 
             // Ambil penilaian siswa unik pada kelas dan periode ini (mencegah ulasan periode lain bocor)
-            // Mendeteksi baik melalui penilaian.class_id MAUPUN siswa yang terdaftar di kelas bersangkutan
-            $penilaians = Penilaian::select('id', 'guru_id', 'siswa_id', 'total_nilai', 'periode_id', 'class_id')
+            // Mendeteksi baik melalui penilaian.class_id, relasi pivot siswa_kelas, maupun string users.kelas
+            $penilaians = Penilaian::with('siswa')
+                ->select('id', 'guru_id', 'siswa_id', 'total_nilai', 'periode_id', 'class_id')
                 ->where('periode_id', $periodeId)
-                ->where(function ($q) use ($kelasId) {
+                ->where(function ($q) use ($kelasId, $tingkat, $namaKelas, $roman) {
                     $q->where('class_id', $kelasId)
-                      ->orWhereHas('siswa.kelas', fn ($sk) => $sk->whereKey($kelasId));
+                      ->orWhereHas('siswa.kelas', fn ($sk) => $sk->whereKey($kelasId))
+                      ->orWhereHas('siswa', function ($sq) use ($kelasId, $tingkat, $namaKelas, $roman) {
+                          $sq->where(function ($kQ) use ($kelasId, $tingkat, $namaKelas, $roman) {
+                              $kQ->where('kelas', (string)$kelasId)
+                                 ->orWhere('kelas', $namaKelas)
+                                 ->orWhere('kelas', "{$tingkat} {$namaKelas}")
+                                 ->orWhere('kelas', "{$roman} {$namaKelas}")
+                                 ->orWhere('kelas', "Kelas {$tingkat} {$namaKelas}")
+                                 ->orWhere('kelas', "Kelas {$roman} {$namaKelas}")
+                                 ->orWhere('kelas', "{$namaKelas} Kelas {$tingkat}")
+                                 ->orWhere('kelas', "{$namaKelas} Kelas {$roman}")
+                                 ->orWhere('kelas', 'like', "%{$namaKelas}%");
+                          });
+                      });
                 })
                 ->latest()
                 ->get()
                 ->unique(fn ($p) => $p->guru_id . '_' . $p->siswa_id);
+
+            // Auto-heal class_id dan relasi pivot siswa_kelas jika belum terhubung
+            foreach ($penilaians as $p) {
+                if (empty($p->class_id)) {
+                    $p->class_id = $kelasId;
+                    $p->saveQuietly();
+                }
+                if ($p->siswa && $p->siswa->kelas()->whereKey($kelasId)->doesntExist()) {
+                    $p->siswa->kelas()->syncWithoutDetaching([$kelasId => ['tahun_ajaran' => now()->year . '/' . (now()->year + 1)]]);
+                }
+            }
 
             // Guru yang terdaftar mengajar di kelas ini ATAU guru yang menerima evaluasi dari kelas ini
             $evaluatedGuruIds = $penilaians->pluck('guru_id')->filter()->unique();
@@ -150,13 +194,13 @@ class Guru extends Model
                 $guru->setAttribute('rata_rata_nilai', $rataRata);
                 $guru->setAttribute('persentase_kepuasan', round(($rataRata / 5) * 100));
                 $guru->setAttribute('partisipasi_persen', $persentase);
-                $guru->setAttribute('is_eligible_leaderboard', $jumlahMemilih >= 5);
+                $guru->setAttribute('is_eligible_leaderboard', $jumlahMemilih > 0);
 
                 return $guru;
             });
 
-            // Hanya tampilkan guru yang memenuhi syarat minimal 5 penilaian pada kelas dan periode ini
-            $ranked = $gurus->filter(fn ($g) => $g->total_penilaian >= 5)
+            // Tampilkan seluruh guru yang memiliki penilaian pada kelas dan periode ini
+            $ranked = $gurus->filter(fn ($g) => $g->total_penilaian > 0)
                 ->sort(function ($a, $b) {
                     if ($b->rata_rata_nilai != $a->rata_rata_nilai) {
                         return $b->rata_rata_nilai <=> $a->rata_rata_nilai;

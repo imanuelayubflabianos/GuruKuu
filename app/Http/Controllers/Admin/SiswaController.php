@@ -118,6 +118,8 @@ class SiswaController extends Controller
             $siswa->badges()->sync($request->input('badge_ids', []));
         }
 
+        $this->syncSiswaKelasPivot($siswa, $request->kelas);
+
         return redirect()->route('admin.siswa.index')->with('success', 'Siswa berhasil ditambahkan!');
     }
 
@@ -170,7 +172,32 @@ class SiswaController extends Controller
         $siswa->update($data);
         $siswa->badges()->sync($request->input('badge_ids', []));
 
+        $this->syncSiswaKelasPivot($siswa, $request->kelas);
+
         return redirect()->route('admin.siswa.index')->with('success', 'Data siswa berhasil diperbarui!');
+    }
+
+    private function syncSiswaKelasPivot(User $siswa, ?string $rawKelas): void
+    {
+        if (empty(trim((string)$rawKelas))) return;
+        $matchedKelas = Kelas::all()->first(function ($k) use ($rawKelas) {
+            $tingkat = (string) $k->tingkat;
+            $nama = (string) $k->nama_kelas;
+            $roman = match ((int)$tingkat) { 10 => 'X', 11 => 'XI', 12 => 'XII', default => $tingkat };
+            $cands = [$nama, "{$tingkat} {$nama}", "{$roman} {$nama}", "Kelas {$tingkat} {$nama}", "Kelas {$roman} {$nama}", $k->label_singkat];
+            foreach ($cands as $c) {
+                if (strcasecmp(trim($c), trim($rawKelas)) === 0) return true;
+            }
+            return stripos($rawKelas, $nama) !== false;
+        });
+
+        if ($matchedKelas) {
+            $tahunAjaran = \App\Models\Periode::getActivePeriode()?->tahun_ajaran ?? (now()->year . '/' . (now()->year + 1));
+            $siswa->kelas()->syncWithoutDetaching([$matchedKelas->id => ['tahun_ajaran' => $tahunAjaran]]);
+            if ($matchedKelas->jurusan_id && empty($siswa->jurusan_id)) {
+                $siswa->update(['jurusan_id' => $matchedKelas->jurusan_id]);
+            }
+        }
     }
 
     public function destroy(User $siswa)

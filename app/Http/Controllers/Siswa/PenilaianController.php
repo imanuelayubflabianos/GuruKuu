@@ -14,7 +14,7 @@ class PenilaianController extends Controller
     public function create(Guru $guru)
     {
         $user = auth()->user();
-        $periodeAktif = Periode::where('status', 'aktif')->first();
+        $periodeAktif = Periode::getActivePeriode();
 
         if (!$periodeAktif) {
             return redirect()->route('siswa.guru.index')->with('error', 'Tidak ada periode aktif saat ini.');
@@ -59,7 +59,7 @@ class PenilaianController extends Controller
         ]);
 
         $user = auth()->user();
-        $periodeAktif = Periode::where('status', 'aktif')->first();
+        $periodeAktif = Periode::getActivePeriode();
 
         if (!$periodeAktif) {
             return redirect()->route('siswa.guru.index')->with('error', 'Tidak ada periode aktif saat ini.');
@@ -234,20 +234,48 @@ class PenilaianController extends Controller
 
         // 3. Cek dari kolom string kelas di tabel users
         if (!$kelas) {
-            $rawKelas = $user->getRawOriginal('kelas') ?? $user->getAttributeFromArray('kelas');
-            if ($rawKelas) {
+            $rawKelas = trim((string) ($user->getRawOriginal('kelas') ?? $user->getAttributeFromArray('kelas')));
+            if ($rawKelas !== '') {
                 if (is_numeric($rawKelas)) {
                     $kelas = \App\Models\Kelas::find((int) $rawKelas);
                 }
                 if (!$kelas) {
-                    $kelas = \App\Models\Kelas::all()->first(function ($k) use ($rawKelas) {
-                        $format1 = "Kelas {$k->tingkat} {$k->nama_kelas}";
-                        $format2 = "{$k->nama_kelas} Kelas {$k->tingkat}";
-                        return $k->nama_kelas === $rawKelas
-                            || strcasecmp($format1, $rawKelas) === 0
-                            || strcasecmp($format2, $rawKelas) === 0
-                            || stripos($rawKelas, $k->nama_kelas) !== false;
+                    $allKelas = \App\Models\Kelas::all();
+                    $kelas = $allKelas->first(function ($k) use ($rawKelas) {
+                        $tingkat = (string) $k->tingkat;
+                        $nama = (string) $k->nama_kelas;
+                        $roman = match ((int)$tingkat) {
+                            10 => 'X',
+                            11 => 'XI',
+                            12 => 'XII',
+                            default => $tingkat,
+                        };
+
+                        $candidates = [
+                            $nama,
+                            "{$tingkat} {$nama}",
+                            "{$roman} {$nama}",
+                            "Kelas {$tingkat} {$nama}",
+                            "Kelas {$roman} {$nama}",
+                            "{$nama} Kelas {$tingkat}",
+                            "{$nama} Kelas {$roman}",
+                            $k->label_singkat,
+                        ];
+
+                        foreach ($candidates as $cand) {
+                            if (strcasecmp(trim($cand), $rawKelas) === 0) {
+                                return true;
+                            }
+                        }
+
+                        return false;
                     });
+
+                    if (!$kelas) {
+                        $kelas = $allKelas->first(function ($k) use ($rawKelas) {
+                            return stripos($rawKelas, $k->nama_kelas) !== false;
+                        });
+                    }
                 }
             }
         }
