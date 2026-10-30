@@ -934,13 +934,13 @@
         <div class="settings-card mb-3">
             <div class="d-flex align-items-center justify-content-between gap-3 flex-wrap">
                 <div>
-                    <div class="settings-muted mb-1">PERIODE AKTIF</div>
+                    <div class="settings-muted mb-1"><i class="bi bi-clock-history me-1"></i>PERIODE AKTIF SAAT INI</div>
                     <h2 class="settings-heading">{{ $periodeAktif?->nama_periode ?? 'Belum ada periode aktif' }}</h2>
                 </div>
                 @if($periodeAktif)
                     <div class="text-md-end small">
-                        <span class="badge bg-success">Aktif</span>
-                        <span class="text-muted ms-1">{{ $periodeAktif->tanggal_mulai?->format('d M Y') }} – {{ $periodeAktif->tanggal_selesai?->format('d M Y') }}</span>
+                        <span class="badge bg-success-subtle text-success border border-success-subtle px-2.5 py-1.5 fw-semibold"><i class="bi bi-check-circle me-1"></i>Sedang Berlangsung</span>
+                        <div class="text-muted mt-1">{{ $periodeAktif->tanggal_mulai?->format('d M Y H:i') }} – {{ $periodeAktif->tanggal_selesai?->format('d M Y H:i') }}</div>
                     </div>
                 @endif
             </div>
@@ -978,7 +978,16 @@
                     </div>
                     <div class="col-md-2">
                         <label class="form-label" for="statusSelect">Status</label>
-                        <select name="status" id="statusSelect" class="form-select" required><option value="aktif">Aktif</option><option value="nonaktif">Nonaktif</option></select>
+                        <select name="status" id="statusSelect" class="form-select" required>
+                            <option value="otomatis" selected>Otomatis</option>
+                            <option value="aktif">Aktif</option>
+                            <option value="terjadwal">Terjadwal</option>
+                            <option value="selesai">Selesai</option>
+                            <option value="nonaktif">Nonaktif</option>
+                        </select>
+                    </div>
+                    <div class="col-12 mt-1">
+                        <small class="text-muted"><i class="bi bi-info-circle me-1 text-primary"></i><strong>Aktivasi Otomatis:</strong> Pilih status <em>Otomatis</em> agar sistem secara mandiri menandai periode sebagai <strong>Terjadwal</strong> (sebelum tanggal mulai), <strong>Aktif</strong> (saat periode berjalan), dan <strong>Selesai / Arsip</strong> (setelah tanggal selesai).</small>
                     </div>
                     <div class="col-12 d-flex justify-content-end"><button type="submit" class="btn btn-primary-custom px-4" id="btnSimpanPeriode"><i class="bi bi-check2 me-1"></i>Simpan</button></div>
                 </div>
@@ -998,7 +1007,17 @@
                             <tr>
                                 <td><div class="fw-semibold">{{ $p->nama_periode }}</div><small class="text-muted text-capitalize">{{ $p->semester }} · {{ $p->tahun_ajaran }}</small></td>
                                 <td class="small text-muted">{{ $p->tanggal_mulai?->format('d/m/Y H:i') }} – {{ $p->tanggal_selesai?->format('d/m/Y H:i') }}</td>
-                                <td><span class="badge {{ $p->status === 'aktif' ? 'bg-success' : 'bg-secondary' }}">{{ ucfirst($p->status) }}</span></td>
+                                <td>
+                                    @if($p->status === 'aktif')
+                                        <span class="badge bg-success-subtle text-success border border-success-subtle px-2.5 py-1 fw-semibold"><i class="bi bi-check-circle me-1"></i>Aktif</span>
+                                    @elseif($p->status === 'terjadwal')
+                                        <span class="badge bg-info-subtle text-info border border-info-subtle px-2.5 py-1 fw-semibold"><i class="bi bi-clock me-1"></i>Terjadwal</span>
+                                    @elseif($p->status === 'selesai')
+                                        <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle px-2.5 py-1 fw-semibold"><i class="bi bi-archive me-1"></i>Selesai</span>
+                                    @else
+                                        <span class="badge bg-light text-muted border px-2.5 py-1 fw-semibold"><i class="bi bi-dash-circle me-1"></i>Nonaktif</span>
+                                    @endif
+                                </td>
                                 <td class="text-end">
                                     <div class="dropdown d-inline-block">
                                         <button class="btn btn-sm btn-light border shadow-xs rounded-circle d-inline-flex align-items-center justify-content-center" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="width: 32px; height: 32px;" title="Pilihan Aksi">
@@ -1763,7 +1782,7 @@ function editPeriode(periode) {
     document.getElementById('namaPeriodeInput').value = periode.nama_periode || '';
     document.getElementById('tahunAjaranInput').value = periode.tahun_ajaran || '';
     document.getElementById('semesterSelect').value = periode.semester || 'ganjil';
-    document.getElementById('statusSelect').value = periode.status || 'aktif';
+    document.getElementById('statusSelect').value = periode.status || 'otomatis';
     if (periode.tanggal_mulai) {
         document.getElementById('tanggalMulaiInput').value = formatToDatetimeLocalInput(periode.tanggal_mulai);
     }
@@ -1781,6 +1800,8 @@ function editPeriode(periode) {
 function resetPeriodeForm() {
     document.getElementById('formPeriode').reset();
     document.getElementById('periodeIdInput').value = '';
+    const statusSelect = document.getElementById('statusSelect');
+    if (statusSelect) statusSelect.value = 'otomatis';
     const title = document.getElementById('formPeriodeTitle');
     if (title) title.innerHTML = '<i class="bi bi-calendar-plus me-2"></i>Tambah Periode Baru';
     const submit = document.getElementById('btnSimpanPeriode');

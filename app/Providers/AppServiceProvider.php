@@ -26,6 +26,11 @@ class AppServiceProvider extends ServiceProvider
     {
         if (!app()->runningInConsole()) {
             @ini_set('max_execution_time', '120');
+            try {
+                \App\Models\Periode::syncAllStatuses();
+            } catch (\Throwable $e) {
+                // Jangan interupsi jika database belum siap/migrasi
+            }
         }
 
         if (config('app.env') === 'production' || request()->server('HTTP_X_FORWARDED_PROTO') === 'https' || request()->server('HTTPS') === 'on' || str_starts_with((string) config('app.url'), 'https://')) {

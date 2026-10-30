@@ -19,7 +19,8 @@ class PengaturanController extends Controller
 {
     public function index()
     {
-        $periodeAktif = Periode::where('status', 'aktif')->first();
+        Periode::syncAllStatuses();
+        $periodeAktif = Periode::getActivePeriode();
 
         $settings = [
             'site_title'        => Setting::get('site_title', 'GuruKuu'),
@@ -113,7 +114,7 @@ class PengaturanController extends Controller
         // FAQ data
         $faqs = \App\Services\FaqService::all();
 
-        $semuaPeriode = Periode::orderBy('tahun_ajaran', 'desc')->orderBy('semester', 'desc')->get();
+        $semuaPeriode = Periode::orderBy('tanggal_mulai', 'desc')->get();
         $jumlahPenilaian = Penilaian::count();
         // System & Maintenance stats
         $logSize = 0;
@@ -791,7 +792,7 @@ class PengaturanController extends Controller
             'semester'        => 'required|in:ganjil,genap',
             'tanggal_mulai'   => 'required|date',
             'tanggal_selesai' => 'required|date|after:tanggal_mulai',
-            'status'          => 'required|in:aktif,nonaktif',
+            'status'          => 'required|in:otomatis,aktif,terjadwal,selesai,nonaktif',
         ], [
             'nama_periode.unique' => 'Nama periode sudah terdaftar dalam riwayat database. Gunakan nama yang berbeda agar tidak menimbulkan kebingungan sistem.',
             'tanggal_selesai.after' => 'Tanggal selesai harus setelah tanggal mulai periode.',
@@ -811,50 +812,56 @@ class PengaturanController extends Controller
                 ->with('error', 'Nama periode mengandung kata yang tidak pantas atau dilarang oleh filter moderasi.');
         }
 
+        $inputStatus = $request->status;
+        if ($inputStatus === 'otomatis') {
+            $status = Periode::calculateStatusFromDates($request->tanggal_mulai, $request->tanggal_selesai);
+        } else {
+            $status = $inputStatus;
+        }
+
+        $data = [
+            'nama_periode'    => trim($request->nama_periode),
+            'tahun_ajaran'    => trim($request->tahun_ajaran),
+            'semester'        => $request->semester,
+            'tanggal_mulai'   => $request->tanggal_mulai,
+            'tanggal_selesai' => $request->tanggal_selesai,
+            'status'          => $status,
+        ];
+
         $periodeId = $request->input('periode_id');
         if ($periodeId) {
             $periode = Periode::findOrFail($periodeId);
-            $periode->update([
-                'nama_periode'    => trim($request->nama_periode),
-                'tahun_ajaran'    => trim($request->tahun_ajaran),
-                'semester'        => $request->semester,
-                'tanggal_mulai'   => $request->tanggal_mulai,
-                'tanggal_selesai' => $request->tanggal_selesai,
-                'status'          => $request->status,
-            ]);
+            $periode->update($data);
         } else {
-            $periode = Periode::create([
-                'nama_periode'    => trim($request->nama_periode),
-                'tahun_ajaran'    => trim($request->tahun_ajaran),
-                'semester'        => $request->semester,
-                'tanggal_mulai'   => $request->tanggal_mulai,
-                'tanggal_selesai' => $request->tanggal_selesai,
-                'status'          => $request->status,
-            ]);
+            $periode = Periode::create($data);
         }
 
-        if ($request->status === 'aktif') {
-            Periode::where('id', '!=', $periode->id)->update(['status' => 'nonaktif']);
+        if ($status === 'aktif') {
+            Periode::where('id', '!=', $periode->id)
+                ->where('status', 'aktif')
+                ->update(['status' => 'selesai']);
+
             Guru::recalculateAll($periode->id);
             Guru::clearLeaderboardCache();
             Setting::set('active_periode_changed_at', (string)now()->timestamp);
             Setting::set('active_periode_id', (string)$periode->id);
             Setting::set('active_periode_name', $periode->nama_periode);
-            $pesan = 'Periode ' . $periode->nama_periode . ' berhasil diaktifkan! Ulasan periode ini otomatis tampil di ulasan utama, dan periode sebelumnya tersimpan rapi sebagai arsip.';
+            $pesan = "Periode '{$periode->nama_periode}' berhasil diaktifkan! Ulasan periode ini otomatis tampil di ulasan utama, dan periode sebelumnya tersimpan rapi sebagai arsip.";
         } else {
-            $adaAktif = Periode::where('status', 'aktif')->where('id', '!=', $periode->id)->first();
-            if (!$adaAktif) {
-                $periodeLain = Periode::where('id', '!=', $periode->id)->latest('tanggal_mulai')->first();
-                if ($periodeLain) {
-                    $periodeLain->update(['status' => 'aktif']);
-                    Guru::recalculateAll($periodeLain->id);
-                    Guru::clearLeaderboardCache();
-                    Setting::set('active_periode_changed_at', (string)now()->timestamp);
-                    Setting::set('active_periode_id', (string)$periodeLain->id);
-                    Setting::set('active_periode_name', $periodeLain->nama_periode);
-                }
+            Periode::syncAllStatuses();
+            $activePeriode = Periode::getActivePeriode();
+            if ($activePeriode) {
+                Setting::set('active_periode_changed_at', (string)now()->timestamp);
+                Setting::set('active_periode_id', (string)$activePeriode->id);
+                Setting::set('active_periode_name', $activePeriode->nama_periode);
             }
-            $pesan = 'Pengaturan periode ' . $periode->nama_periode . ' berhasil disimpan!';
+            $statusLabel = match($status) {
+                'terjadwal' => 'Terjadwal (akan otomatis aktif saat tanggal mulai tiba)',
+                'selesai'   => 'Selesai (Arsip)',
+                'nonaktif'  => 'Nonaktif',
+                default     => ucfirst($status)
+            };
+            $pesan = "Periode '{$periode->nama_periode}' berhasil disimpan dengan status {$statusLabel}.";
         }
 
         return redirect()->to(route('admin.pengaturan.index') . '#tabPeriode')
@@ -864,11 +871,26 @@ class PengaturanController extends Controller
 
     public function aktifkanPeriode(Periode $periode)
     {
-        Periode::where('id', '!=', $periode->id)->update(['status' => 'nonaktif']);
-        $periode->update(['status' => 'aktif']);
+        $now = now();
+        $updates = ['status' => 'aktif'];
+
+        // Jika periode diaktifkan manual sebelum tanggal mulai, majukan tanggal mulai ke saat ini
+        if ($periode->tanggal_mulai && $now->lt($periode->tanggal_mulai)) {
+            $updates['tanggal_mulai'] = $now;
+        }
+        // Jika tanggal selesai sudah lewat, perpanjang otomatis agar periode tetap aktif
+        if ($periode->tanggal_selesai && $now->gt($periode->tanggal_selesai)) {
+            $updates['tanggal_selesai'] = $now->copy()->addMonths(6);
+        }
+
+        Periode::where('id', '!=', $periode->id)
+            ->where('status', 'aktif')
+            ->update(['status' => 'selesai']);
+
+        $periode->update($updates);
         Guru::recalculateAll($periode->id);
         Guru::clearLeaderboardCache();
-        Setting::set('active_periode_changed_at', (string)now()->timestamp);
+        Setting::set('active_periode_changed_at', (string)$now->timestamp);
         Setting::set('active_periode_id', (string)$periode->id);
         Setting::set('active_periode_name', $periode->nama_periode);
 
@@ -891,8 +913,10 @@ class PengaturanController extends Controller
         Penilaian::where('periode_id', $periode->id)->delete();
         $periode->delete();
 
-        $activePeriode = Periode::where('status', 'aktif')->first();
+        Periode::syncAllStatuses();
+        $activePeriode = Periode::getActivePeriode();
         Guru::recalculateAll($activePeriode?->id);
+        Guru::clearLeaderboardCache();
 
         return redirect()->to(route('admin.pengaturan.index') . '#tabPeriode')
             ->with('active_tab', '#tabPeriode')

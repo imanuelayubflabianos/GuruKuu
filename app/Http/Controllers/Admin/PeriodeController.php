@@ -15,7 +15,8 @@ class PeriodeController extends Controller
 {
     public function index()
     {
-        $periode = Periode::latest()->get();
+        Periode::syncAllStatuses();
+        $periode = Periode::latest('tanggal_mulai')->get();
         return view('admin.periode.index', compact('periode'));
     }
 
@@ -27,13 +28,23 @@ class PeriodeController extends Controller
             'semester' => 'required|in:ganjil,genap',
             'tanggal_mulai' => 'required|date',
             'tanggal_selesai' => 'required|date|after:tanggal_mulai',
+            'status' => 'nullable|in:otomatis,aktif,terjadwal,selesai,nonaktif',
         ]);
 
         if (!ProfanityFilterService::isClean($validated['nama_periode'])) {
             return back()->withInput()->with('error', 'Nama periode mengandung kata yang tidak pantas atau dilarang oleh filter moderasi.');
         }
 
-        Periode::create($validated);
+        $inputStatus = $validated['status'] ?? 'otomatis';
+        if ($inputStatus === 'otomatis') {
+            $status = Periode::calculateStatusFromDates($validated['tanggal_mulai'], $validated['tanggal_selesai']);
+        } else {
+            $status = $inputStatus;
+        }
+        $validated['status'] = $status;
+
+        $periode = Periode::create($validated);
+        Periode::syncAllStatuses();
 
         return back()->with('success', 'Periode berhasil ditambahkan!');
     }
@@ -46,13 +57,23 @@ class PeriodeController extends Controller
             'semester' => 'required|in:ganjil,genap',
             'tanggal_mulai' => 'required|date',
             'tanggal_selesai' => 'required|date|after:tanggal_mulai',
+            'status' => 'nullable|in:otomatis,aktif,terjadwal,selesai,nonaktif',
         ]);
 
         if (!ProfanityFilterService::isClean($validated['nama_periode'])) {
             return back()->withInput()->with('error', 'Nama periode mengandung kata yang tidak pantas atau dilarang oleh filter moderasi.');
         }
 
+        $inputStatus = $validated['status'] ?? ($periode->status ?: 'otomatis');
+        if ($inputStatus === 'otomatis') {
+            $status = Periode::calculateStatusFromDates($validated['tanggal_mulai'], $validated['tanggal_selesai']);
+        } else {
+            $status = $inputStatus;
+        }
+        $validated['status'] = $status;
+
         $periode->update($validated);
+        Periode::syncAllStatuses();
 
         if ($periode->status === 'aktif') {
             Setting::set('active_periode_name', $periode->nama_periode);
@@ -64,19 +85,28 @@ class PeriodeController extends Controller
 
     public function toggleStatus(Periode $periode)
     {
-        if ($periode->status === 'nonaktif') {
-            Periode::where('id', '!=', $periode->id)->update(['status' => 'nonaktif']);
-            $periode->update(['status' => 'aktif']);
+        if ($periode->status !== 'aktif') {
+            $now = now();
+            $updates = ['status' => 'aktif'];
+            if ($periode->tanggal_mulai && $now->lt($periode->tanggal_mulai)) {
+                $updates['tanggal_mulai'] = $now;
+            }
+            if ($periode->tanggal_selesai && $now->gt($periode->tanggal_selesai)) {
+                $updates['tanggal_selesai'] = $now->copy()->addMonths(6);
+            }
+
+            Periode::where('id', '!=', $periode->id)->update(['status' => 'selesai']);
+            $periode->update($updates);
             Guru::recalculateAll($periode->id);
             Guru::clearLeaderboardCache();
             Setting::set('active_periode_changed_at', (string)now()->timestamp);
             Setting::set('active_periode_id', (string)$periode->id);
             Setting::set('active_periode_name', $periode->nama_periode);
         } else {
-            $periode->update(['status' => 'nonaktif']);
-            $periodeLain = Periode::where('id', '!=', $periode->id)->latest('tanggal_mulai')->first();
+            $periode->update(['status' => 'selesai']);
+            Periode::syncAllStatuses();
+            $periodeLain = Periode::where('status', 'aktif')->first();
             if ($periodeLain) {
-                $periodeLain->update(['status' => 'aktif']);
                 Guru::recalculateAll($periodeLain->id);
                 Guru::clearLeaderboardCache();
                 Setting::set('active_periode_changed_at', (string)now()->timestamp);

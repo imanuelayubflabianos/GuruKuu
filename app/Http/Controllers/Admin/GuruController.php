@@ -462,8 +462,8 @@ class GuruController extends Controller
                 ->get()
             : collect();
 
-        // Arsip ulasan dari periode-periode nonaktif (lampau)
-        $arsipPeriode = \App\Models\Periode::where('status', 'nonaktif')
+        // Arsip ulasan dari periode-periode lampau (selesai/nonaktif)
+        $arsipPeriode = \App\Models\Periode::whereIn('status', ['selesai', 'nonaktif'])
             ->whereHas('penilaian', function($q) use ($guru) {
                 $q->where('guru_id', $guru->id);
             })

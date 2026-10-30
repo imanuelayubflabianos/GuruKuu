@@ -88,7 +88,13 @@ erDiagram
    * Relasi: `siswa`, `guru`, `periode`, `kelas` (`class_id`), `balasans()`, `helpfuls()`.
 
 5. **`Periode` (`periode`)**:
-   * Mengatur putaran semester aktif: `nama_periode`, `tahun_ajaran` (misal 2024/2025), `semester` (ganjil/genap), `status` (`aktif`/`nonaktif`).
+   * Sistem Multi-Periode dengan Aktivasi Otomatis: `nama_periode`, `tahun_ajaran` (misal 2026/2027), `semester` (ganjil/genap), `status` (`terjadwal`/`aktif`/`selesai`/`nonaktif`), `tanggal_mulai`, `tanggal_selesai`.
+   * **Siklus Hidup Dinamis Otomatis:**
+     - Sebelum `tanggal_mulai`: **`terjadwal`**
+     - Saat rentang `tanggal_mulai` s/d `tanggal_selesai`: **`aktif`**
+     - Melewati `tanggal_selesai`: **`selesai`** (arsip permanen)
+   * **Preservasi Data Multi-Periode:** Data penilaian setiap periode tersimpan permanen dan terisolasi dengan `periode_id`. Ulasan periode lampau dapat diakses sebagai arsip dan tidak pernah menimpa periode baru.
+   * **Otomatisasi:** Sinkronisasi waktu otomatis via `Periode::syncAllStatuses()`, background scheduler cron `periode:sync` setiap menit (`routes/console.php`), serta self-healing saat web request berjalan via `AppServiceProvider`.
 
 6. **`PenilaianBalasan` & `PenilaianHelpful`**:
    * Fitur sosial dua arah: Balasan komentar guru/siswa dan tanda jempol (*helpful like*) ala toko aplikasi.
@@ -360,12 +366,20 @@ GuruKuu/
   - **Ekspansi Kuota Pemeringkatan Top 30:** Mengubah batas tampilan mode Semua Guru (Rating Kepuasan) di seluruh sistem web dari **Top 10** menjadi **Top 30** (`take(30)`).
   - **Penyelarasan Seluruh Antarmuka Web:** Memperbarui label kartu, judul tabel, badge kuota, batas query controller ([`LandingController`](file:///c:/Users/ADVAN/PROJEK/Laravel/GuruKuu/app/Http/Controllers/LandingController.php), [`Siswa\LeaderboardController`](file:///c:/Users/ADVAN/PROJEK/Laravel/GuruKuu/app/Http/Controllers/Siswa/LeaderboardController.php), [`Guru\DashboardController`](file:///c:/Users/ADVAN/PROJEK/Laravel/GuruKuu/app/Http/Controllers/Guru/DashboardController.php)), dan kartu status privat guru di dashboard guru agar konsisten menampilkan standar Top 30.
   - **Preservasi Mode Kelas:** Mode Berdasarkan Kelas tetap dipertahankan pada **Top 5** (`take(5)`).
-* **2026-10-30 (Sinkronisasi Penuh Leaderboard Berdasarkan Kelas Satu Web & Auto-Healing Deteksi Suara Siswa):**
-  - **Deteksi Menyeluruh Multi-Faktor Suara Siswa per Kelas (`Guru::leaderboardFor`):** Mengimplementasikan algoritma pendeteksi evaluasi kelas komprehensif yang mengenali suara siswa melalui 3 jalur sekaligus: `penilaian.class_id`, relasi pivot `siswa_kelas`, dan kolom teks `users.kelas` (mendukung angka tingkat, angka romawi X/XI/XII, format "Kelas 10 AKL 1", "10 AKL 1", "X AKL 1", maupun nama rombel).
-  - **Mekanisme *Auto-Healing* Basis Data:** Saat query leaderboard kelas berjalan, sistem secara otomatis melengkapi kolom `penilaian.class_id` yang kosong dan menautkan siswa ke tabel pivot `siswa_kelas` demi performa kueri berikutnya yang instan.
-  - **Sinkronisasi Otomatis Input Admin Siswa:** Pada penambahan dan penyuntingan siswa oleh Admin (`Admin\SiswaController`), sistem kini otomatis memetakan teks input kelas ke master kelas lokal dan menyinkronkan tabel pivot `siswa_kelas`.
-  - **Penyelarasan Leaderboard Satu Web Penuh:** Menyeragamkan seluruh controller (`LandingController@leaderboard`, `Siswa\LeaderboardController`, `Guru\DashboardController`, dan `Admin\LeaderboardController`) menggunakan resolusi periode handal `Periode::getActivePeriode()` dan dukungan parameter `periode_id`, menjamin konsistensi 100% di semua halaman.
-  - **Refleksi Cepat Suara Kelas:** Memastikan setiap penilaian yang diberikan siswa di kelasnya langsung tampil dan diperhitungkan pada Top 5 Leaderboard Berdasarkan Kelas (`total_penilaian > 0`), sembari tetap mempertahankan aturan ketat minimal 5 penilaian (`total_penilaian >= 5`) untuk pemeringkatan Top 10 Rating Semua Guru tingkat sekolah.
+* **2026-10-30 (Implementasi Multi-Periode & Aktivasi Otomatis Berbasis Waktu):**
+  - **Sistem Multi-Periode Otomatis:** Mengubah arsitektur periode menjadi Multi-Periode dengan aktivasi dan penyelesaian otomatis berbasis tanggal/waktu mulai & selesai (`tanggal_mulai` & `tanggal_selesai`). Admin tidak perlu lagi mengaktifkan periode secara manual setiap pergantian semester.
+  - **Siklus Hidup Status Dinamis:**
+    * Sebelum tanggal mulai: **`terjadwal`**
+    * Saat memasuki tanggal mulai: **`aktif`**
+    * Melewati tanggal selesai: **`selesai`**
+    * Periode berikutnya otomatis aktif saat waktunya tiba tanpa intervensi manual.
+  - **Sinkronisasi Multi-Jalur (*Multi-Path Synchronization*):**
+    * Background scheduler cron `php artisan periode:sync` per menit pada `routes/console.php`.
+    * Self-healing otomatis saat web request masuk di `AppServiceProvider::boot()`.
+    * Sinkronisasi instan saat Admin mengakses atau menyimpan data di menu Pengaturan (`/admin/pengaturan#tabPeriode`).
+  - **Preservasi Data Penilaian Permanen:** Penilaian setiap periode terisolasi dengan `periode_id`, sehingga periode lama aman tersimpan sebagai arsip dan dapat ditinjau kembali kapan saja.
+  - **Antarmuka Admin Responsif:** Tabel Riwayat Periode kini menampilkan badge status Bootstrap 5.3 (`Aktif` [hijau], `Terjadwal` [biru], `Selesai` [abu-abu/arsip]), opsi dropdown status otomatis, tombol aktifkan manual override, serta pelindung penghapusan periode aktif.
+
 
 
 

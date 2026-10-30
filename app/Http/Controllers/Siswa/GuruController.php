@@ -123,8 +123,8 @@ class GuruController extends Controller
             'rata_keramahan' => $allPenilaian->avg('keramahan') ?? 0,
         ];
 
-        // Arsip penilaian dari periode-periode nonaktif (lampau)
-        $arsipPeriode = Periode::where('status', 'nonaktif')
+        // Arsip penilaian dari periode-periode lampau (selesai/nonaktif)
+        $arsipPeriode = Periode::whereIn('status', ['selesai', 'nonaktif'])
             ->whereHas('penilaian', function($q) use ($guru) {
                 $q->where('guru_id', $guru->id);
             })

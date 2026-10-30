@@ -16,6 +16,10 @@
                     <td>
                         @if($p->status === 'aktif')
                             <span class="badge-custom" style="background: #d1fae5; color: #065f46;">AKTIF</span>
+                        @elseif($p->status === 'terjadwal')
+                            <span class="badge-custom" style="background: #e0f2fe; color: #0369a1;">TERJADWAL</span>
+                        @elseif($p->status === 'selesai')
+                            <span class="badge-custom" style="background: #f1f5f9; color: #475569;">SELESAI</span>
                         @else
                             <span class="badge-custom" style="background: #fee2e2; color: #991b1b;">NONAKTIF</span>
                         @endif

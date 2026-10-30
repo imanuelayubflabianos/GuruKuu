@@ -413,8 +413,8 @@ class DashboardController extends Controller
                 ->get()
             : collect();
 
-        // Arsip ulasan dari periode-periode nonaktif (lampau)
-        $arsipPeriode = Periode::where('status', 'nonaktif')
+        // Arsip ulasan dari periode-periode lampau (selesai/nonaktif)
+        $arsipPeriode = Periode::whereIn('status', ['selesai', 'nonaktif'])
             ->whereHas('penilaian', function($q) use ($guru) {
                 $q->where('guru_id', $guru->id);
             })
