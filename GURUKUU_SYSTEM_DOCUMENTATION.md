@@ -378,7 +378,7 @@ GuruKuu/
     * Self-healing otomatis saat web request masuk di `AppServiceProvider::boot()`.
     * Sinkronisasi instan saat Admin mengakses atau menyimpan data di menu Pengaturan (`/admin/pengaturan#tabPeriode`).
   - **Preservasi Data Penilaian Permanen:** Penilaian setiap periode terisolasi dengan `periode_id`, sehingga periode lama aman tersimpan sebagai arsip dan dapat ditinjau kembali kapan saja.
-  - **Antarmuka Admin Responsif:** Tabel Riwayat Periode kini menampilkan badge status Bootstrap 5.3 (`Aktif` [hijau], `Terjadwal` [biru], `Selesai` [abu-abu/arsip]), opsi dropdown status otomatis, tombol aktifkan manual override, serta pelindung penghapusan periode aktif.
+  - **Antarmuka Admin Responsif:** Tabel Riwayat Periode kini menampilkan badge status Bootstrap 5.3 (`Aktif` [hijau], `Terjadwal` [biru], `Selesai` [abu-abu/arsip]), opsi dropdown status otomatis, tombol aktifkan manual override, pelindung penghapusan periode aktif, serta kotak catatan/panduan penting yang menegaskan kewajiban Admin membuat periode baru setiap pergantian semester agar riwayat ulasan tersimpan permanen.
 
 
 

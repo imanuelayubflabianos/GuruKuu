@@ -946,6 +946,18 @@
             </div>
         </div>
 
+        <div class="alert alert-info border-info-subtle bg-info-subtle text-dark d-flex align-items-start gap-3 mb-3 p-3 rounded-3" role="alert">
+            <i class="bi bi-info-circle-fill text-info fs-5 flex-shrink-0 mt-0.5"></i>
+            <div class="small">
+                <strong class="text-dark">Catatan Penting Manajemen Periode:</strong>
+                <ul class="mb-0 ps-3 mt-1.5 text-secondary">
+                    <li><strong class="text-dark">Wajib Buat Periode Baru:</strong> Setiap pergantian semester/tahun ajaran, Admin <strong>wajib membuat periode baru</strong> (klik tombol <em>+ Baru</em>). Jangan menimpa atau mengedit nama periode lama yang sudah berjalan/selesai.</li>
+                    <li><strong class="text-dark">Aktivasi Otomatis:</strong> Cukup atur tanggal & waktu mulai serta selesai. Sistem otomatis mengaktifkan periode ini saat waktunya tiba dan menyelesaikan periode sebelumnya.</li>
+                    <li><strong class="text-dark">Penyimpanan Riwayat Ulasan:</strong> Seluruh ulasan periode sebelumnya tetap tersimpan aman dan permanen di database sesuai riwayat periodenya masing-masing (tersimpan rapi sebagai arsip).</li>
+                </ul>
+            </div>
+        </div>
+
         <div class="settings-card">
             <div class="d-flex align-items-center justify-content-between mb-4">
                 <h2 class="settings-heading" id="formPeriodeTitle"><i class="bi bi-calendar-plus me-2"></i>Periode</h2>
