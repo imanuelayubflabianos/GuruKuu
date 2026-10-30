@@ -353,6 +353,9 @@ GuruKuu/
 * **2026-10-29 (Sanitasi & Pembersihan Kredensial Sensitif di `.env.example`):**
   - **Pembersihan Total:** Mengosongkan seluruh nilai kredensial SiPintu (`SIPINTU_CLIENT_ID` dan `SIPINTU_CLIENT_SECRET`) yang sebelumnya tertulis di file `.env.example` dari commit lama (24 Sep 2026).
   - **Audit Repositori Git:** Memastikan tidak ada file git lain yang mengekspos kredensial rahasia; seluruh konfigurasi kredensial sensitif kini murni berada di `.env` lokal yang di-ignore oleh git.
+* **2026-10-30 (Penyelarasan Tampilan Top Guru di Dashboard Siswa Menjadi Urutan 1, 2, 3):**
+  - **Urutan Sekuensial Kartu Dashboard:** Mengubah tata letak kartu preview Top Guru pada Dashboard Siswa dari format podium (`2 di kiri, 1 di tengah, 3 di kanan`) menjadi urutan sekuensial linear **1, 2, 3** (`#1st di kiri, #2nd di tengah, #3rd di kanan`).
+  - **Preservasi Halaman Leaderboard:** Format podium tradisional mahkota romawi (`1 di tengah, 2 di samping, 3 di samping`) tetap dipertahankan penuh pada halaman utama Leaderboard publik maupun siswa.
 * **2026-10-30 (Peningkatan Kapasitas Leaderboard Semua Guru Menjadi Top 30):**
   - **Ekspansi Kuota Pemeringkatan Top 30:** Mengubah batas tampilan mode Semua Guru (Rating Kepuasan) di seluruh sistem web dari **Top 10** menjadi **Top 30** (`take(30)`).
   - **Penyelarasan Seluruh Antarmuka Web:** Memperbarui label kartu, judul tabel, badge kuota, batas query controller ([`LandingController`](file:///c:/Users/ADVAN/PROJEK/Laravel/GuruKuu/app/Http/Controllers/LandingController.php), [`Siswa\LeaderboardController`](file:///c:/Users/ADVAN/PROJEK/Laravel/GuruKuu/app/Http/Controllers/Siswa/LeaderboardController.php), [`Guru\DashboardController`](file:///c:/Users/ADVAN/PROJEK/Laravel/GuruKuu/app/Http/Controllers/Guru/DashboardController.php)), dan kartu status privat guru di dashboard guru agar konsisten menampilkan standar Top 30.

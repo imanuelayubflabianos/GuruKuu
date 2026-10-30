@@ -662,7 +662,62 @@
                     $g3 = $topGuru->get(2);
                 @endphp
                 <div class="row g-2 g-md-3 align-items-stretch mb-3">
-                    {{-- #2nd (KIRI - PERAK) --}}
+                    {{-- #1st (URUTAN 1 - EMAS UTAMA) --}}
+                    @if($g1)
+                    @php
+                        $score1 = (float)($g1->rata_rata_nilai ?? 0);
+                        $pct1 = round(($score1 / 5) * 100);
+                        $stars1 = round($score1 * 2) / 2;
+                    @endphp
+                    <div class="col-4">
+                        <div class="gk-clean-card gk-dash-podium-card is-podium-1 text-center h-100 d-flex flex-column justify-content-between">
+                            <div>
+                                <div class="mb-1.5">
+                                    <span class="badge rounded-pill px-2 py-0.5 px-md-3 py-md-1 fw-bold" style="background: #fef08a; color: #854d0e; font-size: 0.74rem;">
+                                        #1st
+                                    </span>
+                                </div>
+                                <div class="gk-avatar-clean-wrap gk-dash-podium-avatar">
+                                    <img src="{{ $g1->photo_url }}" alt="{{ $g1->nama }}" class="w-100 h-100">
+                                </div>
+                                <h6 class="fw-bold mb-0.5 text-dark text-truncate gk-dash-podium-name" title="{{ $g1->nama }}">{{ $g1->nama }}</h6>
+                                <div class="text-muted small mb-1.5 text-truncate font-mono gk-dash-podium-sub">
+                                    {{ strtoupper($g1->jurusan?->nama_jurusan ?? $g1->kategori_label ?? 'GURU NORMADA') }}
+                                </div>
+
+                                {{-- BINTANG EMAS --}}
+                                <div class="text-warning mb-1.5 gk-dash-podium-stars">
+                                    @for($i = 1; $i <= 5; $i++)
+                                        @if($stars1 >= $i)
+                                             <i class="bi bi-star-fill"></i>
+                                        @elseif($stars1 >= ($i - 0.5))
+                                            <i class="bi bi-star-half"></i>
+                                        @else
+                                            <i class="bi bi-star text-muted opacity-25"></i>
+                                        @endif
+                                    @endfor
+                                </div>
+
+                                {{-- PROGRESS PILL PERSENTASE --}}
+                                <div class="mb-1">
+                                    <div class="gk-progress-pill mx-auto">
+                                        <div class="gk-progress-pill-fill" style="width: {{ $pct1 }}%;"></div>
+                                        <span class="position-relative text-white" style="z-index: 2; text-shadow: 0 1px 2px rgba(0,0,0,0.6);">{{ $pct1 }}%</span>
+                                    </div>
+                                </div>
+                                <small class="text-muted font-mono d-block mb-2.5 gk-dash-podium-ulasan">{{ $g1->penilaian_count ?? $g1->total_penilaian ?? 0 }} ulasan</small>
+                            </div>
+
+                            <div>
+                                <a href="{{ route('siswa.guru.show', $g1) }}" class="btn btn-sm btn-outline-primary w-100 rounded-pill py-1 py-md-1.5 fw-semibold gk-dash-podium-btn" style="border-color: rgba(0, 51, 102, 0.25); color: #003366;">
+                                    <i class="bi bi-eye me-1"></i> Profil
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    @endif
+
+                    {{-- #2nd (URUTAN 2 - PERAK) --}}
                     @if($g2)
                     @php
                         $score2 = (float)($g2->rata_rata_nilai ?? 0);
@@ -717,62 +772,7 @@
                     </div>
                     @endif
 
-                    {{-- #1st (TENGAH - EMAS UTAMA) --}}
-                    @if($g1)
-                    @php
-                        $score1 = (float)($g1->rata_rata_nilai ?? 0);
-                        $pct1 = round(($score1 / 5) * 100);
-                        $stars1 = round($score1 * 2) / 2;
-                    @endphp
-                    <div class="col-4">
-                        <div class="gk-clean-card gk-dash-podium-card is-podium-1 text-center h-100 d-flex flex-column justify-content-between">
-                            <div>
-                                <div class="mb-1.5">
-                                    <span class="badge rounded-pill px-2 py-0.5 px-md-3 py-md-1 fw-bold" style="background: #fef08a; color: #854d0e; font-size: 0.74rem;">
-                                        #1st
-                                    </span>
-                                </div>
-                                <div class="gk-avatar-clean-wrap gk-dash-podium-avatar">
-                                    <img src="{{ $g1->photo_url }}" alt="{{ $g1->nama }}" class="w-100 h-100">
-                                </div>
-                                <h6 class="fw-bold mb-0.5 text-dark text-truncate gk-dash-podium-name" title="{{ $g1->nama }}">{{ $g1->nama }}</h6>
-                                <div class="text-muted small mb-1.5 text-truncate font-mono gk-dash-podium-sub">
-                                    {{ strtoupper($g1->jurusan?->nama_jurusan ?? $g1->kategori_label ?? 'GURU NORMADA') }}
-                                </div>
-
-                                {{-- BINTANG EMAS --}}
-                                <div class="text-warning mb-1.5 gk-dash-podium-stars">
-                                    @for($i = 1; $i <= 5; $i++)
-                                        @if($stars1 >= $i)
-                                            <i class="bi bi-star-fill"></i>
-                                        @elseif($stars1 >= ($i - 0.5))
-                                            <i class="bi bi-star-half"></i>
-                                        @else
-                                            <i class="bi bi-star text-muted opacity-25"></i>
-                                        @endif
-                                    @endfor
-                                </div>
-
-                                {{-- PROGRESS PILL PERSENTASE --}}
-                                <div class="mb-1">
-                                    <div class="gk-progress-pill mx-auto">
-                                        <div class="gk-progress-pill-fill" style="width: {{ $pct1 }}%;"></div>
-                                        <span class="position-relative text-white" style="z-index: 2; text-shadow: 0 1px 2px rgba(0,0,0,0.6);">{{ $pct1 }}%</span>
-                                    </div>
-                                </div>
-                                <small class="text-muted font-mono d-block mb-2.5 gk-dash-podium-ulasan">{{ $g1->penilaian_count ?? $g1->total_penilaian ?? 0 }} ulasan</small>
-                            </div>
-
-                            <div>
-                                <a href="{{ route('siswa.guru.show', $g1) }}" class="btn btn-sm btn-outline-primary w-100 rounded-pill py-1 py-md-1.5 fw-semibold gk-dash-podium-btn" style="border-color: rgba(0, 51, 102, 0.25); color: #003366;">
-                                    <i class="bi bi-eye me-1"></i> Profil
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                    @endif
-
-                    {{-- #3rd (KANAN - PERUNGGU) --}}
+                    {{-- #3rd (URUTAN 3 - PERUNGGU) --}}
                     @if($g3)
                     @php
                         $score3 = (float)($g3->rata_rata_nilai ?? 0);
