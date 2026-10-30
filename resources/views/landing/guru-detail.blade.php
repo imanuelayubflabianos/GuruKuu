@@ -359,16 +359,64 @@
                                     @forelse($periodeLalu->penilaian as $fbLalu)
                                         @php
                                             $scoreLalu = round(($fbLalu->rata_rata_evaluasi / 5) * 100);
+                                            $fbColorLalu = $scoreLalu >= 80 ? 'bg-success' : ($scoreLalu >= 60 ? 'bg-info' : ($scoreLalu >= 40 ? 'bg-warning' : 'bg-danger'));
+                                            $aspectsLalu = [
+                                                'Ketepatan Waktu' => $fbLalu->kedisiplinan,
+                                                'Kehadiran di Kelas' => $fbLalu->tanggung_jawab,
+                                                'Penyampaian Materi' => $fbLalu->komunikasi,
+                                                'Interaksi dengan Siswa' => $fbLalu->keramahan,
+                                                'Keterlibatan & Suasana Belajar' => $fbLalu->kreativitas,
+                                            ];
                                         @endphp
-                                        <div class="p-3 bg-white rounded border mb-2">
-                                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <div class="p-3 bg-white rounded border mb-3 shadow-xs">
+                                            <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
                                                 <div class="d-flex align-items-center gap-2">
-                                                    <i class="bi bi-incognito text-muted"></i>
-                                                    <span class="small fw-bold">Siswa (Anonim)</span>
-                                                    <span class="badge bg-light text-dark border font-mono">Nilai: {{ $scoreLalu }}%</span>
+                                                    <div class="rounded-circle d-flex align-items-center justify-content-center bg-secondary bg-opacity-10 text-secondary" style="width: 38px; height: 38px;">
+                                                        <i class="bi bi-incognito fs-5"></i>
+                                                    </div>
+                                                    <div>
+                                                        <div class="d-flex align-items-center gap-2">
+                                                            <strong class="small text-dark">Siswa (Anonim)</strong>
+                                                            <span class="badge {{ $fbColorLalu }} text-white font-mono" style="font-size: 0.72rem;">
+                                                                Skor: {{ $scoreLalu }}%
+                                                            </span>
+                                                        </div>
+                                                        <div class="mt-0.5">
+                                                            <small class="text-muted font-mono" style="font-size: 0.72rem;">{{ $fbLalu->created_at->format('d M Y') }}</small>
+                                                        </div>
+                                                    </div>
                                                 </div>
-                                                <small class="text-muted font-mono" style="font-size: 0.72rem;">{{ $fbLalu->created_at->format('d M Y') }}</small>
+                                                <div style="min-width: 140px;">
+                                                    <div class="d-flex justify-content-between mb-1">
+                                                        <small class="text-muted" style="font-size: 0.7rem;">Nilai Diberikan:</small>
+                                                        <small class="fw-bold font-mono text-dark" style="font-size: 0.7rem;">{{ $scoreLalu }}% ({{ $fbLalu->total_nilai }}/25)</small>
+                                                    </div>
+                                                    <div class="progress" style="height: 6px; background-color: #dee2e6; border-radius: 3px;">
+                                                        <div class="progress-bar {{ $fbColorLalu }}" style="width: {{ $scoreLalu }}%;"></div>
+                                                    </div>
+                                                </div>
                                             </div>
+
+                                            {{-- RINCIAN BINTANG PER KRITERIA (ARSIP) --}}
+                                            <div class="p-2 rounded mb-2" style="background: var(--bg-light, #f8fafc); border: 1px solid var(--border, #e2e8f0);">
+                                                <div class="small fw-bold text-muted mb-1" style="font-size: 0.7rem; letter-spacing: 0.5px;">
+                                                    <i class="bi bi-star-fill text-warning me-1"></i> RINCIAN NILAI PER ASPEK:
+                                                </div>
+                                                <div class="row g-1 text-center">
+                                                    @foreach($aspectsLalu as $aspLabel => $aspVal)
+                                                        <div class="col-6 col-sm">
+                                                            <div class="bg-white p-1 rounded border" style="font-size: 0.68rem;">
+                                                                <div class="text-truncate text-muted fw-semibold" title="{{ $aspLabel }}">{{ $aspLabel }}</div>
+                                                                <div class="text-warning mt-0.5 d-flex align-items-center justify-content-center gap-0.5">
+                                                                    <i class="bi bi-star-fill" style="font-size: 0.65rem;"></i>
+                                                                    <span class="fw-bold font-mono text-dark" style="font-size: 0.72rem;">{{ $aspVal ?? '-' }}<span class="text-muted fw-normal" style="font-size: 0.62rem;">/5</span></span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    @endforeach
+                                                </div>
+                                            </div>
+
                                             @if($fbLalu->is_censored)
                                                 <div class="small text-muted fst-italic mb-1"><i class="bi bi-shield-exclamation text-warning me-1"></i>Ulasan ini disembunyikan karena tidak memenuhi kriteria kebijakan.</div>
                                             @else

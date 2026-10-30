@@ -344,13 +344,29 @@
                                     $isMyReviewLalu = (auth()->check() && $fbLalu->siswa_id === auth()->id());
                                 @endphp
                                 <div id="ulasan-{{ $fbLalu->id }}" class="p-3 bg-white rounded border mb-2 {{ $isMyReviewLalu ? 'shadow-sm' : '' }}" style="{{ $isMyReviewLalu ? 'border-color: #003366 !important; border-left: 4px solid #003366 !important; background: #f0f7ff !important;' : '' }}">
-                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
                                         <div class="d-flex align-items-center gap-2">
-                                            <i class="bi {{ $isMyReviewLalu ? 'bi-person-fill text-primary' : 'bi-incognito text-muted' }}"></i>
-                                            <span class="small fw-bold">{{ $isMyReviewLalu ? 'Ulasan Anda' : 'Siswa (Anonim)' }}</span>
-                                            <span class="badge bg-light text-dark border font-mono">Nilai: {{ $scoreLalu }}%</span>
+                                            <i class="bi {{ $isMyReviewLalu ? 'bi-person-fill text-primary' : 'bi-incognito text-muted' }} fs-5"></i>
+                                            <div>
+                                                <div class="d-flex align-items-center gap-2">
+                                                    <span class="small fw-bold text-dark">{{ $isMyReviewLalu ? 'Ulasan Anda' : 'Siswa (Anonim)' }}</span>
+                                                    @php $fbColorLalu = $scoreLalu >= 80 ? 'bg-success' : ($scoreLalu >= 60 ? 'bg-info' : ($scoreLalu >= 40 ? 'bg-warning' : 'bg-danger')); @endphp
+                                                    <span class="badge {{ $fbColorLalu }} text-white font-mono" style="font-size: 0.72rem;">
+                                                        Skor: {{ $scoreLalu }}%
+                                                    </span>
+                                                </div>
+                                                <small class="text-muted font-mono" style="font-size: 0.7rem;">{{ $fbLalu->created_at->format('d M Y H:i') }}</small>
+                                            </div>
                                         </div>
-                                        <small class="text-muted font-mono" style="font-size: 0.72rem;">{{ $fbLalu->created_at->format('d M Y') }}</small>
+                                        <div style="min-width: 130px;">
+                                            <div class="d-flex justify-content-between mb-1">
+                                                <small class="text-muted" style="font-size: 0.68rem;">Nilai Diberikan:</small>
+                                                <small class="fw-bold font-mono text-dark" style="font-size: 0.68rem;">{{ $scoreLalu }}% ({{ $fbLalu->total_nilai }}/25)</small>
+                                            </div>
+                                            <div class="progress" style="height: 5px; background-color: #dee2e6; border-radius: 3px;">
+                                                <div class="progress-bar {{ $fbColorLalu }}" style="width: {{ $scoreLalu }}%;"></div>
+                                            </div>
+                                        </div>
                                     </div>
 
                                     {{-- RINCIAN BINTANG PER KRITERIA (ARSIP) --}}

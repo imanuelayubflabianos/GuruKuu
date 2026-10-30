@@ -280,27 +280,99 @@
                     <div id="collapseArsipAdmin{{ $periodeLalu->id }}" class="accordion-collapse collapse" data-bs-parent="#accordionArsipAdmin">
                         <div class="accordion-body bg-light">
                             @forelse($periodeLalu->penilaian as $fbLalu)
-                                @php $scoreLalu = round(($fbLalu->rata_rata_evaluasi / 5) * 100); @endphp
-                                <div class="p-3 bg-white rounded border mb-2">
-                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                @php
+                                    $scoreLalu = round(($fbLalu->rata_rata_evaluasi / 5) * 100);
+                                    $fbColorLalu = $scoreLalu >= 80 ? 'bg-success' : ($scoreLalu >= 60 ? 'bg-info' : ($scoreLalu >= 40 ? 'bg-warning' : 'bg-danger'));
+                                    $aspectsLalu = [
+                                        'Ketepatan Waktu' => $fbLalu->kedisiplinan,
+                                        'Kehadiran di Kelas' => $fbLalu->tanggung_jawab,
+                                        'Penyampaian Materi' => $fbLalu->komunikasi,
+                                        'Interaksi dengan Siswa' => $fbLalu->keramahan,
+                                        'Keterlibatan & Suasana Belajar' => $fbLalu->kreativitas,
+                                    ];
+                                @endphp
+                                <div class="border rounded p-3 mb-3 bg-white shadow-xs">
+                                    <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
                                         <div class="d-flex align-items-center gap-2">
-                                            @if($fbLalu->siswa)
-                                                <i class="bi bi-person-fill text-primary"></i>
-                                                <span class="small fw-bold text-dark">{{ $fbLalu->siswa->name }}</span>
-                                                <span class="badge bg-secondary-subtle text-secondary font-mono" style="font-size: 0.65rem;">{{ $fbLalu->siswa->nis }}</span>
-                                            @else
-                                                <i class="bi bi-incognito text-muted"></i>
-                                                <span class="small fw-bold">Siswa (Anonim)</span>
-                                            @endif
-                                            <span class="badge bg-light text-dark border font-mono">Nilai: {{ $scoreLalu }}%</span>
+                                            <div class="rounded-circle d-flex align-items-center justify-content-center bg-light border" style="width: 38px; height: 38px;">
+                                                <i class="bi bi-person-check-fill fs-5 text-primary"></i>
+                                            </div>
+                                            <div>
+                                                <div class="d-flex align-items-center gap-2">
+                                                    @if($fbLalu->siswa)
+                                                        <strong class="small text-dark">{{ $fbLalu->siswa->name }}</strong>
+                                                        <span class="badge bg-secondary-subtle text-secondary font-mono" style="font-size: 0.65rem;">NIS: {{ $fbLalu->siswa->nis }}</span>
+                                                    @else
+                                                        <strong class="small text-dark">Siswa (Anonim)</strong>
+                                                    @endif
+                                                    <span class="badge {{ $fbColorLalu }} text-white font-mono" style="font-size: 0.72rem;">
+                                                        Skor: {{ $scoreLalu }}%
+                                                    </span>
+                                                </div>
+                                                <small class="text-muted font-mono" style="font-size: 0.72rem;">{{ $fbLalu->created_at->format('d M Y H:i') }}</small>
+                                            </div>
                                         </div>
-                                        <small class="text-muted font-mono" style="font-size: 0.72rem;">{{ $fbLalu->created_at->format('d M Y H:i') }}</small>
+                                        <div style="min-width: 140px;">
+                                            <div class="d-flex justify-content-between mb-1">
+                                                <small class="text-muted" style="font-size: 0.7rem;">Nilai Siswa:</small>
+                                                <small class="fw-bold font-mono text-dark" style="font-size: 0.7rem;">{{ $scoreLalu }}% ({{ $fbLalu->total_nilai }}/25)</small>
+                                            </div>
+                                            <div class="progress" style="height: 6px; background-color: #dee2e6; border-radius: 3px;">
+                                                <div class="progress-bar {{ $fbColorLalu }}" style="width: {{ $scoreLalu }}%;"></div>
+                                            </div>
+                                        </div>
                                     </div>
-                                    @if($fbLalu->kritik)
-                                        <div class="small text-muted mb-1"><strong>Kritik:</strong> {{ $fbLalu->kritik }}</div>
+
+                                    {{-- RINCIAN BINTANG PER KRITERIA (ARSIP) --}}
+                                    <div class="p-2 rounded mb-2" style="background: var(--bg-light, #f8fafc); border: 1px solid var(--border, #e2e8f0);">
+                                        <div class="small fw-bold text-muted mb-1" style="font-size: 0.7rem; letter-spacing: 0.5px;">
+                                            <i class="bi bi-star-fill text-warning me-1"></i> RINCIAN NILAI PER ASPEK:
+                                        </div>
+                                        <div class="row g-1 text-center">
+                                            @foreach($aspectsLalu as $aspLabel => $aspVal)
+                                                <div class="col-6 col-sm">
+                                                    <div class="bg-white p-1.5 rounded border" style="font-size: 0.7rem;">
+                                                        <div class="text-truncate text-muted fw-semibold" title="{{ $aspLabel }}">{{ $aspLabel }}</div>
+                                                        <div class="text-warning mt-0.5 d-flex align-items-center justify-content-center gap-0.5">
+                                                            <i class="bi bi-star-fill" style="font-size: 0.7rem;"></i>
+                                                            <span class="fw-bold font-mono text-dark" style="font-size: 0.75rem;">{{ $aspVal ?? '-' }}<span class="text-muted fw-normal" style="font-size: 0.65rem;">/5</span></span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                    </div>
+
+                                    @if($fbLalu->is_censored)
+                                        <div class="p-2 rounded small mb-2 bg-warning-subtle border border-warning-subtle text-dark">
+                                            <i class="bi bi-shield-exclamation text-warning me-1"></i><strong>Ulasan Disembunyikan (Disensor):</strong> Tidak memenuhi kriteria kebijakan.
+                                            <details class="mt-1">
+                                                <summary class="text-muted small cursor-pointer" style="cursor: pointer;">Lihat teks asli</summary>
+                                                <div class="mt-1 small text-muted"><strong>Kritik:</strong> {{ $fbLalu->kritik ?: '-' }} | <strong>Saran:</strong> {{ $fbLalu->saran ?: '-' }}</div>
+                                            </details>
+                                        </div>
+                                    @else
+                                        @if(!$fbLalu->kritik && !$fbLalu->saran)
+                                            <div class="p-2 rounded small mb-2 bg-white text-muted fst-italic border">
+                                                <i class="bi bi-star-fill text-warning me-1"></i> Siswa memberikan nilai bintang tanpa kritik & saran tertulis.
+                                            </div>
+                                        @endif
+                                        @if($fbLalu->kritik)
+                                            <div class="p-2 rounded small mb-2 bg-white border-start border-3 border-warning">
+                                                <strong class="text-warning-emphasis">Kritik:</strong> {{ $fbLalu->kritik }}
+                                            </div>
+                                        @endif
+                                        @if($fbLalu->saran)
+                                            <div class="p-2 rounded small mb-2 bg-white border-start border-3 border-info">
+                                                <strong class="text-info">Saran:</strong> {{ $fbLalu->saran }}
+                                            </div>
+                                        @endif
                                     @endif
-                                    @if($fbLalu->saran)
-                                        <div class="small text-muted mb-1"><strong>Saran:</strong> {{ $fbLalu->saran }}</div>
+                                    @if($fbLalu->balasan_guru)
+                                        <div class="p-2 rounded small mt-2 bg-white border-start border-3 border-primary shadow-sm">
+                                            <strong class="text-primary d-block mb-1"><i class="bi bi-reply-fill me-1"></i>Balasan Guru:</strong>
+                                            <span class="text-dark">{{ $fbLalu->balasan_guru }}</span>
+                                        </div>
                                     @endif
                                 </div>
                             @empty
