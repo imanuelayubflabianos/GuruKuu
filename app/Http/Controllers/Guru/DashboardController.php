@@ -357,7 +357,7 @@ class DashboardController extends Controller
         $myRankInfo = null;
         if ($myGuru) {
             $myEntry = $fullLeaderboard->first(fn($g) => $g->id === $myGuru->id);
-            $limit = ($mode === 'partisipasi') ? 5 : 10;
+            $limit = ($mode === 'partisipasi') ? 5 : 30;
             $totalEvaluated = $fullLeaderboard->filter(fn($g) => $g->total_penilaian > 0)->count();
 
             $myRankInfo = [
@@ -372,8 +372,8 @@ class DashboardController extends Controller
             ];
         }
 
-        // Tampilan umum user dibatasi: Top 10 (Semua Guru) & Top 5 (Berdasarkan Kelas)
-        $limit = ($mode === 'partisipasi') ? 5 : 10;
+        // Tampilan umum user dibatasi: Top 30 (Semua Guru) & Top 5 (Berdasarkan Kelas)
+        $limit = ($mode === 'partisipasi') ? 5 : 30;
         $leaderboard = $fullLeaderboard
             ->filter(fn($g) => !empty($g->leaderboard_rank))
             ->take($limit);

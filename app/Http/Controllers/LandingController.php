@@ -20,10 +20,10 @@ class LandingController extends Controller
             ? Penilaian::where('periode_id', $periodeAktif->id)->count() 
             : Penilaian::count();
 
-        // Leaderboard resmi menggunakan aturan standar sistem (Top 10 Publik)
+        // Leaderboard resmi menggunakan aturan standar sistem (Top 30 Publik)
         $leaderboard = Guru::leaderboardFor('rating', null, $periodeAktif?->id)
             ->filter(fn($g) => !empty($g->leaderboard_rank))
-            ->take(10);
+            ->take(30);
 
         return view('landing.index', compact(
             'periodeAktif',
@@ -56,8 +56,8 @@ class LandingController extends Controller
             $kelasId = null;
         }
 
-        // Tampilan publik dibatasi: Top 10 (Semua Guru) & Top 5 (Berdasarkan Kelas)
-        $limit = ($mode === 'partisipasi') ? 5 : 10;
+        // Tampilan publik dibatasi: Top 30 (Semua Guru) & Top 5 (Berdasarkan Kelas)
+        $limit = ($mode === 'partisipasi') ? 5 : 30;
         $leaderboard = Guru::leaderboardFor($mode, $kelasId, $periodeId)
             ->filter(fn($g) => !empty($g->leaderboard_rank))
             ->take($limit);

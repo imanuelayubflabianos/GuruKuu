@@ -119,7 +119,7 @@ Sistem memiliki 2 mode peringkat di `Guru::leaderboardFor()`:
    * Menghitung rata-rata skor bintang dari seluruh siswa yang menilai guru di periode aktif.
    * **Isolasi Ketat Periode:** Penilaian wajib difilter secara ketat dengan `where('periode_id', $periodeId)` sehingga ulasan arsip periode lampau tidak pernah bocor ke periode berjalan. Jika tidak ada periode aktif/valid, sistem langsung mengembalikan koleksi kosong (`collect()`).
    * **Kelayakan Peringkat (Wajib Minimal 5 Penilaian):** Hanya guru yang telah menerima setidaknya 5 penilaian (`total_penilaian >= 5`) pada periode berjalan yang berhak masuk pemeringkatan leaderboard dan podium. Guru dengan jumlah penilaian di bawah 5 tidak mendapatkan peringkat (`leaderboard_rank = null`) dan tidak dimunculkan di leaderboard. Pemeringkatan diurutkan berdasarkan `rata_rata_nilai` DESC, `total_penilaian` DESC, dan `nama` ASC.
-   * **Batasan Tampilan Publik / Pengguna:** Dibatasi hanya menampilkan **Top 10** (`take(10)`).
+   * **Batasan Tampilan Publik / Pengguna:** Dibatasi hanya menampilkan **Top 30** (`take(30)`).
 
 2. **Mode Berdasarkan Kelas (Guru Mengajar di Kelas X):**
    * Menghitung rata-rata nilai bintang dari siswa kelas bersangkutan (`class_id`) pada periode aktif yang dipilih.
@@ -133,8 +133,8 @@ Sistem memiliki 2 mode peringkat di `Guru::leaderboardFor()`:
 
 3. **Kebijakan Tampilan & Privasi Leaderboard:**
    * **Penyembunyian Keterangan Minimal:** Keterangan teknis seperti *"minimal 5 ulasan untuk masuk top"* dihilangkan dari antarmuka publik, siswa, dan guru agar tampilan bersih dan elegan.
-   * **Akses Penuh Administrator:** Halaman Admin Leaderboard (`/admin/leaderboard`) tetap menampilkan seluruh guru dan seluruh peringkat tanpa pemotongan limit (tidak dibatasi Top 10/Top 5) untuk keperluan audit.
-   * **Peringkat Pribadi Guru (*Private Personal Ranking*):** Di Dashboard Guru (`/guru/dashboard`) dan Leaderboard Guru (`/guru/leaderboard`), guru dapat melihat posisi peringkat sekolahnya sendiri secara rahasia (misal *"Peringkat #15 dari 60 Guru"*). Guru di luar Top 10 tidak muncul di leaderboard publik sehingga aman dari ledekan, sekaligus tetap memberi ruang refleksi diri pribadi.
+   * **Akses Penuh Administrator:** Halaman Admin Leaderboard (`/admin/leaderboard`) tetap menampilkan seluruh guru dan seluruh peringkat tanpa pemotongan limit (tidak dibatasi Top 30/Top 5) untuk keperluan audit.
+   * **Peringkat Pribadi Guru (*Private Personal Ranking*):** Di Dashboard Guru (`/guru/dashboard`) dan Leaderboard Guru (`/guru/leaderboard`), guru dapat melihat posisi peringkat sekolahnya sendiri secara rahasia (misal *"Peringkat #35 dari 60 Guru"*). Guru di luar Top 30 tidak muncul di leaderboard publik sehingga aman dari ledekan, sekaligus tetap memberi ruang refleksi diri pribadi.
    * **Klaim Anonimitas Penuh Siswa:** Di Dashboard Guru dan Halaman Ulasan Guru (`/guru/ulasan`), detail kelas spesifik (seperti *MPLB 2 Kelas 11*) disamarkan menjadi hanya nama/kode jurusan (seperti *Jurusan MPLB*) agar identitas siswa tidak teridentifikasi.
 
 ### C. Keamanan & Filter Konten Cerdas (*Profanity Filter Service*)
@@ -353,6 +353,10 @@ GuruKuu/
 * **2026-10-29 (Sanitasi & Pembersihan Kredensial Sensitif di `.env.example`):**
   - **Pembersihan Total:** Mengosongkan seluruh nilai kredensial SiPintu (`SIPINTU_CLIENT_ID` dan `SIPINTU_CLIENT_SECRET`) yang sebelumnya tertulis di file `.env.example` dari commit lama (24 Sep 2026).
   - **Audit Repositori Git:** Memastikan tidak ada file git lain yang mengekspos kredensial rahasia; seluruh konfigurasi kredensial sensitif kini murni berada di `.env` lokal yang di-ignore oleh git.
+* **2026-10-30 (Peningkatan Kapasitas Leaderboard Semua Guru Menjadi Top 30):**
+  - **Ekspansi Kuota Pemeringkatan Top 30:** Mengubah batas tampilan mode Semua Guru (Rating Kepuasan) di seluruh sistem web dari **Top 10** menjadi **Top 30** (`take(30)`).
+  - **Penyelarasan Seluruh Antarmuka Web:** Memperbarui label kartu, judul tabel, badge kuota, batas query controller ([`LandingController`](file:///c:/Users/ADVAN/PROJEK/Laravel/GuruKuu/app/Http/Controllers/LandingController.php), [`Siswa\LeaderboardController`](file:///c:/Users/ADVAN/PROJEK/Laravel/GuruKuu/app/Http/Controllers/Siswa/LeaderboardController.php), [`Guru\DashboardController`](file:///c:/Users/ADVAN/PROJEK/Laravel/GuruKuu/app/Http/Controllers/Guru/DashboardController.php)), dan kartu status privat guru di dashboard guru agar konsisten menampilkan standar Top 30.
+  - **Preservasi Mode Kelas:** Mode Berdasarkan Kelas tetap dipertahankan pada **Top 5** (`take(5)`).
 * **2026-10-30 (Sinkronisasi Penuh Leaderboard Berdasarkan Kelas Satu Web & Auto-Healing Deteksi Suara Siswa):**
   - **Deteksi Menyeluruh Multi-Faktor Suara Siswa per Kelas (`Guru::leaderboardFor`):** Mengimplementasikan algoritma pendeteksi evaluasi kelas komprehensif yang mengenali suara siswa melalui 3 jalur sekaligus: `penilaian.class_id`, relasi pivot `siswa_kelas`, dan kolom teks `users.kelas` (mendukung angka tingkat, angka romawi X/XI/XII, format "Kelas 10 AKL 1", "10 AKL 1", "X AKL 1", maupun nama rombel).
   - **Mekanisme *Auto-Healing* Basis Data:** Saat query leaderboard kelas berjalan, sistem secara otomatis melengkapi kolom `penilaian.class_id` yang kosong dan menautkan siswa ke tabel pivot `siswa_kelas` demi performa kueri berikutnya yang instan.

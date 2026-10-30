@@ -319,9 +319,9 @@ class KritikSaranAndPenilaianTest extends TestCase
             'jumlah_siswa' => 40,
         ]);
 
-        // Buat 12 Guru dengan penilaian eligible (masing-masing 5 penilaian siswa)
+        // Buat 32 Guru dengan penilaian eligible (masing-masing 5 penilaian siswa)
         $gurus = [];
-        for ($i = 1; $i <= 12; $i++) {
+        for ($i = 1; $i <= 32; $i++) {
             $g = Guru::create([
                 'nama' => "Guru Nomor {$i}",
                 'nip' => "1990000000000000" . str_pad($i, 2, '0', STR_PAD_LEFT),
@@ -338,11 +338,11 @@ class KritikSaranAndPenilaianTest extends TestCase
                     'guru_id' => $g->id,
                     'periode_id' => $periode->id,
                     'class_id' => $kelas->id,
-                    'kedisiplinan' => min(5, max(1, 6 - $i * 0.2)),
-                    'komunikasi' => min(5, max(1, 6 - $i * 0.2)),
-                    'tanggung_jawab' => min(5, max(1, 6 - $i * 0.2)),
-                    'kreativitas' => min(5, max(1, 6 - $i * 0.2)),
-                    'keramahan' => min(5, max(1, 6 - $i * 0.2)),
+                    'kedisiplinan' => min(5, max(1, 6 - $i * 0.1)),
+                    'komunikasi' => min(5, max(1, 6 - $i * 0.1)),
+                    'tanggung_jawab' => min(5, max(1, 6 - $i * 0.1)),
+                    'kreativitas' => min(5, max(1, 6 - $i * 0.1)),
+                    'keramahan' => min(5, max(1, 6 - $i * 0.1)),
                     'total_nilai' => max(5, 25 - $i),
                 ]);
             }
@@ -352,18 +352,18 @@ class KritikSaranAndPenilaianTest extends TestCase
         $admin = User::factory()->create(['role' => 'admin', 'is_active' => true]);
         $siswaUser = User::factory()->create(['role' => 'siswa', 'is_active' => true]);
 
-        // 1. Cek Admin Leaderboard (Mode Semua Guru): Admin melihat semua 12 guru
+        // 1. Cek Admin Leaderboard (Mode Semua Guru): Admin melihat semua 32 guru
         $resAdmin = $this->actingAs($admin)->get(route('admin.leaderboard.index', ['mode' => 'rating']));
         $resAdmin->assertStatus(200);
         $resAdmin->assertViewHas('leaderboard', function ($lb) {
-            return $lb->count() === 12;
+            return $lb->count() === 32;
         });
 
-        // 2. Cek Siswa Leaderboard (Mode Semua Guru): Siswa dibatasi Top 10 saja
+        // 2. Cek Siswa Leaderboard (Mode Semua Guru): Siswa dibatasi Top 30 saja
         $resSiswaRating = $this->actingAs($siswaUser)->get(route('siswa.leaderboard.index', ['mode' => 'rating']));
         $resSiswaRating->assertStatus(200);
         $resSiswaRating->assertViewHas('leaderboard', function ($lb) {
-            return $lb->count() === 10;
+            return $lb->count() === 30;
         });
 
         // 3. Cek Siswa Leaderboard (Mode Kelas): Siswa dibatasi Top 5 saja
@@ -377,7 +377,7 @@ class KritikSaranAndPenilaianTest extends TestCase
         });
 
         // 4. Guru Dashboard & Leaderboard: Menampilkan peringkat pribadi guru
-        $targetGuru = $gurus[10]; // Guru Nomor 11 (di luar Top 10)
+        $targetGuru = $gurus[30]; // Guru Nomor 31 (di luar Top 30)
         $guruUser = User::factory()->create([
             'role' => 'guru',
             'nis' => $targetGuru->nip,
@@ -387,16 +387,16 @@ class KritikSaranAndPenilaianTest extends TestCase
         $resGuruDash = $this->actingAs($guruUser)->get(route('guru.dashboard'));
         $resGuruDash->assertStatus(200);
         $resGuruDash->assertSee('PERINGKAT PRIBADI ANDA');
-        $resGuruDash->assertSee('Peringkat #11');
+        $resGuruDash->assertSee('Peringkat #31');
 
         $resGuruLb = $this->actingAs($guruUser)->get(route('guru.leaderboard', ['mode' => 'rating']));
         $resGuruLb->assertStatus(200);
-        // Pada tabel umum hanya ada 10 guru
+        // Pada tabel umum dibatasi Top 30 guru
         $resGuruLb->assertViewHas('leaderboard', function ($lb) {
-            return $lb->count() === 10;
+            return $lb->count() === 30;
         });
-        // Namun di banner privat, guru ini tetap tahu dia peringkat #11
-        $resGuruLb->assertSee('Peringkat #11');
+        // Namun di banner privat, guru ini tetap tahu dia peringkat #31
+        $resGuruLb->assertSee('Peringkat #31');
         $resGuruLb->assertSee('STATUS PRIBADI ANDA');
     }
 
@@ -696,7 +696,7 @@ class KritikSaranAndPenilaianTest extends TestCase
         ]);
 
         // 1. Leaderboard aktif: Guru B TIDAK boleh ada (karena di periode lampau)
-        // Guru A juga TIDAK boleh ada pada mode rating karena ulasan baru 2 (< 5 ulasan wajib untuk Top 10 Sekolah)
+        // Guru A juga TIDAK boleh ada pada mode rating karena ulasan baru 2 (< 5 ulasan wajib untuk Top 30 Sekolah)
         $lbAktif = Guru::leaderboardFor('rating', null, $periodeAktif->id);
         $this->assertFalse($lbAktif->contains('id', $guruB->id));
         $this->assertFalse($lbAktif->contains('id', $guruA->id));

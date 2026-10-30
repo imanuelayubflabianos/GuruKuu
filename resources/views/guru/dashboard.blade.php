@@ -337,16 +337,16 @@
                                 @if(!empty($mySchoolRank))
                                     <span class="text-primary font-mono fw-extrabold">Peringkat #{{ $mySchoolRank }}</span>
                                     <span class="text-muted fw-normal" style="font-size: 0.82rem;">dari {{ $totalEvaluatedGurus }} Guru</span>
-                                    @if($mySchoolRank <= 10)
-                                        <span class="badge bg-success-subtle text-success border border-success-subtle ms-1" style="font-size: 0.68rem;">Top 10 Sekolah</span>
+                                    @if($mySchoolRank <= 30)
+                                        <span class="badge bg-success-subtle text-success border border-success-subtle ms-1" style="font-size: 0.68rem;">Top 30 Sekolah</span>
                                     @endif
                                 @else
                                     <span class="text-muted fw-semibold" style="font-size: 0.88rem;">Belum Masuk Peringkat</span>
                                 @endif
                             </div>
                             <small class="text-muted d-block" style="font-size: 0.72rem; line-height: 1.3;">
-                                @if(!empty($mySchoolRank) && $mySchoolRank > 10)
-                                    Peringkat Anda tidak dipublikasikan di leaderboard umum (Top 10) demi kenyamanan & privasi Anda.
+                                @if(!empty($mySchoolRank) && $mySchoolRank > 30)
+                                    Peringkat Anda tidak dipublikasikan di leaderboard umum (Top 30) demi kenyamanan & privasi Anda.
                                 @else
                                     Data peringkat ini hanya dapat dilihat oleh Anda sebagai sarana refleksi & evaluasi diri.
                                 @endif

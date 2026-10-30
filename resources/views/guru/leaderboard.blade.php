@@ -408,9 +408,9 @@
     <div class="card-header bg-white px-4 py-3.5 border-bottom d-flex justify-content-between align-items-center">
         <h6 class="fw-bold mb-0 d-flex align-items-center gap-2">
             <i class="bi bi-trophy-fill text-warning fs-5"></i>
-            <span>Daftar Peringkat {{ $mode === 'partisipasi' ? 'Top 5 Guru' : 'Top 10 Guru' }}</span>
+            <span>Daftar Peringkat {{ $mode === 'partisipasi' ? 'Top 5 Guru' : 'Top 30 Guru' }}</span>
         </h6>
-        <span class="badge bg-primary px-3 py-1.5 rounded-pill">{{ $list->count() }} Guru (Top {{ $mode === 'partisipasi' ? '5' : '10' }})</span>
+        <span class="badge bg-primary px-3 py-1.5 rounded-pill">{{ $list->count() }} Guru (Top {{ $mode === 'partisipasi' ? '5' : '30' }})</span>
     </div>
     <div class="table-responsive">
         <table class="table table-custom mb-0 align-middle">
