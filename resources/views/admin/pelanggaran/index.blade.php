@@ -22,7 +22,7 @@
                 </form>
             @endif
 
-            @if(($stats['total'] ?? 0) > 0)
+            @if(auth()->user()->role === 'admin' && ($stats['total'] ?? 0) > 0)
                 <div class="dropdown d-inline-block">
                     <button class="btn btn-outline-secondary btn-sm dropdown-toggle d-inline-flex align-items-center gap-1.5" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                         <i class="bi bi-trash3 text-danger"></i>
@@ -417,57 +417,59 @@
                                                 <i class="bi bi-three-dots"></i>
                                             </button>
                                             <ul class="dropdown-menu dropdown-menu-end shadow border-0 rounded-3 p-1.5" style="font-size: 0.8rem; min-width: 195px; box-shadow: 0 10px 25px rgba(0,0,0,0.12) !important;">
-                                                @if($isLaporan && $p->penilaian_id)
-                                                    {{-- AKSI KHUSUS LAPORAN USER --}}
-                                                    @if($p->penilaian && !$p->penilaian->is_censored)
-                                                        <li>
-                                                            <form action="{{ route('admin.pelanggaran.report.censor', $p->penilaian_id) }}" method="POST" data-confirm="Setujui laporan ini dan sensor ulasan siswa agar tidak tampil di publik?" data-confirm-title="Setujui Laporan & Sensor Ulasan?" data-confirm-btn="Ya, Sensor" data-confirm-type="danger">
-                                                                @csrf
-                                                                <button type="submit" class="dropdown-item py-1.5 rounded-2 d-flex align-items-center gap-2 text-warning-emphasis">
-                                                                    <i class="bi bi-eye-slash"></i>
-                                                                    <span>Sensor Ulasan</span>
+                                                @if(auth()->user()->role === 'admin')
+                                                    @if($isLaporan && $p->penilaian_id)
+                                                        {{-- AKSI KHUSUS LAPORAN USER --}}
+                                                        @if($p->penilaian && !$p->penilaian->is_censored)
+                                                            <li>
+                                                                <form action="{{ route('admin.pelanggaran.report.censor', $p->penilaian_id) }}" method="POST" data-confirm="Setujui laporan ini dan sensor ulasan siswa agar tidak tampil di publik?" data-confirm-title="Setujui Laporan & Sensor Ulasan?" data-confirm-btn="Ya, Sensor" data-confirm-type="danger">
+                                                                    @csrf
+                                                                    <button type="submit" class="dropdown-item py-1.5 rounded-2 d-flex align-items-center gap-2 text-warning-emphasis">
+                                                                        <i class="bi bi-eye-slash"></i>
+                                                                        <span>Sensor Ulasan</span>
+                                                                    </button>
+                                                                </form>
+                                                            </li>
+                                                        @endif
+                                                        @if($p->user)
+                                                            <li>
+                                                                <button type="button" class="dropdown-item py-1.5 rounded-2 d-flex align-items-center gap-2 text-danger" onclick="openModalTindakUser({{ $p->user->id }}, '{{ addslashes($p->user->name) }}', '{{ $p->user->role }}', {{ $p->user->is_active ? 'true' : 'false' }})">
+                                                                    <i class="bi bi-shield-slash"></i>
+                                                                    <span>Sanksi Akun</span>
                                                                 </button>
-                                                            </form>
-                                                        </li>
-                                                    @endif
-                                                    @if($p->user)
+                                                            </li>
+                                                        @endif
                                                         <li>
-                                                            <button type="button" class="dropdown-item py-1.5 rounded-2 d-flex align-items-center gap-2 text-danger" onclick="openModalTindakUser({{ $p->user->id }}, '{{ addslashes($p->user->name) }}', '{{ $p->user->role }}', {{ $p->user->is_active ? 'true' : 'false' }})">
-                                                                <i class="bi bi-shield-slash"></i>
-                                                                <span>Sanksi Akun</span>
-                                                            </button>
-                                                        </li>
-                                                    @endif
-                                                    <li>
-                                                        <form action="{{ route('admin.pelanggaran.report.delete-review', $p->penilaian_id) }}" method="POST" data-confirm="Apakah Anda yakin ingin MENGHAPUS PERMANEN ulasan ini beserta riwayat laporannya?" data-confirm-title="Hapus Ulasan Permanen?" data-confirm-btn="Ya, Hapus Ulasan" data-confirm-type="danger">
-                                                            @csrf @method('DELETE')
-                                                            <button type="submit" class="dropdown-item py-1.5 rounded-2 d-flex align-items-center gap-2 text-danger">
-                                                                <i class="bi bi-trash"></i>
-                                                                <span>Hapus Ulasan</span>
-                                                            </button>
-                                                        </form>
-                                                    </li>
-                                                    <li><hr class="dropdown-divider my-1"></li>
-                                                    @if($p->tindakan === 'menunggu_verifikasi_admin')
-                                                        <li>
-                                                            <form action="{{ route('admin.pelanggaran.report.dismiss', $p->penilaian_id) }}" method="POST" data-confirm="Tolak laporan ini karena ulasan dinilai wajar dan tidak melanggar?" data-confirm-title="Tolak Laporan Pengguna?" data-confirm-btn="Ya, Tolak Laporan" data-confirm-type="warning">
+                                                            <form action="{{ route('admin.pelanggaran.report.delete-review', $p->penilaian_id) }}" method="POST" data-confirm="Apakah Anda yakin ingin MENGHAPUS PERMANEN ulasan ini beserta riwayat laporannya?" data-confirm-title="Hapus Ulasan Permanen?" data-confirm-btn="Ya, Hapus Ulasan" data-confirm-type="danger">
                                                                 @csrf @method('DELETE')
-                                                                <button type="submit" class="dropdown-item py-1.5 rounded-2 d-flex align-items-center gap-2 text-secondary">
-                                                                    <i class="bi bi-x-circle"></i>
-                                                                    <span>Tolak Laporan (Bersih)</span>
+                                                                <button type="submit" class="dropdown-item py-1.5 rounded-2 d-flex align-items-center gap-2 text-danger">
+                                                                    <i class="bi bi-trash"></i>
+                                                                    <span>Hapus Ulasan</span>
                                                                 </button>
                                                             </form>
                                                         </li>
-                                                    @endif
-                                                @else
-                                                    {{-- AKSI PELANGGARAN SISTEM --}}
-                                                    @if($p->user)
-                                                        <li>
-                                                            <button type="button" class="dropdown-item py-1.5 rounded-2 d-flex align-items-center gap-2 text-danger" onclick="openModalTindakUser({{ $p->user->id }}, '{{ addslashes($p->user->name) }}', '{{ $p->user->role }}', {{ $p->user->is_active ? 'true' : 'false' }})">
-                                                                <i class="bi bi-shield-slash"></i>
-                                                                <span>Sanksi Akun</span>
-                                                            </button>
-                                                        </li>
+                                                        <li><hr class="dropdown-divider my-1"></li>
+                                                        @if($p->tindakan === 'menunggu_verifikasi_admin')
+                                                            <li>
+                                                                <form action="{{ route('admin.pelanggaran.report.dismiss', $p->penilaian_id) }}" method="POST" data-confirm="Tolak laporan ini karena ulasan dinilai wajar dan tidak melanggar?" data-confirm-title="Tolak Laporan Pengguna?" data-confirm-btn="Ya, Tolak Laporan" data-confirm-type="warning">
+                                                                    @csrf @method('DELETE')
+                                                                    <button type="submit" class="dropdown-item py-1.5 rounded-2 d-flex align-items-center gap-2 text-secondary">
+                                                                        <i class="bi bi-x-circle"></i>
+                                                                        <span>Tolak Laporan (Bersih)</span>
+                                                                    </button>
+                                                                </form>
+                                                            </li>
+                                                        @endif
+                                                    @else
+                                                        {{-- AKSI PELANGGARAN SISTEM --}}
+                                                        @if($p->user)
+                                                            <li>
+                                                                <button type="button" class="dropdown-item py-1.5 rounded-2 d-flex align-items-center gap-2 text-danger" onclick="openModalTindakUser({{ $p->user->id }}, '{{ addslashes($p->user->name) }}', '{{ $p->user->role }}', {{ $p->user->is_active ? 'true' : 'false' }})">
+                                                                    <i class="bi bi-shield-slash"></i>
+                                                                    <span>Sanksi Akun</span>
+                                                                </button>
+                                                            </li>
+                                                        @endif
                                                     @endif
                                                 @endif
 
@@ -481,18 +483,22 @@
                                                             </button>
                                                         </form>
                                                     </li>
+                                                @elseif(auth()->user()->role === 'wakil')
+                                                    <li class="px-3 py-1.5 text-muted small fst-italic">Sudah Ditinjau</li>
                                                 @endif
 
-                                                <li><hr class="dropdown-divider my-1"></li>
-                                                <li>
-                                                    <form action="{{ route('admin.pelanggaran.destroy', $p) }}" method="POST" data-confirm="Hapus catatan log ini?" data-confirm-title="Hapus Catatan Log?" data-confirm-btn="Ya, Hapus" data-confirm-type="danger">
-                                                        @csrf @method('DELETE')
-                                                        <button type="submit" class="dropdown-item py-1.5 rounded-2 d-flex align-items-center gap-2 text-danger">
-                                                            <i class="bi bi-trash"></i>
-                                                            <span>Hapus Log</span>
-                                                        </button>
-                                                    </form>
-                                                </li>
+                                                @if(auth()->user()->role === 'admin')
+                                                    <li><hr class="dropdown-divider my-1"></li>
+                                                    <li>
+                                                        <form action="{{ route('admin.pelanggaran.destroy', $p) }}" method="POST" data-confirm="Hapus catatan log ini?" data-confirm-title="Hapus Catatan Log?" data-confirm-btn="Ya, Hapus" data-confirm-type="danger">
+                                                            @csrf @method('DELETE')
+                                                            <button type="submit" class="dropdown-item py-1.5 rounded-2 d-flex align-items-center gap-2 text-danger">
+                                                                <i class="bi bi-trash"></i>
+                                                                <span>Hapus Log</span>
+                                                            </button>
+                                                        </form>
+                                                    </li>
+                                                @endif
                                             </ul>
                                         </div>
                                     </td>
@@ -613,19 +619,23 @@
                                     </td>
                                     <td class="text-center">
                                         @if($siswaUser)
-                                            <div class="d-flex align-items-center justify-content-center gap-1.5">
-                                                <form action="{{ route('admin.pelanggaran.reset-user', $siswaUser) }}" method="POST" data-confirm="Pulihkan akun siswa {{ $siswaUser->name }} dan bersihkan seluruh catatan pelanggarannya?" data-confirm-title="Pulihkan Akun Siswa?" data-confirm-btn="Ya, Pulihkan" data-confirm-type="warning">
-                                                    @csrf @method('DELETE')
-                                                    <button type="submit" class="btn btn-sm btn-outline-success d-inline-flex align-items-center gap-1 rounded-pill px-2.5 py-1" title="Pulihkan Akun Siswa">
-                                                        <i class="bi bi-arrow-counterclockwise"></i>
-                                                        <span>Pulihkan</span>
+                                            @if(auth()->user()->role === 'admin')
+                                                <div class="d-flex align-items-center justify-content-center gap-1.5">
+                                                    <form action="{{ route('admin.pelanggaran.reset-user', $siswaUser) }}" method="POST" data-confirm="Pulihkan akun siswa {{ $siswaUser->name }} dan bersihkan seluruh catatan pelanggarannya?" data-confirm-title="Pulihkan Akun Siswa?" data-confirm-btn="Ya, Pulihkan" data-confirm-type="warning">
+                                                        @csrf @method('DELETE')
+                                                        <button type="submit" class="btn btn-sm btn-outline-success d-inline-flex align-items-center gap-1 rounded-pill px-2.5 py-1" title="Pulihkan Akun Siswa">
+                                                            <i class="bi bi-arrow-counterclockwise"></i>
+                                                            <span>Pulihkan</span>
+                                                        </button>
+                                                    </form>
+                                                    <button type="button" class="btn btn-sm btn-outline-danger d-inline-flex align-items-center gap-1 rounded-pill px-2.5 py-1" onclick="openModalTindakUser({{ $siswaUser->id }}, '{{ addslashes($siswaUser->name) }}', 'siswa', {{ $siswaUser->is_active ? 'true' : 'false' }})" title="Tindak / Sanksi Akun Siswa">
+                                                        <i class="bi bi-shield-slash"></i>
+                                                        <span>Sanksi</span>
                                                     </button>
-                                                </form>
-                                                <button type="button" class="btn btn-sm btn-outline-danger d-inline-flex align-items-center gap-1 rounded-pill px-2.5 py-1" onclick="openModalTindakUser({{ $siswaUser->id }}, '{{ addslashes($siswaUser->name) }}', 'siswa', {{ $siswaUser->is_active ? 'true' : 'false' }})" title="Tindak / Sanksi Akun Siswa">
-                                                    <i class="bi bi-shield-slash"></i>
-                                                    <span>Sanksi</span>
-                                                </button>
-                                            </div>
+                                                </div>
+                                            @else
+                                                <span class="badge bg-light text-muted border">Hanya Pantau</span>
+                                            @endif
                                         @endif
                                     </td>
                                 </tr>
@@ -739,19 +749,23 @@
                                     </td>
                                     <td class="text-center">
                                         @if($guruUser)
-                                            <div class="d-flex align-items-center justify-content-center gap-1.5">
-                                                <form action="{{ route('admin.pelanggaran.reset-user', $guruUser) }}" method="POST" data-confirm="Pulihkan akun guru {{ $guruUser->name }} dan bersihkan seluruh catatan pelanggarannya?" data-confirm-title="Pulihkan Akun Guru?" data-confirm-btn="Ya, Pulihkan" data-confirm-type="warning">
-                                                    @csrf @method('DELETE')
-                                                    <button type="submit" class="btn btn-sm btn-outline-success d-inline-flex align-items-center gap-1 rounded-pill px-2.5 py-1" title="Pulihkan Akun Guru">
-                                                        <i class="bi bi-arrow-counterclockwise"></i>
-                                                        <span>Pulihkan</span>
+                                            @if(auth()->user()->role === 'admin')
+                                                <div class="d-flex align-items-center justify-content-center gap-1.5">
+                                                    <form action="{{ route('admin.pelanggaran.reset-user', $guruUser) }}" method="POST" data-confirm="Pulihkan akun guru {{ $guruUser->name }} dan bersihkan seluruh catatan pelanggarannya?" data-confirm-title="Pulihkan Akun Guru?" data-confirm-btn="Ya, Pulihkan" data-confirm-type="warning">
+                                                        @csrf @method('DELETE')
+                                                        <button type="submit" class="btn btn-sm btn-outline-success d-inline-flex align-items-center gap-1 rounded-pill px-2.5 py-1" title="Pulihkan Akun Guru">
+                                                            <i class="bi bi-arrow-counterclockwise"></i>
+                                                            <span>Pulihkan</span>
+                                                        </button>
+                                                    </form>
+                                                    <button type="button" class="btn btn-sm btn-outline-danger d-inline-flex align-items-center gap-1 rounded-pill px-2.5 py-1" onclick="openModalTindakUser({{ $guruUser->id }}, '{{ addslashes($guruUser->name) }}', 'guru', {{ $guruUser->is_active ? 'true' : 'false' }})" title="Tindak / Sanksi Akun Guru">
+                                                        <i class="bi bi-shield-slash"></i>
+                                                        <span>Sanksi</span>
                                                     </button>
-                                                </form>
-                                                <button type="button" class="btn btn-sm btn-outline-danger d-inline-flex align-items-center gap-1 rounded-pill px-2.5 py-1" onclick="openModalTindakUser({{ $guruUser->id }}, '{{ addslashes($guruUser->name) }}', 'guru', {{ $guruUser->is_active ? 'true' : 'false' }})" title="Tindak / Sanksi Akun Guru">
-                                                    <i class="bi bi-shield-slash"></i>
-                                                    <span>Sanksi</span>
-                                                </button>
-                                            </div>
+                                                </div>
+                                            @else
+                                                <span class="badge bg-light text-muted border">Hanya Pantau</span>
+                                            @endif
                                         @endif
                                     </td>
                                 </tr>
@@ -894,54 +908,58 @@
                                         </small>
                                     </td>
                                     <td class="text-center">
-                                        {{-- MEATBALLS MENU (TITIK TIGA) --}}
-                                        <div class="dropdown">
-                                            <button class="btn btn-sm btn-outline-secondary rounded-pill px-2 py-1" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="Menu Aksi">
-                                                <i class="bi bi-three-dots"></i>
-                                            </button>
-                                            <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 rounded-3 p-1.5" style="font-size: 0.8rem; min-width: 180px;">
-                                                @if($pen && !$pen->is_censored)
-                                                    <li>
-                                                        <form action="{{ route('admin.pelanggaran.report.censor', $pen->id) }}" method="POST">
-                                                            @csrf
-                                                            <button type="submit" class="dropdown-item py-1.5 rounded-2 d-flex align-items-center gap-2 text-warning-emphasis">
-                                                                <i class="bi bi-eye-slash"></i>
-                                                                <span>Sensor Ulasan</span>
+                                        @if(auth()->user()->role === 'admin')
+                                            {{-- MEATBALLS MENU (TITIK TIGA) --}}
+                                            <div class="dropdown">
+                                                <button class="btn btn-sm btn-outline-secondary rounded-pill px-2 py-1" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="Menu Aksi">
+                                                    <i class="bi bi-three-dots"></i>
+                                                </button>
+                                                <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 rounded-3 p-1.5" style="font-size: 0.8rem; min-width: 180px;">
+                                                    @if($pen && !$pen->is_censored)
+                                                        <li>
+                                                            <form action="{{ route('admin.pelanggaran.report.censor', $pen->id) }}" method="POST">
+                                                                @csrf
+                                                                <button type="submit" class="dropdown-item py-1.5 rounded-2 d-flex align-items-center gap-2 text-warning-emphasis">
+                                                                    <i class="bi bi-eye-slash"></i>
+                                                                    <span>Sensor Ulasan</span>
+                                                                </button>
+                                                            </form>
+                                                        </li>
+                                                    @endif
+                                                    @if($pen && $siswaUser)
+                                                        <li>
+                                                            <button type="button" class="dropdown-item py-1.5 rounded-2 d-flex align-items-center gap-2 text-danger" onclick="openModalTindakUser({{ $siswaUser->id }}, '{{ addslashes($siswaUser->name) }}', 'siswa', {{ $siswaUser->is_active ? 'true' : 'false' }})">
+                                                                <i class="bi bi-shield-slash"></i>
+                                                                <span>Sanksi Siswa</span>
                                                             </button>
-                                                        </form>
-                                                    </li>
-                                                @endif
-                                                @if($pen && $siswaUser)
+                                                        </li>
+                                                    @endif
+                                                    @if($pen)
+                                                        <li>
+                                                            <form action="{{ route('admin.pelanggaran.report.delete-review', $pen->id) }}" method="POST" data-confirm="Apakah Anda yakin ingin MENGHAPUS PERMANEN ulasan ini beserta riwayat laporannya?" data-confirm-title="Hapus Ulasan Permanen?" data-confirm-btn="Ya, Hapus Ulasan" data-confirm-type="danger">
+                                                                @csrf @method('DELETE')
+                                                                <button type="submit" class="dropdown-item py-1.5 rounded-2 d-flex align-items-center gap-2 text-danger">
+                                                                    <i class="bi bi-trash"></i>
+                                                                    <span>Hapus Ulasan</span>
+                                                                </button>
+                                                            </form>
+                                                        </li>
+                                                    @endif
+                                                    <li><hr class="dropdown-divider my-1"></li>
                                                     <li>
-                                                        <button type="button" class="dropdown-item py-1.5 rounded-2 d-flex align-items-center gap-2 text-danger" onclick="openModalTindakUser({{ $siswaUser->id }}, '{{ addslashes($siswaUser->name) }}', 'siswa', {{ $siswaUser->is_active ? 'true' : 'false' }})">
-                                                            <i class="bi bi-shield-slash"></i>
-                                                            <span>Sanksi Siswa</span>
-                                                        </button>
-                                                    </li>
-                                                @endif
-                                                @if($pen)
-                                                    <li>
-                                                        <form action="{{ route('admin.pelanggaran.report.delete-review', $pen->id) }}" method="POST" data-confirm="Apakah Anda yakin ingin MENGHAPUS PERMANEN ulasan ini beserta riwayat laporannya?" data-confirm-title="Hapus Ulasan Permanen?" data-confirm-btn="Ya, Hapus Ulasan" data-confirm-type="danger">
+                                                        <form action="{{ route('admin.pelanggaran.report.dismiss', $rep->penilaian_id) }}" method="POST" data-confirm="Tolak/Abaikan laporan ini dan bersihkan dari daftar laporan?" data-confirm-title="Tolak Laporan Ulasan?" data-confirm-btn="Ya, Tolak Laporan" data-confirm-type="warning">
                                                             @csrf @method('DELETE')
-                                                            <button type="submit" class="dropdown-item py-1.5 rounded-2 d-flex align-items-center gap-2 text-danger">
-                                                                <i class="bi bi-trash"></i>
-                                                                <span>Hapus Ulasan</span>
+                                                            <button type="submit" class="dropdown-item py-1.5 rounded-2 d-flex align-items-center gap-2 text-muted">
+                                                                <i class="bi bi-x-circle"></i>
+                                                                <span>Tolak / Bersihkan</span>
                                                             </button>
                                                         </form>
                                                     </li>
-                                                @endif
-                                                <li><hr class="dropdown-divider my-1"></li>
-                                                <li>
-                                                    <form action="{{ route('admin.pelanggaran.report.dismiss', $rep->penilaian_id) }}" method="POST" data-confirm="Tolak/Abaikan laporan ini dan bersihkan dari daftar laporan?" data-confirm-title="Tolak Laporan Ulasan?" data-confirm-btn="Ya, Tolak Laporan" data-confirm-type="warning">
-                                                        @csrf @method('DELETE')
-                                                        <button type="submit" class="dropdown-item py-1.5 rounded-2 d-flex align-items-center gap-2 text-muted">
-                                                            <i class="bi bi-x-circle"></i>
-                                                            <span>Tolak / Bersihkan</span>
-                                                        </button>
-                                                    </form>
-                                                </li>
-                                            </ul>
-                                        </div>
+                                                </ul>
+                                            </div>
+                                        @else
+                                            <span class="badge bg-light text-muted border">Hanya Pantau</span>
+                                        @endif
                                     </td>
                                 </tr>
                             @empty
@@ -1053,6 +1071,7 @@
     </div>
 </div>
 
+@if(auth()->user()->role === 'admin')
 {{-- MODAL RESET SEMUA PELANGGARAN --}}
 <div class="modal fade" id="modalResetAllPelanggaran" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
@@ -1084,6 +1103,7 @@
         </form>
     </div>
 </div>
+@endif
 
 {{-- MODAL POPUP LIHAT ULASAN LENGKAP --}}
 <div class="modal fade" id="modalDetailUlasanPelanggar" tabindex="-1" aria-hidden="true">
@@ -1175,6 +1195,7 @@
                 </div>
             </div>
             <div class="modal-footer border-top py-2.5 px-4 bg-light d-flex justify-content-between align-items-center">
+                @if(auth()->user()->role === 'admin')
                 <div id="modalLaporanActions" class="d-flex align-items-center gap-2 d-none">
                     <form id="formModalCensor" method="POST" action="" data-confirm="Setujui laporan ini dan sensor ulasan siswa agar tidak tampil di publik?" data-confirm-title="Setujui Laporan & Sensor Ulasan?" data-confirm-btn="Ya, Sensor" data-confirm-type="danger">
                         @csrf
@@ -1191,6 +1212,9 @@
                         </button>
                     </form>
                 </div>
+                @else
+                <div></div>
+                @endif
                 <button type="button" class="btn btn-secondary btn-sm px-3 rounded-pill ms-auto" data-bs-dismiss="modal">Tutup</button>
             </div>
         </div>

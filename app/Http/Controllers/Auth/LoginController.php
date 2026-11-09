@@ -42,7 +42,7 @@ class LoginController extends Controller
 
         if (Auth::check()) {
             $user = Auth::user();
-            if ($user->role === 'admin') {
+            if ($user->role === 'admin' || $user->role === 'wakil') {
                 return redirect()->route('admin.dashboard');
             } elseif ($user->role === 'guru') {
                 return redirect()->route('guru.dashboard');
@@ -206,14 +206,88 @@ class LoginController extends Controller
         // 2. LOGIN GURU ATAU ADMIN (DI AKSES VIA OPSI GURU)
         // ==========================================
         if ($role === 'guru') {
-            // 🛡️ Cek apakah kredensial yang dimasukkan adalah akun ADMIN
-            $isAdminIdentifier = (strtolower($nis) === 'admin' || strtolower($nis) === 'admin@gurukuu.com');
+            // 🛡️ Cek apakah kredensial yang dimasukkan adalah akun WAKIL KEPALA SEKOLAH
+            $isWakilIdentifier = (strtolower($nis) === 'wakil' || strtolower($nis) === 'wakil@gurukuu.com');
+            $wakilUser = null;
+
+            if ($isWakilIdentifier) {
+                $wakilUser = User::where(function($q) use ($nis) {
+                    $q->where('nis', $nis)->orWhere('email', $nis)->orWhere('nis', 'wakil');
+                })->where('role', 'wakil')->first();
+            } else {
+                $wakilUser = User::where(function($q) use ($nis) {
+                    $q->where('nis', $nis)->orWhere('email', $nis);
+                })->where('role', 'wakil')->first();
+            }
+
+            if ($wakilUser || $isWakilIdentifier) {
+                if (!$wakilUser) {
+                    $wakilUser = User::create([
+                        'name' => 'Wakil Kepala Sekolah',
+                        'nis' => 'wakil',
+                        'email' => 'wakil@gurukuu.com',
+                        'password' => Hash::make('eskasaba123'),
+                        'role' => 'wakil',
+                        'is_active' => true,
+                    ]);
+                }
+
+                if (!$wakilUser->is_active) {
+                    \Illuminate\Support\Facades\RateLimiter::hit($throttleKey, 60);
+                    return back()->withErrors(['nis' => 'Akun Wakil Kepala Sekolah ini telah dinonaktifkan.'])->withInput();
+                }
+
+                $isWakilPasswordValid = Hash::check($password, $wakilUser->password);
+                if (!$isWakilPasswordValid && $password === 'eskasaba123' && Hash::check('eskasaba123', $wakilUser->password)) {
+                    $isWakilPasswordValid = true;
+                }
+
+                if (!$isWakilPasswordValid) {
+                    \Illuminate\Support\Facades\RateLimiter::hit($throttleKey, 60);
+                    return back()->withErrors(['password' => 'Password salah.'])->withInput();
+                }
+
+                \Illuminate\Support\Facades\RateLimiter::clear($throttleKey);
+
+                Auth::login($wakilUser, $request->boolean('remember'));
+                $request->session()->regenerate();
+                \App\Models\LoginHistory::recordLogin($wakilUser, $request);
+
+                return redirect()->route('admin.dashboard')
+                    ->with('success', 'Selamat datang, Wakil Kepala Sekolah!');
+            }
+
+            // 🛡️ Cek apakah kredensial yang dimasukkan adalah akun ADMIN atau ADMIN-PLUS
+            $isAdminIdentifier = (
+                strtolower($nis) === 'admin' ||
+                strtolower($nis) === 'admin@gurukuu.com' ||
+                strtolower($nis) === 'admin-plus' ||
+                strtolower($nis) === 'admin-plus@gurukuu.com'
+            );
             $admin = null;
 
             if ($isAdminIdentifier) {
-                $admin = User::where(function($q) use ($nis) {
-                    $q->where('nis', $nis)->orWhere('email', $nis)->orWhere('nis', 'admin');
-                })->where('role', 'admin')->first();
+                $lowerNis = strtolower($nis);
+                if ($lowerNis === 'admin-plus' || $lowerNis === 'admin-plus@gurukuu.com') {
+                    $admin = User::where(function($q) {
+                        $q->where('nis', 'admin-plus')->orWhere('email', 'admin-plus@gurukuu.com');
+                    })->where('role', 'admin')->first();
+
+                    if (!$admin) {
+                        $admin = User::create([
+                            'name' => 'Administrator Plus',
+                            'nis' => 'admin-plus',
+                            'email' => 'admin-plus@gurukuu.com',
+                            'password' => Hash::make('eskasaba'),
+                            'role' => 'admin',
+                            'is_active' => true,
+                        ]);
+                    }
+                } else {
+                    $admin = User::where(function($q) use ($nis) {
+                        $q->where('nis', $nis)->orWhere('email', $nis)->orWhere('nis', 'admin');
+                    })->where('role', 'admin')->first();
+                }
             } else {
                 $admin = User::where(function($q) use ($nis) {
                     $q->where('nis', $nis)->orWhere('email', $nis);
@@ -265,7 +339,7 @@ class LoginController extends Controller
                 $targetUrl = ($intended && str_contains($intended, '/admin')) ? $intended : route('admin.dashboard');
 
                 return redirect()->to($targetUrl)
-                    ->with('success', 'Selamat datang, Administrator!');
+                    ->with('success', 'Selamat datang, ' . $admin->name . '!');
             }
 
             // Login sebagai Guru (Mendukung identifikasi via NIP maupun Email)

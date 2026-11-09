@@ -8,7 +8,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class RoleMiddleware
 {
-    public function handle(Request $request, Closure $next, string $role): Response
+    public function handle(Request $request, Closure $next, ...$roles): Response
     {
         $user = $request->user();
 
@@ -27,15 +27,22 @@ class RoleMiddleware
             ]);
         }
 
-        if ($user->role !== $role) {
+        $allowedRoles = [];
+        foreach ($roles as $roleParam) {
+            foreach (explode(',', $roleParam) as $r) {
+                $allowedRoles[] = trim($r);
+            }
+        }
+
+        if (!in_array($user->role, $allowedRoles)) {
             $targetDashboard = match ($user->role) {
-                'admin' => route('admin.dashboard'),
+                'admin', 'wakil' => route('admin.dashboard'),
                 'guru' => route('guru.dashboard'),
                 'siswa' => route('siswa.dashboard'),
                 default => route('landing.index'),
             };
 
-            return redirect($targetDashboard)->with('error', 'Akses dialihkan. Anda saat ini aktif sebagai ' . ucfirst($user->role) . ', bukan ' . ucfirst($role) . '. Silakan logout terlebih dahulu jika ingin mengganti akun.');
+            return redirect($targetDashboard)->with('error', 'Akses dialihkan. Anda saat ini aktif sebagai ' . ucfirst($user->role) . '. Anda tidak memiliki izin untuk mengakses halaman tersebut.');
         }
 
         return $next($request);

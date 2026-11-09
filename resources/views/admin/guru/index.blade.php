@@ -9,10 +9,12 @@
         <p class="page-subtitle mb-0">Kelola master data guru pengajar SMK Negeri 1 Bangsri.</p>
     </div>
     <div class="d-flex gap-2 align-items-center flex-wrap">
+        @if(auth()->user()->role === 'admin')
         <button type="button" class="btn btn-outline-custom d-inline-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#modalImportJadwalGuru">
             <i class="bi bi-calendar2-range text-primary"></i>
             <span>Import Jadwal Kelas</span>
         </button>
+        @endif
         <div class="dropdown">
             <button class="btn btn-outline-custom dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                 <i class="bi bi-download me-1"></i> Export Data
@@ -30,6 +32,7 @@
                 </li>
             </ul>
         </div>
+        @if(auth()->user()->role === 'admin')
         <div class="btn-group shadow-sm">
             <form action="{{ route('admin.sipintu.guru.sync-all') }}" method="POST" id="formSyncGuru" class="d-inline" data-confirm="Tarik dan sinkronkan seluruh data guru dari SiPintu Gateway ke database lokal GuruKuu sekarang?" data-confirm-title="Sinkronkan Data Guru?" data-confirm-btn="Ya, Sinkronkan" data-confirm-type="info">
                 @csrf
@@ -41,6 +44,7 @@
                 <i class="bi bi-box-arrow-up-right"></i>
             </a>
         </div>
+        @endif
     </div>
 </div>
 
@@ -225,6 +229,7 @@
                                         <span>Lihat Detail</span>
                                     </a>
                                 </li>
+                                @if(auth()->user()->role === 'admin')
                                 @if($u)
                                     @if($u->is_active)
                                         <li>
@@ -275,6 +280,7 @@
                                         </button>
                                     </form>
                                 </li>
+                                @endif
                             </ul>
                         </div>
                     </td>

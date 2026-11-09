@@ -89,110 +89,132 @@ Route::post('/ulasan/{penilaian}/report', [\App\Http\Controllers\UlasanReportCon
 // REAKSI ULASAN BERGUNA (THUMBS UP / HELPFUL ALA PLAY STORE)
 Route::post('/penilaian/{penilaian}/helpful', [\App\Http\Controllers\PenilaianHelpfulController::class, 'toggle'])->name('penilaian.helpful');
 
-// ==================== 4. ADMIN ROUTES ====================
-Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
+// ==================== 4. ADMIN & WAKIL ROUTES ====================
+Route::middleware(['auth', 'role:admin,wakil'])->prefix('admin')->name('admin.')->group(function () {
+    // Fitur yang dapat diakses oleh Admin dan Wakil (Monitoring, Leaderboard, & Detail Penilaian)
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
-    Route::post('/dashboard/clear-cache', [AdminDashboardController::class, 'clearCache'])->name('dashboard.clear-cache');
     Route::get('/profil', [AdminProfilController::class, 'index'])->name('profil.index');
-    Route::get('/guru/template-jadwal', [AdminGuruController::class, 'downloadTemplateJadwal'])->name('guru.template-jadwal');
-    Route::post('/guru/import-jadwal', [AdminGuruController::class, 'importJadwal'])->name('guru.import-jadwal');
-    Route::resource('guru', AdminGuruController::class);
-    Route::patch('/guru/{guru}/toggle', [AdminGuruController::class, 'toggleStatus'])->name('guru.toggle');
-    Route::patch('/guru/{guru}/reset-password', [AdminGuruController::class, 'resetPassword'])->name('guru.reset-password');
-    Route::resource('siswa', AdminSiswaController::class);
-    Route::patch('/siswa/{siswa}/toggle', [AdminSiswaController::class, 'toggleStatus'])->name('siswa.toggle');
-
-    // MANAJEMEN BADGE
-    Route::post('/badge', [\App\Http\Controllers\Admin\BadgeController::class, 'store'])->name('badge.store');
-    Route::put('/badge/{badge}', [\App\Http\Controllers\Admin\BadgeController::class, 'update'])->name('badge.update');
-    Route::delete('/badge/{badge}', [\App\Http\Controllers\Admin\BadgeController::class, 'destroy'])->name('badge.destroy');
-    Route::get('/jurusan', [AdminJurusanController::class, 'index'])->name('jurusan.index');
-    Route::post('/jurusan', [AdminJurusanController::class, 'store'])->name('jurusan.store');
-    Route::get('/jurusan/{jurusan}', [AdminJurusanController::class, 'show'])->name('jurusan.show');
-    Route::get('/jurusan/{jurusan}/edit', [AdminJurusanController::class, 'edit'])->name('jurusan.edit');
-    Route::put('/jurusan/{jurusan}', [AdminJurusanController::class, 'update'])->name('jurusan.update');
-    Route::delete('/jurusan/{jurusan}', [AdminJurusanController::class, 'destroy'])->name('jurusan.destroy');
-    Route::resource('periode', PeriodeController::class)->except(['create', 'show', 'edit']);
-    Route::patch('periode/{periode}/toggle', [PeriodeController::class, 'toggleStatus'])->name('periode.toggle');
-    
+    Route::get('/leaderboard', [AdminLeaderboardController::class, 'index'])->name('leaderboard.index');
+    Route::get('/guru', [AdminGuruController::class, 'index'])->name('guru.index');
+    Route::get('/guru/{guru}', [AdminGuruController::class, 'show'])->name('guru.show');
     Route::get('/kritik-saran', [KritikSaranController::class, 'index'])->name('kritik-saran.index');
-    Route::delete('/kritik-saran/batch', [KritikSaranController::class, 'destroyBatch'])->name('kritik-saran.batch-destroy');
-    Route::delete('/kritik-saran/{kritikSaran}', [KritikSaranController::class, 'destroy'])->name('kritik-saran.destroy');
-    Route::post('/kritik-saran/{kritikSaran}/warn', [KritikSaranController::class, 'warn'])->name('kritik-saran.warn');
-    Route::post('/kritik-saran/{kritikSaran}/unwarn', [KritikSaranController::class, 'unwarn'])->name('kritik-saran.unwarn');
-
-    // NOTIFIKASI & LOG PELANGGARAN ATURAN
+    
+    // NOTIFIKASI & LOG PELANGGARAN ATURAN (Monitoring)
     Route::get('/pelanggaran', [\App\Http\Controllers\Admin\PelanggaranController::class, 'index'])->name('pelanggaran.index');
     Route::patch('/pelanggaran/{pelanggaran}/read', [\App\Http\Controllers\Admin\PelanggaranController::class, 'markAsRead'])->name('pelanggaran.read');
     Route::post('/pelanggaran/read-all', [\App\Http\Controllers\Admin\PelanggaranController::class, 'markAllAsRead'])->name('pelanggaran.read-all');
-    Route::delete('/pelanggaran/{pelanggaran}', [\App\Http\Controllers\Admin\PelanggaranController::class, 'destroy'])->name('pelanggaran.destroy');
-    Route::post('/pelanggaran/{pelanggaran}/warn-siswa', [\App\Http\Controllers\Admin\PelanggaranController::class, 'warnSiswa'])->name('pelanggaran.warn-siswa');
-    Route::post('/pelanggaran/clean-logs', [\App\Http\Controllers\Admin\PelanggaranController::class, 'cleanLogs'])->name('pelanggaran.clean-logs');
-    Route::post('/pelanggaran/reset-all', [\App\Http\Controllers\Admin\PelanggaranController::class, 'resetAll'])->name('pelanggaran.reset-all');
-    Route::delete('/pelanggaran/user/{user}/reset', [\App\Http\Controllers\Admin\PelanggaranController::class, 'resetUser'])->name('pelanggaran.reset-user');
-    Route::post('/pelanggaran/user/{user}/tindak', [\App\Http\Controllers\Admin\PelanggaranController::class, 'tindakUser'])->name('pelanggaran.tindak-user');
-    Route::delete('/pelanggaran/siswa/{user}/reset', [\App\Http\Controllers\Admin\PelanggaranController::class, 'resetUser'])->name('pelanggaran.reset-siswa');
-    Route::delete('/pelanggaran/guru/{guru}/reset', [\App\Http\Controllers\Admin\PelanggaranController::class, 'resetGuru'])->name('pelanggaran.reset-guru');
-    Route::post('/pelanggaran/report/{penilaian}/censor', [\App\Http\Controllers\Admin\PelanggaranController::class, 'censorReportedReview'])->name('pelanggaran.report.censor');
-    Route::delete('/pelanggaran/report/{penilaian}/dismiss', [\App\Http\Controllers\Admin\PelanggaranController::class, 'dismissReportedReview'])->name('pelanggaran.report.dismiss');
-    Route::delete('/pelanggaran/report/{penilaian}/delete-review', [\App\Http\Controllers\Admin\PelanggaranController::class, 'deleteReportedReview'])->name('pelanggaran.report.delete-review');
-    
-    Route::get('/leaderboard', [AdminLeaderboardController::class, 'index'])->name('leaderboard.index');
-    Route::get('/pengaturan', [PengaturanController::class, 'index'])->name('pengaturan.index');
-    Route::post('/pengaturan/clear-cache', [AdminDashboardController::class, 'clearCache'])->name('pengaturan.clear-cache');
-    Route::post('/pengaturan/landing', [PengaturanController::class, 'updateLanding'])->name('pengaturan.landing');
-    Route::post('/pelanggaran/kata-toxic', [PengaturanController::class, 'updateProfanityWords'])->name('pelanggaran.words.update');
-    Route::post('/pelanggaran/kata-toxic/delete', [PengaturanController::class, 'deleteProfanityWord'])->name('pelanggaran.words.delete');
-    Route::post('/pelanggaran/kata-toxic/edit', [PengaturanController::class, 'editProfanityWord'])->name('pelanggaran.words.edit');
-    Route::post('/pelanggaran/kata-toxic/reset', [PengaturanController::class, 'resetProfanityWords'])->name('pelanggaran.words.reset');
-    Route::post('/pengaturan/landing/reset', [PengaturanController::class, 'resetLandingHero'])->name('pengaturan.landing.reset');
-    Route::post('/pengaturan/reset', [PengaturanController::class, 'reset'])->name('pengaturan.reset');
-    Route::post('/pengaturan/ganti-password', [PengaturanController::class, 'gantiPassword'])->name('pengaturan.password');
-    Route::post('/pengaturan/periode', [PengaturanController::class, 'simpanPeriode'])->name('pengaturan.periode');
-    Route::post('/pengaturan/periode/{periode}/aktifkan', [PengaturanController::class, 'aktifkanPeriode'])->name('pengaturan.periode.aktifkan');
-    Route::delete('/pengaturan/periode/{periode}', [PengaturanController::class, 'destroyPeriode'])->name('pengaturan.periode.destroy');
-    
-    // PENGATURAN FAQ
-    Route::post('/pengaturan/faq', [PengaturanController::class, 'storeFaq'])->name('pengaturan.faq.store');
-    Route::put('/pengaturan/faq/{id}', [PengaturanController::class, 'updateFaq'])->name('pengaturan.faq.update');
-    Route::delete('/pengaturan/faq/{id}', [PengaturanController::class, 'destroyFaq'])->name('pengaturan.faq.destroy');
-    Route::post('/pengaturan/faq/reset', [PengaturanController::class, 'resetFaq'])->name('pengaturan.faq.reset');
-    
-    Route::get('/kontak', [AdminKontakController::class, 'index'])->name('kontak.index');
-    Route::delete('/kontak/all', [AdminKontakController::class, 'destroyAll'])->name('kontak.destroy-all');
-    Route::delete('/kontak/batch', [AdminKontakController::class, 'destroyBatch'])->name('kontak.destroy-batch');
-    Route::delete('/kontak/chat/{identifier}/conversation', [AdminKontakController::class, 'destroyConversation'])->name('kontak.chat.destroy-conversation');
-    Route::get('/kontak/chat/{identifier}', [AdminKontakController::class, 'chat'])->name('kontak.chat');
-    Route::get('/kontak/chat/{identifier}/stream', [AdminKontakController::class, 'stream'])->name('kontak.chat.stream');
-    Route::post('/kontak/chat/{identifier}', [AdminKontakController::class, 'sendChatMessage'])->name('kontak.chat.send');
-    Route::post('/kontak/{kontak}/reply', [AdminKontakController::class, 'reply'])->name('kontak.reply');
-    Route::put('/kontak/{kontak}/reply', [AdminKontakController::class, 'editReply'])->name('kontak.edit-reply');
-    Route::delete('/kontak/{kontak}', [AdminKontakController::class, 'destroy'])->name('kontak.destroy');
-    Route::delete('/kontak/{kontak}/reply', [AdminKontakController::class, 'destroyReply'])->name('kontak.destroy-reply');
 
-    // EXPORTS
+    // EXPORTS (Monitoring)
     Route::prefix('export')->name('export.')->group(function () {
         Route::get('/leaderboard/excel', [ExportController::class, 'leaderboardExcel'])->name('leaderboard.excel');
         Route::get('/leaderboard/pdf', [ExportController::class, 'leaderboardPdf'])->name('leaderboard.pdf');
         Route::get('/guru/excel', [ExportController::class, 'guruExcel'])->name('guru.excel');
         Route::get('/guru/pdf', [ExportController::class, 'guruPdf'])->name('guru.pdf');
-        Route::get('/siswa/excel', [ExportController::class, 'siswaExcel'])->name('siswa.excel');
-        Route::get('/siswa/pdf', [ExportController::class, 'siswaPdf'])->name('siswa.pdf');
-        Route::get('/all/zip', [ExportController::class, 'allZip'])->name('all.zip');
     });
 
-    Route::prefix('sipintu')->name('sipintu.')->group(function () {
-        Route::get('/', [\App\Http\Controllers\Admin\SiPintuController::class, 'index'])->name('index');
-        Route::get('/guru', [\App\Http\Controllers\Admin\SiPintuController::class, 'teachers'])->name('guru');
-        Route::get('/siswa', [\App\Http\Controllers\Admin\SiPintuController::class, 'students'])->name('siswa');
-        Route::get('/guru/{nip}/detail', [\App\Http\Controllers\Admin\SiPintuController::class, 'teacherDetail'])->name('guru.detail');
-        Route::get('/siswa/{nis}/detail', [\App\Http\Controllers\Admin\SiPintuController::class, 'studentDetail'])->name('siswa.detail');
-        Route::post('/guru/import', [\App\Http\Controllers\Admin\SiPintuController::class, 'importTeacher'])->name('guru.import');
-        Route::post('/siswa/import', [\App\Http\Controllers\Admin\SiPintuController::class, 'importStudent'])->name('siswa.import');
-        Route::post('/guru/sync-all', [\App\Http\Controllers\Admin\SiPintuController::class, 'syncAllTeachers'])->name('guru.sync-all');
-        Route::post('/siswa/sync-all', [\App\Http\Controllers\Admin\SiPintuController::class, 'syncAllStudents'])->name('siswa.sync-all');
-        Route::post('/sync-all-full', [\App\Http\Controllers\Admin\SiPintuController::class, 'syncAllDirect'])->name('sync-all-full');
-        Route::post('/check-connection', [\App\Http\Controllers\Admin\SiPintuController::class, 'checkConnection'])->name('check-connection');
+    // ==========================================
+    // KHUSUS ROLE ADMIN (Manajemen Penuh & Pengaturan)
+    // ==========================================
+    Route::middleware('role:admin')->group(function () {
+        Route::post('/dashboard/clear-cache', [AdminDashboardController::class, 'clearCache'])->name('dashboard.clear-cache');
+        Route::get('/guru/template-jadwal', [AdminGuruController::class, 'downloadTemplateJadwal'])->name('guru.template-jadwal');
+        Route::post('/guru/import-jadwal', [AdminGuruController::class, 'importJadwal'])->name('guru.import-jadwal');
+        Route::get('/guru/create', [AdminGuruController::class, 'create'])->name('guru.create');
+        Route::post('/guru', [AdminGuruController::class, 'store'])->name('guru.store');
+        Route::get('/guru/{guru}/edit', [AdminGuruController::class, 'edit'])->name('guru.edit');
+        Route::put('/guru/{guru}', [AdminGuruController::class, 'update'])->name('guru.update');
+        Route::delete('/guru/{guru}', [AdminGuruController::class, 'destroy'])->name('guru.destroy');
+        Route::patch('/guru/{guru}/toggle', [AdminGuruController::class, 'toggleStatus'])->name('guru.toggle');
+        Route::patch('/guru/{guru}/reset-password', [AdminGuruController::class, 'resetPassword'])->name('guru.reset-password');
+        
+        Route::resource('siswa', AdminSiswaController::class);
+        Route::patch('/siswa/{siswa}/toggle', [AdminSiswaController::class, 'toggleStatus'])->name('siswa.toggle');
+
+        // MANAJEMEN BADGE
+        Route::post('/badge', [\App\Http\Controllers\Admin\BadgeController::class, 'store'])->name('badge.store');
+        Route::put('/badge/{badge}', [\App\Http\Controllers\Admin\BadgeController::class, 'update'])->name('badge.update');
+        Route::delete('/badge/{badge}', [\App\Http\Controllers\Admin\BadgeController::class, 'destroy'])->name('badge.destroy');
+        Route::get('/jurusan', [AdminJurusanController::class, 'index'])->name('jurusan.index');
+        Route::post('/jurusan', [AdminJurusanController::class, 'store'])->name('jurusan.store');
+        Route::get('/jurusan/{jurusan}', [AdminJurusanController::class, 'show'])->name('jurusan.show');
+        Route::get('/jurusan/{jurusan}/edit', [AdminJurusanController::class, 'edit'])->name('jurusan.edit');
+        Route::put('/jurusan/{jurusan}', [AdminJurusanController::class, 'update'])->name('jurusan.update');
+        Route::delete('/jurusan/{jurusan}', [AdminJurusanController::class, 'destroy'])->name('jurusan.destroy');
+        Route::resource('periode', PeriodeController::class)->except(['create', 'show', 'edit']);
+        Route::patch('periode/{periode}/toggle', [PeriodeController::class, 'toggleStatus'])->name('periode.toggle');
+        
+        // MODERASI KRITIK & SARAN
+        Route::delete('/kritik-saran/batch', [KritikSaranController::class, 'destroyBatch'])->name('kritik-saran.batch-destroy');
+        Route::delete('/kritik-saran/{kritikSaran}', [KritikSaranController::class, 'destroy'])->name('kritik-saran.destroy');
+        Route::post('/kritik-saran/{kritikSaran}/warn', [KritikSaranController::class, 'warn'])->name('kritik-saran.warn');
+        Route::post('/kritik-saran/{kritikSaran}/unwarn', [KritikSaranController::class, 'unwarn'])->name('kritik-saran.unwarn');
+
+        // TINDAKAN PELANGGARAN & RESET
+        Route::delete('/pelanggaran/{pelanggaran}', [\App\Http\Controllers\Admin\PelanggaranController::class, 'destroy'])->name('pelanggaran.destroy');
+        Route::post('/pelanggaran/{pelanggaran}/warn-siswa', [\App\Http\Controllers\Admin\PelanggaranController::class, 'warnSiswa'])->name('pelanggaran.warn-siswa');
+        Route::post('/pelanggaran/clean-logs', [\App\Http\Controllers\Admin\PelanggaranController::class, 'cleanLogs'])->name('pelanggaran.clean-logs');
+        Route::post('/pelanggaran/reset-all', [\App\Http\Controllers\Admin\PelanggaranController::class, 'resetAll'])->name('pelanggaran.reset-all');
+        Route::delete('/pelanggaran/user/{user}/reset', [\App\Http\Controllers\Admin\PelanggaranController::class, 'resetUser'])->name('pelanggaran.reset-user');
+        Route::post('/pelanggaran/user/{user}/tindak', [\App\Http\Controllers\Admin\PelanggaranController::class, 'tindakUser'])->name('pelanggaran.tindak-user');
+        Route::delete('/pelanggaran/siswa/{user}/reset', [\App\Http\Controllers\Admin\PelanggaranController::class, 'resetUser'])->name('pelanggaran.reset-siswa');
+        Route::delete('/pelanggaran/guru/{guru}/reset', [\App\Http\Controllers\Admin\PelanggaranController::class, 'resetGuru'])->name('pelanggaran.reset-guru');
+        Route::post('/pelanggaran/report/{penilaian}/censor', [\App\Http\Controllers\Admin\PelanggaranController::class, 'censorReportedReview'])->name('pelanggaran.report.censor');
+        Route::delete('/pelanggaran/report/{penilaian}/dismiss', [\App\Http\Controllers\Admin\PelanggaranController::class, 'dismissReportedReview'])->name('pelanggaran.report.dismiss');
+        Route::delete('/pelanggaran/report/{penilaian}/delete-review', [\App\Http\Controllers\Admin\PelanggaranController::class, 'deleteReportedReview'])->name('pelanggaran.report.delete-review');
+        
+        // PENGATURAN
+        Route::get('/pengaturan', [PengaturanController::class, 'index'])->name('pengaturan.index');
+        Route::post('/pengaturan/clear-cache', [AdminDashboardController::class, 'clearCache'])->name('pengaturan.clear-cache');
+        Route::post('/pengaturan/landing', [PengaturanController::class, 'updateLanding'])->name('pengaturan.landing');
+        Route::post('/pelanggaran/kata-toxic', [PengaturanController::class, 'updateProfanityWords'])->name('pelanggaran.words.update');
+        Route::post('/pelanggaran/kata-toxic/delete', [PengaturanController::class, 'deleteProfanityWord'])->name('pelanggaran.words.delete');
+        Route::post('/pelanggaran/kata-toxic/edit', [PengaturanController::class, 'editProfanityWord'])->name('pelanggaran.words.edit');
+        Route::post('/pelanggaran/kata-toxic/reset', [PengaturanController::class, 'resetProfanityWords'])->name('pelanggaran.words.reset');
+        Route::post('/pengaturan/landing/reset', [PengaturanController::class, 'resetLandingHero'])->name('pengaturan.landing.reset');
+        Route::post('/pengaturan/reset', [PengaturanController::class, 'reset'])->name('pengaturan.reset');
+        Route::post('/pengaturan/ganti-password', [PengaturanController::class, 'gantiPassword'])->name('pengaturan.password');
+        Route::post('/pengaturan/periode', [PengaturanController::class, 'simpanPeriode'])->name('pengaturan.periode');
+        Route::post('/pengaturan/periode/{periode}/aktifkan', [PengaturanController::class, 'aktifkanPeriode'])->name('pengaturan.periode.aktifkan');
+        Route::delete('/pengaturan/periode/{periode}', [PengaturanController::class, 'destroyPeriode'])->name('pengaturan.periode.destroy');
+        
+        // PENGATURAN FAQ
+        Route::post('/pengaturan/faq', [PengaturanController::class, 'storeFaq'])->name('pengaturan.faq.store');
+        Route::put('/pengaturan/faq/{id}', [PengaturanController::class, 'updateFaq'])->name('pengaturan.faq.update');
+        Route::delete('/pengaturan/faq/{id}', [PengaturanController::class, 'destroyFaq'])->name('pengaturan.faq.destroy');
+        Route::post('/pengaturan/faq/reset', [PengaturanController::class, 'resetFaq'])->name('pengaturan.faq.reset');
+        
+        // PESAN MASUK
+        Route::get('/kontak', [AdminKontakController::class, 'index'])->name('kontak.index');
+        Route::delete('/kontak/all', [AdminKontakController::class, 'destroyAll'])->name('kontak.destroy-all');
+        Route::delete('/kontak/batch', [AdminKontakController::class, 'destroyBatch'])->name('kontak.destroy-batch');
+        Route::delete('/kontak/chat/{identifier}/conversation', [AdminKontakController::class, 'destroyConversation'])->name('kontak.chat.destroy-conversation');
+        Route::get('/kontak/chat/{identifier}', [AdminKontakController::class, 'chat'])->name('kontak.chat');
+        Route::get('/kontak/chat/{identifier}/stream', [AdminKontakController::class, 'stream'])->name('kontak.chat.stream');
+        Route::post('/kontak/chat/{identifier}', [AdminKontakController::class, 'sendChatMessage'])->name('kontak.chat.send');
+        Route::post('/kontak/{kontak}/reply', [AdminKontakController::class, 'reply'])->name('kontak.reply');
+        Route::put('/kontak/{kontak}/reply', [AdminKontakController::class, 'editReply'])->name('kontak.edit-reply');
+        Route::delete('/kontak/{kontak}', [AdminKontakController::class, 'destroy'])->name('kontak.destroy');
+        Route::delete('/kontak/{kontak}/reply', [AdminKontakController::class, 'destroyReply'])->name('kontak.destroy-reply');
+
+        // EXPORT SISWA & ALL ZIP
+        Route::get('/export/siswa/excel', [ExportController::class, 'siswaExcel'])->name('export.siswa.excel');
+        Route::get('/export/siswa/pdf', [ExportController::class, 'siswaPdf'])->name('export.siswa.pdf');
+        Route::get('/export/all/zip', [ExportController::class, 'allZip'])->name('export.all.zip');
+
+        // GATEWAY SIPINTU
+        Route::prefix('sipintu')->name('sipintu.')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Admin\SiPintuController::class, 'index'])->name('index');
+            Route::get('/guru', [\App\Http\Controllers\Admin\SiPintuController::class, 'teachers'])->name('guru');
+            Route::get('/siswa', [\App\Http\Controllers\Admin\SiPintuController::class, 'students'])->name('siswa');
+            Route::get('/guru/{nip}/detail', [\App\Http\Controllers\Admin\SiPintuController::class, 'teacherDetail'])->name('guru.detail');
+            Route::get('/siswa/{nis}/detail', [\App\Http\Controllers\Admin\SiPintuController::class, 'studentDetail'])->name('siswa.detail');
+            Route::post('/guru/import', [\App\Http\Controllers\Admin\SiPintuController::class, 'importTeacher'])->name('guru.import');
+            Route::post('/siswa/import', [\App\Http\Controllers\Admin\SiPintuController::class, 'importStudent'])->name('siswa.import');
+            Route::post('/guru/sync-all', [\App\Http\Controllers\Admin\SiPintuController::class, 'syncAllTeachers'])->name('guru.sync-all');
+            Route::post('/siswa/sync-all', [\App\Http\Controllers\Admin\SiPintuController::class, 'syncAllStudents'])->name('siswa.sync-all');
+            Route::post('/sync-all-full', [\App\Http\Controllers\Admin\SiPintuController::class, 'syncAllDirect'])->name('sync-all-full');
+            Route::post('/check-connection', [\App\Http\Controllers\Admin\SiPintuController::class, 'checkConnection'])->name('check-connection');
+        });
     });
 });
 

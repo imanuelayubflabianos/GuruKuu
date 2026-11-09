@@ -150,6 +150,7 @@
                 <span class="small text-muted">Menampilkan {{ $feedbacks->firstItem() ?? 0 }}–{{ $feedbacks->lastItem() ?? 0 }} dari {{ $feedbacks->total() }} penilaian</span>
                 <span class="badge bg-light text-dark border">15 per halaman</span>
             </div>
+            @if(auth()->user()->role === 'admin')
             <div id="bulkDeleteBar" class="d-none align-items-center gap-2">
                 <span class="small fw-bold text-danger"><span id="selectedCount">0</span> ulasan terpilih</span>
                 <button type="submit" class="btn btn-sm btn-danger d-inline-flex align-items-center gap-1.5 px-3 py-1.5 rounded-pill shadow-xs" data-confirm="Hapus seluruh ulasan terpilih secara permanen? Rating guru akan dihitung ulang secara otomatis." data-confirm-title="Hapus Ulasan Terpilih?" data-confirm-btn="Ya, Hapus Terpilih" data-confirm-type="danger">
@@ -157,15 +158,18 @@
                     <span>Hapus Terpilih</span>
                 </button>
             </div>
+            @endif
         </div>
 
         <div class="table-responsive">
             <table class="table table-custom align-middle mb-0" id="feedbackTable">
                 <thead>
                     <tr>
+                        @if(auth()->user()->role === 'admin')
                         <th style="width: 40px;" class="text-center">
                             <input type="checkbox" id="checkAllFeedback" class="form-check-input" title="Pilih Semua Ulasan">
                         </th>
+                        @endif
                         <th style="width: 50px;">NO</th>
                         <th style="min-width: 220px;">GURU</th>
                         <th style="min-width: 200px;">SISWA & KELAS</th>
@@ -180,9 +184,11 @@
                         $isCensored = $f->is_censored || str_contains($f->kritik ?? '', 'melanggar');
                     @endphp
                     <tr>
+                        @if(auth()->user()->role === 'admin')
                         <td class="text-center">
                             <input type="checkbox" name="ids[]" value="{{ $f->id }}" class="form-check-input feedback-checkbox">
                         </td>
+                        @endif
                         <td class="text-muted font-mono">{{ $feedbacks->firstItem() + $index }}</td>
                     
                     {{-- TARGET GURU --}}
@@ -275,6 +281,7 @@
                                         <span>Rincian Evaluasi</span>
                                     </button>
                                 </li>
+                                @if(auth()->user()->role === 'admin')
                                 <li>
                                     @if(!$isCensored)
                                         <form action="{{ route('admin.kritik-saran.warn', $f->id) }}" method="POST" class="d-inline"
@@ -317,13 +324,14 @@
                                         </button>
                                     </form>
                                 </li>
+                                @endif
                             </ul>
                         </div>
                     </td>
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="7" class="text-center py-5 text-muted">
+                    <td colspan="{{ auth()->user()->role === 'admin' ? 7 : 6 }}" class="text-center py-5 text-muted">
                         <i class="bi bi-chat-left-text fs-1 d-block mb-2 text-secondary"></i>
                         Belum ada evaluasi & ulasan kritik/saran yang sesuai dengan kriteria filter.
                     </td>

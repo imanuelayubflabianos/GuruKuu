@@ -190,13 +190,18 @@
         <div class="sidebar-menu">
             <div class="px-3 py-1 mb-1">
                 <span class="badge bg-light text-muted border text-truncate w-100 text-start" style="font-size: 0.65rem;">
-                    SMKN 1 BANGSRI • ADMIN
+                    SMKN 1 BANGSRI • {{ auth()->user()->role === 'wakil' ? 'WAKIL KEPALA SEKOLAH' : 'ADMIN' }}
                 </span>
             </div>
             <a href="{{ route('admin.dashboard') }}" class="sidebar-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
                 <i class="bi bi-speedometer2"></i> Dashboard
             </a>
             
+            <a href="{{ route('admin.leaderboard.index') }}" class="sidebar-link {{ request()->routeIs('admin.leaderboard.*') ? 'active' : '' }}">
+                <i class="bi bi-trophy"></i> Leaderboard
+            </a>
+
+            @if(auth()->user()->role === 'admin')
             <div class="sidebar-link" data-bs-toggle="collapse" data-bs-target="#menuData">
                 <i class="bi bi-database"></i> Data Lokal
                 <i class="bi bi-chevron-down ms-auto" style="font-size:0.8rem;"></i>
@@ -220,10 +225,16 @@
                     <a href="{{ route('admin.sipintu.siswa') }}" class="sidebar-link {{ request()->routeIs('admin.sipintu.siswa*') ? 'active' : '' }}">Data Siswa SiPintu</a>
                 </div>
             </div>
+            @else
+            {{-- MENU KHUSUS WAKIL (MONITORING EVALUASI & PENILAIAN GURU) --}}
+            <a href="{{ route('admin.guru.index') }}" class="sidebar-link {{ request()->routeIs('admin.guru.*') ? 'active' : '' }}">
+                <i class="bi bi-person-video3"></i> Detail Nilai Guru
+            </a>
+            @endif
 
             @php $totalReportNotif = ($unreadPelanggaranCount ?? 0) + ($unreadChatCount ?? 0); @endphp
             <div class="sidebar-link d-flex align-items-center justify-content-between" data-bs-toggle="collapse" data-bs-target="#menuLaporan">
-                <div><i class="bi bi-file-earmark-bar-graph"></i> Laporan & Feedback</div>
+                <div><i class="bi bi-file-earmark-bar-graph"></i> {{ auth()->user()->role === 'wakil' ? 'Evaluasi & Aduan' : 'Laporan & Feedback' }}</div>
                 <div class="d-flex align-items-center gap-1">
                     @if($totalReportNotif > 0)
                         <span class="badge bg-danger rounded-pill px-1.5 py-0.5" style="font-size: 0.65rem;">{{ $totalReportNotif }}</span>
@@ -231,16 +242,17 @@
                     <i class="bi bi-chevron-down" style="font-size:0.8rem;"></i>
                 </div>
             </div>
-            <div class="collapse {{ request()->routeIs('admin.leaderboard.*', 'admin.kritik-saran.*', 'admin.kontak.*', 'admin.pelanggaran.*') ? 'show' : '' }}" id="menuLaporan">
+            <div class="collapse {{ request()->routeIs('admin.kritik-saran.*', 'admin.kontak.*', 'admin.pelanggaran.*') ? 'show' : '' }}" id="menuLaporan">
                 <div class="sidebar-submenu">
-                    <a href="{{ route('admin.leaderboard.index') }}" class="sidebar-link {{ request()->routeIs('admin.leaderboard.*') ? 'active' : '' }}">Leaderboard</a>
                     <a href="{{ route('admin.kritik-saran.index') }}" class="sidebar-link {{ request()->routeIs('admin.kritik-saran.*') ? 'active' : '' }}">Kritik & Saran</a>
+                    @if(auth()->user()->role === 'admin')
                     <a href="{{ route('admin.kontak.index') }}" class="sidebar-link d-flex align-items-center justify-content-between {{ request()->routeIs('admin.kontak.*') ? 'active' : '' }}">
                         <span>Pesan Masuk</span>
                         @if(($unreadChatCount ?? 0) > 0)
                             <span class="badge bg-primary rounded-pill px-2" style="font-size: 0.65rem;">{{ $unreadChatCount }} baru</span>
                         @endif
                     </a>
+                    @endif
                     <a href="{{ route('admin.pelanggaran.index') }}" class="sidebar-link d-flex align-items-center justify-content-between {{ request()->routeIs('admin.pelanggaran.*') ? 'active' : '' }}">
                         <span>Log Pelanggaran Dll</span>
                         @if(($unreadPelanggaranCount ?? 0) > 0)
@@ -250,9 +262,11 @@
                 </div>
             </div>
 
+            @if(auth()->user()->role === 'admin')
             <a href="{{ route('admin.pengaturan.index') }}" class="sidebar-link {{ request()->routeIs('admin.pengaturan.*') ? 'active' : '' }}">
                 <i class="bi bi-gear"></i> Pengaturan
             </a>
+            @endif
         </div>
     </div>
 
@@ -260,7 +274,11 @@
         {{-- TOPBAR HEADER --}}
         <div class="d-none d-lg-flex align-items-center justify-content-between bg-white px-4 py-2.5 rounded-3 border mb-4 shadow-sm" style="position: sticky; top: 0.75rem; z-index: 1020; backdrop-filter: blur(10px); background: rgba(255, 255, 255, 0.95) !important;">
             <div class="d-flex align-items-center gap-2">
-                <span class="badge bg-primary-subtle text-primary fw-bold px-2.5 py-1">ADMINISTRATOR</span>
+                @if(auth()->user()->role === 'wakil')
+                    <span class="badge bg-info-subtle text-info fw-bold px-2.5 py-1">WAKIL KEPALA SEKOLAH</span>
+                @else
+                    <span class="badge bg-primary-subtle text-primary fw-bold px-2.5 py-1">ADMINISTRATOR</span>
+                @endif
                 <span class="text-muted small d-none d-md-inline">| Sistem Evaluasi & Akuntabilitas Pendidik</span>
             </div>
             <div class="d-flex align-items-center gap-2">
@@ -275,7 +293,7 @@
                 </a>
 
                 {{-- NOTIFIKASI GABUNGAN DESKTOP (PELANGGARAN & CHAT) --}}
-                @php $totalNotif = ($unreadPelanggaranCount ?? 0) + ($unreadChatCount ?? 0); @endphp
+                @php $totalNotif = ($unreadPelanggaranCount ?? 0) + (auth()->user()->role === 'admin' ? ($unreadChatCount ?? 0) : 0); @endphp
                 <div class="dropdown">
                     <button class="btn btn-light position-relative rounded-circle border shadow-sm gk-topbar-btn" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false" title="Pusat Notifikasi">
                         <i class="bi bi-bell-fill gk-bell-icon {{ $totalNotif > 0 ? 'has-unread' : 'no-unread' }} admin-bell-icon"></i>
@@ -292,7 +310,7 @@
                 {{-- USER BADGE DROPDOWN --}}
                 <div class="dropdown border-start ps-3 ms-2">
                     @php
-                        $adminName = auth()->user()->name ?? 'Admin';
+                        $adminName = auth()->user()->name ?? 'Pengguna';
                         $nameParts = array_values(array_filter(explode(' ', trim($adminName))));
                         if (count($nameParts) >= 2) {
                             $adminInitials = strtoupper(mb_substr($nameParts[0], 0, 1) . mb_substr(end($nameParts), 0, 1));
@@ -311,13 +329,21 @@
                     <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 p-2 mt-2" style="border-radius: 12px; min-width: 190px;">
                         <li class="px-2 py-1 mb-1 border-bottom">
                             <div class="fw-bold small text-dark text-truncate">{{ auth()->user()->name ?? 'Administrator' }}</div>
-                            <small class="text-muted d-block" style="font-size: 0.7rem;">Administrator</small>
+                            <small class="text-muted d-block" style="font-size: 0.7rem;">{{ auth()->user()->role === 'wakil' ? 'Wakil Kepala Sekolah' : 'Administrator' }}</small>
                         </li>
+                        @if(auth()->user()->role === 'admin')
                         <li>
                             <a class="dropdown-item rounded py-1.5 small" href="{{ route('admin.pengaturan.index') }}">
                                 <i class="bi bi-gear me-2 text-primary"></i> Pengaturan
                             </a>
                         </li>
+                        @else
+                        <li>
+                            <a class="dropdown-item rounded py-1.5 small" href="{{ route('admin.profil.index') }}">
+                                <i class="bi bi-person me-2 text-primary"></i> Profil Akun
+                            </a>
+                        </li>
+                        @endif
                         <li><hr class="dropdown-divider my-1"></li>
                         <li>
                             <form action="{{ route('logout') }}" method="POST">

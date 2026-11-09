@@ -14,11 +14,13 @@
                 <span class="badge bg-secondary font-mono">NIP: {{ $guru->nip }}</span>
             </p>
         </div>
+        @if(auth()->user()->role === 'admin')
         <div class="d-flex gap-2">
             <a href="{{ route('admin.guru.edit', $guru) }}" class="btn btn-warning">
                 <i class="bi bi-pencil-square me-1"></i> Ubah Data Guru
             </a>
         </div>
+        @endif
     </div>
 </div>
 
