@@ -180,15 +180,15 @@
 </div>
 
 {{-- ULASAN SISWA PERIODE BERJALAN --}}
-<div class="card-custom p-4 mb-4">
+<div class="card-custom p-4 mb-4" id="ulasan-siswa">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h5 class="fw-bold mb-0">
             <i class="bi bi-chat-left-quote me-2 text-primary"></i>Ulasan & Masukan Siswa (Periode Berjalan)
-            <span class="badge bg-primary ms-2">{{ $semuaFeedback->count() }}</span>
+            <span class="badge bg-primary ms-2">{{ $semuaFeedback->total() }}</span>
         </h5>
     </div>
 
-    @if($semuaFeedback->count() > 0)
+    @if($semuaFeedback->total() > 0)
         @foreach($semuaFeedback as $fb)
         @php
             $fbScore = round(($fb->rata_rata_evaluasi / 5) * 100);
@@ -303,6 +303,12 @@
             </div>
         </div>
         @endforeach
+
+        @if($semuaFeedback->hasPages())
+            <div class="d-flex justify-content-center overflow-auto pt-3 mt-3 border-top">
+                {{ $semuaFeedback->fragment('ulasan-siswa')->links() }}
+            </div>
+        @endif
     @else
         <div class="text-center py-4 text-muted">
             <i class="bi bi-chat-dots fs-2 d-block mb-2 text-muted opacity-50"></i>

@@ -134,4 +134,64 @@ class AdminPlusAndWakilRoleTest extends TestCase
         $detailResponseAsAdmin->assertSee('Ahmad Siswa Rahasia');
         $detailResponseAsAdmin->assertSee('NIS: 88889999');
     }
+
+    public function test_teacher_detail_reviews_are_paginated_ten_per_page(): void
+    {
+        $periode = Periode::create([
+            'nama_periode' => 'Semester Ganjil 2026/2027',
+            'tahun_ajaran' => '2026/2027',
+            'semester' => 'ganjil',
+            'status' => 'aktif',
+            'tanggal_mulai' => now()->subMonth(),
+            'tanggal_selesai' => now()->addMonth(),
+        ]);
+
+        $guru = Guru::create([
+            'nama' => 'Guru Populer, S.Pd.',
+            'nip' => '198501012010011002',
+            'kategori' => 'produktif',
+        ]);
+
+        // Create 15 reviews
+        for ($i = 1; $i <= 15; $i++) {
+            $siswa = User::create([
+                'name' => "Siswa {$i}",
+                'nis' => "100{$i}",
+                'email' => "siswa{$i}@test.com",
+                'password' => bcrypt('password'),
+                'role' => 'siswa',
+                'is_active' => true,
+            ]);
+
+            Penilaian::create([
+                'guru_id' => $guru->id,
+                'siswa_id' => $siswa->id,
+                'periode_id' => $periode->id,
+                'kedisiplinan' => 5,
+                'komunikasi' => 5,
+                'tanggung_jawab' => 5,
+                'keramahan' => 5,
+                'kreativitas' => 5,
+                'total_nilai' => 25,
+                'rata_rata_evaluasi' => 5.0,
+                'kritik' => "Kritik ke-{$i}",
+                'saran' => "Saran ke-{$i}",
+                'is_censored' => false,
+                'created_at' => now()->subMinutes(20 - $i),
+                'updated_at' => now()->subMinutes(20 - $i),
+            ]);
+        }
+
+        // Check landing guru detail page 1
+        $responsePage1 = $this->get(route('landing.guru.detail', $guru));
+        $responsePage1->assertStatus(200);
+        $this->assertEquals(15, $responsePage1->viewData('semuaFeedback')->total());
+        $this->assertCount(10, $responsePage1->viewData('semuaFeedback')->items());
+
+        // Check landing guru detail page 2
+        $responsePage2 = $this->get(route('landing.guru.detail', ['guru' => $guru->id, 'page' => 2]));
+        $responsePage2->assertStatus(200);
+        $this->assertEquals(15, $responsePage2->viewData('semuaFeedback')->total());
+        $this->assertCount(5, $responsePage2->viewData('semuaFeedback')->items());
+    }
 }

@@ -167,7 +167,8 @@ class PenilaianController extends Controller
         $riwayat = Penilaian::where('siswa_id', auth()->id())
                            ->with(['guru', 'periode', 'kelas'])
                            ->latest()
-                           ->get();
+                           ->paginate(10)
+                           ->withQueryString();
 
         return view('siswa.riwayat.index', compact('riwayat'));
     }

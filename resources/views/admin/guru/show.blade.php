@@ -140,11 +140,11 @@
 </div>
 
 {{-- DAFTAR ULASAN SISWA --}}
-<div class="card-custom p-4 mb-4">
+<div class="card-custom p-4 mb-4" id="ulasan-siswa">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h5 class="fw-bold mb-0">
             <i class="bi bi-chat-left-quote me-2 text-primary"></i>Ulasan Siswa (Periode Aktif)
-            <span class="badge bg-primary ms-2">{{ $semuaFeedback->count() }}</span>
+            <span class="badge bg-primary ms-2">{{ $semuaFeedback->total() }}</span>
         </h5>
         <span class="badge bg-light text-dark border">Anonimitas Siswa</span>
     </div>
@@ -253,6 +253,12 @@
         Belum ada ulasan dari siswa untuk guru ini pada periode aktif.
     </div>
     @endforelse
+
+    @if($semuaFeedback->hasPages())
+        <div class="d-flex justify-content-center overflow-auto pt-3 mt-3 border-top">
+            {{ $semuaFeedback->fragment('ulasan-siswa')->links() }}
+        </div>
+    @endif
 </div>
 
 {{-- ARSIP HISTORI PENILAIAN PERIODE LALU --}}

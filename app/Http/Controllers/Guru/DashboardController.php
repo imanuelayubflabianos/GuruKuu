@@ -401,7 +401,7 @@ class DashboardController extends Controller
             'rata_keramahan' => $allPenilaian->avg('keramahan') ?? 0,
         ];
 
-        // Ulasan periode berjalan / aktif
+        // Ulasan periode berjalan / aktif (Paginasi 10 ulasan per halaman)
         $semuaFeedback = $periodeId
             ? Penilaian::with(['siswa.jurusan', 'kelas.jurusan'])
                 ->where('guru_id', $guru->id)
@@ -410,8 +410,9 @@ class DashboardController extends Controller
                     $q->where('is_censored', false)->orWhereNull('is_censored');
                 })
                 ->latest()
-                ->get()
-            : collect();
+                ->paginate(10)
+                ->withQueryString()
+            : Penilaian::whereRaw('1=0')->paginate(10);
 
         // Arsip ulasan dari periode-periode lampau (selesai/nonaktif)
         $arsipPeriode = Periode::whereIn('status', ['selesai', 'nonaktif'])

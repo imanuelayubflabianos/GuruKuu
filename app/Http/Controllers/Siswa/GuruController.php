@@ -104,8 +104,9 @@ class GuruController extends Controller
                 })
                 ->orderByRaw("CASE WHEN siswa_id = ? THEN 0 ELSE 1 END", [$userId])
                 ->latest()
-                ->get()
-            : collect();
+                ->paginate(10)
+                ->withQueryString()
+            : Penilaian::whereRaw('1=0')->paginate(10);
 
         // Statistik evaluasi
         $allPenilaian = $periodeId

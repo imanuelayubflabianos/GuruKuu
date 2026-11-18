@@ -450,7 +450,7 @@ class GuruController extends Controller
             'rata_keramahan' => $allPenilaian->avg('keramahan') ?? 0,
         ];
 
-        // Ulasan periode aktif berjalan
+        // Ulasan periode aktif berjalan (Paginasi 10 ulasan per halaman)
         $semuaFeedback = $periodeId
             ? \App\Models\Penilaian::with('siswa')
                 ->where('guru_id', $guru->id)
@@ -459,8 +459,9 @@ class GuruController extends Controller
                     $q->where('is_censored', false)->orWhereNull('is_censored');
                 })
                 ->latest()
-                ->get()
-            : collect();
+                ->paginate(10)
+                ->withQueryString()
+            : \App\Models\Penilaian::whereRaw('1=0')->paginate(10);
 
         // Arsip ulasan dari periode-periode lampau (selesai/nonaktif)
         $arsipPeriode = \App\Models\Periode::whereIn('status', ['selesai', 'nonaktif'])

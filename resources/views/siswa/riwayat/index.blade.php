@@ -145,5 +145,11 @@
         </div>
     </div>
     @endforelse
+
+    @if($riwayat->hasPages())
+    <div class="col-12 d-flex justify-content-center overflow-auto mt-4 pt-2">
+        {{ $riwayat->links() }}
+    </div>
+    @endif
 </div>
 @endsection

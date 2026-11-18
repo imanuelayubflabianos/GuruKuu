@@ -395,6 +395,16 @@ GuruKuu/
   - **Fitur Baru "Bagikan Peringkat" (`admin.leaderboard.index`):** Menambahkan tombol dan modal khusus untuk menyalin ringkasan teks leaderboard berformat rapi (dengan ikon medali 🥇🥈🥉, persentase nilai, dan link web) yang siap diposting ke grup WhatsApp, media sosial, atau saluran sekolah, serta tautan langsung ke WhatsApp Web/App.
   - **Penjaminan Privasi & Anonimitas Siswa:** Wakil **TIDAK DAPAT** melihat identitas siswa yang memberikan ulasan; nama siswa disamarkan menjadi `Siswa (Anonim)` dan NIS disembunyikan sepenuhnya di seluruh kartu ulasan. Hak melihat nama dan NIS siswa murni milik `admin`.
   - **Restriksi Akses & Alur Navigasi:** Login wakil dan akses root dashboard otomatis dialihkan langsung ke halaman Leaderboard (`/admin/leaderboard`). Menu dan rute Kritik & Saran (`/admin/kritik-saran`), Log Pelanggaran (`/admin/pelanggaran`), dan Master Data Guru diproteksi murni untuk `role:admin`.
+* **2026-11-18 (Implementasi Paginasi 10 Ulasan per Halaman di Seluruh Detail Guru & Riwayat):**
+  - **Optimasi Performa & Pencegahan Lag:** Mengubah pemuatan data ulasan siswa periode berjalan dari `->get()` (yang me-render seluruh ulasan sekaligus dan menyebabkan penurunan performa saat ulasan bertambah banyak) menjadi paginasi standar 10 item per halaman (`paginate(10)->withQueryString()`).
+  - **Penerapan Menyeluruh di Semua Portal:**
+    * Landing Page Publik: [`LandingController::guruDetail`](file:///c:/Users/ADVAN/PROJEK/Laravel/GuruKuu/app/Http/Controllers/LandingController.php) & [`landing/guru-detail.blade.php`](file:///c:/Users/ADVAN/PROJEK/Laravel/GuruKuu/resources/views/landing/guru-detail.blade.php).
+    * Portal Siswa: [`Siswa\GuruController::show`](file:///c:/Users/ADVAN/PROJEK/Laravel/GuruKuu/app/Http/Controllers/Siswa/GuruController.php) & [`siswa/guru/show.blade.php`](file:///c:/Users/ADVAN/PROJEK/Laravel/GuruKuu/resources/views/siswa/guru/show.blade.php).
+    * Portal Guru: [`Guru\DashboardController::detailGuru`](file:///c:/Users/ADVAN/PROJEK/Laravel/GuruKuu/app/Http/Controllers/Guru/DashboardController.php) & [`guru/show.blade.php`](file:///c:/Users/ADVAN/PROJEK/Laravel/GuruKuu/resources/views/guru/show.blade.php).
+    * Portal Admin & Wakil: [`Admin\GuruController::show`](file:///c:/Users/ADVAN/PROJEK/Laravel/GuruKuu/app/Http/Controllers/Admin/GuruController.php) & [`admin/guru/show.blade.php`](file:///c:/Users/ADVAN/PROJEK/Laravel/GuruKuu/resources/views/admin/guru/show.blade.php).
+    * Riwayat Penilaian Siswa: [`Siswa\PenilaianController::riwayat`](file:///c:/Users/ADVAN/PROJEK/Laravel/GuruKuu/app/Http/Controllers/Siswa/PenilaianController.php) & [`siswa/riwayat/index.blade.php`](file:///c:/Users/ADVAN/PROJEK/Laravel/GuruKuu/resources/views/siswa/riwayat/index.blade.php).
+  - **UX & Navigasi Mulus:** Mempertahankan keakuratan badge jumlah total ulasan menggunakan `$semuaFeedback->total()` (bukan `count()`), menyematkan *URL fragment anchor* `#ulasan-siswa` pada link paginasi agar halaman otomatis melompat ke bagian ulasan saat berpindah halaman, serta menyediakan container wrapper fleksibel dan *overflow-friendly* baik pada resolusi desktop maupun layar seluler (mobile).
+
 
 
 

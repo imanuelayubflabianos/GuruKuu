@@ -117,7 +117,7 @@ class LandingController extends Controller
             'rata_keramahan' => $allPenilaian->avg('keramahan') ?? 0,
         ];
 
-        // Semua ulasan & masukan siswa periode berjalan
+        // Semua ulasan & masukan siswa periode berjalan (Paginasi 10 ulasan per halaman)
         $semuaFeedback = $periodeId
             ? Penilaian::with(['siswa', 'balasans.user'])
                 ->where('guru_id', $guru->id)
@@ -126,8 +126,9 @@ class LandingController extends Controller
                     $query->where('is_censored', false)->orWhereNull('is_censored');
                 })
                 ->latest()
-                ->get()
-            : collect();
+                ->paginate(10)
+                ->withQueryString()
+            : Penilaian::whereRaw('1=0')->paginate(10);
 
         // Arsip penilaian dari periode-periode lampau (selesai/nonaktif)
         $arsipPeriode = Periode::whereIn('status', ['selesai', 'nonaktif'])
