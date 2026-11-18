@@ -494,10 +494,7 @@
                         </div>
                     </td>
                     <td class="text-center font-mono align-middle" style="font-size: 0.82rem;">
-                        <a href="{{ route('admin.guru.show', array_filter(['guru' => $g->id, 'kelas_id' => $kelasId, 'periode_id' => $selectedPeriode?->id])) }}#ulasan-siswa" class="text-decoration-none text-dark hover-primary" title="Lihat detail ulasan & siswa">
-                            <strong>{{ $g->total_penilaian }}</strong> <span class="text-muted small">{{ $mode === 'partisipasi' ? 'siswa' : 'penilaian' }}</span>
-                            <i class="bi bi-box-arrow-up-right ms-1 text-primary opacity-75" style="font-size: 0.72rem;"></i>
-                        </a>
+                        <strong>{{ $g->total_penilaian }}</strong> <span class="text-muted small">{{ $mode === 'partisipasi' ? 'siswa' : 'penilaian' }}</span>
                     </td>
                     <td class="text-center align-middle">
                         <div class="dropdown">
@@ -507,8 +504,8 @@
                             <ul class="dropdown-menu dropdown-menu-end shadow border-0 py-1" style="border-radius: 12px; font-size: 0.85rem; min-width: 170px; box-shadow: 0 10px 25px rgba(0,0,0,0.12) !important;">
                                 <li>
                                     <a class="dropdown-item py-1.5 px-3 d-flex align-items-center gap-2 text-primary" href="{{ route('admin.guru.show', array_filter(['guru' => $g->id, 'kelas_id' => $kelasId, 'periode_id' => $selectedPeriode?->id])) }}#ulasan-siswa">
-                                        <i class="bi bi-chat-left-text text-primary"></i>
-                                        <span>Detail Ulasan & Siswa</span>
+                                        <i class="bi bi-eye text-primary"></i>
+                                        <span>Detail</span>
                                     </a>
                                 </li>
                             </ul>

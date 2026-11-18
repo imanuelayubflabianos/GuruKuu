@@ -33,7 +33,7 @@ return new class extends Migration
         User::updateOrCreate(
             ['nis' => 'wakil'],
             [
-                'name' => 'Wakil Kepala Sekolah',
+                'name' => 'Wakil',
                 'email' => 'wakil@gurukuu.com',
                 'password' => Hash::make('eskasaba123'),
                 'role' => 'wakil',

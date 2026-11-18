@@ -62,7 +62,7 @@
     transition: width 0.15s ease, opacity 0.2s ease 0.05s;
 }
 
-/* Spinner Modern di Tengah Layar Putih (Efek Loading Muter Sesuai Tema Logo) */
+/* Spinner Modern di Tengah Layar Putih (Efek Loading Muter Gradient Sesuai Tema Logo) */
 .gk-veil-loader-box {
     display: flex;
     flex-direction: column;
@@ -72,13 +72,19 @@
     user-select: none;
 }
 .gk-veil-spinner {
-    width: 44px;
-    height: 44px;
-    border: 3.5px solid rgba(0, 0, 0, 0.08);
-    border-top-color: {{ $siteTitleColor1 ?? '#003366' }};
-    border-right-color: {{ $siteTitleColor2 ?? '#ff6600' }};
+    width: 46px;
+    height: 46px;
     border-radius: 50%;
-    animation: gkSpinnerRotate 0.75s linear infinite;
+    background: conic-gradient(
+        from 0deg,
+        transparent 0deg,
+        {{ $siteTitleColor1 ?? '#003366' }} 140deg,
+        {{ $siteTitleColor2 ?? '#ff6600' }} 330deg,
+        transparent 360deg
+    );
+    -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 3.5px));
+    mask: radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 3.5px));
+    animation: gkSpinnerRotate 0.8s linear infinite;
     display: inline-block;
 }
 @keyframes gkSpinnerRotate {

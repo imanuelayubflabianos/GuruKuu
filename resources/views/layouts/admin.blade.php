@@ -108,7 +108,7 @@
     {{-- MOBILE TOPBAR HEADER (KHUSUS TAMPILAN HP - BERSIH TANPA BURGER MENU) --}}
     <header class="gk-mobile-header shadow-sm">
         <div class="d-flex align-items-center gap-2">
-            <a href="{{ route('admin.dashboard') }}" class="text-decoration-none d-flex align-items-center gap-2" style="font-size: 1.1rem;">
+            <a href="{{ auth()->user()->role === 'wakil' ? route('admin.leaderboard.index') : route('admin.dashboard') }}" class="text-decoration-none d-flex align-items-center gap-2" style="font-size: 1.1rem;">
                 @if(!empty($siteLogo))
                     <img src="{{ $siteLogo }}" alt="{{ $siteTitle ?? 'GuruKuu' }}" style="height: 30px; max-width: 38px; object-fit: contain;" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
                     <i class="bi bi-mortarboard-fill fs-4" style="display: none; color: {{ $siteTitleColor1 ?? '#003366' }};"></i>
@@ -140,33 +140,48 @@
         </div>
     </header>
 
-    {{-- MOBILE BOTTOM NAVIGATION BAR (KHUSUS ADMINISTRATOR) --}}
+    {{-- MOBILE BOTTOM NAVIGATION BAR --}}
     <nav class="gk-bottom-nav d-lg-none" aria-label="Navigasi Bawah Admin">
-        <a href="{{ route('admin.dashboard') }}" class="gk-bottom-nav-item {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
-            <i class="bi {{ request()->routeIs('admin.dashboard') ? 'bi-grid-fill' : 'bi-grid' }}"></i>
-            <span>Dashboard</span>
-        </a>
-        <a href="{{ route('admin.guru.index') }}" class="gk-bottom-nav-item {{ request()->routeIs('admin.guru.*') ? 'active' : '' }}">
-            <i class="bi {{ request()->routeIs('admin.guru.*') ? 'bi-person-badge-fill' : 'bi-person-badge' }}"></i>
-            <span>Guru</span>
-        </a>
-        <a href="{{ route('admin.siswa.index') }}" class="gk-bottom-nav-item {{ request()->routeIs('admin.siswa.*') ? 'active' : '' }}">
-            <i class="bi {{ request()->routeIs('admin.siswa.*') ? 'bi-mortarboard-fill' : 'bi-mortarboard' }}"></i>
-            <span>Siswa</span>
-        </a>
-        <a href="{{ route('admin.leaderboard.index') }}" class="gk-bottom-nav-item {{ request()->routeIs('admin.leaderboard.*') ? 'active' : '' }}">
-            <i class="bi {{ request()->routeIs('admin.leaderboard.*') ? 'bi-trophy-fill' : 'bi-trophy' }}"></i>
-            <span>Peringkat</span>
-        </a>
-        <button type="button" class="gk-bottom-nav-item border-0 bg-transparent p-0" onclick="GuruKuuTheme.toggleSidebar()" title="Buka Menu Lengkap">
-            <i class="bi bi-three-dots"></i>
-            <span>Lainnya</span>
-        </button>
+        @if(auth()->user()->role === 'wakil')
+            <a href="{{ route('admin.leaderboard.index') }}" class="gk-bottom-nav-item {{ request()->routeIs('admin.leaderboard.*') ? 'active' : '' }}">
+                <i class="bi {{ request()->routeIs('admin.leaderboard.*') ? 'bi-trophy-fill' : 'bi-trophy' }}"></i>
+                <span>Leaderboard</span>
+            </a>
+            <a href="{{ route('admin.pengaturan.wakil') }}" class="gk-bottom-nav-item {{ request()->routeIs('admin.pengaturan.wakil*') ? 'active' : '' }}">
+                <i class="bi {{ request()->routeIs('admin.pengaturan.wakil*') ? 'bi-gear-fill' : 'bi-gear' }}"></i>
+                <span>Pengaturan</span>
+            </a>
+            <button type="button" class="gk-bottom-nav-item border-0 bg-transparent p-0" onclick="GuruKuuTheme.toggleSidebar()" title="Buka Menu Lengkap">
+                <i class="bi bi-three-dots"></i>
+                <span>Lainnya</span>
+            </button>
+        @else
+            <a href="{{ route('admin.dashboard') }}" class="gk-bottom-nav-item {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
+                <i class="bi {{ request()->routeIs('admin.dashboard') ? 'bi-grid-fill' : 'bi-grid' }}"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="{{ route('admin.guru.index') }}" class="gk-bottom-nav-item {{ request()->routeIs('admin.guru.*') ? 'active' : '' }}">
+                <i class="bi {{ request()->routeIs('admin.guru.*') ? 'bi-person-badge-fill' : 'bi-person-badge' }}"></i>
+                <span>Guru</span>
+            </a>
+            <a href="{{ route('admin.siswa.index') }}" class="gk-bottom-nav-item {{ request()->routeIs('admin.siswa.*') ? 'active' : '' }}">
+                <i class="bi {{ request()->routeIs('admin.siswa.*') ? 'bi-mortarboard-fill' : 'bi-mortarboard' }}"></i>
+                <span>Siswa</span>
+            </a>
+            <a href="{{ route('admin.leaderboard.index') }}" class="gk-bottom-nav-item {{ request()->routeIs('admin.leaderboard.*') ? 'active' : '' }}">
+                <i class="bi {{ request()->routeIs('admin.leaderboard.*') ? 'bi-trophy-fill' : 'bi-trophy' }}"></i>
+                <span>Peringkat</span>
+            </a>
+            <button type="button" class="gk-bottom-nav-item border-0 bg-transparent p-0" onclick="GuruKuuTheme.toggleSidebar()" title="Buka Menu Lengkap">
+                <i class="bi bi-three-dots"></i>
+                <span>Lainnya</span>
+            </button>
+        @endif
     </nav>
 
     <div class="sidebar">
         <div class="sidebar-brand">
-            <a href="{{ route('admin.dashboard') }}" class="d-flex align-items-center gap-2 text-decoration-none">
+            <a href="{{ auth()->user()->role === 'wakil' ? route('admin.leaderboard.index') : route('admin.dashboard') }}" class="d-flex align-items-center gap-2 text-decoration-none">
                 @php
                     $logoImgUrlAdmin = '';
                     if (!empty($siteLogo)) {
@@ -191,7 +206,7 @@
         <div class="sidebar-menu">
             <div class="px-3 py-1 mb-1">
                 <span class="badge bg-light text-muted border text-truncate w-100 text-start" style="font-size: 0.65rem;">
-                    SMKN 1 BANGSRI • {{ auth()->user()->role === 'wakil' ? 'WAKIL KEPALA SEKOLAH' : 'ADMIN' }}
+                    SMKN 1 BANGSRI • {{ auth()->user()->role === 'wakil' ? 'WAKIL' : 'ADMIN' }}
                 </span>
             </div>
             @if(auth()->user()->role === 'admin')
@@ -261,6 +276,12 @@
                 <i class="bi bi-gear"></i> Pengaturan
             </a>
             @endif
+
+            @if(auth()->user()->role === 'wakil')
+            <a href="{{ route('admin.pengaturan.wakil') }}" class="sidebar-link {{ request()->routeIs('admin.pengaturan.wakil*') ? 'active' : '' }}">
+                <i class="bi bi-gear"></i> Pengaturan
+            </a>
+            @endif
         </div>
     </div>
 
@@ -269,7 +290,7 @@
         <div class="d-none d-lg-flex align-items-center justify-content-between bg-white px-4 py-2.5 rounded-3 border mb-4 shadow-sm" style="position: sticky; top: 0.75rem; z-index: 1020; backdrop-filter: blur(10px); background: rgba(255, 255, 255, 0.95) !important;">
             <div class="d-flex align-items-center gap-2">
                 @if(auth()->user()->role === 'wakil')
-                    <span class="badge bg-info-subtle text-info fw-bold px-2.5 py-1">WAKIL KEPALA SEKOLAH</span>
+                    <span class="badge bg-info-subtle text-info fw-bold px-2.5 py-1">WAKIL</span>
                 @else
                     <span class="badge bg-primary-subtle text-primary fw-bold px-2.5 py-1">ADMINISTRATOR</span>
                 @endif
@@ -322,8 +343,8 @@
                     </button>
                     <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 p-2 mt-2" style="border-radius: 12px; min-width: 190px;">
                         <li class="px-2 py-1 mb-1 border-bottom">
-                            <div class="fw-bold small text-dark text-truncate">{{ auth()->user()->name ?? 'Administrator' }}</div>
-                            <small class="text-muted d-block" style="font-size: 0.7rem;">{{ auth()->user()->role === 'wakil' ? 'Wakil Kepala Sekolah' : 'Administrator' }}</small>
+                            <div class="fw-bold small text-dark text-truncate">{{ auth()->user()->role === 'wakil' ? 'Wakil' : (auth()->user()->name ?? 'Administrator') }}</div>
+                            <small class="text-muted d-block" style="font-size: 0.7rem;">{{ auth()->user()->role === 'wakil' ? 'Wakil' : 'Administrator' }}</small>
                         </li>
                         @if(auth()->user()->role === 'admin')
                         <li>
@@ -333,8 +354,8 @@
                         </li>
                         @else
                         <li>
-                            <a class="dropdown-item rounded py-1.5 small" href="{{ route('admin.profil.index') }}">
-                                <i class="bi bi-person me-2 text-primary"></i> Profil Akun
+                            <a class="dropdown-item rounded py-1.5 small" href="{{ route('admin.pengaturan.wakil') }}">
+                                <i class="bi bi-gear me-2 text-primary"></i> Pengaturan
                             </a>
                         </li>
                         @endif

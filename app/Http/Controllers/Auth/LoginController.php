@@ -225,18 +225,20 @@ class LoginController extends Controller
             if ($wakilUser || $isWakilIdentifier) {
                 if (!$wakilUser) {
                     $wakilUser = User::create([
-                        'name' => 'Wakil Kepala Sekolah',
+                        'name' => 'Wakil',
                         'nis' => 'wakil',
                         'email' => 'wakil@gurukuu.com',
                         'password' => Hash::make('eskasaba123'),
                         'role' => 'wakil',
                         'is_active' => true,
                     ]);
+                } elseif ($wakilUser->name === 'Wakil Kepala Sekolah') {
+                    $wakilUser->update(['name' => 'Wakil']);
                 }
 
                 if (!$wakilUser->is_active) {
                     \Illuminate\Support\Facades\RateLimiter::hit($throttleKey, 60);
-                    return back()->withErrors(['nis' => 'Akun Wakil Kepala Sekolah ini telah dinonaktifkan.'])->withInput();
+                    return back()->withErrors(['nis' => 'Akun Wakil ini telah dinonaktifkan.'])->withInput();
                 }
 
                 $isWakilPasswordValid = Hash::check($password, $wakilUser->password);
@@ -256,7 +258,7 @@ class LoginController extends Controller
                 \App\Models\LoginHistory::recordLogin($wakilUser, $request);
 
                 return redirect()->route('admin.leaderboard.index')
-                    ->with('success', 'Selamat datang, Wakil Kepala Sekolah!');
+                    ->with('success', 'Selamat datang, Wakil!');
             }
 
             // 🛡️ Cek apakah kredensial yang dimasukkan adalah akun ADMIN atau ADMIN-PLUS

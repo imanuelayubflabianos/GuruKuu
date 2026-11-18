@@ -97,6 +97,11 @@ Route::middleware(['auth', 'role:admin,wakil'])->prefix('admin')->name('admin.')
     Route::get('/leaderboard', [AdminLeaderboardController::class, 'index'])->name('leaderboard.index');
     Route::get('/guru/{guru}', [AdminGuruController::class, 'show'])->name('guru.show');
 
+    // PENGATURAN WAKIL (Riwayat Perangkat, FAQ, Chat Admin, Kebijakan Privasi)
+    Route::get('/pengaturan/wakil', [\App\Http\Controllers\Admin\PengaturanWakilController::class, 'index'])->name('pengaturan.wakil');
+    Route::post('/pengaturan/wakil/password', [\App\Http\Controllers\Admin\PengaturanWakilController::class, 'updatePassword'])->name('pengaturan.wakil.password');
+    Route::post('/pengaturan/wakil/chat', [\App\Http\Controllers\Admin\PengaturanWakilController::class, 'kirimPesan'])->name('pengaturan.wakil.chat');
+
     // EXPORTS LEADERBOARD (Monitoring & Berbagi Data Peringkat)
     Route::prefix('export')->name('export.')->group(function () {
         Route::get('/leaderboard/excel', [ExportController::class, 'leaderboardExcel'])->name('leaderboard.excel');

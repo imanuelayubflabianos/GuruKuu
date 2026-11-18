@@ -336,5 +336,88 @@ class AdminPlusAndWakilRoleTest extends TestCase
         $resFiltered->assertStatus(200);
         $resFiltered->assertSee($kelasA->label_singkat);
         $resFiltered->assertDontSee($kelasB->label_singkat);
+        // Soft styled badge
+        $resFiltered->assertSee('badge bg-light text-dark border');
+    }
+
+    public function test_wakil_can_access_pengaturan_wakil_and_admin_parities(): void
+    {
+        $wakil = User::firstOrCreate(
+            ['nis' => 'wakil'],
+            [
+                'name' => 'Wakil',
+                'email' => 'wakil@test.sch.id',
+                'password' => bcrypt('eskasaba123'),
+                'role' => 'wakil',
+                'is_active' => true,
+            ]
+        );
+
+        $response = $this->actingAs($wakil)->get(route('admin.pengaturan.wakil'));
+        $response->assertStatus(200);
+        $response->assertSee('Pengaturan Akun Wakil');
+        $response->assertSee('Riwayat Perangkat');
+        $response->assertSee('FAQ');
+        $response->assertSee('Chat Admin');
+        $response->assertSee('Kebijakan Privasi');
+
+        // Leaderboard check: badge WAKIL and action "Detail" without arrow icon
+        $periode = Periode::create([
+            'nama_periode' => 'Semester Ganjil 2026/2027',
+            'tahun_ajaran' => '2026/2027',
+            'semester' => 'ganjil',
+            'status' => 'aktif',
+            'tanggal_mulai' => now()->subMonth(),
+            'tanggal_selesai' => now()->addMonth(),
+        ]);
+        $guru = Guru::create([
+            'nama' => 'Guru Leaderboard, S.Pd.',
+            'nip' => '199901012022011009',
+            'kategori' => 'normada',
+        ]);
+        for ($i = 1; $i <= 5; $i++) {
+            $siswa = User::create([
+                'name' => "Siswa Penguji {$i}",
+                'nis' => "9999111{$i}",
+                'email' => "siswa-test{$i}@test.sch.id",
+                'password' => bcrypt('password'),
+                'role' => 'siswa',
+                'is_active' => true,
+            ]);
+            Penilaian::create([
+                'guru_id' => $guru->id,
+                'siswa_id' => $siswa->id,
+                'periode_id' => $periode->id,
+                'kedisiplinan' => 5,
+                'komunikasi' => 5,
+                'tanggung_jawab' => 5,
+                'keramahan' => 5,
+                'kreativitas' => 5,
+                'total_nilai' => 25,
+                'rata_rata_evaluasi' => 5.0,
+                'is_censored' => false,
+            ]);
+        }
+
+        $leaderboardRes = $this->actingAs($wakil)->get(route('admin.leaderboard.index'));
+        $leaderboardRes->assertStatus(200);
+        $leaderboardRes->assertSee('WAKIL');
+        $leaderboardRes->assertDontSee('WAKIL KEPALA SEKOLAH');
+        $leaderboardRes->assertSee('Detail');
+        $leaderboardRes->assertDontSee('bi-box-arrow-up-right');
+
+        // Admin visiting wakil settings is redirected to admin settings
+        $admin = User::firstOrCreate(
+            ['nis' => 'admin-utama'],
+            [
+                'name' => 'Admin Utama',
+                'email' => 'admin-utama@test.sch.id',
+                'password' => bcrypt('password'),
+                'role' => 'admin',
+                'is_active' => true,
+            ]
+        );
+        $adminSettingsRedirect = $this->actingAs($admin)->get(route('admin.pengaturan.wakil'));
+        $adminSettingsRedirect->assertRedirect(route('admin.pengaturan.index'));
     }
 }

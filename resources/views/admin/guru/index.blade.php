@@ -192,7 +192,7 @@
                             }
                         @endphp
                         @forelse($displayedClasses as $kelas)
-                            <span class="badge {{ !empty($filterKId) ? 'bg-primary text-white' : 'bg-light text-dark' }} border mb-1">{{ $kelas->label_singkat }}</span>
+                            <span class="badge bg-light text-dark border mb-1">{{ $kelas->label_singkat }}</span>
                         @empty
                             <span class="text-muted small">Belum diatur</span>
                         @endforelse
