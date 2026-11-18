@@ -1359,6 +1359,7 @@
                 <button type="button" class="btn btn-sm btn-outline-primary rounded-pill faq-filter-btn" data-role="publik">Publik ({{ count(array_filter($faqs, fn($f) => in_array($f['role'] ?? '', ['publik', 'semua']))) }})</button>
                 <button type="button" class="btn btn-sm btn-outline-success rounded-pill faq-filter-btn" data-role="siswa">Siswa ({{ count(array_filter($faqs, fn($f) => ($f['role'] ?? '') === 'siswa')) }})</button>
                 <button type="button" class="btn btn-sm btn-outline-info rounded-pill faq-filter-btn" data-role="guru">Guru ({{ count(array_filter($faqs, fn($f) => ($f['role'] ?? '') === 'guru')) }})</button>
+                <button type="button" class="btn btn-sm btn-outline-info rounded-pill faq-filter-btn" data-role="wakil">Wakil ({{ count(array_filter($faqs, fn($f) => ($f['role'] ?? '') === 'wakil')) }})</button>
                 <button type="button" class="btn btn-sm btn-outline-warning rounded-pill faq-filter-btn" data-role="admin">Admin ({{ count(array_filter($faqs, fn($f) => ($f['role'] ?? '') === 'admin')) }})</button>
             </div>
 
@@ -1373,8 +1374,9 @@
                                     <span class="badge rounded-pill px-2.5 py-1 text-uppercase font-mono fw-bold
                                         @if($fRole === 'siswa') bg-success-subtle text-success border border-success-subtle
                                         @elseif($fRole === 'guru') bg-info-subtle text-info border border-info-subtle
+                                        @elseif($fRole === 'wakil') bg-primary-subtle text-primary border border-primary-subtle
                                         @elseif($fRole === 'admin') bg-warning-subtle text-warning border border-warning-subtle
-                                        @else bg-primary-subtle text-primary border border-primary-subtle
+                                        @else bg-secondary-subtle text-secondary border border-secondary-subtle
                                         @endif" style="font-size: 0.7rem;">
                                         <i class="bi {{ $fRole === 'publik' ? 'bi-globe' : 'bi-person-badge' }} me-1"></i> {{ $fRole }}
                                     </span>
@@ -1606,6 +1608,7 @@
                                 <option value="publik">Publik / Umum (Landing Page)</option>
                                 <option value="siswa">Khusus Siswa</option>
                                 <option value="guru">Khusus Guru</option>
+                                <option value="wakil">Khusus Wakil</option>
                                 <option value="admin">Khusus Admin</option>
                             </select>
                         </div>
@@ -1651,6 +1654,7 @@
                                 <option value="publik">Publik / Umum (Landing Page)</option>
                                 <option value="siswa">Khusus Siswa</option>
                                 <option value="guru">Khusus Guru</option>
+                                <option value="wakil">Khusus Wakil</option>
                                 <option value="admin">Khusus Admin</option>
                             </select>
                         </div>

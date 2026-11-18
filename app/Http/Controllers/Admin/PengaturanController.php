@@ -576,7 +576,7 @@ class PengaturanController extends Controller
         $request->validate([
             'q' => 'required|string|max:255',
             'a' => 'required|string|max:2000',
-            'role' => 'required|in:publik,siswa,guru,admin',
+            'role' => 'required|in:publik,siswa,guru,admin,wakil',
             'icon' => 'nullable|string|max:50',
         ]);
 
@@ -596,7 +596,7 @@ class PengaturanController extends Controller
         $request->validate([
             'q' => 'required|string|max:255',
             'a' => 'required|string|max:2000',
-            'role' => 'required|in:publik,siswa,guru,admin',
+            'role' => 'required|in:publik,siswa,guru,admin,wakil',
             'icon' => 'nullable|string|max:50',
         ]);
 

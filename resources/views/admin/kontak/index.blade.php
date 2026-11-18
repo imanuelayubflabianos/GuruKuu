@@ -119,7 +119,7 @@
                                         @endif
                                     </div>
                                     <small class="text-muted font-mono d-block" style="font-size: 0.78rem;">
-                                        {{ $k->is_siswa ? 'Siswa (NIS: ' . $k->identifier . ')' : 'Pengguna / Tamu (' . (substr($k->display_pengirim, 6) ?: '-') . ')' }}
+                                        {{ $k->is_siswa ? 'Siswa (NIS: ' . $k->identifier . ')' : ($k->identifier === 'wakil' || $k->pengirim === 'Wakil' ? 'Wakil (Akun Monitoring)' : 'Pengguna / Tamu (' . (substr($k->display_pengirim, 6) ?: '-') . ')') }}
                                     </small>
                                 </div>
                                 <div class="kontak-action-hint d-none d-md-flex align-items-center gap-1.5 text-primary fw-semibold small flex-shrink-0 pe-2">

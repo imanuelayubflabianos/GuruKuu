@@ -66,12 +66,17 @@ class PengaturanWakilController extends Controller
         ]);
 
         if ($request->captcha != session('wakil_chat_captcha')) {
-            return redirect()->to(route('admin.pengaturan.wakil') . '#tabChatWakil')->withInput()->withErrors(['captcha' => 'Jawaban verifikasi captcha tidak cocok.']);
+            return redirect()->to(route('admin.pengaturan.wakil') . '#tabChat')->withInput()->withErrors(['captcha' => 'Jawaban verifikasi captcha tidak cocok.']);
         }
 
         $pesanTeks = trim($request->pesan);
         if (\App\Services\ProfanityFilterService::containsLink($pesanTeks)) {
-            return redirect()->to(route('admin.pengaturan.wakil') . '#tabChatWakil')->withInput()->withErrors(['pesan' => 'Pesan tidak boleh mengandung link luar.']);
+            return redirect()->to(route('admin.pengaturan.wakil') . '#tabChat')->withInput()->withErrors(['pesan' => 'Pesan tidak boleh mengandung tautan / link URL luar demi keamanan.']);
+        }
+
+        $profanity = \App\Services\ProfanityFilterService::check($pesanTeks);
+        if (!$profanity['clean']) {
+            return redirect()->to(route('admin.pengaturan.wakil') . '#tabChat')->with('violation_popup', $profanity['message']);
         }
 
         $user = Auth::user();
@@ -84,7 +89,48 @@ class PengaturanWakilController extends Controller
             'is_replied' => false,
         ]);
 
-        return redirect()->to(route('admin.pengaturan.wakil') . '#tabChatWakil')->with('success', 'Pesan berhasil dikirim ke Administrator.');
+        return redirect()->to(route('admin.pengaturan.wakil') . '#tabChat')->with('success', 'Pesan Anda berhasil dikirimkan ke Administrator!');
+    }
+
+    public function updatePesan(Request $request, Kontak $kontak)
+    {
+        $user = Auth::user();
+        $allowedIdentifier = $user->nis ?: 'wakil';
+        if ($kontak->identifier !== $allowedIdentifier && $kontak->identifier !== 'wakil') {
+            return back()->with('error', 'Akses ditolak.');
+        }
+
+        $request->validate(['pesan' => 'required|string|min:3|max:255'], [
+            'pesan.required' => 'Pesan tidak boleh kosong.',
+            'pesan.max' => 'Pesan melebihi batas maksimal 255 karakter.'
+        ]);
+
+        $pesanTeks = trim($request->pesan);
+        if (\App\Services\ProfanityFilterService::containsLink($pesanTeks)) {
+            return redirect()->to(route('admin.pengaturan.wakil') . '#tabChat')->withInput()->withErrors(['pesan' => 'Pesan tidak boleh mengandung tautan luar.']);
+        }
+
+        $profanity = \App\Services\ProfanityFilterService::check($pesanTeks);
+        if (!$profanity['clean']) {
+            return redirect()->to(route('admin.pengaturan.wakil') . '#tabChat')->with('violation_popup', $profanity['message']);
+        }
+
+        $kontak->update(['pesan' => $pesanTeks]);
+
+        return redirect()->to(route('admin.pengaturan.wakil') . '#tabChat')->with('success', 'Pesan berhasil diperbarui!');
+    }
+
+    public function destroyPesan(Kontak $kontak)
+    {
+        $user = Auth::user();
+        $allowedIdentifier = $user->nis ?: 'wakil';
+        if ($kontak->identifier !== $allowedIdentifier && $kontak->identifier !== 'wakil') {
+            return back()->with('error', 'Akses ditolak.');
+        }
+
+        $kontak->update(['pesan' => '[Pesan Dihapus]']);
+
+        return redirect()->to(route('admin.pengaturan.wakil') . '#tabChat')->with('success', 'Pesan berhasil dihapus.');
     }
 }
 

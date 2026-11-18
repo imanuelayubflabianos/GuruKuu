@@ -65,6 +65,9 @@ class Kontak extends Model
 
     public function getDisplayPengirimAttribute(): string
     {
+        if ($this->identifier === 'wakil' || $this->pengirim === 'Wakil') {
+            return 'Wakil';
+        }
         if ($this->is_siswa) {
             return $this->pengirim;
         }

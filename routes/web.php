@@ -101,6 +101,8 @@ Route::middleware(['auth', 'role:admin,wakil'])->prefix('admin')->name('admin.')
     Route::get('/pengaturan/wakil', [\App\Http\Controllers\Admin\PengaturanWakilController::class, 'index'])->name('pengaturan.wakil');
     Route::post('/pengaturan/wakil/password', [\App\Http\Controllers\Admin\PengaturanWakilController::class, 'updatePassword'])->name('pengaturan.wakil.password');
     Route::post('/pengaturan/wakil/chat', [\App\Http\Controllers\Admin\PengaturanWakilController::class, 'kirimPesan'])->name('pengaturan.wakil.chat');
+    Route::put('/pengaturan/wakil/chat/{kontak}', [\App\Http\Controllers\Admin\PengaturanWakilController::class, 'updatePesan'])->name('pengaturan.wakil.chat.update');
+    Route::delete('/pengaturan/wakil/chat/{kontak}', [\App\Http\Controllers\Admin\PengaturanWakilController::class, 'destroyPesan'])->name('pengaturan.wakil.chat.destroy');
 
     // EXPORTS LEADERBOARD (Monitoring & Berbagi Data Peringkat)
     Route::prefix('export')->name('export.')->group(function () {

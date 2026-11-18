@@ -132,6 +132,36 @@ class FaqService
                 'a' => 'Gunakan modul Gateway SiPintu di sidebar untuk memeriksa status koneksi API dan menjalankan sinkronisasi data guru, siswa, dan rombel secara otomatis.',
                 'icon' => 'bi-arrow-repeat'
             ],
+
+            // WAKIL
+            [
+                'id' => 'faq_w1',
+                'role' => 'wakil',
+                'q' => 'Apa peran dan wewenang akun Wakil di sistem GuruKuu?',
+                'a' => 'Akun Wakil berwenang memantau Leaderboard peringkat guru terbaik, mengunduh rekapitulasi laporan evaluasi (Excel/PDF), serta membagikan data peringkat apresiasi ke publik atau grup WhatsApp.',
+                'icon' => 'bi-trophy-fill'
+            ],
+            [
+                'id' => 'faq_w2',
+                'role' => 'wakil',
+                'q' => 'Mengapa seluruh identitas siswa disamarkan sebagai Siswa (Anonim)?',
+                'a' => 'Sistem GuruKuu menjamin kerahasiaan 100% anonimitas siswa agar penilaian bebas dari intervensi atau prasangka. Hanya Administrator utama yang memiliki hak audit identitas siswa bila diperlukan.',
+                'icon' => 'bi-incognito'
+            ],
+            [
+                'id' => 'faq_w3',
+                'role' => 'wakil',
+                'q' => 'Bagaimana cara membagikan data peringkat ke grup WhatsApp sekolah?',
+                'a' => 'Buka menu Leaderboard, klik tombol "Bagikan Peringkat" di bagian kanan atas, lalu salin format teks yang sudah disiapkan atau klik langsung "Buka & Kirim Langsung ke WhatsApp".',
+                'icon' => 'bi-share-fill'
+            ],
+            [
+                'id' => 'faq_w4',
+                'role' => 'wakil',
+                'q' => 'Bagaimana cara berkonsultasi atau mengirim pesan ke Administrator?',
+                'a' => 'Buka menu Pengaturan > Tab Chat Admin. Anda dapat mengirimkan pesan koordinasi, saran, atau pertanyaan yang akan langsung masuk ke pusat pesan Administrator sekolah.',
+                'icon' => 'bi-chat-dots-fill'
+            ],
         ];
     }
 
@@ -151,24 +181,46 @@ class FaqService
         }
 
         // Migrasikan 'semua' menjadi 'publik' secara transparan
-        return array_map(function ($item) {
+        $cleaned = array_map(function ($item) {
             if (($item['role'] ?? '') === 'semua') {
                 $item['role'] = 'publik';
             }
             return $item;
         }, $decoded);
+
+        // Jika setting kustom belum memiliki entri untuk role wakil, gabungkan default wakil
+        $hasWakil = false;
+        foreach ($cleaned as $item) {
+            if (($item['role'] ?? '') === 'wakil') {
+                $hasWakil = true;
+                break;
+            }
+        }
+        if (!$hasWakil) {
+            $wakilDefaults = array_values(array_filter(self::defaults(), fn($item) => ($item['role'] ?? '') === 'wakil'));
+            $cleaned = array_merge($cleaned, $wakilDefaults);
+        }
+
+        return $cleaned;
     }
 
     /**
-     * Ambil FAQ yang sesuai dengan role target ('publik', 'siswa', 'guru', 'admin')
+     * Ambil FAQ yang sesuai dengan role target ('publik', 'siswa', 'guru', 'admin', 'wakil')
      */
     public static function getForRole(string $role): array
     {
         $all = self::all();
-        return array_values(array_filter($all, function ($item) use ($role) {
+        $filtered = array_values(array_filter($all, function ($item) use ($role) {
             $r = $item['role'] ?? 'publik';
             return $r === $role;
         }));
+
+        if ($role === 'wakil' && empty($filtered)) {
+            $wakilDefaults = array_values(array_filter(self::defaults(), fn($item) => ($item['role'] ?? '') === 'wakil'));
+            return $wakilDefaults;
+        }
+
+        return $filtered;
     }
 
     /**
@@ -179,7 +231,7 @@ class FaqService
         $all = self::all();
         $role = $data['role'] ?? 'publik';
         if ($role === 'semua') $role = 'publik';
-        if (!in_array($role, ['publik', 'siswa', 'guru', 'admin'])) {
+        if (!in_array($role, ['publik', 'siswa', 'guru', 'admin', 'wakil'])) {
             $role = 'publik';
         }
 
@@ -208,7 +260,7 @@ class FaqService
             if (($item['id'] ?? '') === $id) {
                 $role = $data['role'] ?? $item['role'];
                 if ($role === 'semua') $role = 'publik';
-                $all[$k]['role'] = in_array($role, ['publik', 'siswa', 'guru', 'admin']) ? $role : $item['role'];
+                $all[$k]['role'] = in_array($role, ['publik', 'siswa', 'guru', 'admin', 'wakil']) ? $role : $item['role'];
                 $all[$k]['q'] = trim($data['q'] ?? $item['q']);
                 $all[$k]['a'] = trim($data['a'] ?? $item['a']);
                 if (isset($data['icon']) && trim($data['icon']) !== '') {

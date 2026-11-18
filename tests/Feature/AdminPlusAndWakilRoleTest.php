@@ -406,6 +406,48 @@ class AdminPlusAndWakilRoleTest extends TestCase
         $leaderboardRes->assertSee('Detail');
         $leaderboardRes->assertDontSee('bi-box-arrow-up-right');
 
+        // Assert Wakil FAQ is loaded from FaqService (4 questions)
+        $response->assertSee('Apa peran dan wewenang akun Wakil');
+        $response->assertSee('4 Tanya Jawab');
+
+        // Test Chat Admin workflow for Wakil
+        session(['wakil_chat_captcha' => 10]);
+        $chatSendResponse = $this->actingAs($wakil)->post(route('admin.pengaturan.wakil.chat'), [
+            'pesan' => 'Mohon update data peringkat guru.',
+            'captcha' => 10,
+        ]);
+        $chatSendResponse->assertRedirect(route('admin.pengaturan.wakil') . '#tabChat');
+        $chatRecord = \App\Models\Kontak::where('identifier', 'wakil')->latest()->first();
+        $this->assertNotNull($chatRecord);
+        $this->assertEquals('Mohon update data peringkat guru.', $chatRecord->pesan);
+
+        // Edit chat message
+        $chatEditResponse = $this->actingAs($wakil)->put(route('admin.pengaturan.wakil.chat.update', $chatRecord), [
+            'pesan' => 'Mohon revisi dan update data peringkat guru.',
+        ]);
+        $chatEditResponse->assertRedirect(route('admin.pengaturan.wakil') . '#tabChat');
+        $this->assertEquals('Mohon revisi dan update data peringkat guru.', $chatRecord->fresh()->pesan);
+
+        // Delete chat message
+        $chatDeleteResponse = $this->actingAs($wakil)->delete(route('admin.pengaturan.wakil.chat.destroy', $chatRecord));
+        $chatDeleteResponse->assertRedirect(route('admin.pengaturan.wakil') . '#tabChat');
+        $this->assertEquals('[Pesan Dihapus]', $chatRecord->fresh()->pesan);
+
+        // Test Synchronization: Kebijakan Privasi updated by Admin is synced to Wakil
+        \App\Models\Setting::set('kebijakan_privasi', 'Kebijakan Privasi Baru SMK 1 Bangsri Terupdate 2026');
+        $syncedResponse = $this->actingAs($wakil)->get(route('admin.pengaturan.wakil'));
+        $syncedResponse->assertSee('Kebijakan Privasi Baru SMK 1 Bangsri Terupdate 2026');
+
+        // Test Synchronization: FAQ updated by Admin is synced to Wakil
+        \App\Services\FaqService::add([
+            'role' => 'wakil',
+            'q' => 'Bagaimana cara melihat update skor evaluasi?',
+            'a' => 'Skor evaluasi otomatis terupdate secara real-time saat siswa memberikan ulasan.',
+        ]);
+        $syncedFaqResponse = $this->actingAs($wakil)->get(route('admin.pengaturan.wakil'));
+        $syncedFaqResponse->assertSee('Bagaimana cara melihat update skor evaluasi?');
+        $syncedFaqResponse->assertSee('5 Tanya Jawab');
+
         // Admin visiting wakil settings is redirected to admin settings
         $admin = User::firstOrCreate(
             ['nis' => 'admin-utama'],

@@ -121,6 +121,9 @@ class KontakController extends Controller
             $userObj = User::where('nis', $identifier)->first();
             $senderName = $userObj?->name ?? $first->pengirim;
             $roleLabel = 'Siswa (NIS: ' . $identifier . ')';
+        } elseif ($identifier === 'wakil' || $first->pengirim === 'Wakil') {
+            $senderName = 'Wakil';
+            $roleLabel = 'Wakil (Akun Monitoring)';
         } else {
             $guru = Guru::where('nip', $identifier)->orWhere('email', $identifier)->first();
             if ($guru) {
