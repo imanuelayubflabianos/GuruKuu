@@ -386,6 +386,7 @@ GuruKuu/
     * Disediakan akun khusus `nis: admin-plus` dengan kata sandi `eskasaba` yang memiliki hak akses penuh setara Administrator utama sekolah.
     * Dapat diakses langsung melalui tab login Guru (`login_role: guru`) tanpa merusak atau berselisih dengan kredensial akun admin utama yang diubah oleh pihak mitra/atasan.
     * Dilengkapi mekanisme *auto-provisioning* terisolasi dan migration seeder aman.
+    * **Prinsip Kesetaraan Mutlak:** Setiap pembaruan atau instruksi seputar sistem, fitur, rute, dan pengaturan Admin secara permanen berlaku identik dan sinkron 100% untuk kedua akun (`admin` dan `admin-plus`).
   - **Role Khusus `wakil` (Monitoring Evaluasi & Penilaian):**
     * Disediakan peran baru `wakil` (`nis: wakil`, kata sandi `eskasaba123`) diakses via opsi login Guru (`login_role: guru`).
     * Ditujukan khusus bagi Wakil Kepala Sekolah atau Tim Penjaminan Mutu untuk memantau seluruh proses evaluasi guru: Dashboard Analitik, Leaderboard Sekolah lengkap, Detail Nilai Guru beserta rincian bintang kriteria & kritik/saran, Feedback & Ulasan Siswa, serta Audit Log Pelanggaran etika.
