@@ -22,6 +22,10 @@ Aturan permanen untuk setiap prompt dan eksekusi:
    - Tuntaskan bug hingga tidak ada yang tersisa sehingga sistem benar-benar jadi dan stabil.
 
 6. **Wajib Rujuk & Sinkronkan Dokumentasi Sistem**:
-   - Selalu baca dan patuhi [GURUKUU_SYSTEM_DOCUMENTATION.md](file:///c:/Users/ADVAN/PROJEK/Laravel/GuruKuu/GURUKUU_SYSTEM_DOCUMENTATION.md) sebelum menganalisis atau mengubah kode.
+   - Selalu baca dan patuhi [GURUKUU_SYSTEM_DOCUMENTATION.md](file:///c:/Users/ADVAN/PROJEK\Laravel\GuruKuu\GURUKUU_SYSTEM_DOCUMENTATION.md) sebelum menganalisis atau mengubah kode.
    - Setiap kali melakukan penambahan fitur, perubahan alur, rumus, atau perbaikan sistem, AI **WAJIB** memperbarui file dokumentasi tersebut agar informasinya tidak pernah usang bagi AI/pengembang berikutnya.
+
+7. **Kesetaraan Mutlak Admin & Admin-Plus**:
+   - Setiap perubahan, penambahan fitur, alur kerja, rute, maupun hak akses seputar Admin **WAJIB** berlaku identik dan sinkron 100% untuk akun admin utama dan `admin-plus` tanpa perbedaan sama sekali.
+
 
