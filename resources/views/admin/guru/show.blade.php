@@ -5,8 +5,8 @@
 <div class="page-header mb-4">
     <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
         <div>
-            <a href="{{ route('admin.guru.index') }}" class="gk-btn-back mb-3">
-                <i class="bi bi-arrow-left"></i> Kembali ke Data Guru
+            <a href="{{ auth()->user()->role === 'wakil' ? route('admin.leaderboard.index') : route('admin.guru.index') }}" class="gk-btn-back mb-3">
+                <i class="bi bi-arrow-left"></i> {{ auth()->user()->role === 'wakil' ? 'Kembali ke Leaderboard' : 'Kembali ke Data Guru' }}
             </a>
             <h1 class="page-title mt-1">{{ $guru->nama }}</h1>
             <p class="page-subtitle mb-0">
@@ -162,7 +162,7 @@
                 </div>
                 <div>
                     <div class="d-flex align-items-center gap-2">
-                        @if($fb->siswa)
+                        @if(auth()->user()->role === 'admin' && $fb->siswa)
                             <strong class="small text-dark">{{ $fb->siswa->name }}</strong>
                             <span class="badge bg-secondary-subtle text-secondary font-mono" style="font-size: 0.65rem;">NIS: {{ $fb->siswa->nis }}</span>
                         @else
@@ -301,7 +301,7 @@
                                             </div>
                                             <div>
                                                 <div class="d-flex align-items-center gap-2">
-                                                    @if($fbLalu->siswa)
+                                                    @if(auth()->user()->role === 'admin' && $fbLalu->siswa)
                                                         <strong class="small text-dark">{{ $fbLalu->siswa->name }}</strong>
                                                         <span class="badge bg-secondary-subtle text-secondary font-mono" style="font-size: 0.65rem;">NIS: {{ $fbLalu->siswa->nis }}</span>
                                                     @else

@@ -16,6 +16,10 @@ class DashboardController extends Controller
 {
     public function index()
     {
+        if (auth()->check() && auth()->user()->role === 'wakil') {
+            return redirect()->route('admin.leaderboard.index');
+        }
+
         $periodeAktif = Periode::where('status', 'aktif')->first();
         $totalGuru = Guru::count();
         $totalSiswa = User::where('role', 'siswa')->count();

@@ -91,31 +91,34 @@ Route::post('/penilaian/{penilaian}/helpful', [\App\Http\Controllers\PenilaianHe
 
 // ==================== 4. ADMIN & WAKIL ROUTES ====================
 Route::middleware(['auth', 'role:admin,wakil'])->prefix('admin')->name('admin.')->group(function () {
-    // Fitur yang dapat diakses oleh Admin dan Wakil (Monitoring, Leaderboard, & Detail Penilaian)
+    // Fitur yang dapat diakses oleh Admin dan Wakil (Peringkat Leaderboard & Detail Guru)
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
     Route::get('/profil', [AdminProfilController::class, 'index'])->name('profil.index');
     Route::get('/leaderboard', [AdminLeaderboardController::class, 'index'])->name('leaderboard.index');
-    Route::get('/guru', [AdminGuruController::class, 'index'])->name('guru.index');
     Route::get('/guru/{guru}', [AdminGuruController::class, 'show'])->name('guru.show');
-    Route::get('/kritik-saran', [KritikSaranController::class, 'index'])->name('kritik-saran.index');
-    
-    // NOTIFIKASI & LOG PELANGGARAN ATURAN (Monitoring)
-    Route::get('/pelanggaran', [\App\Http\Controllers\Admin\PelanggaranController::class, 'index'])->name('pelanggaran.index');
-    Route::patch('/pelanggaran/{pelanggaran}/read', [\App\Http\Controllers\Admin\PelanggaranController::class, 'markAsRead'])->name('pelanggaran.read');
-    Route::post('/pelanggaran/read-all', [\App\Http\Controllers\Admin\PelanggaranController::class, 'markAllAsRead'])->name('pelanggaran.read-all');
 
-    // EXPORTS (Monitoring)
+    // EXPORTS LEADERBOARD (Monitoring & Berbagi Data Peringkat)
     Route::prefix('export')->name('export.')->group(function () {
         Route::get('/leaderboard/excel', [ExportController::class, 'leaderboardExcel'])->name('leaderboard.excel');
         Route::get('/leaderboard/pdf', [ExportController::class, 'leaderboardPdf'])->name('leaderboard.pdf');
-        Route::get('/guru/excel', [ExportController::class, 'guruExcel'])->name('guru.excel');
-        Route::get('/guru/pdf', [ExportController::class, 'guruPdf'])->name('guru.pdf');
     });
 
     // ==========================================
-    // KHUSUS ROLE ADMIN (Manajemen Penuh & Pengaturan)
+    // KHUSUS ROLE ADMIN (Manajemen Penuh, Master Data, & Privasi Siswa)
     // ==========================================
     Route::middleware('role:admin')->group(function () {
+        Route::get('/guru', [AdminGuruController::class, 'index'])->name('guru.index');
+        Route::get('/kritik-saran', [KritikSaranController::class, 'index'])->name('kritik-saran.index');
+        
+        // NOTIFIKASI & LOG PELANGGARAN ATURAN (Khusus Admin)
+        Route::get('/pelanggaran', [\App\Http\Controllers\Admin\PelanggaranController::class, 'index'])->name('pelanggaran.index');
+        Route::patch('/pelanggaran/{pelanggaran}/read', [\App\Http\Controllers\Admin\PelanggaranController::class, 'markAsRead'])->name('pelanggaran.read');
+        Route::post('/pelanggaran/read-all', [\App\Http\Controllers\Admin\PelanggaranController::class, 'markAllAsRead'])->name('pelanggaran.read-all');
+
+        // EXPORT DATA GURU (Khusus Admin)
+        Route::get('/export/guru/excel', [ExportController::class, 'guruExcel'])->name('export.guru.excel');
+        Route::get('/export/guru/pdf', [ExportController::class, 'guruPdf'])->name('export.guru.pdf');
+
         Route::post('/dashboard/clear-cache', [AdminDashboardController::class, 'clearCache'])->name('dashboard.clear-cache');
         Route::get('/guru/template-jadwal', [AdminGuruController::class, 'downloadTemplateJadwal'])->name('guru.template-jadwal');
         Route::post('/guru/import-jadwal', [AdminGuruController::class, 'importJadwal'])->name('guru.import-jadwal');

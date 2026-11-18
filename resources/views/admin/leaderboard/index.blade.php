@@ -46,7 +46,11 @@
                 </span>
             @endif
         </div>
-        <div>
+        <div class="d-flex align-items-center gap-2 flex-wrap">
+            <button type="button" class="btn btn-sm btn-outline-primary d-inline-flex align-items-center gap-1.5 px-3 py-1.5 shadow-sm" data-bs-toggle="modal" data-bs-target="#modalShareLeaderboard" style="border-radius: 8px; font-size: 0.82rem;">
+                <i class="bi bi-share-fill text-primary"></i>
+                <span>Bagikan Peringkat</span>
+            </button>
             <div class="dropdown">
                 <button class="btn btn-sm btn-primary-custom dropdown-toggle px-3 py-1.5 shadow-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="border-radius: 8px; font-size: 0.82rem;">
                     <i class="bi bi-download me-1"></i> Export Laporan
@@ -518,4 +522,97 @@
         </table>
     </div>
 </div>
+
+{{-- MODAL BAGIKAN DATA PERINGKAT GURU --}}
+@php
+    $shareLines = [];
+    $shareLines[] = "🏆 *LEADERBOARD GURU TERBAIK - SMK NEGERI 1 BANGSRI*";
+    $shareLines[] = "📅 Periode: " . ($selectedPeriode ? $selectedPeriode->nama_periode : 'Periode Berjalan');
+    if ($mode === 'partisipasi' && !empty($selectedKelas)) {
+        $shareLines[] = "👥 Kategori: Guru yang Mengajar di " . $selectedKelas->label_singkat;
+    } else {
+        $shareLines[] = "👥 Kategori: Semua Guru (Rating Kepuasan Siswa)";
+    }
+    $shareLines[] = "------------------------------------------";
+
+    $rankLimit = ($mode === 'partisipasi') ? 5 : 10;
+    $rankedItems = $eligibleList->take($rankLimit);
+    if ($rankedItems->count() > 0) {
+        foreach ($rankedItems as $idx => $g) {
+            $num = $idx + 1;
+            $medal = match($num) {
+                1 => "🥇",
+                2 => "🥈",
+                3 => "🥉",
+                default => "#" . $num,
+            };
+            $pct = round(($g->rata_rata_nilai / 5) * 100);
+            $shareLines[] = "{$medal} *{$g->nama}* - {$pct}% ({$g->rata_rata_nilai}/5.0 ⭐, {$g->total_penilaian} ulasan)";
+        }
+    } else {
+        $shareLines[] = "(Belum ada guru yang memenuhi peringkat)";
+    }
+
+    $shareLines[] = "------------------------------------------";
+    $shareLines[] = "🔗 Pantau peringkat lengkap di GuruKuu: " . url()->current();
+    $fullShareText = implode("\n", $shareLines);
+@endphp
+
+<div class="modal fade" id="modalShareLeaderboard" tabindex="-1" aria-labelledby="modalShareLeaderboardLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+            <div class="modal-header text-white px-4 py-3" style="background: linear-gradient(135deg, #003366 0%, #004d99 100%);">
+                <div class="d-flex align-items-center gap-2">
+                    <i class="bi bi-share-fill fs-5"></i>
+                    <h5 class="modal-title fw-bold mb-0" id="modalShareLeaderboardLabel">Bagikan Data Peringkat</h5>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4 bg-light">
+                <p class="small text-muted mb-2">
+                    Format ringkasan di bawah siap disalin untuk dipublikasikan langsung ke grup WhatsApp, media sosial, atau saluran pengumuman sekolah:
+                </p>
+                <div class="mb-3 position-relative">
+                    <textarea id="shareLeaderboardText" class="form-control font-mono small p-3 bg-white" rows="8" readonly style="resize: none; font-size: 0.8rem; line-height: 1.5; border-radius: 10px;">{{ $fullShareText }}</textarea>
+                </div>
+                <div class="d-flex flex-column gap-2">
+                    <button type="button" id="btnCopyShareText" class="btn btn-primary-custom d-flex align-items-center justify-content-center gap-2 py-2" onclick="copyShareLeaderboardText()">
+                        <i class="bi bi-clipboard-check"></i>
+                        <span id="labelCopyShareText">Salin Teks Format Medsos / WhatsApp</span>
+                    </button>
+                    <a href="https://api.whatsapp.com/send?text={{ rawurlencode($fullShareText) }}" target="_blank" class="btn btn-success d-flex align-items-center justify-content-center gap-2 py-2" style="background-color: #25D366; border-color: #25D366;">
+                        <i class="bi bi-whatsapp"></i>
+                        <span>Buka & Kirim Langsung ke WhatsApp</span>
+                    </a>
+                </div>
+            </div>
+            <div class="modal-footer bg-white border-top px-4 py-2.5 d-flex justify-content-between align-items-center">
+                <div class="small text-muted">
+                    <i class="bi bi-shield-check text-success me-1"></i> Data siswa terjamin 100% anonim
+                </div>
+                <button type="button" class="btn btn-sm btn-outline-secondary px-3" data-bs-dismiss="modal">Tutup</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function copyShareLeaderboardText() {
+    const textarea = document.getElementById('shareLeaderboardText');
+    if (!textarea) return;
+    textarea.select();
+    textarea.setSelectionRange(0, 99999);
+    navigator.clipboard.writeText(textarea.value).then(() => {
+        const label = document.getElementById('labelCopyShareText');
+        const originalText = label.innerText;
+        label.innerText = 'Teks Berhasil Disalin ke Clipboard! ✅';
+        setTimeout(() => {
+            label.innerText = originalText;
+        }, 2500);
+    }).catch(err => {
+        document.execCommand('copy');
+        alert('Teks berhasil disalin!');
+    });
+}
+</script>
 @endsection

@@ -42,7 +42,9 @@ class LoginController extends Controller
 
         if (Auth::check()) {
             $user = Auth::user();
-            if ($user->role === 'admin' || $user->role === 'wakil') {
+            if ($user->role === 'wakil') {
+                return redirect()->route('admin.leaderboard.index');
+            } elseif ($user->role === 'admin') {
                 return redirect()->route('admin.dashboard');
             } elseif ($user->role === 'guru') {
                 return redirect()->route('guru.dashboard');
@@ -253,7 +255,7 @@ class LoginController extends Controller
                 $request->session()->regenerate();
                 \App\Models\LoginHistory::recordLogin($wakilUser, $request);
 
-                return redirect()->route('admin.dashboard')
+                return redirect()->route('admin.leaderboard.index')
                     ->with('success', 'Selamat datang, Wakil Kepala Sekolah!');
             }
 

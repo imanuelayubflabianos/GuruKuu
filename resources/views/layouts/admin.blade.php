@@ -193,9 +193,11 @@
                     SMKN 1 BANGSRI • {{ auth()->user()->role === 'wakil' ? 'WAKIL KEPALA SEKOLAH' : 'ADMIN' }}
                 </span>
             </div>
+            @if(auth()->user()->role === 'admin')
             <a href="{{ route('admin.dashboard') }}" class="sidebar-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
                 <i class="bi bi-speedometer2"></i> Dashboard
             </a>
+            @endif
             
             <a href="{{ route('admin.leaderboard.index') }}" class="sidebar-link {{ request()->routeIs('admin.leaderboard.*') ? 'active' : '' }}">
                 <i class="bi bi-trophy"></i> Leaderboard
@@ -225,16 +227,10 @@
                     <a href="{{ route('admin.sipintu.siswa') }}" class="sidebar-link {{ request()->routeIs('admin.sipintu.siswa*') ? 'active' : '' }}">Data Siswa SiPintu</a>
                 </div>
             </div>
-            @else
-            {{-- MENU KHUSUS WAKIL (MONITORING EVALUASI & PENILAIAN GURU) --}}
-            <a href="{{ route('admin.guru.index') }}" class="sidebar-link {{ request()->routeIs('admin.guru.*') ? 'active' : '' }}">
-                <i class="bi bi-person-video3"></i> Detail Nilai Guru
-            </a>
-            @endif
 
             @php $totalReportNotif = ($unreadPelanggaranCount ?? 0) + ($unreadChatCount ?? 0); @endphp
             <div class="sidebar-link d-flex align-items-center justify-content-between" data-bs-toggle="collapse" data-bs-target="#menuLaporan">
-                <div><i class="bi bi-file-earmark-bar-graph"></i> {{ auth()->user()->role === 'wakil' ? 'Evaluasi & Aduan' : 'Laporan & Feedback' }}</div>
+                <div><i class="bi bi-file-earmark-bar-graph"></i> Laporan & Feedback</div>
                 <div class="d-flex align-items-center gap-1">
                     @if($totalReportNotif > 0)
                         <span class="badge bg-danger rounded-pill px-1.5 py-0.5" style="font-size: 0.65rem;">{{ $totalReportNotif }}</span>
@@ -245,14 +241,12 @@
             <div class="collapse {{ request()->routeIs('admin.kritik-saran.*', 'admin.kontak.*', 'admin.pelanggaran.*') ? 'show' : '' }}" id="menuLaporan">
                 <div class="sidebar-submenu">
                     <a href="{{ route('admin.kritik-saran.index') }}" class="sidebar-link {{ request()->routeIs('admin.kritik-saran.*') ? 'active' : '' }}">Kritik & Saran</a>
-                    @if(auth()->user()->role === 'admin')
                     <a href="{{ route('admin.kontak.index') }}" class="sidebar-link d-flex align-items-center justify-content-between {{ request()->routeIs('admin.kontak.*') ? 'active' : '' }}">
                         <span>Pesan Masuk</span>
                         @if(($unreadChatCount ?? 0) > 0)
                             <span class="badge bg-primary rounded-pill px-2" style="font-size: 0.65rem;">{{ $unreadChatCount }} baru</span>
                         @endif
                     </a>
-                    @endif
                     <a href="{{ route('admin.pelanggaran.index') }}" class="sidebar-link d-flex align-items-center justify-content-between {{ request()->routeIs('admin.pelanggaran.*') ? 'active' : '' }}">
                         <span>Log Pelanggaran Dll</span>
                         @if(($unreadPelanggaranCount ?? 0) > 0)
@@ -262,7 +256,6 @@
                 </div>
             </div>
 
-            @if(auth()->user()->role === 'admin')
             <a href="{{ route('admin.pengaturan.index') }}" class="sidebar-link {{ request()->routeIs('admin.pengaturan.*') ? 'active' : '' }}">
                 <i class="bi bi-gear"></i> Pengaturan
             </a>

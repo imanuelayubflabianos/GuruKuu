@@ -36,7 +36,8 @@ class RoleMiddleware
 
         if (!in_array($user->role, $allowedRoles)) {
             $targetDashboard = match ($user->role) {
-                'admin', 'wakil' => route('admin.dashboard'),
+                'wakil' => route('admin.leaderboard.index'),
+                'admin' => route('admin.dashboard'),
                 'guru' => route('guru.dashboard'),
                 'siswa' => route('siswa.dashboard'),
                 default => route('landing.index'),
