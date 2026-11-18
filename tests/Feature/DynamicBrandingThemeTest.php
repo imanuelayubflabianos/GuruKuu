@@ -27,7 +27,6 @@ class DynamicBrandingThemeTest extends TestCase
         $response->assertSee('kaa');
         $response->assertSee('#123456');
         $response->assertSee('#abcdef');
-        $response->assertSee('gk-dynamic-brand-colors');
 
         // Test Auth/Login page
         $loginResponse = $this->get('/login');
@@ -176,5 +175,58 @@ class DynamicBrandingThemeTest extends TestCase
         $oldResponse->assertStatus(200);
         $oldResponse->assertSee('Guru Periode Lalu');
         $oldResponse->assertDontSee('Guru Periode Aktif');
+    }
+
+    public function test_pagination_renders_numbered_pages_for_mobile_and_desktop(): void
+    {
+        $periode = \App\Models\Periode::create([
+            'nama_periode' => 'Semester Ganjil 2026/2027',
+            'tahun_ajaran' => '2026/2027',
+            'semester' => 'ganjil',
+            'status' => 'aktif',
+            'tanggal_mulai' => now()->subMonth(),
+            'tanggal_selesai' => now()->addMonth(),
+        ]);
+
+        $guru = \App\Models\Guru::create([
+            'nama' => 'Guru Pagination Test, S.Pd.',
+            'nip' => '199001012015011005',
+            'kategori' => 'produktif',
+        ]);
+
+        $hashedPass = bcrypt('secret');
+        // Create 25 reviews (10 per page -> 3 pages)
+        for ($i = 1; $i <= 25; $i++) {
+            $siswa = User::create([
+                'name' => "Siswa Pag {$i}",
+                'nis' => "9900{$i}",
+                'email' => "siswapag{$i}@test.com",
+                'password' => $hashedPass,
+                'role' => 'siswa',
+                'is_active' => true,
+            ]);
+
+            \App\Models\Penilaian::create([
+                'guru_id' => $guru->id,
+                'siswa_id' => $siswa->id,
+                'periode_id' => $periode->id,
+                'kedisiplinan' => 5,
+                'komunikasi' => 5,
+                'tanggung_jawab' => 5,
+                'keramahan' => 5,
+                'kreativitas' => 5,
+                'total_nilai' => 25,
+                'rata_rata_evaluasi' => 5.0,
+                'is_censored' => false,
+            ]);
+        }
+
+        $res = $this->get(route('landing.guru.detail', $guru));
+        $res->assertStatus(200);
+        // Ensure page numbers 1, 2, 3 are present in the DOM (not hidden by d-sm-none)
+        $res->assertSee('Navigasi Halaman');
+        $res->assertSee('>1<', false);
+        $res->assertSee('>2<', false);
+        $res->assertSee('>3<', false);
     }
 }

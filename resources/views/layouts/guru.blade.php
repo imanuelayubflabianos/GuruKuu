@@ -132,7 +132,6 @@
         .gk-topbar-btn-sm:hover { transform: translateY(-1px); box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08) !important; }
     </style>
     <link href="{{ asset('css/gurukuu-theme.css') }}?v={{ file_exists(public_path('css/gurukuu-theme.css')) ? filemtime(public_path('css/gurukuu-theme.css')) : time() }}" rel="stylesheet">
-    @include('components.brand-theme')
     <script src="{{ asset('js/gurukuu-theme.js') }}"></script>
 </head>
 <body>
@@ -145,9 +144,9 @@
             <a href="{{ route('guru.dashboard') }}" class="text-decoration-none d-flex align-items-center gap-2" style="font-size: 1.1rem;">
                 @if(!empty($siteLogo))
                     <img src="{{ $siteLogo }}" alt="{{ $siteTitle ?? 'GuruKuu' }}" style="height: 30px; max-width: 38px; object-fit: contain;" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
-                    <i class="bi bi-mortarboard-fill fs-4" style="display: none; color: {{ $siteTitleColor1 ?? '#003366' }};"></i>
+                    <i class="bi bi-mortarboard-fill text-primary fs-4" style="display: none;"></i>
                 @else
-                    <i class="bi bi-mortarboard-fill fs-4" style="color: {{ $siteTitleColor1 ?? '#003366' }};"></i>
+                    <i class="bi bi-mortarboard-fill text-primary fs-4"></i>
                 @endif
                 <span class="fw-bold fs-5">
                     <span style="color: {{ $siteTitleColor1 ?? '#003366' }} !important;">{{ $siteTitlePart1 ?? 'Guru' }}</span><span style="color: {{ $siteTitleColor2 ?? '#FFC107' }} !important;">{{ $siteTitlePart2 ?? 'Kuu' }}</span>
@@ -188,9 +187,9 @@
             <a href="{{ route('guru.dashboard') }}" class="d-flex align-items-center gap-2 text-decoration-none">
                 @if(!empty($siteLogo))
                     <img src="{{ $siteLogo }}" alt="{{ $siteTitle ?? 'GuruKuu' }}" style="height: 32px; max-width: 45px; object-fit: contain;" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
-                    <i class="bi bi-mortarboard-fill fs-4" style="display: none; color: {{ $siteTitleColor1 ?? '#003366' }} !important;"></i>
+                    <i class="bi bi-mortarboard-fill text-primary fs-4" style="display: none;"></i>
                 @else
-                    <i class="bi bi-mortarboard-fill fs-4" style="color: {{ $siteTitleColor1 ?? '#003366' }} !important;"></i>
+                    <i class="bi bi-mortarboard-fill text-primary fs-4"></i>
                 @endif
                 <span class="fs-5 fw-bold brand-logo-text">
                     <span style="color: {{ $siteTitleColor1 ?? '#003366' }} !important;">{{ $siteTitlePart1 ?? 'Guru' }}</span><span style="color: {{ $siteTitleColor2 ?? '#FFC107' }} !important;">{{ $siteTitlePart2 ?? 'Kuu' }}</span>

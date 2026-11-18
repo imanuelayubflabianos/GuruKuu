@@ -68,7 +68,7 @@
                href="{{ url('/') }}" 
                target="_blank">
                 <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" 
-                     style="width: 32px; height: 32px; background: rgba(0, 51, 102, 0.08); color: {{ $siteTitleColor1 ?? '#003366' }};">
+                     style="width: 32px; height: 32px; background: rgba(0, 51, 102, 0.08); color: #003366;">
                     <i class="bi bi-globe2 fs-6"></i>
                 </div>
                 <div>

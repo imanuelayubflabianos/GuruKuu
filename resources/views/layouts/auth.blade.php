@@ -93,7 +93,6 @@
         }
     </style>
     <link href="{{ asset('css/gurukuu-theme.css') }}" rel="stylesheet">
-    @include('components.brand-theme')
     <script src="{{ asset('js/gurukuu-theme.js') }}"></script>
 </head>
 <body class="auth-page">

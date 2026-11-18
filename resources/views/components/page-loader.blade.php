@@ -47,8 +47,8 @@
     left: 0;
     height: 3.5px;
     width: 0%;
-    background: linear-gradient(90deg, {{ $siteTitleColor1 ?? '#003366' }}, {{ $siteTitleColor2 ?? '#ff6600' }});
-    box-shadow: 0 0 10px {{ $siteTitleColor1 ?? '#003366' }}66;
+    background: linear-gradient(90deg, #003366, #ff6600);
+    box-shadow: 0 0 10px rgba(0, 51, 102, 0.4);
     transition: width 0.35s ease;
     z-index: 1000000000;
 }
@@ -75,7 +75,7 @@
     width: 44px;
     height: 44px;
     border: 3.5px solid rgba(0, 0, 0, 0.08);
-    border-top-color: {{ $siteTitleColor1 ?? '#003366' }};
+    border-top-color: #003366;
     border-radius: 50%;
     animation: gkSpinnerRotate 0.75s linear infinite;
 }

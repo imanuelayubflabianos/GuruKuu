@@ -391,9 +391,9 @@
                     <div class="d-flex align-items-center justify-content-center gap-2 mb-2">
                         @if(!empty($siteLogo))
                             <img src="{{ $siteLogo }}" alt="{{ $siteTitle ?? 'GuruKuu' }}" style="height: 36px; max-width: 120px; object-fit: contain;" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
-                            <i class="bi bi-mortarboard-fill fs-3" style="display: none; color: {{ $siteTitleColor1 ?? '#003366' }};"></i>
+                            <i class="bi bi-mortarboard-fill text-primary fs-3" style="display: none;"></i>
                         @else
-                            <i class="bi bi-mortarboard-fill fs-3" style="color: {{ $siteTitleColor1 ?? '#003366' }};"></i>
+                            <i class="bi bi-mortarboard-fill text-primary fs-3"></i>
                         @endif
                         <h3 class="fw-bold mb-0 font-mono">
                             <span style="color: {{ $siteTitleColor1 ?? '#003366' }} !important;">{{ $siteTitlePart1 ?? 'Guru' }}</span><span style="color: {{ $siteTitleColor2 ?? '#FFC107' }} !important;">{{ $siteTitlePart2 ?? 'Kuu' }}</span>

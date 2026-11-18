@@ -98,7 +98,6 @@
         .gk-topbar-btn-sm:hover { transform: translateY(-1px); box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08) !important; }
     </style>
     <link href="{{ asset('css/gurukuu-theme.css') }}?v={{ file_exists(public_path('css/gurukuu-theme.css')) ? filemtime(public_path('css/gurukuu-theme.css')) : time() }}" rel="stylesheet">
-    @include('components.brand-theme')
     @stack('styles')
     <script src="{{ asset('js/gurukuu-theme.js') }}"></script>
 </head>

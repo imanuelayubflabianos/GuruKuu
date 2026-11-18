@@ -417,7 +417,6 @@
         }
     </style>
     <link href="{{ asset('css/gurukuu-theme.css') }}?v={{ file_exists(public_path('css/gurukuu-theme.css')) ? filemtime(public_path('css/gurukuu-theme.css')) : time() }}" rel="stylesheet">
-    @include('components.brand-theme')
     <script src="{{ asset('js/gurukuu-theme.js') }}"></script>
 </head>
 <body>
