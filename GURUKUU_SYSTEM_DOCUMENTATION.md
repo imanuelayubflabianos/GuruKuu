@@ -409,6 +409,11 @@ GuruKuu/
   - **Dynamic Theme Injector (`components/brand-theme.blade.php`):** Menginjeksikan variabel CSS `--primary`, `--primary-light`, `--secondary`, `--accent`, `--bs-primary`, dan `--bs-primary-rgb` secara otomatis ke seluruh layout (`landing`, `auth`, `admin`, `guru`, `siswa`) setelah file CSS tema statis dimuat, sehingga tombol, navigasi, link aktif, dan aksen di seluruh web langsung mengikuti perubahan warna yang diatur Admin.
   - **Normalisasi URL `$siteLogo` Global & Fallback Onerror:** Normalisasi string path `$siteLogo` via `asset()` di `AppServiceProvider` view composer dan melengkapi seluruh tag `<img>` logo (mobile header & sidebar) dengan `onerror` fallback ke ikon mortarboard dinamis.
   - **Sinkronisasi Otomatis Nama Website & Bagian Pecahan:** Sinkronisasi dua arah di frontend dan controller `Admin\PengaturanController::updateLanding` saat mengubah `site_title` maupun `part1` & `part2`.
+* **2026-11-18 (Filter Periode Semester pada Riwayat Penilaian Siswa):**
+  - **Pemisahan Riwayat Antar-Periode:** Mengimplementasikan filter periode pada halaman Riwayat Penilaian Siswa ([`Siswa\PenilaianController::riwayat`](file:///c:/Users/ADVAN/PROJEK/Laravel/GuruKuu/app/Http/Controllers/Siswa/PenilaianController.php) & [`siswa/riwayat/index.blade.php`](file:///c:/Users/ADVAN/PROJEK/Laravel/GuruKuu/resources/views/siswa/riwayat/index.blade.php)) sehingga data penilaian dari periode lampau tidak bercampur aduk dengan periode aktif yang baru dimulai.
+  - **Default Cerdas ke Periode Aktif:** Jika siswa mengakses halaman riwayat tanpa query parameter, sistem otomatis memfilter dan menampilkan penilaian pada periode berjalan (`$periodeAktif->id`), sehingga siswa tidak bingung apakah mereka sudah menilai di periode baru atau itu riwayat dari semester lalu.
+  - **Opsi Filter Fleksibel:** Menyediakan dropdown pilihan `Semua Periode` dan daftar seluruh periode lampau (arsip), lengkap dengan status badge dan empty-state kontekstual yang ramah pengguna.
+
 
 
 

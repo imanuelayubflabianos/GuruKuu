@@ -162,15 +162,29 @@ class PenilaianController extends Controller
         return redirect()->route('siswa.guru.show', $guru)->with('success', 'Penilaian berhasil dikirim! Terima kasih atas kontribusi Anda.');
     }
 
-    public function riwayat()
+    public function riwayat(Request $request)
     {
-        $riwayat = Penilaian::where('siswa_id', auth()->id())
-                           ->with(['guru', 'periode', 'kelas'])
-                           ->latest()
-                           ->paginate(10)
-                           ->withQueryString();
+        $periodeAktif = Periode::getActivePeriode();
+        $semuaPeriode = Periode::orderBy('tahun_ajaran', 'desc')->orderBy('semester', 'desc')->get();
 
-        return view('siswa.riwayat.index', compact('riwayat'));
+        // Default filter periode: jika tidak diset di query string, gunakan periode aktif berjalan
+        $selectedPeriodeId = $request->input('periode_id');
+        if ($selectedPeriodeId === null) {
+            $selectedPeriodeId = $periodeAktif ? (string)$periodeAktif->id : 'all';
+        }
+
+        $query = Penilaian::where('siswa_id', auth()->id())
+            ->with(['guru', 'periode', 'kelas']);
+
+        if ($selectedPeriodeId !== 'all' && !empty($selectedPeriodeId)) {
+            $query->where('periode_id', $selectedPeriodeId);
+        }
+
+        $riwayat = $query->latest()
+            ->paginate(10)
+            ->withQueryString();
+
+        return view('siswa.riwayat.index', compact('riwayat', 'periodeAktif', 'semuaPeriode', 'selectedPeriodeId'));
     }
 
     public function destroy(Penilaian $penilaian)

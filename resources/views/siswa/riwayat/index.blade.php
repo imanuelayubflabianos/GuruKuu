@@ -16,11 +16,28 @@
 }
 </style>
 
-<div class="page-header">
+<div class="page-header d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
     <div>
         <h1 class="page-title mb-1">Riwayat Penilaian Anda</h1>
-        <p class="page-subtitle mb-0">Daftar guru yang telah Anda nilai. Anda dapat menghapusnya jika diperlukan.</p>
+        <p class="page-subtitle mb-0">Daftar guru yang telah Anda nilai. Anda dapat memfilter berdasarkan periode semester.</p>
     </div>
+
+    {{-- Filter Periode Semester --}}
+    @if(isset($semuaPeriode) && $semuaPeriode->count() > 0)
+    <form action="{{ route('siswa.riwayat') }}" method="GET" class="d-flex align-items-center gap-2">
+        <label for="filterPeriodeSelect" class="form-label mb-0 small fw-semibold text-muted text-nowrap d-none d-sm-inline">
+            <i class="bi bi-calendar-event me-1 text-primary"></i>Periode:
+        </label>
+        <select name="periode_id" id="filterPeriodeSelect" class="form-select form-select-sm rounded-pill shadow-xs" style="min-width: 220px; font-size: 0.82rem; border-color: rgba(0, 51, 102, 0.2);" onchange="this.form.submit()">
+            <option value="all" {{ ($selectedPeriodeId ?? '') === 'all' ? 'selected' : '' }}>Semua Periode</option>
+            @foreach($semuaPeriode as $p)
+                <option value="{{ $p->id }}" {{ (string)($selectedPeriodeId ?? '') === (string)$p->id ? 'selected' : '' }}>
+                    {{ $p->nama_periode }} {{ $p->status === 'aktif' ? '(Aktif)' : '(Arsip)' }}
+                </option>
+            @endforeach
+        </select>
+    </form>
+    @endif
 </div>
 
 <div class="row g-4">
@@ -139,9 +156,28 @@
     </div>
     @empty
     <div class="col-12">
-        <div class="alert alert-info text-center">
-            <i class="bi bi-inbox fs-1 d-block mb-2"></i>
-            Anda belum memberikan penilaian apapun.
+        <div class="card-custom p-5 text-center text-muted">
+            <i class="bi bi-inbox fs-1 d-block mb-2 text-muted opacity-50"></i>
+            @if(($selectedPeriodeId ?? 'all') !== 'all')
+                <h6 class="fw-bold text-dark mb-1">Belum Ada Penilaian di Periode Ini</h6>
+                <p class="small text-muted mb-3">Anda belum memberikan penilaian kepada guru manapun pada periode ini.</p>
+                <div class="d-flex justify-content-center gap-2 flex-wrap">
+                    <a href="{{ route('siswa.guru.index') }}" class="btn btn-sm btn-primary-custom rounded-pill px-3 py-1.5">
+                        <i class="bi bi-pencil-square me-1"></i> Mulai Nilai Guru
+                    </a>
+                    <a href="{{ route('siswa.riwayat', ['periode_id' => 'all']) }}" class="btn btn-sm btn-outline-secondary rounded-pill px-3 py-1.5">
+                        Lihat Semua Riwayat
+                    </a>
+                </div>
+            @else
+                <h6 class="fw-bold text-dark mb-1">Belum Ada Riwayat Penilaian</h6>
+                <p class="small text-muted mb-3">Anda belum pernah memberikan penilaian kepada guru manapun.</p>
+                <div>
+                    <a href="{{ route('siswa.guru.index') }}" class="btn btn-sm btn-primary-custom rounded-pill px-3 py-1.5">
+                        <i class="bi bi-pencil-square me-1"></i> Mulai Nilai Guru
+                    </a>
+                </div>
+            @endif
         </div>
     </div>
     @endforelse
