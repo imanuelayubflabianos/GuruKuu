@@ -10,7 +10,7 @@
             <h5 class="fw-bold mb-1 d-flex align-items-center" style="color: var(--text-dark);">
                 <i class="bi bi-question-circle-fill text-primary me-2"></i>Pertanyaan Umum (FAQ)
             </h5>
-            <p class="text-muted small mb-0">Jawaban ringkas dan praktis seputar penggunaan sistem evaluasi GuruKuu.</p>
+            <p class="text-muted small mb-0">Jawaban ringkas dan praktis seputar penggunaan sistem evaluasi {{ $siteTitle ?? 'GuruKuu' }}.</p>
         </div>
         <span class="badge bg-light text-primary border px-2.5 py-1.5 fw-semibold">
             <i class="bi bi-patch-question me-1"></i> {{ count($faqs) }} Tanya Jawab

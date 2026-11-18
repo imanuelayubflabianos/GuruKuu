@@ -554,7 +554,7 @@
     }
 
     $shareLines[] = "------------------------------------------";
-    $shareLines[] = "🔗 Pantau peringkat lengkap di GuruKuu: " . url()->current();
+    $shareLines[] = "🔗 Pantau peringkat lengkap di " . ($siteTitle ?? 'GuruKuu') . ": " . url()->current();
     $fullShareText = implode("\n", $shareLines);
 @endphp
 

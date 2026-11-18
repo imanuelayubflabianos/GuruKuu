@@ -20,8 +20,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #003366; --primary-light: #004080; --secondary: #ff6600;
-            --accent: #f97316; --bg-light: #f8fafc; --text-dark: #0f172a; --text-muted: #64748b; --border: #e2e8f0;
+            --primary: {{ $siteTitleColor1 ?? '#003366' }}; 
+            --primary-light: {{ $siteTitleColor1 ?? '#004080' }}; 
+            --secondary: {{ $siteTitleColor2 ?? '#ff6600' }};
+            --accent: {{ $siteTitleColor2 ?? '#f97316' }}; 
+            --bg-light: #f8fafc; --text-dark: #0f172a; --text-muted: #64748b; --border: #e2e8f0;
         }
         * { font-family: 'Inter', sans-serif; }
         .font-mono { font-family: 'JetBrains Mono', monospace; }
@@ -129,6 +132,7 @@
         .gk-topbar-btn-sm:hover { transform: translateY(-1px); box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08) !important; }
     </style>
     <link href="{{ asset('css/gurukuu-theme.css') }}?v={{ file_exists(public_path('css/gurukuu-theme.css')) ? filemtime(public_path('css/gurukuu-theme.css')) : time() }}" rel="stylesheet">
+    @include('components.brand-theme')
     <script src="{{ asset('js/gurukuu-theme.js') }}"></script>
 </head>
 <body>
@@ -140,7 +144,8 @@
         <div class="d-flex align-items-center gap-2">
             <a href="{{ route('guru.dashboard') }}" class="text-decoration-none d-flex align-items-center gap-2" style="font-size: 1.1rem;">
                 @if(!empty($siteLogo))
-                    <img src="{{ $siteLogo }}" alt="{{ $siteTitle ?? 'GuruKuu' }}" style="height: 30px; max-width: 38px; object-fit: contain;">
+                    <img src="{{ $siteLogo }}" alt="{{ $siteTitle ?? 'GuruKuu' }}" style="height: 30px; max-width: 38px; object-fit: contain;" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
+                    <i class="bi bi-mortarboard-fill fs-4" style="display: none; color: {{ $siteTitleColor1 ?? '#003366' }};"></i>
                 @else
                     <i class="bi bi-mortarboard-fill fs-4" style="color: {{ $siteTitleColor1 ?? '#003366' }};"></i>
                 @endif
@@ -182,7 +187,8 @@
         <div class="sidebar-brand">
             <a href="{{ route('guru.dashboard') }}" class="d-flex align-items-center gap-2 text-decoration-none">
                 @if(!empty($siteLogo))
-                    <img src="{{ $siteLogo }}" alt="{{ $siteTitle ?? 'GuruKuu' }}" style="height: 32px; max-width: 45px; object-fit: contain;">
+                    <img src="{{ $siteLogo }}" alt="{{ $siteTitle ?? 'GuruKuu' }}" style="height: 32px; max-width: 45px; object-fit: contain;" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
+                    <i class="bi bi-mortarboard-fill fs-4" style="display: none; color: {{ $siteTitleColor1 ?? '#003366' }} !important;"></i>
                 @else
                     <i class="bi bi-mortarboard-fill fs-4" style="color: {{ $siteTitleColor1 ?? '#003366' }} !important;"></i>
                 @endif

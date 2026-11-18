@@ -47,8 +47,8 @@
     left: 0;
     height: 3.5px;
     width: 0%;
-    background: linear-gradient(90deg, #003366, #0284c7, #ff6600);
-    box-shadow: 0 0 10px rgba(0, 51, 102, 0.4);
+    background: linear-gradient(90deg, {{ $siteTitleColor1 ?? '#003366' }}, {{ $siteTitleColor2 ?? '#ff6600' }});
+    box-shadow: 0 0 10px {{ $siteTitleColor1 ?? '#003366' }}66;
     transition: width 0.35s ease;
     z-index: 1000000000;
 }
@@ -68,14 +68,14 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 16px;
+    gap: 14px;
     user-select: none;
 }
 .gk-veil-spinner {
-    width: 46px;
-    height: 46px;
-    border: 4px solid rgba(0, 51, 102, 0.12);
-    border-top-color: #003366;
+    width: 44px;
+    height: 44px;
+    border: 3.5px solid rgba(0, 0, 0, 0.08);
+    border-top-color: {{ $siteTitleColor1 ?? '#003366' }};
     border-radius: 50%;
     animation: gkSpinnerRotate 0.75s linear infinite;
 }
@@ -85,18 +85,28 @@
 }
 .gk-veil-brand {
     font-weight: 800;
-    font-size: 1.25rem;
-    color: #003366;
+    font-size: 1.3rem;
     letter-spacing: -0.5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
 }
 </style>
 
 <div id="gk-page-veil" aria-hidden="true">
     <div class="gk-veil-bar"></div>
     <div class="gk-veil-loader-box">
-        <div class="gk-veil-spinner"></div>
+        @if(!empty($siteLogo))
+            <div class="position-relative d-flex align-items-center justify-content-center" style="min-height: 46px;">
+                <img src="{{ $siteLogo }}" alt="{{ $siteTitle ?? 'Logo' }}" style="height: 46px; max-width: 140px; object-fit: contain;" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
+                <div class="gk-veil-spinner" style="display: none;"></div>
+            </div>
+        @else
+            <div class="gk-veil-spinner"></div>
+        @endif
         <div class="gk-veil-brand">
-            Guru<span style="color: #ff6600;">Kuu</span>
+            <span style="color: {{ $siteTitleColor1 ?? '#003366' }} !important;">{{ $siteTitlePart1 ?? 'Guru' }}</span><span style="color: {{ $siteTitleColor2 ?? '#FFC107' }} !important;">{{ $siteTitlePart2 ?? 'Kuu' }}</span>
         </div>
     </div>
 </div>

@@ -9,18 +9,18 @@
         <div class="modal-content border-0 shadow-lg" style="border-radius: 24px; overflow: hidden; background: #ffffff;">
             {{-- Header Icon --}}
             <div class="modal-header border-0 pb-0 pt-4 px-4 d-flex justify-content-center position-relative">
-                <div class="d-inline-flex align-items-center justify-content-center rounded-circle shadow-sm" style="width: 72px; height: 72px; background: linear-gradient(135deg, rgba(0, 51, 102, 0.08), rgba(2, 132, 199, 0.14)); color: #003366; border: 1.5px solid rgba(0, 51, 102, 0.12);">
-                    <i class="bi bi-compass-fill" style="font-size: 2.2rem; color: #003366;"></i>
+                <div class="d-inline-flex align-items-center justify-content-center rounded-circle shadow-sm" style="width: 72px; height: 72px; background: rgba(0, 51, 102, 0.08); color: {{ $siteTitleColor1 ?? '#003366' }}; border: 1.5px solid rgba(0, 51, 102, 0.12);">
+                    <i class="bi bi-compass-fill" style="font-size: 2.2rem; color: {{ $siteTitleColor1 ?? '#003366' }};"></i>
                 </div>
             </div>
 
             {{-- Body Content --}}
             <div class="modal-body text-center px-4 pt-3 pb-4">
-                <div class="badge rounded-pill px-3 py-1 mb-2 fw-semibold" style="background: rgba(0, 51, 102, 0.08); color: #003366; font-size: 0.75rem; letter-spacing: 0.5px;">
-                    PORTAL INFORMASI GURUKUU
+                <div class="badge rounded-pill px-3 py-1 mb-2 fw-semibold" style="background: rgba(0, 51, 102, 0.08); color: {{ $siteTitleColor1 ?? '#003366' }}; font-size: 0.75rem; letter-spacing: 0.5px;">
+                    PORTAL INFORMASI {{ strtoupper($siteTitle ?? 'GURUKUU') }}
                 </div>
                 <h4 class="fw-bold text-dark mb-2" id="welcomeLandingPromptLabel" style="font-size: 1.3rem;">
-                    Selamat Datang di GuruKuu!
+                    Selamat Datang di {{ $siteTitle ?? 'GuruKuu' }}!
                 </h4>
                 <p class="text-muted mb-3" style="font-size: 0.94rem; line-height: 1.6;">
                     Anda yakin untuk tetap di dashboard dan tidak mau melihat detail web kami di beranda?

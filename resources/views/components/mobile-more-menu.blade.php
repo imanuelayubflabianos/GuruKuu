@@ -68,12 +68,12 @@
                href="{{ url('/') }}" 
                target="_blank">
                 <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" 
-                     style="width: 32px; height: 32px; background: rgba(0, 51, 102, 0.08); color: #003366;">
+                     style="width: 32px; height: 32px; background: rgba(0, 51, 102, 0.08); color: {{ $siteTitleColor1 ?? '#003366' }};">
                     <i class="bi bi-globe2 fs-6"></i>
                 </div>
                 <div>
                     <div class="fw-bold text-dark small" style="line-height: 1.2;">Beranda Publik</div>
-                    <div class="text-muted" style="font-size: 0.68rem;">Halaman utama GuruKuu</div>
+                    <div class="text-muted" style="font-size: 0.68rem;">Halaman utama {{ $siteTitle ?? 'GuruKuu' }}</div>
                 </div>
             </a>
         </li>

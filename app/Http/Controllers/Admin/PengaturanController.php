@@ -383,6 +383,27 @@ class PengaturanController extends Controller
             }
         }
 
+        // Pastikan nama website (site_title) dan bagian pecahan (part1 & part2) selalu sinkron dan konsisten
+        $sTitle = trim((string) Setting::get('site_title', ''));
+        $sPart1 = trim((string) Setting::get('site_title_part1', ''));
+        $sPart2 = trim((string) Setting::get('site_title_part2', ''));
+
+        if (!empty($sTitle)) {
+            // Jika user mengisi part1 & part2, gabungkan menjadi site_title
+            if ($request->filled('site_title_part1') && $request->filled('site_title_part2')) {
+                $combined = $sPart1 . $sPart2;
+                if ($sTitle !== $combined) {
+                    Setting::set('site_title', $combined);
+                }
+            } elseif (empty($sPart1) && empty($sPart2)) {
+                // Jika user hanya mengisi site_title, pecah menjadi dua bagian seimbang
+                $len = mb_strlen($sTitle, 'UTF-8');
+                $mid = (int) ceil($len / 2);
+                Setting::set('site_title_part1', mb_substr($sTitle, 0, $mid, 'UTF-8'));
+                Setting::set('site_title_part2', mb_substr($sTitle, $mid, null, 'UTF-8'));
+            }
+        }
+
         if ($request->filled('profanity_words')) {
             $existing = collect(preg_split('/[\r\n,]+/', (string) Setting::get('profanity_words', ''), -1, PREG_SPLIT_NO_EMPTY));
             $new = collect(preg_split('/[\r\n,]+/', (string) $request->profanity_words, -1, PREG_SPLIT_NO_EMPTY));

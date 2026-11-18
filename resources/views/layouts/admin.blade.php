@@ -17,7 +17,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
     <style>
-        :root { --primary:#003366; --primary-light:#004080; --secondary:#ff6600; --accent:#f97316; --bg-light:#f8fafc; --text-dark:#0f172a; --text-muted:#64748b; --border:#e2e8f0; }
+        :root { --primary:{{ $siteTitleColor1 ?? '#003366' }}; --primary-light:{{ $siteTitleColor1 ?? '#004080' }}; --secondary:{{ $siteTitleColor2 ?? '#ff6600' }}; --accent:{{ $siteTitleColor2 ?? '#f97316' }}; --bg-light:#f8fafc; --text-dark:#0f172a; --text-muted:#64748b; --border:#e2e8f0; }
         body { background-color:var(--bg-light); color:var(--text-dark); font-family:'Inter',sans-serif; }
         .sidebar { width:260px; height:100vh; max-height:100vh; position:fixed; left:0; top:0; background:white; border-right:1px solid var(--border); z-index:1040; overflow-y:auto !important; overflow-x:hidden; display:flex; flex-direction:column; scrollbar-width:thin; padding-bottom:2.5rem; }
         .sidebar::-webkit-scrollbar { width:4px; }
@@ -98,6 +98,7 @@
         .gk-topbar-btn-sm:hover { transform: translateY(-1px); box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08) !important; }
     </style>
     <link href="{{ asset('css/gurukuu-theme.css') }}?v={{ file_exists(public_path('css/gurukuu-theme.css')) ? filemtime(public_path('css/gurukuu-theme.css')) : time() }}" rel="stylesheet">
+    @include('components.brand-theme')
     @stack('styles')
     <script src="{{ asset('js/gurukuu-theme.js') }}"></script>
 </head>
@@ -110,7 +111,8 @@
         <div class="d-flex align-items-center gap-2">
             <a href="{{ route('admin.dashboard') }}" class="text-decoration-none d-flex align-items-center gap-2" style="font-size: 1.1rem;">
                 @if(!empty($siteLogo))
-                    <img src="{{ $siteLogo }}" alt="{{ $siteTitle ?? 'GuruKuu' }}" style="height: 30px; max-width: 38px; object-fit: contain;">
+                    <img src="{{ $siteLogo }}" alt="{{ $siteTitle ?? 'GuruKuu' }}" style="height: 30px; max-width: 38px; object-fit: contain;" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
+                    <i class="bi bi-mortarboard-fill fs-4" style="display: none; color: {{ $siteTitleColor1 ?? '#003366' }};"></i>
                 @else
                     <i class="bi bi-mortarboard-fill fs-4" style="color: {{ $siteTitleColor1 ?? '#003366' }};"></i>
                 @endif

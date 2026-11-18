@@ -66,13 +66,33 @@ class AppServiceProvider extends ServiceProvider
         // 2. View Composer Optimal: Menggunakan in-memory cache Setting
         View::composer('*', function ($view) {
             try {
-                $siteLogo = \App\Models\Setting::get('site_logo') ?: '';
+                $rawSiteLogo = \App\Models\Setting::get('site_logo') ?: '';
+                $siteLogo = '';
+                if (!empty($rawSiteLogo)) {
+                    $siteLogo = (str_starts_with($rawSiteLogo, 'http://') || str_starts_with($rawSiteLogo, 'https://'))
+                        ? $rawSiteLogo
+                        : asset(ltrim($rawSiteLogo, '/'));
+                }
+
                 $siteTitle = \App\Models\Setting::get('site_title') ?: 'GuruKuu';
-                $siteTitlePart1 = \App\Models\Setting::get('site_title_part1') ?: 'Guru';
-                $siteTitlePart2 = \App\Models\Setting::get('site_title_part2') ?: 'Kuu';
+                $siteTitlePart1 = \App\Models\Setting::get('site_title_part1');
+                $siteTitlePart2 = \App\Models\Setting::get('site_title_part2');
+
+                // Jika part1 & part2 belum diset atau kosong, bagi otomatis dari siteTitle
+                if (empty($siteTitlePart1) && empty($siteTitlePart2)) {
+                    $len = mb_strlen($siteTitle, 'UTF-8');
+                    $mid = (int) ceil($len / 2);
+                    $siteTitlePart1 = mb_substr($siteTitle, 0, $mid, 'UTF-8');
+                    $siteTitlePart2 = mb_substr($siteTitle, $mid, null, 'UTF-8');
+                } else {
+                    $siteTitlePart1 = $siteTitlePart1 ?: 'Guru';
+                    $siteTitlePart2 = $siteTitlePart2 ?: 'Kuu';
+                }
+
                 $siteTitleColor1 = \App\Models\Setting::get('site_title_color1') ?: '#003366';
                 $siteTitleColor2 = \App\Models\Setting::get('site_title_color2') ?: '#FFC107';
                 $schoolName = \App\Models\Setting::get('school_name') ?: 'SMK Negeri 1 Bangsri';
+
                 $view->with(compact('siteLogo', 'siteTitle', 'siteTitlePart1', 'siteTitlePart2', 'siteTitleColor1', 'siteTitleColor2', 'schoolName'));
             } catch (\Throwable $e) {
                 $view->with([

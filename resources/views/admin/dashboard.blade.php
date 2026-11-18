@@ -28,7 +28,7 @@
         <div>
             <div class="small fw-semibold text-uppercase opacity-75 mb-1">Administrator</div>
             <h1 class="h3 fw-bold mb-1">Selamat datang, {{ auth()->user()->name }}</h1>
-            <p class="text-muted mb-0">Ringkasan operasional GuruKuu.</p>
+            <p class="text-muted mb-0">Ringkasan operasional {{ $siteTitle ?? 'GuruKuu' }}.</p>
         </div>
         <div class="d-flex gap-2">
             <form action="{{ route('admin.dashboard.clear-cache') }}" method="POST" class="d-inline" data-confirm="Bersihkan cache seluruh web sekarang?" data-confirm-title="Bersihkan Cache Web?" data-confirm-btn="Ya, Bersihkan" data-confirm-type="warning">

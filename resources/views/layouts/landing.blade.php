@@ -20,8 +20,11 @@
     <style>
         html { scroll-behavior: smooth; }
         :root {
-            --primary: #003366; --primary-light: #004080; --secondary: #ff6600;
-            --accent: #f97316; --bg-light: #f8fafc; --text-dark: #0f172a; --text-muted: #64748b; --border: #e2e8f0;
+            --primary: {{ $siteTitleColor1 ?? '#003366' }}; 
+            --primary-light: {{ $siteTitleColor1 ?? '#004080' }}; 
+            --secondary: {{ $siteTitleColor2 ?? '#ff6600' }};
+            --accent: {{ $siteTitleColor2 ?? '#f97316' }}; 
+            --bg-light: #f8fafc; --text-dark: #0f172a; --text-muted: #64748b; --border: #e2e8f0;
         }
         * { font-family: 'Inter', sans-serif; box-sizing: border-box; }
         .font-mono { font-family: 'JetBrains Mono', monospace; }
@@ -414,6 +417,7 @@
         }
     </style>
     <link href="{{ asset('css/gurukuu-theme.css') }}?v={{ file_exists(public_path('css/gurukuu-theme.css')) ? filemtime(public_path('css/gurukuu-theme.css')) : time() }}" rel="stylesheet">
+    @include('components.brand-theme')
     <script src="{{ asset('js/gurukuu-theme.js') }}"></script>
 </head>
 <body>

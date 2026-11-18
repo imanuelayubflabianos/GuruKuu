@@ -17,8 +17,9 @@
     
     <style>
         :root { 
-            --primary: #003366; 
-            --primary-hover: #002244;
+            --primary: {{ $siteTitleColor1 ?? '#003366' }}; 
+            --primary-hover: {{ $siteTitleColor1 ?? '#002244' }};
+            --secondary: {{ $siteTitleColor2 ?? '#ff6600' }};
             --bg-light: #f8fafc; 
         }
         * { font-family: 'Inter', sans-serif; box-sizing: border-box; }
@@ -92,6 +93,7 @@
         }
     </style>
     <link href="{{ asset('css/gurukuu-theme.css') }}" rel="stylesheet">
+    @include('components.brand-theme')
     <script src="{{ asset('js/gurukuu-theme.js') }}"></script>
 </head>
 <body class="auth-page">

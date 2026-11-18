@@ -1999,10 +1999,12 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Brand live preview
+    const siteTitle = document.getElementById('siteTitleInput');
     const part1 = document.getElementById('part1Input');
     const part2 = document.getElementById('part2Input');
     const color1 = document.getElementById('color1Input');
     const color2 = document.getElementById('color2Input');
+
     function updateBrandPreview() {
         if (!part1 || !part2 || !color1 || !color2) return;
         document.getElementById('previewPart1').textContent = part1.value || 'Guru';
@@ -2010,7 +2012,27 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('previewPart1').style.color = color1.value;
         document.getElementById('previewPart2').style.color = color2.value;
     }
-    [part1, part2, color1, color2].forEach(input => input?.addEventListener('input', updateBrandPreview));
+
+    if (siteTitle) {
+        siteTitle.addEventListener('input', function() {
+            const val = this.value.trim();
+            if (val && part1 && part2) {
+                const mid = Math.ceil(val.length / 2);
+                part1.value = val.substring(0, mid);
+                part2.value = val.substring(mid);
+            }
+            updateBrandPreview();
+        });
+    }
+
+    [part1, part2].forEach(input => input?.addEventListener('input', function() {
+        if (siteTitle && part1 && part2) {
+            siteTitle.value = (part1.value || '') + (part2.value || '');
+        }
+        updateBrandPreview();
+    }));
+
+    [color1, color2].forEach(input => input?.addEventListener('input', updateBrandPreview));
 
     document.getElementById('siteLogoFileInput')?.addEventListener('change', function() {
         if (!this.files[0]) return;
