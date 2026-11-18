@@ -700,11 +700,11 @@
                                 </div>
                                 <div class="d-flex align-items-center gap-2.5 mb-2.5" style="color: #94a3b8; font-size: 0.88rem;">
                                     <i class="bi bi-instagram flex-shrink-0" style="color: #f59e0b; font-size: 1.1rem;"></i>
-                                    <span>@smkn1bangsri</span>
+                                    <span>{{ \App\Models\Setting::get('school_instagram_handle', '@smkn1bangsri.official') }}</span>
                                 </div>
                                 <div class="d-flex align-items-center gap-2.5" style="color: #94a3b8; font-size: 0.88rem;">
                                     <i class="bi bi-envelope-fill flex-shrink-0" style="color: #f59e0b; font-size: 1.1rem;"></i>
-                                    <span>smkn1bangsri@yahoo.co.id</span>
+                                    <span>{{ \App\Models\Setting::get('school_email', 'smkn1bangsri@yahoo.co.id') }}</span>
                                 </div>
                             </div>
                         </div>

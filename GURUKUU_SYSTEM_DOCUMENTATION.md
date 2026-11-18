@@ -413,6 +413,9 @@ GuruKuu/
   - **Transparansi Identitas Siswa Lengkap Khusus Admin (`admin.guru.show`):** Pada kartu ulasan siswa (baik periode berjalan maupun arsip ulasan lampau), Admin (`admin` & `admin-plus`) dapat melihat identitas siswa secara menyeluruh: Nama Lengkap, Badge NIS, Badge Kelas (`<i class="bi bi-door-open"></i>`), dan Badge Jurusan Siswa. Untuk peran `wakil`, privasi siswa tetap terlindungi 100% (*Siswa (Anonim)* tanpa identitas/NIS/kelas).
   - **Filter Kelas pada Ulasan Guru (`admin.guru.show`):** Disediakan dropdown *Filter Kelas* pada bagian atas daftar ulasan guru sehingga Administrator dapat menyaring masukan dan evaluasi khusus murid dari kelas yang dipilih.
   - **Navigasi Presisi dari Leaderboard ke Detail Ulasan (`admin.leaderboard.index`):** Seluruh tautan guru di halaman Leaderboard (tombol profil podium peringkat 1, 2, 3, nama guru, angka kolom total ulasan, dan menu aksi) otomatis meneruskan parameter filter `kelas_id` dan `periode_id` ke rute `admin.guru.show` serta melompat langsung ke anchor `#ulasan-siswa`.
+* **2026-11-18 (Penyesuaian Handle Instagram Resmi & Efek Animasi Loading Muter Tema Logo):**
+  - **Penyesuaian Akun Instagram Resmi (@smkn1bangsri.official):** Memperbarui tampilan handle dan URL tautan Instagram di footer beranda publik ([`layouts/landing.blade.php`](file:///c:/Users/ADVAN/PROJEK/Laravel/GuruKuu/resources/views/layouts/landing.blade.php)) serta panel pengaturan admin menjadi `@smkn1bangsri.official` menuju `https://instagram.com/smkn1bangsri.official`, terhubung dinamis ke pengaturan sistem.
+  - **Efek Animasi Loading Muter Sesuai Tema Logo (`components/page-loader.blade.php`):** Menambahkan spinner berputar halus (*loading muter*) yang selalu tampil aktif saat perpindahan/pemuatan halaman, dengan warna gradasi/arc yang otomatis selaras dengan tema warna logo (`site_title_color1` & `site_title_color2`).
 
 
 

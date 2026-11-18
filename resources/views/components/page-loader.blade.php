@@ -47,8 +47,8 @@
     left: 0;
     height: 3.5px;
     width: 0%;
-    background: linear-gradient(90deg, #003366, #ff6600);
-    box-shadow: 0 0 10px rgba(0, 51, 102, 0.4);
+    background: linear-gradient(90deg, {{ $siteTitleColor1 ?? '#003366' }}, {{ $siteTitleColor2 ?? '#ff6600' }});
+    box-shadow: 0 0 10px {{ $siteTitleColor1 ?? '#003366' }}66;
     transition: width 0.35s ease;
     z-index: 1000000000;
 }
@@ -62,7 +62,7 @@
     transition: width 0.15s ease, opacity 0.2s ease 0.05s;
 }
 
-/* Spinner Modern di Tengah Layar Putih */
+/* Spinner Modern di Tengah Layar Putih (Efek Loading Muter Sesuai Tema Logo) */
 .gk-veil-loader-box {
     display: flex;
     flex-direction: column;
@@ -75,9 +75,11 @@
     width: 44px;
     height: 44px;
     border: 3.5px solid rgba(0, 0, 0, 0.08);
-    border-top-color: #003366;
+    border-top-color: {{ $siteTitleColor1 ?? '#003366' }};
+    border-right-color: {{ $siteTitleColor2 ?? '#ff6600' }};
     border-radius: 50%;
     animation: gkSpinnerRotate 0.75s linear infinite;
+    display: inline-block;
 }
 @keyframes gkSpinnerRotate {
     0% { transform: rotate(0deg); }
@@ -98,13 +100,12 @@
     <div class="gk-veil-bar"></div>
     <div class="gk-veil-loader-box">
         @if(!empty($siteLogo))
-            <div class="position-relative d-flex align-items-center justify-content-center" style="min-height: 46px;">
-                <img src="{{ $siteLogo }}" alt="{{ $siteTitle ?? 'Logo' }}" style="height: 46px; max-width: 140px; object-fit: contain;" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
-                <div class="gk-veil-spinner" style="display: none;"></div>
+            <div class="d-flex align-items-center justify-content-center mb-1">
+                <img src="{{ $siteLogo }}" alt="{{ $siteTitle ?? 'Logo' }}" style="height: 48px; max-width: 140px; object-fit: contain;">
             </div>
-        @else
-            <div class="gk-veil-spinner"></div>
         @endif
+        {{-- Efek loading muter dengan warna sesuai tema logo --}}
+        <div class="gk-veil-spinner"></div>
         <div class="gk-veil-brand">
             <span style="color: {{ $siteTitleColor1 ?? '#003366' }} !important;">{{ $siteTitlePart1 ?? 'Guru' }}</span><span style="color: {{ $siteTitleColor2 ?? '#FFC107' }} !important;">{{ $siteTitlePart2 ?? 'Kuu' }}</span>
         </div>

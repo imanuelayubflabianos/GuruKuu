@@ -27,6 +27,8 @@ class DynamicBrandingThemeTest extends TestCase
         $response->assertSee('kaa');
         $response->assertSee('#123456');
         $response->assertSee('#abcdef');
+        $response->assertSee('@smkn1bangsri.official');
+        $response->assertSee('instagram.com/smkn1bangsri.official');
 
         // Test Auth/Login page
         $loginResponse = $this->get('/login');

@@ -374,6 +374,7 @@ class PengaturanController extends Controller
             'feature2_title', 'feature2_desc',
             'feature3_title', 'feature3_desc',
             'footer_about', 'footer_copyright',
+            'school_instagram_handle', 'school_instagram_url', 'school_email',
             'kebijakan_privasi', 'syarat_ketentuan'
         ];
 
