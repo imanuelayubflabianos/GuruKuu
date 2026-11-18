@@ -432,10 +432,19 @@ class GuruController extends Controller
         ]);
     }
 
-    public function show(Guru $guru)
+    public function show(Request $request, Guru $guru)
     {
-        $periodeAktif = \App\Models\Periode::getActivePeriode();
+        $selectedPeriodeId = $request->input('periode_id');
+        $periodeAktif = $selectedPeriodeId
+            ? \App\Models\Periode::find($selectedPeriodeId)
+            : \App\Models\Periode::getActivePeriode();
+
+        if (!$periodeAktif) {
+            $periodeAktif = \App\Models\Periode::getActivePeriode();
+        }
+
         $periodeId = $periodeAktif?->id;
+        $kelasId = $request->input('kelas_id');
 
         $allPenilaian = $periodeId
             ? \App\Models\Penilaian::where('guru_id', $guru->id)->where('periode_id', $periodeId)->get()
@@ -450,36 +459,70 @@ class GuruController extends Controller
             'rata_keramahan' => $allPenilaian->avg('keramahan') ?? 0,
         ];
 
-        // Ulasan periode aktif berjalan (Paginasi 10 ulasan per halaman)
+        // Ulasan periode aktif/terpilih berjalan (Paginasi 10 ulasan per halaman, dengan filter kelas)
+        $feedbackQuery = \App\Models\Penilaian::with(['siswa.kelas.jurusan', 'siswa.jurusan', 'kelas.jurusan'])
+            ->where('guru_id', $guru->id)
+            ->where('periode_id', $periodeId)
+            ->where(function($q) {
+                $q->where('is_censored', false)->orWhereNull('is_censored');
+            });
+
+        if (!empty($kelasId)) {
+            $feedbackQuery->where(function($q) use ($kelasId) {
+                $q->where('class_id', $kelasId)
+                  ->orWhereHas('siswa.kelas', fn($sq) => $sq->where('kelas.id', $kelasId));
+            });
+        }
+
         $semuaFeedback = $periodeId
-            ? \App\Models\Penilaian::with('siswa')
-                ->where('guru_id', $guru->id)
-                ->where('periode_id', $periodeId)
-                ->where(function($q) {
-                    $q->where('is_censored', false)->orWhereNull('is_censored');
-                })
-                ->latest()
-                ->paginate(10)
-                ->withQueryString()
+            ? $feedbackQuery->latest()->paginate(10)->withQueryString()
             : \App\Models\Penilaian::whereRaw('1=0')->paginate(10);
 
-        // Arsip ulasan dari periode-periode lampau (selesai/nonaktif)
+        // Arsip ulasan dari periode-periode lampau (selesai/nonaktif, dengan filter kelas)
         $arsipPeriode = \App\Models\Periode::whereIn('status', ['selesai', 'nonaktif'])
-            ->whereHas('penilaian', function($q) use ($guru) {
+            ->where('id', '!=', $periodeId)
+            ->whereHas('penilaian', function($q) use ($guru, $kelasId) {
                 $q->where('guru_id', $guru->id);
+                if (!empty($kelasId)) {
+                    $q->where(function($sub) use ($kelasId) {
+                        $sub->where('class_id', $kelasId)
+                            ->orWhereHas('siswa.kelas', fn($sq) => $sq->where('kelas.id', $kelasId));
+                    });
+                }
             })
-            ->with(['penilaian' => function($q) use ($guru) {
+            ->with(['penilaian' => function($q) use ($guru, $kelasId) {
                 $q->where('guru_id', $guru->id)
                   ->where(function($sub) {
                       $sub->where('is_censored', false)->orWhereNull('is_censored');
-                  })
-                  ->latest();
+                  });
+                if (!empty($kelasId)) {
+                    $q->where(function($sub) use ($kelasId) {
+                        $sub->where('class_id', $kelasId)
+                            ->orWhereHas('siswa.kelas', fn($sq) => $sq->where('kelas.id', $kelasId));
+                    });
+                }
+                $q->with(['siswa.kelas.jurusan', 'siswa.jurusan', 'kelas.jurusan'])->latest();
             }])
             ->latest('tanggal_mulai')
             ->get();
 
         $guru->load(['kelas.jurusan', 'penghargaan.badge']);
-        return view('admin.guru.show', compact('guru', 'periodeAktif', 'stats', 'semuaFeedback', 'arsipPeriode'));
+
+        // Daftar kelas yang diajar guru ini atau kelas siswa yang pernah memberi nilai
+        $kelasList = $guru->kelas()->with('jurusan')->orderBy('tingkat')->orderBy('nama_kelas')->get();
+        $reviewedClassIds = \App\Models\Penilaian::where('guru_id', $guru->id)->whereNotNull('class_id')->distinct()->pluck('class_id');
+        if ($reviewedClassIds->isNotEmpty()) {
+            $extraClasses = \App\Models\Kelas::with('jurusan')->whereIn('id', $reviewedClassIds)->get();
+            $kelasList = $kelasList->merge($extraClasses)->unique('id')->sortBy('nama_kelas')->sortBy('tingkat')->values();
+        }
+
+        if ($kelasList->isEmpty()) {
+            $kelasList = \App\Models\Kelas::with('jurusan')->orderBy('tingkat')->orderBy('nama_kelas')->get();
+        }
+
+        $selectedKelasId = $kelasId;
+
+        return view('admin.guru.show', compact('guru', 'periodeAktif', 'stats', 'semuaFeedback', 'arsipPeriode', 'kelasList', 'selectedKelasId'));
     }
 
     public function edit(Guru $guru)

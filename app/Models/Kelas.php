@@ -49,6 +49,11 @@ class Kelas extends Model
                     ->withTimestamps();
     }
 
+    public function gurus()
+    {
+        return $this->guru();
+    }
+
     public function siswa()
     {
         return $this->belongsToMany(User::class, 'siswa_kelas')

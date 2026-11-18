@@ -141,12 +141,37 @@
 
 {{-- DAFTAR ULASAN SISWA --}}
 <div class="card-custom p-4 mb-4" id="ulasan-siswa">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h5 class="fw-bold mb-0">
-            <i class="bi bi-chat-left-quote me-2 text-primary"></i>Ulasan Siswa (Periode Aktif)
-            <span class="badge bg-primary ms-2">{{ $semuaFeedback->total() }}</span>
-        </h5>
-        <span class="badge bg-light text-dark border">Anonimitas Siswa</span>
+    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+        <div>
+            <h5 class="fw-bold mb-0">
+                <i class="bi bi-chat-left-quote me-2 text-primary"></i>Ulasan Siswa ({{ $periodeAktif?->nama_periode ?? 'Periode Aktif' }})
+                <span class="badge bg-primary ms-2">{{ $semuaFeedback->total() }}</span>
+            </h5>
+            <small class="text-muted">Daftar masukan dan evaluasi siswa untuk guru ini.</small>
+        </div>
+        <div class="d-flex align-items-center gap-2 flex-wrap">
+            @if(isset($kelasList) && $kelasList->count() > 0)
+            <form method="GET" action="{{ route('admin.guru.show', $guru) }}#ulasan-siswa" class="d-flex align-items-center gap-1.5 m-0">
+                @if(request('periode_id'))
+                    <input type="hidden" name="periode_id" value="{{ request('periode_id') }}">
+                @endif
+                <label for="filterKelasUlasan" class="form-label mb-0 small text-muted text-nowrap d-none d-sm-inline">
+                    <i class="bi bi-funnel text-primary me-1"></i>Filter Kelas:
+                </label>
+                <select name="kelas_id" id="filterKelasUlasan" class="form-select form-select-sm rounded-pill shadow-xs" style="min-width: 170px; font-size: 0.8rem;" onchange="this.form.submit()">
+                    <option value="">Semua Kelas Diajar</option>
+                    @foreach($kelasList as $k)
+                        <option value="{{ $k->id }}" {{ (string)($selectedKelasId ?? '') === (string)$k->id ? 'selected' : '' }}>
+                            {{ $k->nama_kelas }} (Kelas {{ $k->tingkat }})
+                        </option>
+                    @endforeach
+                </select>
+            </form>
+            @endif
+            <span class="badge bg-light text-dark border">
+                {{ auth()->user()->role === 'admin' ? 'Identitas Terbuka (Khusus Admin)' : 'Anonimitas Siswa' }}
+            </span>
+        </div>
     </div>
 
     @forelse($semuaFeedback as $fb)
@@ -161,10 +186,24 @@
                     <i class="bi bi-person-check-fill fs-5 text-primary"></i>
                 </div>
                 <div>
-                    <div class="d-flex align-items-center gap-2">
+                    <div class="d-flex align-items-center gap-2 flex-wrap">
                         @if(auth()->user()->role === 'admin' && $fb->siswa)
                             <strong class="small text-dark">{{ $fb->siswa->name }}</strong>
                             <span class="badge bg-secondary-subtle text-secondary font-mono" style="font-size: 0.65rem;">NIS: {{ $fb->siswa->nis }}</span>
+                            @php
+                                $kelasSiswa = $fb->kelas?->nama_kelas ?? $fb->siswa?->kelas?->first()?->nama_kelas;
+                                $jurusanSiswa = $fb->siswa?->jurusan?->nama_jurusan ?? $fb->kelas?->jurusan?->nama_jurusan;
+                            @endphp
+                            @if($kelasSiswa)
+                                <span class="badge bg-info-subtle text-info border font-mono" style="font-size: 0.65rem;">
+                                    <i class="bi bi-door-open me-0.5"></i>{{ $kelasSiswa }}
+                                </span>
+                            @endif
+                            @if($jurusanSiswa)
+                                <span class="badge bg-primary-subtle text-primary border" style="font-size: 0.65rem;">
+                                    {{ $jurusanSiswa }}
+                                </span>
+                            @endif
                         @else
                             <strong class="small text-dark">Siswa (Anonim)</strong>
                         @endif
@@ -306,10 +345,24 @@
                                                 <i class="bi bi-person-check-fill fs-5 text-primary"></i>
                                             </div>
                                             <div>
-                                                <div class="d-flex align-items-center gap-2">
+                                                <div class="d-flex align-items-center gap-2 flex-wrap">
                                                     @if(auth()->user()->role === 'admin' && $fbLalu->siswa)
                                                         <strong class="small text-dark">{{ $fbLalu->siswa->name }}</strong>
                                                         <span class="badge bg-secondary-subtle text-secondary font-mono" style="font-size: 0.65rem;">NIS: {{ $fbLalu->siswa->nis }}</span>
+                                                        @php
+                                                            $kelasLalu = $fbLalu->kelas?->nama_kelas ?? $fbLalu->siswa?->kelas?->first()?->nama_kelas;
+                                                            $jurusanLalu = $fbLalu->siswa?->jurusan?->nama_jurusan ?? $fbLalu->kelas?->jurusan?->nama_jurusan;
+                                                        @endphp
+                                                        @if($kelasLalu)
+                                                            <span class="badge bg-info-subtle text-info border font-mono" style="font-size: 0.65rem;">
+                                                                <i class="bi bi-door-open me-0.5"></i>{{ $kelasLalu }}
+                                                            </span>
+                                                        @endif
+                                                        @if($jurusanLalu)
+                                                            <span class="badge bg-primary-subtle text-primary border" style="font-size: 0.65rem;">
+                                                                {{ $jurusanLalu }}
+                                                            </span>
+                                                        @endif
                                                     @else
                                                         <strong class="small text-dark">Siswa (Anonim)</strong>
                                                     @endif

@@ -150,7 +150,7 @@
                         <small class="text-muted font-mono d-block mb-3" style="font-size: 0.8rem;">{{ $top1->total_penilaian }} {{ $mode === 'partisipasi' ? 'siswa yang menilai' : 'ulasan' }}</small>
                     </div>
 
-                    <a href="{{ route('admin.guru.show', $top1->id) }}" class="btn btn-sm btn-outline-primary gk-btn-podium-profile mb-2">
+                    <a href="{{ route('admin.guru.show', array_filter(['guru' => $top1->id, 'kelas_id' => $kelasId, 'periode_id' => $selectedPeriode?->id])) }}#ulasan-siswa" class="btn btn-sm btn-outline-primary gk-btn-podium-profile mb-2">
                         <i class="bi bi-eye me-1"></i> Profil
                     </a>
                 </div>
@@ -205,7 +205,7 @@
                         </div>
                         <small class="text-muted font-mono d-block mb-3" style="font-size: 0.78rem;">{{ $top2->total_penilaian }} {{ $mode === 'partisipasi' ? 'siswa yang menilai' : 'ulasan' }}</small>
                     </div>
-                    <a href="{{ route('admin.guru.show', $top2->id) }}" class="btn btn-sm btn-outline-primary gk-btn-podium-profile mb-2">
+                    <a href="{{ route('admin.guru.show', array_filter(['guru' => $top2->id, 'kelas_id' => $kelasId, 'periode_id' => $selectedPeriode?->id])) }}#ulasan-siswa" class="btn btn-sm btn-outline-primary gk-btn-podium-profile mb-2">
                         <i class="bi bi-eye me-1"></i> Profil
                     </a>
                 </div>
@@ -253,7 +253,7 @@
                         </div>
                         <small class="text-muted font-mono d-block mb-3" style="font-size: 0.8rem;">{{ $top1->total_penilaian }} {{ $mode === 'partisipasi' ? 'siswa yang menilai' : 'ulasan' }}</small>
                     </div>
-                    <a href="{{ route('admin.guru.show', $top1->id) }}" class="btn btn-sm btn-outline-primary gk-btn-podium-profile mb-2">
+                    <a href="{{ route('admin.guru.show', array_filter(['guru' => $top1->id, 'kelas_id' => $kelasId, 'periode_id' => $selectedPeriode?->id])) }}#ulasan-siswa" class="btn btn-sm btn-outline-primary gk-btn-podium-profile mb-2">
                         <i class="bi bi-eye me-1"></i> Profil
                     </a>
                 </div>
@@ -309,7 +309,7 @@
                         </div>
                         <small class="text-muted font-mono d-block mb-3" style="font-size: 0.78rem;">{{ $top2->total_penilaian }} {{ $mode === 'partisipasi' ? 'siswa yang menilai' : 'ulasan' }}</small>
                     </div>
-                    <a href="{{ route('admin.guru.show', $top2->id) }}" class="btn btn-sm btn-outline-primary gk-btn-podium-profile mb-2">
+                    <a href="{{ route('admin.guru.show', array_filter(['guru' => $top2->id, 'kelas_id' => $kelasId, 'periode_id' => $selectedPeriode?->id])) }}#ulasan-siswa" class="btn btn-sm btn-outline-primary gk-btn-podium-profile mb-2">
                         <i class="bi bi-eye me-1"></i> Profil
                     </a>
                 </div>
@@ -357,7 +357,7 @@
                         </div>
                         <small class="text-muted font-mono d-block mb-3" style="font-size: 0.8rem;">{{ $top1->total_penilaian }} {{ $mode === 'partisipasi' ? 'siswa yang menilai' : 'ulasan' }}</small>
                     </div>
-                    <a href="{{ route('admin.guru.show', $top1->id) }}" class="btn btn-sm btn-outline-primary gk-btn-podium-profile mb-2">
+                    <a href="{{ route('admin.guru.show', array_filter(['guru' => $top1->id, 'kelas_id' => $kelasId, 'periode_id' => $selectedPeriode?->id])) }}#ulasan-siswa" class="btn btn-sm btn-outline-primary gk-btn-podium-profile mb-2">
                         <i class="bi bi-eye me-1"></i> Profil
                     </a>
                 </div>
@@ -405,7 +405,7 @@
                         </div>
                         <small class="text-muted font-mono d-block mb-3" style="font-size: 0.75rem;">{{ $top3->total_penilaian }} {{ $mode === 'partisipasi' ? 'siswa yang menilai' : 'ulasan' }}</small>
                     </div>
-                    <a href="{{ route('admin.guru.show', $top3->id) }}" class="btn btn-sm btn-outline-primary gk-btn-podium-profile mb-2">
+                    <a href="{{ route('admin.guru.show', array_filter(['guru' => $top3->id, 'kelas_id' => $kelasId, 'periode_id' => $selectedPeriode?->id])) }}#ulasan-siswa" class="btn btn-sm btn-outline-primary gk-btn-podium-profile mb-2">
                         <i class="bi bi-eye me-1"></i> Profil
                     </a>
                 </div>
@@ -449,7 +449,9 @@
                         <div class="d-flex align-items-center">
                             <img src="{{ $g->photo_url }}" class="rounded-circle me-3 flex-shrink-0" width="44" height="44" style="width: 44px; height: 44px; min-width: 44px; min-height: 44px; aspect-ratio: 1 / 1; object-fit: cover; flex-shrink: 0;">
                             <div>
-                                <div class="fw-bold text-dark lh-sm">{{ $g->nama }}</div>
+                                <a href="{{ route('admin.guru.show', array_filter(['guru' => $g->id, 'kelas_id' => $kelasId, 'periode_id' => $selectedPeriode?->id])) }}#ulasan-siswa" class="fw-bold text-dark text-decoration-none lh-sm hover-primary" title="Lihat detail ulasan & siswa">
+                                    {{ $g->nama }}
+                                </a>
                                 @if(($g->penghargaan ?? collect())->whereNotNull('badge')->isNotEmpty())
                                     <div class="d-flex align-items-center gap-1 flex-wrap my-1">
                                         @foreach($g->penghargaan as $p)
@@ -492,7 +494,10 @@
                         </div>
                     </td>
                     <td class="text-center font-mono align-middle" style="font-size: 0.82rem;">
-                        <strong>{{ $g->total_penilaian }}</strong> <span class="text-muted small">{{ $mode === 'partisipasi' ? 'siswa' : 'penilaian' }}</span>
+                        <a href="{{ route('admin.guru.show', array_filter(['guru' => $g->id, 'kelas_id' => $kelasId, 'periode_id' => $selectedPeriode?->id])) }}#ulasan-siswa" class="text-decoration-none text-dark hover-primary" title="Lihat detail ulasan & siswa">
+                            <strong>{{ $g->total_penilaian }}</strong> <span class="text-muted small">{{ $mode === 'partisipasi' ? 'siswa' : 'penilaian' }}</span>
+                            <i class="bi bi-box-arrow-up-right ms-1 text-primary opacity-75" style="font-size: 0.72rem;"></i>
+                        </a>
                     </td>
                     <td class="text-center align-middle">
                         <div class="dropdown">
@@ -501,9 +506,9 @@
                             </button>
                             <ul class="dropdown-menu dropdown-menu-end shadow border-0 py-1" style="border-radius: 12px; font-size: 0.85rem; min-width: 170px; box-shadow: 0 10px 25px rgba(0,0,0,0.12) !important;">
                                 <li>
-                                    <a class="dropdown-item py-1.5 px-3 d-flex align-items-center gap-2 text-primary" href="{{ route('admin.guru.show', $g->id) }}">
-                                        <i class="bi bi-person-badge text-primary"></i>
-                                        <span>Lihat Profil Guru</span>
+                                    <a class="dropdown-item py-1.5 px-3 d-flex align-items-center gap-2 text-primary" href="{{ route('admin.guru.show', array_filter(['guru' => $g->id, 'kelas_id' => $kelasId, 'periode_id' => $selectedPeriode?->id])) }}#ulasan-siswa">
+                                        <i class="bi bi-chat-left-text text-primary"></i>
+                                        <span>Detail Ulasan & Siswa</span>
                                     </a>
                                 </li>
                             </ul>
