@@ -124,9 +124,10 @@ foreach ($possibleGit as $g) {
 $disabledFunctions = array_map('trim', explode(',', (string)ini_get('disable_functions')));
 $canExec = function_exists('shell_exec') && !in_array('shell_exec', $disabledFunctions, true);
 
-// 9. Konfigurasi Git Safe Directory di Latar Belakang (Mencegah "dubious ownership")
+// 9. Konfigurasi Git Safe Directory & Filemode di Latar Belakang (Mencegah "dubious ownership" & chmod issues di cPanel)
 if ($canExec && $laravelRoot) {
     @shell_exec("{$gitBinary} config --global --add safe.directory " . escapeshellarg($laravelRoot) . " 2>&1");
+    @shell_exec("{$gitBinary} config core.fileMode false 2>&1");
 }
 
 // 10. Pembacaan Kunci Rahasia dari .env (Strict: TIDAK ADA FALLBACK LEMAH)
@@ -277,7 +278,9 @@ if ($isAuthenticated && $laravelRoot && $canExec) {
         $gitCommitMsg    = $p[3] ?? 'N/A';
     }
 
-    // Status Working Tree
+    // Status Working Tree (Abaikan izin fileMode Linux hosting dan sinkronkan .gitignore framework)
+    @shell_exec("{$gitBinary} config core.fileMode false 2>&1");
+    @shell_exec("{$gitBinary} checkout -- bootstrap/cache/.gitignore storage/ 2>&1");
     $statusRaw = trim((string)@shell_exec("{$gitBinary} status --porcelain 2>&1"));
     if (!empty($statusRaw) && !str_starts_with($statusRaw, 'fatal:')) {
         $gitStatusClean = false;
@@ -367,6 +370,8 @@ if ($isAuthenticated && ($_SERVER['REQUEST_METHOD'] ?? '') === 'POST' && isset($
             case 'git_pull':
                 $actionTitle = "Git Fast Pull ({$CONFIG['git_remote']}/{$gitBranch})";
                 $output = [];
+                @shell_exec("{$gitBinary} config core.fileMode false 2>&1");
+                @shell_exec("{$gitBinary} checkout -- bootstrap/cache/.gitignore storage/ 2>&1");
                 $output[] = "$ {$gitBinary} pull {$CONFIG['git_remote']} {$gitBranch}";
                 $output[] = (string)shell_exec("{$gitBinary} pull {$remote} {$branch} 2>&1");
                 $output[] = "$ {$phpBinary} artisan optimize:clear";
@@ -1022,7 +1027,7 @@ if ($isAuthenticated && ($_SERVER['REQUEST_METHOD'] ?? '') === 'POST' && isset($
 <div class="container">
 
 <?php if (!$isAuthenticated): ?>
-    {{-- TAMPILAN LOGIN DEVOPS TERMINAL --}}
+    <!-- TAMPILAN LOGIN DEVOPS TERMINAL -->
     <div class="login-wrap">
         <div class="login-card">
             <div class="login-badge">
@@ -1070,7 +1075,7 @@ if ($isAuthenticated && ($_SERVER['REQUEST_METHOD'] ?? '') === 'POST' && isset($
     </div>
 
 <?php else: ?>
-    {{-- TAMPILAN DASHBOARD DEVOPS UTAMA --}}
+    <!-- TAMPILAN DASHBOARD DEVOPS UTAMA -->
 
     <!-- Topbar -->
     <header class="topbar">
@@ -1181,8 +1186,13 @@ if ($isAuthenticated && ($_SERVER['REQUEST_METHOD'] ?? '') === 'POST' && isset($
     <?php if (!$gitStatusClean): ?>
         <div class="alert alert-warning d-flex align-items-start gap-2 mb-4">
             <i class="bi bi-exclamation-diamond-fill fs-5 mt-1"></i>
-            <div>
-                <strong>Peringatan Working Tree Tidak Bersih:</strong>
+            <div class="w-100">
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                    <strong>Peringatan Working Tree Tidak Bersih:</strong>
+                    <button type="button" class="btn btn-sm btn-amber" onclick="openModal('modalForceSync')">
+                        <i class="bi bi-arrow-clockwise"></i> Bersihkan & Sync Sekarang
+                    </button>
+                </div>
                 <p class="mb-1" style="font-size: 0.78rem;">Terdapat berkas yang dimodifikasi langsung di server tanpa di-commit. Disarankan menggunakan "Git Force Reset & Sync" jika Anda ingin menimpa server sesuai commit GitHub terbaru.</p>
                 <div class="mono small bg-black bg-opacity-25 p-2 rounded" style="font-size: 0.72rem;">
                     <?php foreach ($gitUncommitted as $line): ?>
@@ -1387,7 +1397,7 @@ if ($isAuthenticated && ($_SERVER['REQUEST_METHOD'] ?? '') === 'POST' && isset($
 
 </div>
 
-{{-- MODAL KONFIRMASI: GIT FORCE RESET & SYNC --}}
+<!-- MODAL KONFIRMASI: GIT FORCE RESET & SYNC -->
 <div class="modal-backdrop" id="modalForceSync">
     <div class="modal-box">
         <h3 class="modal-title text-amber"><i class="bi bi-exclamation-triangle-fill text-amber me-1"></i> Konfirmasi Force Clean Sync</h3>
@@ -1407,7 +1417,7 @@ if ($isAuthenticated && ($_SERVER['REQUEST_METHOD'] ?? '') === 'POST' && isset($
     </div>
 </div>
 
-{{-- MODAL KONFIRMASI: GIT UNDO COMMIT --}}
+<!-- MODAL KONFIRMASI: GIT UNDO COMMIT -->
 <div class="modal-backdrop" id="modalUndoCommit">
     <div class="modal-box">
         <h3 class="modal-title"><i class="bi bi-arrow-counterclockwise text-primary me-1"></i> Rollback Commit (Undo)</h3>
@@ -1432,7 +1442,7 @@ if ($isAuthenticated && ($_SERVER['REQUEST_METHOD'] ?? '') === 'POST' && isset($
     </div>
 </div>
 
-{{-- MODAL KONFIRMASI: ROLLBACK MIGRASI DATABASE --}}
+<!-- MODAL KONFIRMASI: ROLLBACK MIGRASI DATABASE -->
 <div class="modal-backdrop" id="modalRollback">
     <div class="modal-box">
         <h3 class="modal-title"><i class="bi bi-skip-backward-fill text-amber me-1"></i> Rollback Batch Migrasi</h3>
@@ -1456,7 +1466,7 @@ if ($isAuthenticated && ($_SERVER['REQUEST_METHOD'] ?? '') === 'POST' && isset($
     </div>
 </div>
 
-{{-- MODAL KONFIRMASI: RESET TOTAL DATABASE (MIGRATE:FRESH) --}}
+<!-- MODAL KONFIRMASI: RESET TOTAL DATABASE (MIGRATE:FRESH) -->
 <div class="modal-backdrop" id="modalFresh">
     <div class="modal-box" style="border-color: rgba(244, 63, 94, 0.4);">
         <h3 class="modal-title text-rose"><i class="bi bi-shield-slash-fill text-rose me-1"></i> BAHAYA: Reset Total Database</h3>

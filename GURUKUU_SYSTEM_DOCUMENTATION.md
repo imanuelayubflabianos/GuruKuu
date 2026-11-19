@@ -446,6 +446,11 @@ GuruKuu/
     * **Cache & Storage:** `optimize` (warmup produksi), `optimize:clear`, `storage:link`, dan perbaikan folder izin 0775 dengan penyematan `.htaccess` anti-eksekusi PHP di storage publik.
     * **Mode Pemeliharaan (Maintenance):** Toggle aktivasi `php artisan down` (dengan token bypass rahasia administrator) dan `php artisan up`.
     * **Telemetri Realtime:** Status branch Git, hash & pesan commit terakhir, status working tree, 6 histori commit terbaru, ruang disk server (GB), dan status storage symlink.
+  - **Penyesuaian Kompatibilitas cPanel Hosting & Pembersihan Sintaks:**
+    * **Eliminasi Sintaks Blade:** Karena `public/deploy.php` berjalan sebagai file PHP murni di luar engine Blade Laravel, seluruh tag komentar `{{-- --}}` diubah menjadi komentar HTML `<!-- -->` agar tidak tercetak sebagai teks mentah di layar browser.
+    * **Penanganan Izin File Linux cPanel (`core.fileMode false`):** Otomatis menyetel `git config core.fileMode false` dan memulihkan berkas internal framework `.gitignore` di `storage/` dan `bootstrap/cache/` agar perubahan permission/chmod server cPanel tidak menyebabkan false positive peringatan "Working Tree Tidak Bersih" saat pull atau inspeksi repositori.
+    * **Aksi Cepat Bersihkan & Sinkronkan:** Menambahkan tombol shortcut langsung pada kotak peringatan working tree untuk memudahkan administrator menjalankan *Clean Sync* dalam 1 klik.
+
 
 
 
