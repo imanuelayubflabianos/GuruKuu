@@ -575,7 +575,7 @@
                     <div class="footer-contact-item">
                         <i class="bi bi-instagram"></i>
                         <a href="{{ \App\Models\Setting::get('school_instagram_url', 'https://instagram.com/smkn1bangsri.official') }}" target="_blank" class="footer-nav-link text-white-50">
-                            <span>{{ \App\Models\Setting::get('school_instagram_handle', '@smkn1bangsri.official') }} coy</span>
+                            <span>{{ \App\Models\Setting::get('school_instagram_handle', '@smkn1bangsri.official') }}</span>
                         </a>
                     </div>
                     <div class="footer-contact-item">
