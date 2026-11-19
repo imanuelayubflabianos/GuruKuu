@@ -29,6 +29,7 @@ _ide_helper.php
 Homestead.json
 Homestead.yaml
 Thumbs.db
+*.zip
 
 /storage/framework/views/*
 /storage/logs/*

@@ -430,20 +430,22 @@ GuruKuu/
       3. **FAQ:** Terintegrasi penuh dengan `FaqService` (4 pertanyaan bawaan khusus wakil dan dapat disinkronkan/dikelola secara dinamis oleh Admin melalui menu Pengaturan Admin).
       4. **Chat Admin:** Mengadopsi antarmuka modern messenger identik dengan portal Siswa dan Guru (header official, bubble chat interaktif, tombol edit & hapus, live counter karakter 255, verifikasi anti-spam, dan auto-scroll).
       5. **Kebijakan & Privasi:** Sinkron secara dinamis dengan pengaturan teks legal global (`kebijakan_privasi` & `syarat_ketentuan`).
-* **2026-11-18 (Penyelarasan Desain Messenger Chat Admin & Sinkronisasi FAQ/Legal Wakil):**
-  - **Modern Messenger UI pada Chat Admin Wakil (`admin.pengaturan.wakil`):**
-    * Mengubah tampilan chat wakil dari formulir card statis menjadi antarmuka chat messenger modern yang identik 100% dengan portal Siswa dan Guru:
-      - Header interaktif: *Administrator GuruKuu*, status *Online*, dan badge *Jalur Komunikasi Resmi*.
-      - Area chat scrollable (`height: 60vh`) dengan bubble chat dua arah (pesan wakil di sisi kanan bergradasi tema navy, balasan admin di sisi kiri dengan avatar dan badge verifikasi).
-      - Fitur edit pesan via modal interaktif (`editModalWakil`) dan hapus pesan (`[Pesan Dihapus]`).
-      - Textarea dengan live counter `0 / 255`, verifikasi matematika anti-spam, tombol kirim ikon pesawat, dan auto-scroll otomatis ke pesan terbawah saat tab dibuka.
-  - **Sinkronisasi FAQ Multi-Role Wakil (`FaqService` & `admin.pengaturan.index`):**
-    * Menambahkan 4 pertanyaan FAQ bawaan khusus wewenang monitoring wakil, anonimitas siswa, publikasi medsos/WhatsApp, dan chat bantuan admin.
-    * Menambahkan tab filter sasaran `Wakil` serta opsi target `Khusus Wakil` pada modal tambah/edit FAQ di panel Pengaturan Administrator, sehingga perubahan FAQ oleh Admin langsung sinkron ke halaman wakil.
-  - **Sinkronisasi Dinamis Kebijakan & Privasi:**
-    * Tab Kebijakan & Privasi Wakil terhubung dinamis ke setting sistem (`kebijakan_privasi` & `syarat_ketentuan`), sehingga setiap pengubahan oleh Admin langsung terbarui di portal wakil.
-  - **Identifikasi Pesan Masuk Admin (`admin.kontak.index` & `admin.kontak.chat`):**
-    * Pengirim dengan identifier/role wakil kini otomatis dilabeli rapi sebagai `Wakil (Akun Monitoring)` di kotak pesan masuk Admin.
+* **2026-11-19 (Implementasi GuruKuu DevOps Terminal — Web Deployment & Maintenance Console):**
+  - **Arsitektur Mandiri Terisolasi (`public/deploy.php`):**
+    * Dibuat sebagai skrip deployment mandiri berbasis web untuk mengelola pembaruan server tanpa ketergantungan SSH.
+    * Terisolasi dari kernel HTTP Laravel penuh, sehingga tetap dapat diakses dan berfungsi untuk memulihkan website saat terjadi *500 error*, kegagalan composer, atau kerusakan cache.
+  - **Sistem Keamanan Ketat & Anti-Injection:**
+    * **Zero Default Secret:** Membaca kunci `DEPLOY_KEY` langsung dari `.env`. Akses ditolak total jika `DEPLOY_KEY` belum disetel (tanpa kata sandi default lemah).
+    * **Brute Force Protection:** Rate limiter berbasis file di `storage/framework/cache/devops_locks/` dengan batas 5 kali percobaan gagal sebelum IP dikunci otomatis selama 15 menit. Dilengkapi validasi `hash_equals()` untuk mencegah *timing attacks*.
+    * **Whitelisted Actions (Zero Arbitrary Execution):** Tidak menerima input perintah shell bebas. Semua aksi dipetakan kaku via switch-case dengan argumen tersanitasi (`escapeshellarg`, integer casting).
+    * **Proteksi File Sensitif:** Perintah `git clean` dikecualikan secara ketat dari berkas `.env`, folder `storage/`, `public/storage/`, `public/uploads/`, dan `public/build/`.
+    * **Header Keamanan & Anti-Indexing:** `X-Robots-Tag: noindex, nofollow, noarchive`, `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`.
+  - **Fitur Utama Terminal:**
+    * **Git Deployment:** Git Fast Pull (`git pull` + `optimize:clear`), Git Force Reset & Clean Sync (dengan konfirmasi modal), dan Git Rollback/Undo Commit (1-5 commit).
+    * **Manajemen Database:** `migrate --force`, `migrate:status`, `migrate:rollback`, `db:seed` (otomatis memindai seeder dari `database/seeders`), dan `migrate:fresh` yang dilindungi konfirmasi kata sandi ketik "RESET".
+    * **Cache & Storage:** `optimize` (warmup produksi), `optimize:clear`, `storage:link`, dan perbaikan folder izin 0775 dengan penyematan `.htaccess` anti-eksekusi PHP di storage publik.
+    * **Mode Pemeliharaan (Maintenance):** Toggle aktivasi `php artisan down` (dengan token bypass rahasia administrator) dan `php artisan up`.
+    * **Telemetri Realtime:** Status branch Git, hash & pesan commit terakhir, status working tree, 6 histori commit terbaru, ruang disk server (GB), dan status storage symlink.
 
 
 
