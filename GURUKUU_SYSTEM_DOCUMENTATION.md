@@ -458,7 +458,8 @@ GuruKuu/
     * Menyamakan hak akses `admin-plus` dengan `admin` pada identitas terbuka siswa di detail ulasan guru.
   - **Filter Interaktif Tipe Ulasan (`admin.kritik-saran`):**
     * Menambahkan tombol tab filter cepat di atas formulir: **Semua Evaluasi**, **Hanya Ada Kalimat Teks**, dan **Hanya Bintang Saja**.
-    * Menjadikan kartu metrik statistik ("Ulasan Teks Masuk", "Bintang 5", "Disensor") dapat diklik (*clickable shortcut*) untuk langsung memfilter daftar ulasan secara instan.
+    * Seluruh angka kartu statistik dihitung dinamis 100% mengikuti filter aktif yang dipilih user (periode, kelas, cakupan kalimat/bintang, rating, status sensor, dan pencarian).
+    * Mengembalikan tampilan kartu statistik menjadi bersih tanpa efek hover dan tanpa border biru.
     * Memperjelas label opsi dropdown cakupan menjadi: `Semua (Kalimat & Bintang)`, `Hanya Ada Kalimat (Teks)`, dan `Hanya Bintang (Tanpa Teks)`.
 
 

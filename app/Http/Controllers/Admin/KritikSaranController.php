@@ -112,54 +112,46 @@ class KritikSaranController extends Controller
             ->orderBy('nama_kelas', 'asc')
             ->get();
 
-        // Statistik ringkas untuk cards (sinkron dinamis mengikuti filter periode, kelas, dan pencarian)
-        $statsBase = Penilaian::query();
+        // Statistik ringkas untuk cards (sinkron dinamis 100% mengikuti seluruh filter aktif yang dipilih user)
+        $statsQuery = clone $query;
 
+        $avgTotal = (clone $statsQuery)->avg('total_nilai');
+        $totalPenilaianFiltered = (clone $statsQuery)->count();
+        $totalUlasanFiltered = (clone $statsQuery)->where(function ($q) {
+            $q->whereNotNull('kritik')->whereRaw("TRIM(kritik) != ''")
+              ->orWhereNotNull('saran')->whereRaw("TRIM(saran) != ''");
+        })->count();
+
+        $stats = [
+            'total_ulasan' => $totalUlasanFiltered,
+            'total_penilaian' => $totalPenilaianFiltered,
+            'rata_rata_bintang' => $avgTotal ? round($avgTotal / 5, 2) : 0,
+            'bintang_5' => (clone $statsQuery)->whereRaw('ROUND(total_nilai / 5) = 5')->count(),
+            'total_disensor' => (clone $statsQuery)->where('is_censored', true)->count(),
+        ];
+
+        // Angka untuk tab filter cepat (semua / teks / bintang) berdasarkan periode & kelas yang sedang dipilih
+        $pillBase = Penilaian::query();
         if (!empty($selectedPeriodeId)) {
-            $statsBase->where('periode_id', $selectedPeriodeId);
+            $pillBase->where('periode_id', $selectedPeriodeId);
         }
-
         if ($request->filled('kelas_id')) {
             $kelasId = (int) $request->kelas_id;
-            $statsBase->where(function ($q) use ($kelasId) {
+            $pillBase->where(function ($q) use ($kelasId) {
                 $q->where('class_id', $kelasId)
-                  ->orWhereHas('siswa.kelas', function ($sk) use ($kelasId) {
-                      $sk->where('kelas.id', $kelasId);
-                  });
+                  ->orWhereHas('siswa.kelas', fn($sk) => $sk->where('kelas.id', $kelasId));
             });
         }
-
-        if ($request->filled('search')) {
-            $terms = preg_split('/\s+/', trim($request->search), -1, PREG_SPLIT_NO_EMPTY);
-            foreach ($terms as $term) {
-                $statsBase->where(function ($q) use ($term) {
-                    $q->where('kritik', 'like', "%{$term}%")
-                      ->orWhere('saran', 'like', "%{$term}%")
-                      ->orWhereHas('guru', function ($g) use ($term) {
-                          $g->where('nama', 'like', "%{$term}%")
-                            ->orWhere('nip', 'like', "%{$term}%");
-                      })
-                      ->orWhereHas('siswa', function ($s) use ($term) {
-                          $s->where('name', 'like', "%{$term}%")
-                            ->orWhere('nis', 'like', "%{$term}%");
-                      });
-                });
-            }
-        }
-
-        $avgTotal = (clone $statsBase)->avg('total_nilai');
-        $stats = [
-            'total_ulasan' => (clone $statsBase)->where(function ($q) {
+        $pillStats = [
+            'total' => (clone $pillBase)->count(),
+            'teks'  => (clone $pillBase)->where(function ($q) {
                 $q->whereNotNull('kritik')->whereRaw("TRIM(kritik) != ''")
                   ->orWhereNotNull('saran')->whereRaw("TRIM(saran) != ''");
             })->count(),
-            'total_penilaian' => (clone $statsBase)->count(),
-            'rata_rata_bintang' => $avgTotal ? round($avgTotal / 5, 2) : 0,
-            'bintang_5' => (clone $statsBase)->whereRaw('ROUND(total_nilai / 5) = 5')->count(),
-            'total_disensor' => (clone $statsBase)->where('is_censored', true)->count(),
         ];
+        $pillStats['bintang'] = max(0, $pillStats['total'] - $pillStats['teks']);
 
-        return view('admin.kritik-saran.index', compact('feedbacks', 'stats', 'kelasList', 'semuaPeriode', 'selectedPeriodeId'));
+        return view('admin.kritik-saran.index', compact('feedbacks', 'stats', 'kelasList', 'semuaPeriode', 'selectedPeriodeId', 'pillStats'));
     }
 
     public function destroy(Penilaian $kritikSaran)
