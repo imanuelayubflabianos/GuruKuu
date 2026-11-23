@@ -14,65 +14,92 @@
 @if(isset($stats))
 <div class="row g-3 mb-4">
     <div class="col-sm-6 col-xl-3">
-        <div class="card-custom p-3 d-flex align-items-center gap-3">
-            <div class="rounded-3 p-3 d-flex align-items-center justify-content-center" style="background: rgba(0, 51, 102, 0.1); color: var(--primary); width: 52px; height: 52px;">
-                <i class="bi bi-chat-quote-fill fs-4"></i>
-            </div>
-            <div>
-                <span class="text-muted small text-uppercase font-mono fw-bold">Ulasan Teks Masuk</span>
-                <h3 class="fw-bold mb-0 text-dark font-mono">{{ $stats['total_ulasan'] }}</h3>
-                <small class="text-muted">Dari total {{ $stats['total_penilaian'] }} evaluasi</small>
-            </div>
-        </div>
-    </div>
-    <div class="col-sm-6 col-xl-3">
-        <div class="card-custom p-3 d-flex align-items-center gap-3">
-            <div class="rounded-3 p-3 d-flex align-items-center justify-content-center" style="background: rgba(245, 158, 11, 0.12); color: #d97706; width: 52px; height: 52px;">
-                <i class="bi bi-star-fill fs-4"></i>
-            </div>
-            <div>
-                <span class="text-muted small text-uppercase font-mono fw-bold">Rata-rata Rating</span>
-                <div class="d-flex align-items-baseline gap-1">
-                    <h3 class="fw-bold mb-0 text-dark font-mono">{{ number_format($stats['rata_rata_bintang'], 2) }}</h3>
-                    <span class="text-muted small">/ 5.0</span>
+        <a href="{{ route('admin.kritik-saran.index', array_merge(request()->except(['cakupan', 'page']), ['cakupan' => 'ada_teks'])) }}" class="text-decoration-none">
+            <div class="card-custom p-3 d-flex align-items-center gap-3 h-100 hover-shadow transition-all {{ request('cakupan') === 'ada_teks' ? 'border-primary shadow-sm bg-primary-subtle' : '' }}" style="transition: all 0.2s ease;">
+                <div class="rounded-3 p-3 d-flex align-items-center justify-content-center flex-shrink-0" style="background: rgba(0, 51, 102, 0.1); color: var(--primary); width: 52px; height: 52px;">
+                    <i class="bi bi-chat-quote-fill fs-4"></i>
                 </div>
-                <div class="text-warning small" style="font-size: 0.75rem;">
-                    @for($i = 1; $i <= 5; $i++)
-                        <i class="bi bi-star-fill {{ $i <= round($stats['rata_rata_bintang']) ? 'text-warning' : 'text-secondary-subtle' }}"></i>
-                    @endfor
+                <div>
+                    <span class="text-muted small text-uppercase font-mono fw-bold">Ulasan Teks Masuk</span>
+                    <h3 class="fw-bold mb-0 text-dark font-mono">{{ $stats['total_ulasan'] }}</h3>
+                    <small class="text-primary fw-semibold"><i class="bi bi-funnel me-0.5"></i>Klik filter ulasan teks</small>
                 </div>
             </div>
-        </div>
+        </a>
     </div>
     <div class="col-sm-6 col-xl-3">
-        <div class="card-custom p-3 d-flex align-items-center gap-3">
-            <div class="rounded-3 p-3 d-flex align-items-center justify-content-center" style="background: rgba(255, 102, 0, 0.1); color: #ff6600; width: 52px; height: 52px;">
-                <i class="bi bi-award-fill fs-4"></i>
+        <a href="{{ route('admin.kritik-saran.index', array_merge(request()->except(['cakupan', 'page']), ['cakupan' => ''])) }}" class="text-decoration-none">
+            <div class="card-custom p-3 d-flex align-items-center gap-3 h-100 hover-shadow transition-all {{ empty(request('cakupan')) && empty(request('rating')) ? 'shadow-xs' : '' }}" style="transition: all 0.2s ease;">
+                <div class="rounded-3 p-3 d-flex align-items-center justify-content-center flex-shrink-0" style="background: rgba(245, 158, 11, 0.12); color: #d97706; width: 52px; height: 52px;">
+                    <i class="bi bi-star-fill fs-4"></i>
+                </div>
+                <div>
+                    <span class="text-muted small text-uppercase font-mono fw-bold">Rata-rata Rating</span>
+                    <div class="d-flex align-items-baseline gap-1">
+                        <h3 class="fw-bold mb-0 text-dark font-mono">{{ number_format($stats['rata_rata_bintang'], 2) }}</h3>
+                        <span class="text-muted small">/ 5.0</span>
+                    </div>
+                    <small class="text-muted">Total {{ $stats['total_penilaian'] }} evaluasi</small>
+                </div>
             </div>
-            <div>
-                <span class="text-muted small text-uppercase font-mono fw-bold">Bintang 5 Sempurna</span>
-                <h3 class="fw-bold mb-0 text-dark font-mono">{{ $stats['bintang_5'] }}</h3>
-                <small class="text-muted fw-semibold">Kepuasan pengajaran maksimal</small>
-            </div>
-        </div>
+        </a>
     </div>
     <div class="col-sm-6 col-xl-3">
-        <div class="card-custom p-3 d-flex align-items-center gap-3">
-            <div class="rounded-3 p-3 d-flex align-items-center justify-content-center" style="background: rgba(239, 68, 68, 0.1); color: #dc2626; width: 52px; height: 52px;">
-                <i class="bi bi-shield-exclamation fs-4"></i>
+        <a href="{{ route('admin.kritik-saran.index', array_merge(request()->except(['rating', 'page']), ['rating' => '5'])) }}" class="text-decoration-none">
+            <div class="card-custom p-3 d-flex align-items-center gap-3 h-100 hover-shadow transition-all {{ request('rating') === '5' ? 'border-warning shadow-sm bg-warning-subtle' : '' }}" style="transition: all 0.2s ease;">
+                <div class="rounded-3 p-3 d-flex align-items-center justify-content-center flex-shrink-0" style="background: rgba(255, 102, 0, 0.1); color: #ff6600; width: 52px; height: 52px;">
+                    <i class="bi bi-award-fill fs-4"></i>
+                </div>
+                <div>
+                    <span class="text-muted small text-uppercase font-mono fw-bold">Bintang 5 Sempurna</span>
+                    <h3 class="fw-bold mb-0 text-dark font-mono">{{ $stats['bintang_5'] }}</h3>
+                    <small class="text-muted fw-semibold">Kepuasan pengajaran maksimal</small>
+                </div>
             </div>
-            <div>
-                <span class="text-muted small text-uppercase font-mono fw-bold">Ulasan Disensor</span>
-                <h3 class="fw-bold mb-0 text-dark font-mono">{{ $stats['total_disensor'] }}</h3>
-                <small class="text-muted">Perlu perhatian / peringatan</small>
+        </a>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <a href="{{ route('admin.kritik-saran.index', array_merge(request()->except(['status', 'page']), ['status' => 'censored'])) }}" class="text-decoration-none">
+            <div class="card-custom p-3 d-flex align-items-center gap-3 h-100 hover-shadow transition-all {{ request('status') === 'censored' ? 'border-danger shadow-sm bg-danger-subtle' : '' }}" style="transition: all 0.2s ease;">
+                <div class="rounded-3 p-3 d-flex align-items-center justify-content-center flex-shrink-0" style="background: rgba(239, 68, 68, 0.1); color: #dc2626; width: 52px; height: 52px;">
+                    <i class="bi bi-shield-exclamation fs-4"></i>
+                </div>
+                <div>
+                    <span class="text-muted small text-uppercase font-mono fw-bold">Ulasan Disensor</span>
+                    <h3 class="fw-bold mb-0 text-dark font-mono">{{ $stats['total_disensor'] }}</h3>
+                    <small class="text-muted">Perlu perhatian / peringatan</small>
+                </div>
             </div>
-        </div>
+        </a>
     </div>
 </div>
 @endif
 
 {{-- FILTER & PENCARIAN --}}
 <div class="card-custom p-3 mb-4">
+    {{-- QUICK FILTER TABS: SEMUA / HANYA KALIMAT TEKS / HANYA BINTANG DOANG --}}
+    @php
+        $currentCakupan = request('cakupan', '');
+        $totalBintangDoang = max(0, ($stats['total_penilaian'] ?? 0) - ($stats['total_ulasan'] ?? 0));
+    @endphp
+    <div class="d-flex align-items-center gap-2 mb-3 pb-2.5 border-bottom flex-wrap">
+        <span class="small text-muted fw-bold text-uppercase d-flex align-items-center gap-1" style="font-size: 0.72rem;">
+            <i class="bi bi-funnel-fill text-primary"></i> Tipe Ulasan:
+        </span>
+        <a href="{{ route('admin.kritik-saran.index', array_merge(request()->except(['cakupan', 'page']), ['cakupan' => ''])) }}" 
+           class="btn btn-sm rounded-pill px-3 py-1 fw-semibold {{ empty($currentCakupan) ? 'btn-primary text-white shadow-xs' : 'btn-light border text-dark' }}" style="font-size: 0.78rem;">
+            <i class="bi bi-collection-fill me-1"></i> Semua Evaluasi ({{ number_format($stats['total_penilaian'] ?? 0) }})
+        </a>
+        <a href="{{ route('admin.kritik-saran.index', array_merge(request()->except(['cakupan', 'page']), ['cakupan' => 'ada_teks'])) }}" 
+           class="btn btn-sm rounded-pill px-3 py-1 fw-semibold {{ $currentCakupan === 'ada_teks' ? 'btn-primary text-white shadow-xs' : 'btn-light border text-dark' }}" style="font-size: 0.78rem;">
+            <i class="bi bi-chat-text-fill text-info me-1"></i> Hanya Ada Kalimat Teks ({{ number_format($stats['total_ulasan'] ?? 0) }})
+        </a>
+        <a href="{{ route('admin.kritik-saran.index', array_merge(request()->except(['cakupan', 'page']), ['cakupan' => 'hanya_bintang'])) }}" 
+           class="btn btn-sm rounded-pill px-3 py-1 fw-semibold {{ $currentCakupan === 'hanya_bintang' ? 'btn-primary text-white shadow-xs' : 'btn-light border text-dark' }}" style="font-size: 0.78rem;">
+            <i class="bi bi-star-fill text-warning me-1"></i> Hanya Bintang Saja ({{ number_format($totalBintangDoang) }})
+        </a>
+    </div>
+
     <form method="GET" action="{{ route('admin.kritik-saran.index') }}" class="row g-2 align-items-center">
         <div class="col-12 col-md-4 col-lg-3">
             <div class="input-group input-group-sm">
@@ -116,9 +143,9 @@
         </div>
         <div class="col-6 col-md-4 col-lg-2">
             <select name="cakupan" class="form-select form-select-sm" onchange="this.form.submit()">
-                <option value="" {{ (!request('cakupan') || request('cakupan') == 'semua') ? 'selected' : '' }}>Semua Penilaian / Vote</option>
-                <option value="ada_teks" {{ request('cakupan') == 'ada_teks' ? 'selected' : '' }}>Hanya Ada Kritik/Saran</option>
-                <option value="hanya_bintang" {{ request('cakupan') == 'hanya_bintang' ? 'selected' : '' }}>Hanya Rating Bintang</option>
+                <option value="" {{ (!request('cakupan') || request('cakupan') == 'semua') ? 'selected' : '' }}>Semua (Kalimat & Bintang)</option>
+                <option value="ada_teks" {{ request('cakupan') == 'ada_teks' ? 'selected' : '' }}>Hanya Ada Kalimat (Teks)</option>
+                <option value="hanya_bintang" {{ request('cakupan') == 'hanya_bintang' ? 'selected' : '' }}>Hanya Bintang (Tanpa Teks)</option>
             </select>
         </div>
         <div class="col-6 col-md-4 col-lg-2">
