@@ -450,6 +450,13 @@ GuruKuu/
     * **Eliminasi Sintaks Blade:** Karena `public/deploy.php` berjalan sebagai file PHP murni di luar engine Blade Laravel, seluruh tag komentar `{{-- --}}` diubah menjadi komentar HTML `<!-- -->` agar tidak tercetak sebagai teks mentah di layar browser.
     * **Penanganan Izin File Linux cPanel (`core.fileMode false`):** Otomatis menyetel `git config core.fileMode false` dan memulihkan berkas internal framework `.gitignore` di `storage/` dan `bootstrap/cache/` agar perubahan permission/chmod server cPanel tidak menyebabkan false positive peringatan "Working Tree Tidak Bersih" saat pull atau inspeksi repositori.
     * **Aksi Cepat Bersihkan & Sinkronkan:** Menambahkan tombol shortcut langsung pada kotak peringatan working tree untuk memudahkan administrator menjalankan *Clean Sync* dalam 1 klik.
+* **2026-11-23 (Sinkronisasi Data Penilaian Siswa & Kesetaraan Admin-Plus):**
+  - **Resolusi Ulasan Siswa Guru (`admin.guru.show` & `guru.dashboard`):**
+    * Menghapus filter `is_censored` di `Admin/GuruController` agar Admin dan Admin-Plus dapat melihat 100% ulasan (termasuk yang disensor dengan peringatan khusus kebijakan).
+    * Memperluas ulasan di feed Guru agar penilaian bintang murni (tanpa teks kritik/saran) tetap tampil dan terhitung utuh sehingga total ulasan sinkron dengan jumlah responden.
+    * Menambahkan tombol reset filter kelas pada detail ulasan guru ketika dibuka dari leaderboard.
+    * Menyamakan hak akses `admin-plus` dengan `admin` pada identitas terbuka siswa di detail ulasan guru.
+
 
 
 

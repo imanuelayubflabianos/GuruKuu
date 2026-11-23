@@ -159,17 +159,22 @@
                     <i class="bi bi-funnel text-primary me-1"></i>Filter Kelas:
                 </label>
                 <select name="kelas_id" id="filterKelasUlasan" class="form-select form-select-sm rounded-pill shadow-xs" style="min-width: 170px; font-size: 0.8rem;" onchange="this.form.submit()">
-                    <option value="">Semua Kelas Diajar</option>
+                    <option value="">Semua Kelas Diajar ({{ $stats['total_penilaian'] }} Penilaian)</option>
                     @foreach($kelasList as $k)
                         <option value="{{ $k->id }}" {{ (string)($selectedKelasId ?? '') === (string)$k->id ? 'selected' : '' }}>
                             {{ $k->nama_kelas }} (Kelas {{ $k->tingkat }})
                         </option>
                     @endforeach
                 </select>
+                @if(!empty($selectedKelasId))
+                    <a href="{{ route('admin.guru.show', array_filter(['guru' => $guru->id, 'periode_id' => request('periode_id')])) }}#ulasan-siswa" class="btn btn-sm btn-outline-secondary rounded-pill px-2 py-0.5" title="Reset filter kelas" style="font-size: 0.75rem;">
+                        <i class="bi bi-x-circle me-1"></i>Reset Filter
+                    </a>
+                @endif
             </form>
             @endif
             <span class="badge bg-light text-dark border">
-                {{ auth()->user()->role === 'admin' ? 'Identitas Terbuka (Khusus Admin)' : 'Anonimitas Siswa' }}
+                {{ in_array(auth()->user()->role, ['admin', 'admin-plus']) ? 'Identitas Terbuka (Khusus Admin)' : 'Anonimitas Siswa' }}
             </span>
         </div>
     </div>
@@ -187,7 +192,7 @@
                 </div>
                 <div>
                     <div class="d-flex align-items-center gap-2 flex-wrap">
-                        @if(auth()->user()->role === 'admin' && $fb->siswa)
+                        @if(in_array(auth()->user()->role, ['admin', 'admin-plus']) && $fb->siswa)
                             <strong class="small text-dark">{{ $fb->siswa->name }}</strong>
                             <span class="badge bg-secondary-subtle text-secondary font-mono" style="font-size: 0.65rem;">NIS: {{ $fb->siswa->nis }}</span>
                             @php

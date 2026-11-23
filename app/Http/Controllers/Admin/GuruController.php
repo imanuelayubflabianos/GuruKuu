@@ -460,12 +460,10 @@ class GuruController extends Controller
         ];
 
         // Ulasan periode aktif/terpilih berjalan (Paginasi 10 ulasan per halaman, dengan filter kelas)
+        // Admin & Admin-Plus dapat melihat seluruh ulasan siswa (termasuk yang disensor dengan penanda khusus)
         $feedbackQuery = \App\Models\Penilaian::with(['siswa.kelas.jurusan', 'siswa.jurusan', 'kelas.jurusan'])
             ->where('guru_id', $guru->id)
-            ->where('periode_id', $periodeId)
-            ->where(function($q) {
-                $q->where('is_censored', false)->orWhereNull('is_censored');
-            });
+            ->where('periode_id', $periodeId);
 
         if (!empty($kelasId)) {
             $feedbackQuery->where(function($q) use ($kelasId) {

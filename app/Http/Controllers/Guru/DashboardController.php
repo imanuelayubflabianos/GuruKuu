@@ -27,15 +27,9 @@ class DashboardController extends Controller
         $periodeAktif = Periode::getActivePeriode();
 
         // Ambil ulasan & kritik saran dari siswa untuk guru ini (100% Anonim, tidak disensor) dengan paginasi efisien
+        // Menampilkan seluruh penilaian siswa (baik yang menyertakan kritik/saran maupun bintang murni)
         $ulasanQuery = Penilaian::where('guru_id', $guru->id)
             ->when($periodeAktif, fn($q) => $q->where('periode_id', $periodeAktif->id), fn($q) => $q->whereRaw('1 = 0'))
-            ->where(function ($query) {
-                $query->where(function ($q) {
-                    $q->whereNotNull('kritik')->whereRaw("TRIM(kritik) != ''");
-                })->orWhere(function ($q) {
-                    $q->whereNotNull('saran')->whereRaw("TRIM(saran) != ''");
-                });
-            })
             ->where(function ($query) {
                 $query->where('is_censored', false)->orWhereNull('is_censored');
             })

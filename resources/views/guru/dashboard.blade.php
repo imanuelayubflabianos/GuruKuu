@@ -435,6 +435,12 @@
                             Ulasan ini disembunyikan oleh Administrator sekolah.
                         </div>
                     @else
+                        @if(!$review->kritik && !$review->saran)
+                            <div class="mb-2 p-2 rounded-2 border text-muted fst-italic small" style="background: #f8fafc; font-size: 0.78rem;">
+                                <i class="bi bi-star-fill text-warning me-1"></i> Memberikan penilaian bintang tanpa ulasan tertulis.
+                            </div>
+                        @endif
+
                         {{-- KRITIK: Latar Kuning Lembut, Border Kiri Kuning/Amber --}}
                         @if($review->kritik)
                             <div class="gk-box-kritik mb-2" style="font-size: 0.8rem;">
