@@ -456,6 +456,8 @@ GuruKuu/
     * Memperluas ulasan di feed Guru agar penilaian bintang murni (tanpa teks kritik/saran) tetap tampil dan terhitung utuh sehingga total ulasan sinkron dengan jumlah responden.
     * Menambahkan tombol reset filter kelas pada detail ulasan guru ketika dibuka dari leaderboard.
     * Menyamakan hak akses `admin-plus` dengan `admin` pada identitas terbuka siswa di detail ulasan guru.
+  - **Sinkronisasi Default Periode Kritik & Saran (`KritikSaranController`):**
+    * Menjadikan Periode Aktif berjalan sebagai default filter saat pertama kali membuka halaman Kritik & Saran, sehingga angka total evaluasi langsung sinkron 100% dengan statistik Beranda dan Dashboard. Admin tetap dapat memilih opsi "Semua Periode (Sepanjang Masa)" untuk melihat arsip total.
 
 
 

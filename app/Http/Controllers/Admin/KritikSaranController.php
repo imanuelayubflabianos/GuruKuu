@@ -91,9 +91,13 @@ class KritikSaranController extends Controller
             }
         }
 
-        // Filter Periode
-        if ($request->filled('periode_id')) {
-            $query->where('periode_id', $request->periode_id);
+        // Filter Periode: default ke periode aktif agar angka sinkron persis dengan Beranda & Dashboard
+        $periodeAktif = \App\Models\Periode::getActivePeriode();
+        $defaultPeriodeId = $periodeAktif ? (string)$periodeAktif->id : '';
+        $selectedPeriodeId = $request->has('periode_id') ? (string)$request->input('periode_id') : $defaultPeriodeId;
+
+        if (!empty($selectedPeriodeId)) {
+            $query->where('periode_id', $selectedPeriodeId);
         }
 
         $feedbacks = $query->latest()
@@ -111,8 +115,8 @@ class KritikSaranController extends Controller
         // Statistik ringkas untuk cards (sinkron dinamis mengikuti filter periode, kelas, dan pencarian)
         $statsBase = Penilaian::query();
 
-        if ($request->filled('periode_id')) {
-            $statsBase->where('periode_id', $request->periode_id);
+        if (!empty($selectedPeriodeId)) {
+            $statsBase->where('periode_id', $selectedPeriodeId);
         }
 
         if ($request->filled('kelas_id')) {
@@ -155,7 +159,7 @@ class KritikSaranController extends Controller
             'total_disensor' => (clone $statsBase)->where('is_censored', true)->count(),
         ];
 
-        return view('admin.kritik-saran.index', compact('feedbacks', 'stats', 'kelasList', 'semuaPeriode'));
+        return view('admin.kritik-saran.index', compact('feedbacks', 'stats', 'kelasList', 'semuaPeriode', 'selectedPeriodeId'));
     }
 
     public function destroy(Penilaian $kritikSaran)

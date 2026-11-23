@@ -82,10 +82,10 @@
         </div>
         <div class="col-6 col-md-4 col-lg-2">
             <select name="periode_id" class="form-select form-select-sm" onchange="this.form.submit()">
-                <option value="">Semua Periode</option>
+                <option value="" {{ (string)($selectedPeriodeId ?? '') === '' ? 'selected' : '' }}>Semua Periode (Sepanjang Masa)</option>
                 @if(isset($semuaPeriode))
                     @foreach($semuaPeriode as $p)
-                        <option value="{{ $p->id }}" {{ request('periode_id') == $p->id ? 'selected' : '' }}>
+                        <option value="{{ $p->id }}" {{ (string)($selectedPeriodeId ?? '') === (string)$p->id ? 'selected' : '' }}>
                             {{ $p->nama_periode }} {{ $p->status === 'aktif' ? '(Aktif)' : '' }}
                         </option>
                     @endforeach
