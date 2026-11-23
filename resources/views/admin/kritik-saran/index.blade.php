@@ -69,7 +69,7 @@
 
 {{-- FILTER & PENCARIAN --}}
 <div class="card-custom p-3 mb-4">
-    {{-- QUICK FILTER TABS: SEMUA / HANYA KALIMAT TEKS / HANYA BINTANG DOANG --}}
+    {{-- QUICK FILTER TABS: SEMUA / HANYA KALIMAT TEKS / HANYA BINTANG SAJA --}}
     @php
         $currentCakupan = request('cakupan', '');
         $pillTotal = $pillStats['total'] ?? $stats['total_penilaian'] ?? 0;
@@ -91,22 +91,6 @@
         <a href="{{ route('admin.kritik-saran.index', array_merge(request()->except(['cakupan', 'page']), ['cakupan' => 'hanya_bintang'])) }}" 
            class="btn btn-sm rounded-pill px-3 py-1 fw-semibold {{ $currentCakupan === 'hanya_bintang' ? 'btn-primary text-white shadow-xs' : 'btn-light border text-dark' }}" style="font-size: 0.78rem;">
             <i class="bi bi-star-fill text-warning me-1"></i> Hanya Bintang Saja ({{ number_format($pillBintang) }})
-        </a>
-    </div>
-        <span class="small text-muted fw-bold text-uppercase d-flex align-items-center gap-1" style="font-size: 0.72rem;">
-            <i class="bi bi-funnel-fill text-primary"></i> Tipe Ulasan:
-        </span>
-        <a href="{{ route('admin.kritik-saran.index', array_merge(request()->except(['cakupan', 'page']), ['cakupan' => ''])) }}" 
-           class="btn btn-sm rounded-pill px-3 py-1 fw-semibold {{ empty($currentCakupan) ? 'btn-primary text-white shadow-xs' : 'btn-light border text-dark' }}" style="font-size: 0.78rem;">
-            <i class="bi bi-collection-fill me-1"></i> Semua Evaluasi ({{ number_format($stats['total_penilaian'] ?? 0) }})
-        </a>
-        <a href="{{ route('admin.kritik-saran.index', array_merge(request()->except(['cakupan', 'page']), ['cakupan' => 'ada_teks'])) }}" 
-           class="btn btn-sm rounded-pill px-3 py-1 fw-semibold {{ $currentCakupan === 'ada_teks' ? 'btn-primary text-white shadow-xs' : 'btn-light border text-dark' }}" style="font-size: 0.78rem;">
-            <i class="bi bi-chat-text-fill text-info me-1"></i> Hanya Ada Kalimat Teks ({{ number_format($stats['total_ulasan'] ?? 0) }})
-        </a>
-        <a href="{{ route('admin.kritik-saran.index', array_merge(request()->except(['cakupan', 'page']), ['cakupan' => 'hanya_bintang'])) }}" 
-           class="btn btn-sm rounded-pill px-3 py-1 fw-semibold {{ $currentCakupan === 'hanya_bintang' ? 'btn-primary text-white shadow-xs' : 'btn-light border text-dark' }}" style="font-size: 0.78rem;">
-            <i class="bi bi-star-fill text-warning me-1"></i> Hanya Bintang Saja ({{ number_format($totalBintangDoang) }})
         </a>
     </div>
 
